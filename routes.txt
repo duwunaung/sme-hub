@@ -1,0 +1,25 @@
+No	URL	                            Method	    Purpose
+	/api/login	                    POST    	To Login		
+	/api/logout	                    POST    	To Logout
+	
+	/api/dashboard	                GET	        To View All Data		
+	
+	/api/incomes	                GET	        To View Incomes		
+	/api/incomes	                POST    	To Search Incomes		
+	/api/incomes/categories	        GET     	To View All Cats		
+	/api/incomes/categories/add	    POST	    To Create New Cat		
+	/api/incomes/categories/edit	POST	    To Edit Existing Cat		
+	/api/incomes/categories		    DELETE	    To Delete Existing Cat		
+	/api/incomes/add	            POST        To Add New Income		
+	/api/incomes/edit	            POST	    To Edit Existing Income		
+	/api/incomes		            DELETE	    To Delete Existing Income		
+	
+	/api/expenses	                GET	        To View Expenses		
+	/api/expenses	                POST	    To Search Expenses		
+	/api/expenses/categories	    GET	        To View All Cats		
+	/api/expenses/categories/add	POST	    To Create New Cat		
+	/api/expenses/categories/edit	POST	    To Edit Existing Cat		
+	/api/expenses/categories		DELETE	    To Delete Existing Cat		
+	/api/expenses/add	            POST	    To Add New Expense		
+	/api/expenses/edit	            POST	    To Edit Existing Expense		
+	/api/expenses		            DELETE	    To Delete Existing Expense		
