@@ -1,10 +1,8 @@
 const express = require("express")
+const { dashboard } = require("../../controllers/v0.1/dashboard")
+
 const router = express.Router()
 
-router.get('/', function(req,res){
-  res.send({
-    status: "succsss"
-  })
-})
+router.get('/', dashboard)
 
 module.exports = router
