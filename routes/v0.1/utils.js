@@ -1,17 +1,13 @@
 const express = require('express')
 
-const { register } = require("../../controllers/v0.1/utils")
+const { register, login } = require("../../controllers/v0.1/utils")
 
 
 const router = express.Router()
 
 router.post('/register', register)
 
-router.post('/login', function (req, res) {
-  res.send({
-    status: "success login"
-  })
-})
+router.post('/login', login)
 
 router.post('/logout', function (req, res) {
   res.send({
