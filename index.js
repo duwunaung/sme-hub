@@ -2,18 +2,23 @@ require('dotenv').config()
 
 const express = require('express')
 const bodyParser = require('body-parser')
+const cors = require("cors");
+
+// routes
 const utils_v01 = require('./routes/v0.1/utils')
 const dashboard_v01 = require('./routes/v0.1/dashboard')
 const incomes_v01 = require('./routes/v0.1/incomes')
 const expenses_v01 = require('./routes/v0.1/expenses')
 
+// middlewares
 const authenticateToken = require('./middlewares/authenticateToken')
 const authorizeRole = require('./middlewares/authorizeRole')
 
-
 const app = express();
+app.use(cors());
 
 app.use(bodyParser.json())
+
 const l1Access = ['superadmin']
 const l2Access = ['superadmin', 'admin']
 const l3Access = ['superadmin', 'admin', 'manager']
