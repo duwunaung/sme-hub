@@ -10,6 +10,7 @@ const dashboard_v01 = require('./routes/v0.1/dashboardRoute')
 const incomes_v01 = require('./routes/v0.1/incomesRoute')
 const expenses_v01 = require('./routes/v0.1/expensesRoute')
 const organization_v01 = require('./routes/v0.1/organizationRoute')
+const extUser_v01 = require('./routes/v0.1/extUserRoute')
 const user_v01 = require('./routes/v0.1/userRoute')
 
 // middlewares
@@ -33,6 +34,8 @@ app.use("/api/v0.1/expenses", expenses_v01);
 
 app.use("/api/v0.1/organizations", authenticateToken, authorizeRole(l1Access), organization_v01)
 app.use("/api/v0.1/users", authenticateToken, authorizeRole(l1Access), user_v01)
+
+app.use('/api/v0.1/subscribers', extUser_v01)
 
 app.listen (process.env.PORT, function() {
   console.log("Server is running on", process.env.PORT);

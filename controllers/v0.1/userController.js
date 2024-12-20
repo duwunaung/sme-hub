@@ -1,5 +1,4 @@
 const bcrypt = require('bcryptjs')
-const jwt = require('jsonwebtoken')
 const db_connection = require('../../utils/connection')
 const { calculatedExpiryDate } = require("../../utils/others")
 
@@ -173,26 +172,26 @@ exports.updateUser = (req, res) => {
 
 exports.deleteUser = (req, res) => {
     const userId = req.params.id;
-  
+
     // Ensure superadmin is deleting the user (validate org_id = 0 for superadmins)
     if (req.user.orgId !== 0) {
-      return res.status(403).send({
-        success: false,
-        message: 'Access denied',
-        dev: 'Outside organization cannot delete user',
-      });
+        return res.status(403).send({
+            success: false,
+            message: 'Access denied',
+            dev: 'Outside organization cannot delete user',
+        });
     }
-  
+
     // Soft delete: change status to 'deleted'
     db_connection.query('UPDATE users SET status = "deleted" WHERE id = ?', [userId], (err, result) => {
-      if (err) {
-        return res.status(500).send({ success: false, message: 'Failed to delete user', dev: err.message });
-      }
-  
-      if (result.affectedRows === 0) {
-        return res.status(404).send({ success: false, message: 'User not found', dev: 'User with the provided ID was not found' });
-      }
-  
-      res.send({ success: true, message: 'User deleted successfully', dev: 'User deleted successfully' });
+        if (err) {
+            return res.status(500).send({ success: false, message: 'Failed to delete user', dev: err.message });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send({ success: false, message: 'User not found', dev: 'User with the provided ID was not found' });
+        }
+
+        res.send({ success: true, message: 'User deleted successfully', dev: 'User deleted successfully' });
     });
-  };
+};

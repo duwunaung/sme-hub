@@ -94,7 +94,7 @@ exports.login = (req, res) => {
             const token = jwt.sign(
                 { userId: user.id, email: user.email, role: user.role, orgId: user.orgId},
                 process.env.JWT_SECRET,
-                { expiresIn: '1h'}
+                { expiresIn: process.env.JWT_EXPIRES_IN}
             )
 
             return res.status(200).send({
