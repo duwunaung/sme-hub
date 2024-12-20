@@ -60,7 +60,7 @@ exports.loginUser = (req, res) => {
             name: user.name,
             email: user.email,
             role: user.role,
-            org_id: user.org_id,
+            orgId: user.orgId,
             status: user.status,
         };
         const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
