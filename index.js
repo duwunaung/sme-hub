@@ -7,8 +7,8 @@ const cors = require("cors");
 // routes
 const utils_v01 = require('./routes/v0.1/utilsRoute')
 const dashboard_v01 = require('./routes/v0.1/dashboardRoute')
-const incomes_v01 = require('./routes/v0.1/incomesRoute')
-const expenses_v01 = require('./routes/v0.1/expensesRoute')
+const extInc_v01 = require('./routes/v0.1/extIncRoute')
+const extExp_v01 = require('./routes/v0.1/extExpRoute')
 const organization_v01 = require('./routes/v0.1/organizationRoute')
 const extUser_v01 = require('./routes/v0.1/extUserRoute')
 const user_v01 = require('./routes/v0.1/userRoute')
@@ -31,8 +31,7 @@ const subscribers = ['admin', 'manager', 'staff', 'subscriber']
 
 app.use("/api/v0.1/utils", utils_v01);
 app.use("/api/v0.1/dashboard", authenticateToken, authorizeRole(l1Access), dashboard_v01);
-app.use("/api/v0.1/incomes", incomes_v01);
-app.use("/api/v0.1/expenses", expenses_v01);
+
 
 app.use("/api/v0.1/organizations", authenticateToken, authorizeRole(l1Access), organization_v01)
 app.use("/api/v0.1/users", authenticateToken, authorizeRole(l1Access), user_v01)
@@ -40,9 +39,10 @@ app.use("/api/v0.1/users", authenticateToken, authorizeRole(l1Access), user_v01)
 app.use('/api/v0.1/subscribers', extUser_v01)
 
 app.use('/api/v0.1/subscribers/categories', authenticateToken, authorizeRole(subscribers), extCats_v01)
+app.use("/api/v0.1/subscribers/incomes", authenticateToken, authorizeRole(subscribers), extInc_v01);
+app.use("/api/v0.1/subscribers/expenses", authenticateToken, authorizeRole(subscribers), extExp_v01);
 
 
-
-app.listen (process.env.PORT, function() {
+app.listen(process.env.PORT, function () {
   console.log("Server is running on", process.env.PORT);
 })

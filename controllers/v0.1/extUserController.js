@@ -13,7 +13,7 @@ exports.loginUser = (req, res) => {
         });
     }
 
-    db_connection.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
+    db_connection.query("SELECT * FROM users WHERE email = ? AND orgId != 0", [email], async (err, results) => {
         if (err || results.length == 0) {
             return res.status(401).send({
                 success: false,

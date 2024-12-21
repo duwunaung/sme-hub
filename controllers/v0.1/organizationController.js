@@ -10,7 +10,7 @@ exports.listOrg = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-    const { name, status = 'active', page = 1, pageSize = 10 } = req.query
+    const { name, status = 'active', page = 1, pageSize = 10, expired = false } = req.query
 
     let query = "SELECT * FROM orgs WHERE 1=1"
     let queryParams = []
@@ -23,6 +23,12 @@ exports.listOrg = (req, res) => {
     if (status) {
         query += " AND status LIKE ?"
         queryParams.push(`%${status}%`)
+    }
+
+    if (!expired) {
+        query += " AND expiredDate > NOW()"
+    } else {
+        query += " AND expiredDate < NOW()"
     }
 
     const offset = (page - 1) * pageSize

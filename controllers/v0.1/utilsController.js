@@ -8,6 +8,13 @@ const jwt = require('jsonwebtoken')
 exports.register = async (req, res) => {
 
     try {
+        if (req.user.orgId !== 0) {
+            return res.status(403).send({
+                success: false,
+                message: 'You cannot access at the moment, kindly contact admin team',
+                dev: "This user is from other organization not from us"
+            })
+        }
         const { name, email, phone, password, remark, orgId, role } = req.body
 
         const hashedPassword = await bcrypt.hash(password, 10)
@@ -54,7 +61,7 @@ exports.login = (req, res) => {
     try {
         const { email, password } = req.body
 
-        db_connection.query("SELECT * FROM users WHERE email = ? AND role = 'superadmin'", [email], async (err, results) => {
+        db_connection.query("SELECT * FROM users WHERE email = ? AND role = 'superadmin' AND orgId = 0", [email], async (err, results) => {
             if (err || results.length == 0) {
                 return res.status(401).send({
                     success: false,

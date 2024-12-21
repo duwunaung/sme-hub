@@ -14,10 +14,10 @@ router.post('/register', authenticateToken, authorizeRole(['superadmin']), regis
 
 router.post('/login', login)
 
-router.post('/logout', function (req, res) {
-  res.send({
-    status: "success logout"
-  })
-})
+// router.post('/logout', function (req, res) {
+//   res.send({
+//     status: "success logout"
+//   })
+// })
 
 module.exports = router;

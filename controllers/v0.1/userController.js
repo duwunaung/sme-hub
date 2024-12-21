@@ -1,6 +1,5 @@
 const bcrypt = require('bcryptjs')
 const db_connection = require('../../utils/connection')
-const { calculatedExpiryDate } = require("../../utils/others")
 
 exports.createUser = async (req, res) => {
     if (req.user.orgId !== 0) {
@@ -22,8 +21,8 @@ exports.createUser = async (req, res) => {
             });
         }
 
-        db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered, expired) VALUES (?,?,?,?,?,?,?,?,?)',
-            [name, hashedPassword, phone, role, email, orgId, status, new Date(), calculatedExpiryDate()],
+        db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered) VALUES (?,?,?,?,?,?,?,?)',
+            [name, hashedPassword, phone, role, email, orgId, status, new Date()],
             (err, result) => {
                 if (err) {
                     console.log(err)
@@ -48,7 +47,7 @@ exports.createUser = async (req, res) => {
 }
 
 exports.listUsers = (req, res) => {
-    const { page = 1, pageSize = 10, search, role, status = 'active' } = req.query; // Extract pagination and filter parameters
+    const { page = 1, pageSize = 10, search, role, status = 'active', orgId } = req.query; // Extract pagination and filter parameters
 
     const offset = (page - 1) * pageSize; // Calculate OFFSET for pagination
     const params = [];
@@ -56,7 +55,7 @@ exports.listUsers = (req, res) => {
     // Base query to fetch users with their organization name
     let query = `
       SELECT users.id, users.name, users.email, users.phone, users.role, users.status, 
-             users.registered, users.expired, orgs.name AS organization_name 
+             users.registered, orgs.name AS organization_name 
       FROM users 
       LEFT JOIN orgs ON users.orgId = orgs.id
       WHERE 1=1
@@ -72,9 +71,15 @@ exports.listUsers = (req, res) => {
         query += ` AND users.role = ?`;
         params.push(role);
     }
+    
     if (status) {
         query += ` AND users.status = ?`;
         params.push(status);
+    }
+
+    if (orgId) {
+        query += ` AND users.orgId = ?`;
+        params.push(orgId);
     }
     // Add pagination
     query += ` LIMIT ? OFFSET ?`;
