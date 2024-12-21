@@ -38,43 +38,55 @@ exports.loginUser = (req, res) => {
 
         // Check if the account is expired
         const currentDate = new Date();
-        const expiredDate = new Date(user.expired_date);
-        if (expiredDate < currentDate) {
-            return res.status(403).send(
-                {
+
+        const expiredQuery = `SELECT expiredDate FROM orgs WHERE id = ${user.orgId}`;
+
+        db_connection.query(expiredQuery, async (err, result) => {
+            if (err) {
+                return res.status(500).send({
                     success: false,
-                    message: 'Account has expired. Please renew your subscription.',
-                    dev: 'Account has expired'
+                    message: 'Internal server error',
+                    dev: err
                 });
-        }
-
-        if (!(await bcrypt.compare(password, user.password))) {
-            return res.status(401).send({
-                success: false,
-                message: 'Password is incorrect!',
-                dev: "Password is incorrect"
-            });
-        }
-        const tokenPayload = {
-            id: user.id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            orgId: user.orgId,
-            status: user.status,
-        };
-        const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
-            expiresIn: process.env.JWT_EXPIRES_IN
-        });
-
-        res.status(200).send({
-            success: true,
-            message: 'Login successful',
-            dev: "Good Job, Bro!",
-            data: {
-                token,
-                user: tokenPayload
             }
-        });
+            const expiredDate = new Date(result[0].expiredDate);
+            if (expiredDate < currentDate) {
+                return res.status(403).send(
+                    {
+                        success: false,
+                        message: 'Account has expired. Please renew your subscription.',
+                        dev: 'Account has expired'
+                    });
+            }
+
+            if (!(await bcrypt.compare(password, user.password))) {
+                return res.status(401).send({
+                    success: false,
+                    message: 'Password is incorrect!',
+                    dev: "Password is incorrect"
+                });
+            }
+            const tokenPayload = {
+                id: user.id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                orgId: user.orgId,
+                status: user.status,
+            };
+            const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+                expiresIn: process.env.JWT_EXPIRES_IN
+            });
+
+            res.status(200).send({
+                success: true,
+                message: 'Login successful',
+                dev: "Good Job, Bro!",
+                data: {
+                    token,
+                    user: tokenPayload
+                }
+            });
+        });        
     });
 }
