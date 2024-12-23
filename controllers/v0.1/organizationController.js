@@ -113,10 +113,9 @@ exports.updateOrg = (req, res) => {
     }
 
     const orgId = req.params.id
-    const { name, address, phone, expiredDate } = req.body
+    const { name, address, phone, status } = req.body
 
-    const expiry = new Date(expiredDate)
-    db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, expiredDate = ? WHERE id = ?", [name, address, phone, expiry, orgId], (err, results) => {
+    db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, status = ? WHERE id = ?", [name, address, phone, status, orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -133,8 +132,7 @@ exports.updateOrg = (req, res) => {
                 name: name,
                 address: address,
                 phone: phone,
-                status: 'active',
-                expiredDate: expiry
+                status: 'active'
             }
         })
     })

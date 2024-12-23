@@ -9,8 +9,8 @@ router.use('/login', login)
 router.use('/logout', logout)
 
 router.use('/organizations/restore/:id', checkSuperAdminSession, restoreOrg)
-router.use('/organizations/delete/:id', tmpSession, deleteOrg)
-router.use('/organizations/update/:id', tmpSession, updateOrg)
+router.use('/organizations/delete/:id', checkSuperAdminSession, deleteOrg)
+router.use('/organizations/update/:id', checkSuperAdminSession, updateOrg)
 router.use('/organizations', checkSuperAdminSession, orgs)
 
 

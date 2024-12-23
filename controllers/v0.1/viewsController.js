@@ -88,5 +88,34 @@ exports.deleteOrg = (req, res) => {
 }
 
 exports.updateOrg = (req, res) => {
-    res.render('superadmin/edit-organization', { token: req.session.token, user: req.session.user, orgId: req.params.id });
+    if(req.method == 'GET') {
+        
+        const orgId = req.params.id
+        axios.get(`${process.env.API_URL}/organizations/${orgId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            const options = [
+                { id: 1, name: 'active' },
+                { id: 2, name: 'deleted' }
+            ];
+            res.render('superadmin/edit-organization', { token: req.session.token, user: req.session.user, org: response.data.data, options: options, errorMessage: null });
+        }).catch(error => {
+            res.render('superadmin/edit-organization', { token: req.session.token, user: req.session.user, org: {}, errorMessage: "System Error!" });
+        })
+    } else {
+        const orgId = req.params.id
+        const { name, address, phone, status } = req.body;
+        axios.put(`${process.env.API_URL}/organizations/update/${orgId}`, { name, address, phone, status }, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations')
+        }).catch(error => {
+            res.render('superadmin/edit-organization', { token: req.session.token, user: req.session.user, org: {}, errorMessage: "System Error!" });
+        })
+    }
+    
 }
