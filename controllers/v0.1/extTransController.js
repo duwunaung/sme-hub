@@ -277,7 +277,6 @@ exports.createIncome = (req, res) => {
 exports.updateIncome = (req, res) => {
 	const { description, amount, incomeDate, catId } = req.body
 	const orgId = req.user.orgId
-	// console.log(req.user)
 	const createdBy = req.user.userId
 	const { id } = req.params
 	if (!description || !amount || !incomeDate || !catId) {
@@ -292,7 +291,6 @@ exports.updateIncome = (req, res) => {
 	const sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}', editedAt = NOW() WHERE id = '${id}' AND orgId = '${orgId}'`
 	db_connection.query(sql, (err, results) => {
 		if (err) {
-			console.log(err)
 			return res.status(500).send(
                 {
                     success: false,
@@ -363,7 +361,6 @@ exports.listIncomes = (req, res) => {
 	sql += `ORDER BY i.createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`
 	db_connection.query(sql, (err, results) => {
 		if (err) {
-			console.log(err)
             return res.status(500).send(
                 {
                     success: false,

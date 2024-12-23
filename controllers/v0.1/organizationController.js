@@ -37,7 +37,6 @@ exports.listOrg = (req, res) => {
 
     db_connection.query(query, queryParams, (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -47,7 +46,6 @@ exports.listOrg = (req, res) => {
 
         db_connection.query("SELECT COUNT(*) as total FROM orgs", (err, count) => {
             if (err) {
-                console.log(err);
                 return res.status(500).send({
                     success: false,
                     message: 'internal server error',
@@ -55,7 +53,7 @@ exports.listOrg = (req, res) => {
                 })
             }
 
-            res.status(200).send({
+            res.status(200).json({
                 success: true,
                 data: results,
                 pagination: {
@@ -82,7 +80,6 @@ exports.createOrg = (req, res) => {
     const { name, address, phone } = req.body
     db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status) VALUES (?,?,?,?,?)", [name, address, phone, expiry, "active"], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -120,7 +117,6 @@ exports.updateOrg = (req, res) => {
     const expiry = new Date(expiredDate)
     db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, expiredDate = ? WHERE id = ?", [name, address, phone, expiry, orgId], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -155,7 +151,6 @@ exports.deleteOrg = (req, res) => {
     const orgId = req.params.id
     db_connection.query("UPDATE orgs SET status = 'deleted' WHERE id = ?", [orgId], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',

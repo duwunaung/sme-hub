@@ -25,19 +25,16 @@ exports.createUser = async (req, res) => {
             [name, hashedPassword, phone, role, email, orgId, status, new Date()],
             (err, result) => {
                 if (err) {
-                    console.log(err)
                     res.status(500).send({
                         success: false,
                         message: 'internal server error',
                         dev: "Error while registering new user"
                     })
                 } else {
-                    console.log(result)
                     res.status(201).send({ success: true, message: 'User created successfully', data: { name, email, phone, role, status } })
                 }
             })
     } catch (err) {
-        console.log(err);
         res.status(500).send({
             success: false,
             message: 'internal server error',

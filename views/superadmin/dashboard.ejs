@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home Page</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            overflow-x: hidden;
+        }
+
+        #sidebar {
+            min-height: 100vh;
+        }
+
+        .content {
+            padding: 20px;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 bg-dark text-white p-3">
+                <%- include('../partials/superadmin/navbar.ejs') %>
+
+
+                    <!-- Main Content -->
+                    <main class="col-md-9 col-lg-10">
+
+                        <div class="content">
+                            <div id="errorBox" class="alert alert-danger" role="alert">
+                                something is wrong
+                            </div>
+                            <h2>Welcome to the Dashboard</h2>
+                            <p class="text-muted">Here are your system statistics:</p>
+
+                            <div class="row mt-4">
+                                <!-- Total Organizations -->
+                                <div class="col-md-6">
+                                    <div class="card text-center shadow-sm">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Total Organizations</h5>
+                                            <h2 id="totalOrganizations" class="text-primary">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Total Users -->
+                                <div class="col-md-6">
+                                    <div class="card text-center shadow-sm">
+                                        <div class="card-body">
+                                            <h5 class="card-title">Total Users</h5>
+                                            <h2 id="totalUsers" class="text-primary">0</h2>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </main>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

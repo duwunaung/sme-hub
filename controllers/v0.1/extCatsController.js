@@ -17,7 +17,6 @@ exports.createExpenseCategory = (req, res) => {
 
     db_connection.query(query, [name, orgId, createdBy, 'active'], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -54,7 +53,6 @@ exports.listExpenseCategory = (req, res) => {
 
     db_connection.query(query, [orgId, status, pageSize, offset], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -66,7 +64,6 @@ exports.listExpenseCategory = (req, res) => {
 
         db_connection.query(countQuery, [orgId], (err, countResults) => {
             if (err) {
-                console.log(err);
                 return res.status(500).send({
                     success: false,
                     message: 'internal server error',
@@ -96,14 +93,12 @@ exports.updateExpenseCategory = (req, res) => {
     const { name } = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
-    console.log(id, name, orgId);
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
     const query = `UPDATE expcats SET name = ? WHERE id = ? AND orgId = ?`;
     db_connection.query(query, [name, id, orgId], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -136,7 +131,6 @@ exports.deleteExpenseCategory = (req, res) => {
 
     db_connection.query(query, [id, orgId], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -172,7 +166,6 @@ exports.createIncomeCategory = (req, res) => {
     const query = `INSERT INTO inccats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`;
     db_connection.query(query, [name, orgId, createdBy, 'active'], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -198,14 +191,12 @@ exports.updateIncomeCategory = (req, res) => {
     const { name } = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
-    console.log(id, name, orgId);
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
     const query = `UPDATE incats SET name = ? WHERE id = ? AND orgId = ?`;
     db_connection.query(query, [name, id, orgId], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -239,7 +230,6 @@ exports.deleteIncomeCategory = (req, res) => {
 
     db_connection.query(query, [id, orgId], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -277,7 +267,6 @@ exports.listIncomeCategory = (req, res) => {
 
     db_connection.query(query, [orgId, status, pageSize, offset], (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -289,7 +278,6 @@ exports.listIncomeCategory = (req, res) => {
 
         db_connection.query(countQuery, [orgId], (err, countResults) => {
             if (err) {
-                console.log(err);
                 return res.status(500).send({
                     success: false,
                     message: 'internal server error',

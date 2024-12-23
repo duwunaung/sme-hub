@@ -25,7 +25,6 @@ exports.register = async (req, res) => {
             [name, email, phone, hashedPassword, new Date(), 'active', expiredDate, remark, orgId, role],
             (err, result) => {
                 if (err) {
-                    console.log(err)
                     res.status(500).send({
                         success: false,
                         message: 'internal server error',
@@ -47,8 +46,6 @@ exports.register = async (req, res) => {
                 }
             })
     } catch (err) {
-        console.log(err);
-
         res.status(500).send({
             success: false,
             message: 'internal server error',
@@ -69,7 +66,6 @@ exports.login = (req, res) => {
                     dev: "We cannot found this email."
                 })
             }
-			// console.log(results)
             const user = results[0]
 
             const passwordMatch = await bcrypt.compare(password, user.password)
@@ -109,14 +105,13 @@ exports.login = (req, res) => {
                 message: "Login Success",
                 dev: "In future, kindly include Token in header['authorization'].",
                 data: {
+                    name: user.name,
                     token: token
                 }
             })
 
         })
     } catch (err) {
-        console.log(err);
-
         res.status(500).send({
             success: false,
             message: 'internal server error',
