@@ -89,7 +89,6 @@ exports.deleteOrg = (req, res) => {
 
 exports.updateOrg = (req, res) => {
     if(req.method == 'GET') {
-        
         const orgId = req.params.id
         axios.get(`${process.env.API_URL}/organizations/${orgId}`, {
             headers: {
@@ -100,9 +99,9 @@ exports.updateOrg = (req, res) => {
                 { id: 1, name: 'active' },
                 { id: 2, name: 'deleted' }
             ];
-            res.render('superadmin/edit-organization', { token: req.session.token, user: req.session.user, org: response.data.data, options: options, errorMessage: null });
+            res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null });
         }).catch(error => {
-            res.render('superadmin/edit-organization', { token: req.session.token, user: req.session.user, org: {}, errorMessage: "System Error!" });
+            res.render('superadmin/edit-organization', { org: {}, errorMessage: "System Error!" });
         })
     } else {
         const orgId = req.params.id
@@ -112,10 +111,27 @@ exports.updateOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations')
+            res.redirect('/superadmin/organizations/update/' + orgId)
         }).catch(error => {
-            res.render('superadmin/edit-organization', { token: req.session.token, user: req.session.user, org: {}, errorMessage: "System Error!" });
+            res.render('/superadmin/organizations/update/' + orgId, { org: {}, errorMessage: "System Error!" });
         })
     }
     
+}
+
+exports.extendLicense = (req, res) => {
+    if (req.method == 'GET') {
+        const orgId = req.params.id
+        const num = req.query.num
+        const type = req.query.type
+        axios.put(`${process.env.API_URL}/organizations/license/${orgId}`, { num, type }, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations/update/' + orgId)
+        }).catch(error => {
+            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+        })
+    }
 }

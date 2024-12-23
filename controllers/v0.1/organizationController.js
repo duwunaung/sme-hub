@@ -138,6 +138,64 @@ exports.updateOrg = (req, res) => {
     })
 }
 
+
+exports.licenseOrg = (req, res) => {
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "This user is from other organization not from us"
+        })
+    }
+
+    const orgId = req.params.id
+    const { num, type } = req.body
+
+    db_connection.query("SELECT * FROM orgs WHERE id = ?", [orgId], (err, results) => {
+        if(err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if(results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Organization not found',
+                dev: "Organization not found"
+            })
+        }
+        const org = results[0]
+        let expiry = new Date(org.expiredDate)
+        if (type == 'month') {
+            expiry.setMonth(expiry.getMonth() + parseInt(num))
+        } else {
+            console.log("SOMETHING")
+            expiry.setDate(expiry.getDate() + parseInt(num))
+        }
+
+        db_connection.query("UPDATE orgs SET expiredDate = ? WHERE id = ?", [expiry, orgId], (err, results) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: 'internal server error',
+                    dev: err
+                })
+            }
+            res.status(200).send({
+                success: true,
+                message: 'Organization license updated successfully',
+                dev: "Good Job, Bro!",
+                data: {
+                    expiredDate: expiry
+                }
+            })
+        })
+    })
+}
+
+
 exports.deleteOrg = (req, res) => {
     if (req.user.orgId !== 0) {
         return res.status(403).send({

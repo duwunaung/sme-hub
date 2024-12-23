@@ -42,12 +42,12 @@
                     <h4>License Extension</h4>
                     <p>Extend the organization's license expiration date:</p>
                     <div class="d-flex gap-2">
-                        <button class="btn btn-outline-secondary">-6 Months</button>
-                        <button class="btn btn-outline-secondary">-1 Month</button>
-                        <button class="btn btn-outline-secondary">-5 Days</button>
-                        <button class="btn btn-outline-secondary">+5 Days</button>
-                        <button class="btn btn-outline-secondary">+1 Month</button>
-                        <button class="btn btn-outline-secondary">+6 Months</button>
+                        <a href="/superadmin/organizations/license/<%= org.id %>?num=-1&type=month" class="btn btn-outline-secondary">-1 Months</a>
+                        <a href="/superadmin/organizations/license/<%= org.id %>?num=-7&type=day" class="btn btn-outline-secondary">-7 Days</a>
+                        <a href="/superadmin/organizations/license/<%= org.id %>?num=-1&type=day" class="btn btn-outline-secondary">-1 Day</a>
+                        <a href="/superadmin/organizations/license/<%= org.id %>?num=1&type=day" class="btn btn-outline-secondary">+1 Day</a>
+                        <a href="/superadmin/organizations/license/<%= org.id %>?num=7&type=day" class="btn btn-outline-secondary">+7 Days</a>
+                        <a href="/superadmin/organizations/license/<%= org.id %>?num=1&type=month" class="btn btn-outline-secondary">+1 Months</a>
                     </div>
                     <p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold"></span>
                             <%= new Date(org.expiredDate).toDateString() %>
