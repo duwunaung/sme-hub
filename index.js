@@ -28,20 +28,22 @@ const l2Access = ['superadmin', 'admin']
 const l3Access = ['superadmin', 'admin', 'manager']
 const l4Access = ['superadmin', 'admin', 'manager', 'staff']
 const subscribers = ['admin', 'manager', 'staff', 'subscriber']
-
+//superadmin ...
 app.use("/api/v0.1/utils", utils_v01);
-app.use("/api/v0.1/dashboard", authenticateToken, authorizeRole(l1Access), dashboard_v01);
+app.use("/api/v0.1/dashboard", authenticateToken, authorizeRole(l1Access), dashboard_v01); //not touched yet
 
 
-app.use("/api/v0.1/organizations", authenticateToken, authorizeRole(l1Access), organization_v01)
+app.use("/api/v0.1/organizations", authenticateToken, authorizeRole(l1Access), organization_v01) 
 app.use("/api/v0.1/users", authenticateToken, authorizeRole(l1Access), user_v01)
+//... superadmin
 
-app.use('/api/v0.1/subscribers', extUser_v01)
+//subscriber...
+app.use('/api/v0.1/subscribers', extUser_v01) 
 
 app.use('/api/v0.1/subscribers/categories', authenticateToken, authorizeRole(subscribers), extCats_v01)
 app.use("/api/v0.1/subscribers/incomes", authenticateToken, authorizeRole(subscribers), extInc_v01);
 app.use("/api/v0.1/subscribers/expenses", authenticateToken, authorizeRole(subscribers), extExp_v01);
-
+//...subscriber
 
 app.listen(process.env.PORT, function () {
   console.log("Server is running on", process.env.PORT);

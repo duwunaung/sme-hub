@@ -161,7 +161,7 @@ exports.deleteExpenseCategory = (req, res) => {
 exports.createIncomeCategory = (req, res) => {
     const { name } = req.body
     const orgId = req.user.orgId
-    const createdBy = req.user.userId
+    const createdBy = req.user.id
     if (!name) {
         return res.status(400).send({
             success: false,

@@ -61,7 +61,7 @@ exports.login = (req, res) => {
     try {
         const { email, password } = req.body
 
-        db_connection.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
+        db_connection.query("SELECT * FROM users WHERE email = ? AND role = 'superadmin'", [email], async (err, results) => {
             if (err || results.length == 0) {
                 return res.status(401).send({
                     success: false,

@@ -18,8 +18,8 @@ exports.createExpense = (req, res) => {
             }
         )
     }
-
-    const query = `INSERT INTO exps (description, amount, expenseDate, catId, orgId, createdBy) VALUES ('${description}', '${amount}', '${expenseDate}', '${catId}', '${orgId}', '${createdBy}')`
+	//I added createdAt here
+    const query = `INSERT INTO exps (description, amount, expenseDate, catId, orgId, createdBy, createdAt) VALUES ('${description}', '${amount}', '${expenseDate}', '${catId}', '${orgId}', '${createdBy}', NOW())`
     db_connection.query(query, (err, result) => {
         if (err) {
             return res.status(500).send(
@@ -240,7 +240,7 @@ exports.getMonthlyExpenses = (req, res) => {
 exports.createIncome = (req, res) => {
 	const { description, amount, incomeDate, catId } = req.body
 	const orgId = req.user.orgId
-	const createdBy = req.user.userId
+	const createdBy = req.user.id
 	
 	if (!description || !amount || !incomeDate || !catId) {
 		return res.status(400).send(
@@ -251,6 +251,7 @@ exports.createIncome = (req, res) => {
 			}
 		)
 	}
+	//added createdAt here
 	const sql = 'INSERT into incs (description, amount, incomeDate, catId, orgId, createdBy, createdAt) VALUES (?,?,?,?,?,?,?)'
 	const values = [description, amount, incomeDate, catId, orgId, createdBy, new Date()]
 	db_connection.query(sql, values, (err, results) => {
@@ -277,8 +278,6 @@ exports.createIncome = (req, res) => {
 exports.updateIncome = (req, res) => {
 	const { description, amount, incomeDate, catId } = req.body
 	const orgId = req.user.orgId
-	// console.log(req.user)
-	const createdBy = req.user.userId
 	const { id } = req.params
 	if (!description || !amount || !incomeDate || !catId) {
 		return res.status(400).send(
@@ -289,7 +288,7 @@ exports.updateIncome = (req, res) => {
 			}
 		)
 	}
-	const sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}', editedAt = NOW() WHERE id = '${id}' AND orgId = '${orgId}'`
+	const sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}' WHERE id = '${id}' AND orgId = '${orgId}'`
 	db_connection.query(sql, (err, results) => {
 		if (err) {
 			console.log(err)
@@ -372,8 +371,6 @@ exports.listIncomes = (req, res) => {
                 }
             )
         }
-		const totalNum = results.length
-		const totalAmt = results.reduce((total, item) => total + item.amount, 0)
 		const countQuery = `SELECT COUNT(*) as total from incs WHERE orgId = '${orgId}'`
 		db_connection.query(countQuery, (err, totalResult)=> {
 			if (err) {
@@ -391,8 +388,6 @@ exports.listIncomes = (req, res) => {
                     message: 'Income fetched successfully',
                     dev: 'Thanks bro, you are awesome',
                     data: results,
-					totalNum: totalNum,
-					totalAmt: totalAmt,
                     pagination: {
                         total: totalResult[0].total,
                         page: page,
