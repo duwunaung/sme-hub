@@ -52,3 +52,41 @@ exports.orgs = (req, res) => {
         })
     }
 }
+
+exports.restoreOrg = (req, res) => {
+    if (req.method == 'GET') {
+        const orgId = req.params.id
+        
+        axios.get(`${process.env.API_URL}/organizations/restore/${orgId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations')
+        }).catch(error => {
+            // console.log(error)
+            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+        })
+    }
+}
+
+exports.deleteOrg = (req, res) => {
+    if (req.method == 'GET') {
+        const orgId = req.params.id
+        
+        axios.delete(`${process.env.API_URL}/organizations/delete/${orgId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations')
+        }).catch(error => {
+            // console.log(error)
+            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+        })
+    }
+}
+
+exports.updateOrg = (req, res) => {
+    res.render('superadmin/edit-organization', { token: req.session.token, user: req.session.user, orgId: req.params.id });
+}

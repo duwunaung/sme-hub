@@ -1,123 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Organizations</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            overflow-x: hidden;
-        }
-
-        #sidebar {
-            min-height: 100vh;
-        }
-
-        .content {
-            padding: 20px;
-        }
-    </style>
-</head>
-
-<body class="bg-light">
-    <div class="container-fluid">
-        <div class="row">
-            <!-- Sidebar -->
-            <nav id="sidebar" class="col-md-3 col-lg-2 bg-dark text-white p-3">
-                <%- include('../partials/superadmin/navbar.ejs') %>
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
 
 
-                    <!-- Main Content -->
-                    <main class="col-md-9 col-lg-10">
-                        <div class="content">
+        <!-- Main Content -->
+        <main class="col-md-9 col-lg-10">
+            <div class="content">
 
-                            <% if (errorMessage) { %>
-                                <div id="errorBox" class="alert alert-danger" role="alert">
-                                    <%= errorMessage %>
-                                </div>
-                                <% } %>
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
-                                        <h2>Organizations</h2>
-                                        <button class="btn btn-primary" data-bs-toggle="modal"
-                                            data-bs-target="#addOrganizationModal">
-                                            Add New Organization
-                                        </button>
-                                    </div>
-
-                                    <!-- Organizations Table -->
-                                    <div class="table-responsive">
-                                        <table class="table table-striped table-hover">
-                                            <thead class="table-dark">
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Organization Name</th>
-                                                    <th>Status</th>
-                                                    <th>Expiration Date</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody id="organizationsTable">
-                                                <!-- Dynamic rows go here -->
-                                                <% for (let i=0; i < orgs.length; i++) { %>
-                                                    <tr>
-                                                        <td>
-                                                            <%= i+1 %>
-                                                        </td>
-                                                        <td>
-                                                            <%= orgs[i].name %>
-                                                        </td>
-                                                        <td>
-                                                            <%= orgs[i].status %>
-                                                        </td>
-                                                        <td>
-                                                            <%= new Date(orgs[i].expiredDate).toDateString() %>
-                                                        </td>
-                                                        <td>
-                                                            <a href="/superadmin/organizations/<%= orgs[i]._id %>"
-                                                                class="btn btn-primary btn-sm">View</a>
-                                                            <a href="/superadmin/organizations/<%= orgs[i]._id %>/edit"
-                                                                class="btn btn-warning btn-sm">Edit</a>
-                                                            <a href="/superadmin/organizations/<%= orgs[i]._id %>/delete"
-                                                                class="btn btn-danger btn-sm">Delete</a>
-                                                        </td>
-                                                    </tr>
-                                                    <% } %>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                <% if (errorMessage) { %>
+                    <div id="errorBox" class="alert alert-danger" role="alert">
+                        <%= errorMessage %>
+                    </div>
+                    <% } %>
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h2>Organizations</h2>
+                            <button class="btn btn-primary" data-bs-toggle="modal"
+                                data-bs-target="#addOrganizationModal">
+                                Add New Organization
+                            </button>
                         </div>
-                    </main>
-        </div>
-    </div>
 
-    <!-- Add Organization Modal -->
-    <div class="modal fade" id="addOrganizationModal" tabindex="-1" aria-labelledby="addOrganizationModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addOrganizationModalLabel">Add New Organization</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addOrganizationForm">
-                        <div class="mb-3">
-                            <label for="organizationName" class="form-label">Organization Name</label>
-                            <input type="text" class="form-control" id="organizationName"
-                                placeholder="Enter organization name" required>
+                        <!-- Organizations Table -->
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Organization Name</th>
+                                        <th>Status</th>
+                                        <th>Expiration Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="organizationsTable">
+                                    <!-- Dynamic rows go here -->
+                                    <% for (let i=0; i < orgs.length; i++) { %>
+                                        <tr>
+                                            <td>
+                                                <%= i+1 %>
+                                            </td>
+                                            <td>
+                                                <%= orgs[i].name %>
+                                            </td>
+                                            <td>
+                                                <%= orgs[i].status %>
+                                            </td>
+                                            <td>
+                                                <%= new Date(orgs[i].expiredDate).toDateString() %>
+                                            </td>
+                                            <td>
+                                                <a href="/superadmin/organizations/<%= orgs[i]._id %>"
+                                                    class="btn btn-primary btn-sm">View</a>
+                                                    <a href="/superadmin/organizations/update/<%= orgs[i].id %>"
+                                                    class="btn btn-warning btn-sm">Edit</a>
+
+                                                <% if (orgs[i].status=='deleted' ) { %>
+                                                    <a href="/superadmin/organizations/restore/<%= orgs[i].id %>"
+                                                        class="btn btn-danger btn-sm">Restore</a>
+                                                    <% } else {%>
+                                                        <a href="/superadmin/organizations/delete/<%= orgs[i].id %>"
+                                                            class="btn btn-danger btn-sm">Delete</a>
+                                                        <% } %>
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                </tbody>
+                            </table>
                         </div>
-                        <button type="submit" class="btn btn-primary w-100">Add Organization</button>
-                    </form>
-                </div>
             </div>
-        </div>
-    </div>
+        </main>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-
-</html>
+        <%- include('../partials/superadmin/footer.ejs') %>

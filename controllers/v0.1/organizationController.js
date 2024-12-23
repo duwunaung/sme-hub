@@ -10,7 +10,7 @@ exports.listOrg = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-    const { name, status = 'active', page = 1, pageSize = 10, expired = false } = req.query
+    const { name, status = 'all', page = 1, pageSize = 10, expired = false } = req.query
 
     let query = "SELECT * FROM orgs WHERE 1=1"
     let queryParams = []
@@ -20,21 +20,22 @@ exports.listOrg = (req, res) => {
         queryParams.push(`%${name}%`)
     }
 
-    if (status) {
-        query += " AND status LIKE ?"
-        queryParams.push(`%${status}%`)
-    }
+    if (status != 'all') {
+        if (status) {
+            query += " AND status LIKE ?"
+            queryParams.push(`%${status}%`)
+        }
 
-    if (!expired) {
-        query += " AND expiredDate > NOW()"
-    } else {
-        query += " AND expiredDate < NOW()"
+        if (!expired) {
+            query += " AND expiredDate > NOW()"
+        } else {
+            query += " AND expiredDate < NOW()"
+        }
     }
 
     const offset = (page - 1) * pageSize
     query += ' LIMIT ? OFFSET ?'
     queryParams.push(parseInt(pageSize), offset)
-
     db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -136,7 +137,7 @@ exports.updateOrg = (req, res) => {
                 expiredDate: expiry
             }
         })
-    })  
+    })
 }
 
 exports.deleteOrg = (req, res) => {
@@ -167,6 +168,75 @@ exports.deleteOrg = (req, res) => {
         return res.status(200).send({
             success: true,
             message: 'Organization deleted successfully',
+            dev: "Good Job, Bro!"
+        })
+    })
+}
+
+exports.getOrg = (req, res) => {
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "This user is from other organization not from us"
+        })
+    }
+
+    const orgId = req.params.id
+    db_connection.query("SELECT * FROM orgs WHERE id = ?", [orgId], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Organization not found',
+                dev: "Organization not found"
+            })
+        }
+        return res.status(200).send({
+            success: true,
+            message: 'Here is the organization',
+            dev: "Good Job, Bro!",
+            data: results[0]
+        })
+    })
+}
+
+
+exports.restoreOrg = (req, res) => {
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "This user is from other organization not from us"
+        })
+    }
+
+    const orgId = req.params.id
+    db_connection.query("UPDATE orgs SET status = 'active' WHERE id = ?", [orgId], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.affectedRows === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Organization not found',
+                dev: "Organization not found"
+            })
+        }
+        console.log("RESTORE ORG");
+        return res.status(200).send({
+            success: true,
+            message: 'Organization restored successfully',
             dev: "Good Job, Bro!"
         })
     })
