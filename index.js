@@ -2,6 +2,8 @@ require('dotenv').config()
 
 const express = require('express')
 const bodyParser = require('body-parser')
+const session = require('express-session');
+
 const cors = require("cors");
 
 // routes
@@ -14,6 +16,8 @@ const extUser_v01 = require('./routes/v0.1/extUserRoute')
 const user_v01 = require('./routes/v0.1/userRoute')
 const extCats_v01 = require('./routes/v0.1/extCatsRoute')
 
+const saViews_v01 = require('./routes/v0.1/saViewsRoute')
+
 // middlewares
 const authenticateToken = require('./middlewares/authenticateToken')
 const authorizeRole = require('./middlewares/authorizeRole')
@@ -22,6 +26,15 @@ const app = express();
 app.use(cors());
 
 app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }));
+
+
+app.use(session({
+  secret: process.env.SESSION_SECRET, // Replace with a strong secret
+  resave: false,
+  saveUninitialized: true,
+}));
+
 
 const l1Access = ['superadmin']
 const l2Access = ['superadmin', 'admin']
@@ -41,6 +54,12 @@ app.use('/api/v0.1/subscribers', extUser_v01)
 app.use('/api/v0.1/subscribers/categories', authenticateToken, authorizeRole(subscribers), extCats_v01)
 app.use("/api/v0.1/subscribers/incomes", authenticateToken, authorizeRole(subscribers), extInc_v01);
 app.use("/api/v0.1/subscribers/expenses", authenticateToken, authorizeRole(subscribers), extExp_v01);
+
+// view engine setup
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
+
+app.use('/superadmin', saViews_v01)
 
 
 app.listen(process.env.PORT, function () {

@@ -109,6 +109,7 @@ exports.login = (req, res) => {
                 message: "Login Success",
                 dev: "In future, kindly include Token in header['authorization'].",
                 data: {
+                    name: user.name,
                     token: token
                 }
             })
