@@ -161,8 +161,7 @@ exports.deleteExpenseCategory = (req, res) => {
 exports.createIncomeCategory = (req, res) => {
     const { name } = req.body
     const orgId = req.user.orgId
-    const createdBy = req.user.id
-
+    const createdBy = req.user.userId
     if (!name) {
         return res.status(400).send({
             success: false,
@@ -170,8 +169,7 @@ exports.createIncomeCategory = (req, res) => {
             dev: "name is required"
         })
     }
-    const query = `INSERT INTO incats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`;
-
+    const query = `INSERT INTO inccats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`;
     db_connection.query(query, [name, orgId, createdBy, 'active'], (err, results) => {
         if (err) {
             console.log(err);

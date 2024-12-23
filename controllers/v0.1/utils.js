@@ -53,7 +53,7 @@ exports.register = async (req, res) => {
 exports.login = (req, res) => {
     try {
         const { email, password } = req.body
-
+		
         db_connection.query("SELECT * FROM users WHERE email = ? AND role = 'superadmin'", [email], async (err, results) => {
             if (err || results.length == 0) {
                 return res.status(401).send({
@@ -62,9 +62,8 @@ exports.login = (req, res) => {
                     dev: "We cannot found this email."
                 })
             }
-
+			
             const user = results[0]
-
             const passwordMatch = await bcrypt.compare(password, user.password)
 
             if (!passwordMatch) {
@@ -90,13 +89,11 @@ exports.login = (req, res) => {
                     dev: "Not Activate"
                 })
             }
-
             const token = jwt.sign(
                 { userId: user.id, email: user.email, role: user.role, orgId: user.orgId},
                 process.env.JWT_SECRET,
                 { expiresIn: '1h'}
             )
-
             return res.status(200).send({
                 success: true,
                 message: "Login Success",
