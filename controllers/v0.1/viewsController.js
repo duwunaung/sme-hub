@@ -50,6 +50,18 @@ exports.orgs = (req, res) => {
         }).catch(error => {
             res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "System Error!" });
         })
+    } else if (req.method == 'POST'){
+        const { name, address, phone } = req.body;
+        
+        axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone }, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations');
+        }).catch(error => {
+            res.render('superadmin/organizations', { errorMessage: "System Error!" });
+        });
     }
 }
 
@@ -135,3 +147,21 @@ exports.extendLicense = (req, res) => {
         })
     }
 }
+
+// exports.addNewOrg = (req, res) => {
+//     if (req.method == 'GET') {
+//         res.render('superadmin/organizations', { errorMessage: null });
+//     } else if (req.method == 'POST'){
+//         const { name, address, phone } = req.body;
+        
+//         axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone }, {
+//             headers: {
+//                 'Authorization': `${req.session.token}`
+//             }
+//         }).then(response => {
+//             res.redirect('/superadmin/organizations');
+//         }).catch(error => {
+//             res.render('superadmin/organizations', { errorMessage: "System Error!" });
+//         });
+//     }
+// }

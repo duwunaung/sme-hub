@@ -13,6 +13,7 @@ router.use('/organizations/delete/:id', checkSuperAdminSession, deleteOrg)
 router.use('/organizations/update/:id', checkSuperAdminSession, updateOrg)
 router.use('/organizations/license/:id', checkSuperAdminSession, extendLicense)
 router.use('/organizations', checkSuperAdminSession, orgs)
+// router.use('/organizations', checkSuperAdminSession, addNewOrg)
 
 
 router.use('/dashboard', checkSuperAdminSession, (req, res) => {
