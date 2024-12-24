@@ -177,3 +177,39 @@ exports.registerOrg = (req, res) => {
         })
     }
 }
+
+
+exports.detailOrg = (req, res) => {
+    if (req.method == 'GET') {
+        const orgId = req.params.id
+        axios.get(`${process.env.API_URL}/organizations/${orgId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            const options = [
+                { id: 1, name: 'active' },
+                { id: 2, name: 'deleted' }
+            ];
+            res.render('superadmin/detail-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: null });
+        }).catch(error => {
+            res.render('superadmin/detail-organization', { org: {}, errorMessage: "System Error!", successMessage: null });
+        })
+    }
+}
+
+
+exports.superadmins = (req, res) => {
+    if (req.method == 'GET') {
+        axios.get(`${process.env.API_URL}/utils/users`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.render('superadmin/superadmins', { users: response.data.data, errorMessage: null });
+
+        }).catch(error => {
+            res.render('superadmin/superadmins', { users: [], errorMessage: "System Error!" });
+        })
+    }
+}

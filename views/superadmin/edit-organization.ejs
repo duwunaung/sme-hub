@@ -34,12 +34,14 @@
 
                             <% options.forEach(option=> { %>
                                 <option value="<%= option.name %>" <%=option.name===org.status ? 'selected' : '' %> >
-                                    <%= option.name %>
+                                    <%= option.name.toUpperCase() %>
                                 </option>
                                 <% }); %>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-primary w-100">Update Organization</button>
+                    <button type="submit" class="btn btn-success w-100 mb-2">Update Organization</button>
+                    <a href="/superadmin/organizations" class="btn btn-danger w-100">Cancel</a>
+
                 </form>
 
                 <!-- License Extension -->

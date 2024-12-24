@@ -1,0 +1,51 @@
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-lg-10">
+            <div class="container my-5">
+                <h2 class="mb-4">Organization Detail</h2>
+                <!-- Organization Details Form -->
+                <form id="/" class="mb-4" method="POST">
+                    <div class="mb-3">
+                        <label for="orgName" class="form-label">Organization Name</label>
+                        <input type="text" class="form-control" name="name" id="orgName"
+                            placeholder="Enter organization name" value="<%= org.name %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orgAddress" class="form-label">Address</label>
+                        <textarea class="form-control" id="orgAddress" name="address" rows="2"
+                            placeholder="Enter organization address" disabled><%= org.address %></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orgPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="orgPhone" name="phone"
+                            placeholder="Enter phone number" value="<%= org.phone %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orgStatus" class="form-label">Status</label>
+                        <select id="orgStatus" name="status" class="form-select" disabled>
+
+                            <% options.forEach(option=> { %>
+                                <option value="<%= option.name %>" <%=option.name===org.status ? 'selected' : '' %> >
+                                    <%= option.name.toUpperCase() %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <a href="/superadmin/organizations" class="btn btn-primary w-100 mb-2">Back to Organizations</a>
+                    <a href="/superadmin/organizations/update/<%= org.id %>" class="btn btn-warning w-100">Edit Organization</a>
+
+                </form>
+
+                <!-- License Extension -->
+                <div>
+                    <p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold"></span>
+                        <%= new Date(org.expiredDate).toDateString() %>
+                            </span>
+                    </p>
+                </div>
+            </div>
+        </main>
+
+        <%- include('../partials/superadmin/footer.ejs') %>
