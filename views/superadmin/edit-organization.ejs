@@ -6,6 +6,11 @@
             <div class="container my-5">
                 <h2 class="mb-4">Update Organization</h2>
 
+                <% if (successMessage) { %>
+                <div id="successBox" class="alert alert-success" role="alert">
+                    <%= successMessage %>
+                </div>
+                <% } %>
                 <!-- Organization Details Form -->
                 <form id="/" class="mb-4" method="POST">
                     <div class="mb-3">

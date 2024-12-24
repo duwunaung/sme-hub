@@ -78,8 +78,8 @@ exports.createOrg = (req, res) => {
     }
 
     const expiry = calculatedExpiryDate()
-    const { name, address, phone } = req.body
-    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status) VALUES (?,?,?,?,?)", [name, address, phone, expiry, "active"], (err, results) => {
+    const { name, address, phone, status='active' } = req.body
+    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status) VALUES (?,?,?,?,?)", [name, address, phone, expiry, status], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,

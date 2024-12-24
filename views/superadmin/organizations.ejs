@@ -50,7 +50,7 @@
                                             <td>
                                                 <a href="/superadmin/organizations/<%= orgs[i]._id %>"
                                                     class="btn btn-primary btn-sm">View</a>
-                                                    <a href="/superadmin/organizations/update/<%= orgs[i].id %>"
+                                                <a href="/superadmin/organizations/update/<%= orgs[i].id %>"
                                                     class="btn btn-warning btn-sm">Edit</a>
 
                                                 <% if (orgs[i].status=='deleted' ) { %>
@@ -68,5 +68,48 @@
                         </div>
             </div>
         </main>
+        <!-- Add Organization Modal -->
+        <div class="modal fade" id="addOrganizationModal" tabindex="-1" aria-labelledby="addOrganizationModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addOrganizationModalLabel">Add New Organization</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addOrganizationForm" action="/superadmin/organization/register" method="POST">
 
+                            <div class="mb-3">
+                                <label for="orgName" class="form-label">Organization Name</label>
+                                <input type="text" class="form-control" name="name" id="orgName"
+                                    placeholder="Enter organization name" value="" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="orgAddress" class="form-label">Address</label>
+                                <textarea class="form-control" id="orgAddress" name="address" rows="2"
+                                    placeholder="Enter organization address" required></textarea>
+                            </div>
+                            <div class="mb-3">
+                                <label for="orgPhone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="orgPhone" name="phone"
+                                    placeholder="Enter phone number" value="" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="orgStatus" class="form-label">Status</label>
+                                <select id="orgStatus" name="status" class="form-select" required>
+
+                                    <% options.forEach(option=> { %>
+                                        <option value="<%= option.name %>">
+                                            <%= option.name %>
+                                        </option>
+                                        <% }); %>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Add Organization</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
         <%- include('../partials/superadmin/footer.ejs') %>

@@ -23,7 +23,7 @@ exports.login = (req, res) => {
     } else {
         res.render('superadmin/login', { errorMessage: null })
     }
-    
+
 }
 
 exports.logout = (req, res) => {
@@ -46,9 +46,23 @@ exports.orgs = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: response.data.data, errorMessage: null });
+            const error = req.query.error;
+            const type = req.query.type;
+
+            const options = [
+                { id: 1, name: 'active' },
+                { id: 2, name: 'deleted' }
+            ];
+            if (error) {
+                if (type == 'register') {
+                    res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: "Cannot register at the moment!" });
+                }
+            } else {
+                res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: null });
+            }
+
         }).catch(error => {
-            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "System Error!" });
+            res.render('superadmin/organizations', { orgs: [], options: options, errorMessage: "System Error!" });
         })
     }
 }
@@ -56,7 +70,7 @@ exports.orgs = (req, res) => {
 exports.restoreOrg = (req, res) => {
     if (req.method == 'GET') {
         const orgId = req.params.id
-        
+
         axios.get(`${process.env.API_URL}/organizations/restore/${orgId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
@@ -73,7 +87,7 @@ exports.restoreOrg = (req, res) => {
 exports.deleteOrg = (req, res) => {
     if (req.method == 'GET') {
         const orgId = req.params.id
-        
+
         axios.delete(`${process.env.API_URL}/organizations/delete/${orgId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
@@ -88,7 +102,7 @@ exports.deleteOrg = (req, res) => {
 }
 
 exports.updateOrg = (req, res) => {
-    if(req.method == 'GET') {
+    if (req.method == 'GET') {
         const orgId = req.params.id
         axios.get(`${process.env.API_URL}/organizations/${orgId}`, {
             headers: {
@@ -99,9 +113,19 @@ exports.updateOrg = (req, res) => {
                 { id: 1, name: 'active' },
                 { id: 2, name: 'deleted' }
             ];
-            res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null });
+            const success = req.query.success;
+            const type = req.query.type;
+            if (success) {
+                if (type == 'update') {
+                    res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
+                } else {
+                    res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Extended!" });
+                }
+            } else {
+                res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: null });
+            }
         }).catch(error => {
-            res.render('superadmin/edit-organization', { org: {}, errorMessage: "System Error!" });
+            res.render('superadmin/edit-organization', { org: {}, errorMessage: "System Error!", successMessage: null });
         })
     } else {
         const orgId = req.params.id
@@ -111,12 +135,12 @@ exports.updateOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/update/' + orgId)
+            res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=update')
         }).catch(error => {
             res.render('/superadmin/organizations/update/' + orgId, { org: {}, errorMessage: "System Error!" });
         })
     }
-    
+
 }
 
 exports.extendLicense = (req, res) => {
@@ -129,9 +153,27 @@ exports.extendLicense = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/update/' + orgId)
+            res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=license')
         }).catch(error => {
             res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+        })
+    }
+}
+
+
+exports.registerOrg = (req, res) => {
+    if (req.method == 'POST') {
+
+        const { name, address, phone, status } = req.body;
+        axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status }, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations')
+        }).catch(error => {
+            console.log(error)
+            res.redirect('/superadmin/organizations?error=true&type=register')
         })
     }
 }
