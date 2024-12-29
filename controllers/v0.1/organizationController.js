@@ -1,4 +1,4 @@
-const e = require('express')
+
 const db_connection = require('../../utils/connection')
 const { calculatedExpiryDate } = require("../../utils/others")
 
@@ -78,7 +78,7 @@ exports.createOrg = (req, res) => {
     }
 
     const expiry = calculatedExpiryDate()
-    const { name, address, phone, status='active' } = req.body
+    const { name, address, phone, status = 'active' } = req.body
     db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status) VALUES (?,?,?,?,?)", [name, address, phone, expiry, status], (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -152,14 +152,14 @@ exports.licenseOrg = (req, res) => {
     const { num, type } = req.body
 
     db_connection.query("SELECT * FROM orgs WHERE id = ?", [orgId], (err, results) => {
-        if(err) {
+        if (err) {
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
                 dev: err
             })
         }
-        if(results.length === 0) {
+        if (results.length === 0) {
             return res.status(404).send({
                 success: false,
                 message: 'Organization not found',
@@ -171,7 +171,6 @@ exports.licenseOrg = (req, res) => {
         if (type == 'month') {
             expiry.setMonth(expiry.getMonth() + parseInt(num))
         } else {
-            console.log("SOMETHING")
             expiry.setDate(expiry.getDate() + parseInt(num))
         }
 
@@ -297,3 +296,105 @@ exports.restoreOrg = (req, res) => {
         })
     })
 }
+
+exports.listUsers = (req, res) => {
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "This user is from other organization not from us"
+        })
+    }
+    const { name, status = 'all', page = 1, pageSize = 10, expired = false } = req.query
+
+    const orgId = req.params.id
+
+    let query = "SELECT * FROM users WHERE orgId = ?"
+    let queryParams = [orgId]
+
+    if (name) {
+        query += " AND name LIKE ?"
+        queryParams.push(`%${name}%`)
+    }
+
+    if (status != 'all') {
+        if (status) {
+            query += " AND status LIKE ?"
+            queryParams.push(`%${status}%`)
+        }
+
+        if (!expired) {
+            query += " AND expiredDate > NOW()"
+        } else {
+            query += " AND expiredDate < NOW()"
+        }
+    }
+
+    const offset = (page - 1) * pageSize
+    query += ' LIMIT ? OFFSET ?'
+    queryParams.push(parseInt(pageSize), offset)
+    db_connection.query(query, queryParams, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        db_connection.query("SELECT COUNT(*) as total FROM users where orgId = ?", [orgId], (err, count) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: 'internal server error',
+                    dev: err
+                })
+            }
+
+            res.status(200).json({
+                success: true,
+                data: results,
+                pagination: {
+                    page: page,
+                    pageSize: pageSize,
+                    total: count[0].total,
+                    totalPage: Math.ceil(count[0].total / pageSize)
+                }
+            })
+        })
+    })
+}
+
+
+exports.sendEmail = (req, res) => {
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.GMAIL,
+            pass: process.env.APP_PASSWORD
+        }
+    });
+    var mailOptions = {
+        from: process.env.GMAIL,
+        to: 'duwunaung@gmail.com',
+        subject: 'Welcome to Dat Tech Solutions',
+        html: '<h1>Hi, Welcome to Dat Tech Solutions</h1><p>Thanks for joining us</p><br><p>To start using our service, kindly visit to this link with Password "asdf3x73"</p><p>Best Regards</p><p>Dat Tech Solutions</p>'
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: error
+            })
+        } else {
+            res.status(200).send({
+                success: true,
+                message: 'Email sent successfully',
+                dev: 'Thanks'
+            })
+        }
+    });
+}
+

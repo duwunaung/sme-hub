@@ -11,6 +11,7 @@ const authorizeRole = require('../../middlewares/authorizeRole')
 const router = express.Router()
 
 router.post('/register', authenticateToken, authorizeRole(['superadmin']), register)
+// router.post('/register', register)
 router.get('/users', authenticateToken, authorizeRole(['superadmin']), getSuperAdmins)
 
 router.post('/login', login)

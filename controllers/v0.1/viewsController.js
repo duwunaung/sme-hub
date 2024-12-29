@@ -182,18 +182,52 @@ exports.registerOrg = (req, res) => {
 exports.detailOrg = (req, res) => {
     if (req.method == 'GET') {
         const orgId = req.params.id
+        const error = req.query.error
+        const options = [
+            { id: 1, name: 'active' },
+            { id: 2, name: 'deleted' }
+        ];
+        const roles = [
+            {
+                id: 1,
+                name: 'admin'
+            },
+            {
+                id: 2,
+                name: 'manager'
+            },
+            {
+                id: 3,
+                name: 'staff'
+            }
+        ]
         axios.get(`${process.env.API_URL}/organizations/${orgId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            const options = [
-                { id: 1, name: 'active' },
-                { id: 2, name: 'deleted' }
-            ];
-            res.render('superadmin/detail-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: null });
+
+            axios.get(`${process.env.API_URL}/organizations/users/${orgId}`, {
+                headers: {
+                    'Authorization': `${req.session.token}`
+                }
+            }).then(users => {
+                if (error) {
+                    if (req.query.type == 'user-create') {
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot create user at the moment!", successMessage: null });
+                    } else {
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "System Error!", successMessage: null });
+                    }
+                } else {
+                    res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
+                }
+
+
+            }).catch(error => {
+                res.render('superadmin/detail-organization', { org: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
+            })
         }).catch(error => {
-            res.render('superadmin/detail-organization', { org: {}, errorMessage: "System Error!", successMessage: null });
+            res.render('superadmin/detail-organization', { org: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
         })
     }
 }
@@ -212,4 +246,42 @@ exports.superadmins = (req, res) => {
             res.render('superadmin/superadmins', { users: [], errorMessage: "System Error!" });
         })
     }
+}
+
+exports.createUser = (req, res) => {
+    if (req.method == 'POST') {
+
+        const options = [
+            { id: 1, name: 'active' },
+            { id: 2, name: 'deleted' }
+        ];
+        const roles = [
+            {
+                id: 1,
+                name: 'admin'
+            },
+            {
+                id: 2,
+                name: 'manager'
+            },
+            {
+                id: 3,
+                name: 'staff'
+            }
+        ]
+        const { name, email, password, role, phone } = req.body;
+        const orgId = req.params.id
+        const status = 'pending'
+
+        axios.post(`${process.env.API_URL}/users/create`, { name, email, phone, password, role, orgId, status }, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations/detail/' + orgId)
+        }).catch(error => {
+            res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create')
+        })
+    }
+
 }
