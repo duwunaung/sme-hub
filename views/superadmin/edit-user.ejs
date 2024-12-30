@@ -1,0 +1,64 @@
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-lg-10">
+            <div class="container my-5">
+                <h2 class="mb-4">User Detail</h2>
+				<% if (successMessage) { %>
+					<div id="successBox" class="alert alert-success" role="alert">
+						<%= successMessage %>
+					</div>
+					<% } %>
+                <!-- User Details Form -->
+                <form id="/"  method="POST">
+					<div class="mb-3">
+                        <label for="userName" class="form-label">Username</label>
+                        <input type="text" class="form-control" name="name" id="userName"
+                            placeholder="Enter user name" value="<%= user.username %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="orgName" class="form-label">Organization Name</label>
+                        <input type="text" class="form-control" name="orgname" id="orgName"
+                            placeholder="Enter Organization Name" value="<%= user.orgname %>" disabled>
+                    </div>
+					<div class="mb-3">
+                        <label for="userRole" class="form-label">User Role</label>
+                        <select id="userRole" name="role" class="form-select" required>
+
+                            <% roles.forEach(role=> { %>
+                                <option value="<%= role.name %>" <%=role.name===user.role ? 'selected' : '' %> >
+                                    <%= role.name %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userEmail" class="form-label">Email Address</label>
+                        <input type="text" class="form-control" name="email" id="userEmail"
+                            placeholder="Enter email address" value="<%= user.email %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userPhone" class="form-label">Phone Number</label>
+                        <input type="tel" class="form-control" id="userPhone" name="phone"
+                            placeholder="Enter phone number" value="<%= user.phone %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userStatus" class="form-label">Status</label>
+                        <select id="userStatus" name="status" class="form-select" required>
+
+                            <% options.forEach(option=> { %>
+                                <option value="<%= option.name %>" <%=option.name===user.status ? 'selected' : '' %> >
+                                    <%= option.name.toUpperCase() %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+					<button type="submit" class="btn btn-success w-100">Update User</button>
+                    
+                </form>
+				<a href="/superadmin/organizations/detail/<%= user.orgId %>" class="btn btn-danger w-100 mt-3">Cancel</a>
+            </div>
+        </main>
+
+        <%- include('../partials/superadmin/footer.ejs') %>

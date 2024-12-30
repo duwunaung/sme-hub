@@ -119,3 +119,53 @@ exports.login = (req, res) => {
         })
     }
 }
+
+exports.getSuperAdmins = (req, res) => {
+    const { status = 'all', page = 1, pageSize = 10 } = req.query
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "This user is from other organization not from us"
+        })
+    }
+    let query = 'SELECT * FROM users WHERE role = "superadmin" AND orgId = 0'
+
+    let queryParams = []
+    if (status != 'all') {
+        query += " AND status LIKE ?"
+        queryParams.push(`%${status}%`)
+    }
+    const offset = (page - 1) * pageSize
+    query += ' LIMIT ? OFFSET ?'
+    queryParams.push(parseInt(pageSize), offset)
+    db_connection.query(query, queryParams, (err, results) => {
+        if(err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        db_connection.query("SELECT COUNT(*) as total FROM users WHERE role = 'superadmin' AND orgId = 0", (err, count) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: 'internal server error',
+                    dev: err
+                })
+            }
+
+            res.status(200).json({
+                success: true,
+                data: results,
+                pagination: {
+                    page: page,
+                    pageSize: pageSize,
+                    total: count[0].total,
+                    totalPage: Math.ceil(count[0].total / pageSize)
+                }
+            })
+        })
+    })
+}

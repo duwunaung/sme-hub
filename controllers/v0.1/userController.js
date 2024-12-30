@@ -20,20 +20,20 @@ exports.createUser = async (req, res) => {
                 dev: "Superadmin user creation is restricted from this api"
             });
         }
-
-        db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered) VALUES (?,?,?,?,?,?,?,?)',
-            [name, hashedPassword, phone, role, email, orgId, status, new Date()],
-            (err, result) => {
-                if (err) {
-                    res.status(500).send({
-                        success: false,
-                        message: 'internal server error',
-                        dev: "Error while registering new user"
-                    })
-                } else {
-                    res.status(201).send({ success: true, message: 'User created successfully', data: { name, email, phone, role, status } })
-                }
-            })
+		db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered) VALUES (?,?,?,?,?,?,?,?)',
+        [name, hashedPassword, phone, role, email, orgId, status, new Date()],
+        (err, result) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: 'internal server error',
+                    dev: "Error while registering new user"
+                })
+            } else {
+                res.status(201).send({ success: true, message: 'User created successfully', data: { name, email, phone, role, status } })
+            }
+        })
+        
     } catch (err) {
         res.status(500).send({
             success: false,
@@ -41,6 +41,32 @@ exports.createUser = async (req, res) => {
             dev: err
         })
     }
+}
+
+exports.getUser = (req, res) => {
+	const id = req.params.id
+    db_connection.query("SELECT users.name as username, users.id as id, orgs.name as orgname, orgs.id as orgId, users.role, users.email, users.phone, users.status, users.registered FROM users JOIN orgs ON users.orgId = orgs.id WHERE users.id = ?", [id], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+		return res.status(200).send({
+			success: true,
+            message: 'Here is the user',
+            dev: "Good Job, Bro!",
+			data: results[0]
+		})
+    })
 }
 
 exports.listUsers = (req, res) => {
@@ -135,41 +161,41 @@ exports.updateUser = (req, res) => {
     if (req.user.orgId !== 0) {
         return res.status(403).send({ success: false, message: 'Access denied', dev: 'Outside organization cannot update user' });
     }
+	db_connection.query(
+		'UPDATE users SET name = ?, email = ?, phone = ?, role = ?, status = ?, orgId = ? WHERE id = ?',
+		[name, email, phone, role, status, orgId, userId],
+		(err, result) => {
+			if (err) {
+				return res.status(500).send(
+					{
+						success: false,
+						message: 'Failed to update user',
+						dev: err.message
+					}
+				);
+			}
 
-    db_connection.query(
-        'UPDATE users SET name = ?, email = ?, phone = ?, role = ?, status = ?, orgId = ? WHERE id = ?',
-        [name, email, phone, role, status, orgId, userId],
-        (err, result) => {
-            if (err) {
-                return res.status(500).send(
-                    {
-                        success: false,
-                        message: 'Failed to update user',
-                        dev: err.message
-                    }
-                );
-            }
+			if (result.affectedRows === 0) {
+				return res.status(404).send(
+					{
+						success: false,
+						message: 'User not found',
+						dev: 'User with the provided ID was not found'
+					}
+				);
+			}
 
-            if (result.affectedRows === 0) {
-                return res.status(404).send(
-                    {
-                        success: false,
-                        message: 'User not found',
-                        dev: 'User with the provided ID was not found'
-                    }
-                );
-            }
-
-            res.send(
-                {
-                    success: true,
-                    message: 'User updated successfully',
-                    dev: 'User details updated successfully',
-                    data: { name, email, phone, role, status, orgId }
-                }
-            );
-        }
-    );
+			res.send(
+				{
+					success: true,
+					message: 'User updated successfully',
+					dev: 'User details updated successfully',
+					data: { name, email, phone, role, status, orgId }
+				}
+			);
+		}
+	);
+    
 };
 
 exports.deleteUser = (req, res) => {

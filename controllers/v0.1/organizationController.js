@@ -78,8 +78,8 @@ exports.createOrg = (req, res) => {
     }
 
     const expiry = calculatedExpiryDate()
-    const { name, address, phone } = req.body
-    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status) VALUES (?,?,?,?,?)", [name, address, phone, expiry, "active"], (err, results) => {
+    const { name, address, phone, status='active' } = req.body
+    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status) VALUES (?,?,?,?,?)", [name, address, phone, expiry, status], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -254,12 +254,22 @@ exports.getOrg = (req, res) => {
                 dev: "Organization not found"
             })
         }
-        return res.status(200).send({
-            success: true,
-            message: 'Here is the organization',
-            dev: "Good Job, Bro!",
-            data: results[0]
-        })
+		db_connection.query("SELECT users.id, users.name, users.email, users.phone, users.role, users.status, users.registered, orgs.name AS organization_name FROM users LEFT JOIN orgs ON users.orgId = orgs.id WHERE users.orgId = ?", [ orgId ], (errUsers, resultUsers) => {
+			if (errUsers) {
+				return res.status(500).send({
+					success: false,
+					message: 'internal server error',
+					dev: err
+				})
+			}
+			return res.status(200).send({
+				success: true,
+	            message: 'Here is the organization',
+	            dev: "Good Job, Bro!",
+				data: results[0],
+				dataUsers: resultUsers
+			})
+		})
     })
 }
 
