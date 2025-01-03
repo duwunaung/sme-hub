@@ -5,6 +5,7 @@ const { calculatedExpiryDate } = require("../../utils/others")
 const bcrypt = require('bcryptjs')
 const jwt = require('jsonwebtoken')
 
+var nodemailer = require('nodemailer');
 exports.register = async (req, res) => {
 
     try {
@@ -25,25 +26,38 @@ exports.register = async (req, res) => {
             [name, email, phone, hashedPassword, new Date(), 'active', expiredDate, remark, orgId, role],
             (err, result) => {
                 if (err) {
-                    console.log(err)
                     res.status(500).send({
                         success: false,
                         message: 'internal server error',
                         dev: "Error while registering new user"
                     })
                 } else {
-                    res.status(201).send({
-                        success: true,
-                        dev: 'No Issue, Thanks',
-                        message: 'Successfully Registered',
-                        data: {
-                            username: name,
-                            email: email,
-                            phone: phone,
-                            role: role,
-                            expiredDate: expiredDate
+                    var transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: process.env.GMAIL,
+                            pass: process.env.APP_PASSWORD
                         }
-                    })
+                    });
+                    var mailOptions = {
+                        from: process.env.GMAIL,
+                        to: email,
+                        subject: 'Welcome to Dat Tech Solutions',
+                        html: '<h1>Hi, Welcome to Dat Tech Solutions</h1><p>Thanks for joining us</p><br><p>To start using our service, kindly visit to this link with Password "' + password + '"</p><p>Best Regards</p><p>Dat Tech Solutions</p>'
+                    };
+
+                    transporter.sendMail(mailOptions, function (error, info) {
+                        if (error) {
+                            res.status(500).send({
+                                success: false,
+                                message: 'internal server error',
+                                dev: error
+                            })
+                        } else {
+                            res.status(201).send({ success: true, message: 'User created successfully', data: { name, email, phone, role } })
+                        }
+                    });
+
                 }
             })
     } catch (err) {
@@ -96,9 +110,9 @@ exports.login = (req, res) => {
             }
 
             const token = jwt.sign(
-                { userId: user.id, email: user.email, role: user.role, orgId: user.orgId},
+                { userId: user.id, email: user.email, role: user.role, orgId: user.orgId },
                 process.env.JWT_SECRET,
-                { expiresIn: process.env.JWT_EXPIRES_IN}
+                { expiresIn: process.env.JWT_EXPIRES_IN }
             )
 
             return res.status(200).send({
@@ -141,7 +155,7 @@ exports.getSuperAdmins = (req, res) => {
     query += ' LIMIT ? OFFSET ?'
     queryParams.push(parseInt(pageSize), offset)
     db_connection.query(query, queryParams, (err, results) => {
-        if(err) {
+        if (err) {
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',

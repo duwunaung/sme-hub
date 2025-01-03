@@ -1,0 +1,50 @@
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-lg-10">
+            <div class="container my-5">
+                <h2 class="mb-4">Add New System Admin</h2>
+                <form id="/" class="mb-4" method="POST">
+                    
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Admin Name</label>
+                        <input type="text" class="form-control" name="name" id="userName"
+                            placeholder="Enter Admin name" value="" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="userPassword" class="form-label">Password</label>
+                        <input type="text" class="form-control" name="password" id="userPassword"
+                            placeholder="Enter Admin Password"  required readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="userPhone" class="form-label">Phone</label>
+                        <input type="text" class="form-control" name="phone" id="userPhone"
+                            placeholder="Enter Admin Phone Number"  required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="userEmail" class="form-label">Email</label>
+                        <input type="text" class="form-control" name="email" id="userEmail"
+                            placeholder="Enter Admin Email"  required>
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100 mb-2">Add</button>
+                    <a href="/superadmin/users" class="btn btn-danger w-100">Cancel</a>
+    
+                </form>
+            </div>
+        </main>
+
+        <script>
+            
+            function generatePassword() {
+                const password = Math.random().toString(36).slice(-8);
+                document.getElementById('userPassword').value = password;
+            }
+
+            generatePassword()
+        </script>
+        <%- include('../partials/superadmin/footer.ejs') %>

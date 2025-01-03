@@ -160,7 +160,6 @@ exports.extendLicense = (req, res) => {
     }
 }
 
-
 exports.registerOrg = (req, res) => {
     if (req.method == 'POST') {
 
@@ -177,7 +176,6 @@ exports.registerOrg = (req, res) => {
         })
     }
 }
-
 
 exports.detailOrg = (req, res) => {
     if (req.method == 'GET') {
@@ -215,11 +213,21 @@ exports.detailOrg = (req, res) => {
                 if (error) {
                     if (req.query.type == 'user-create') {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot create user at the moment!", successMessage: null });
+                    } else if (req.query.type == 'user-delete') {
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot delete user at the moment!", successMessage: null });
                     } else {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "System Error!", successMessage: null });
                     }
                 } else {
-                    res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
+
+                    if (req.query.type == 'user-create') {
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: null, successMessage: "User Created" });
+                    } else if (req.query.type == 'user-delete') {
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: null, successMessage: "User Deleted" });
+
+                    } else {
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
+                    }
                 }
 
 
@@ -231,7 +239,6 @@ exports.detailOrg = (req, res) => {
         })
     }
 }
-
 
 exports.superadmins = (req, res) => {
     if (req.method == 'GET') {
@@ -284,4 +291,45 @@ exports.createUser = (req, res) => {
         })
     }
 
+}
+
+exports.deleteUser = (req, res) => {
+    if (req.method == 'GET') {
+        const userId = req.params.id
+        const orgId = req.query.orgId
+
+        axios.delete(`${process.env.API_URL}/organizations/users/delete/${userId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-delete')
+        }).catch(error => {
+            // console.log(error)
+            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+        })
+    }
+}
+
+
+exports.createSuperAdmins = (req, res) => {
+    if (req.method == 'GET') {
+        res.render('superadmin/add-superadmin', { errorMessage: null });
+    } else
+        if (req.method == 'POST') {
+            const role = "superadmin"
+            const { name, email, password, phone } = req.body;
+            const orgId = 0
+            const status = 'pending'
+
+            axios.post(`${process.env.API_URL}/utils/register`, { name, email, phone, password, role, orgId, status }, {
+                headers: {
+                    'Authorization': `${req.session.token}`
+                }
+            }).then(response => {
+                res.redirect('/superadmin/users')
+            }).catch(error => {
+                res.redirect('/superadmin/users?error=true&type=user-create')
+            })
+        }
 }
