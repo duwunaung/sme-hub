@@ -43,9 +43,6 @@ const l4Access = ['superadmin', 'admin', 'manager', 'staff']
 const subscribers = ['admin', 'manager', 'staff', 'subscriber']
 
 
-app.get('/', (req, res) => {
-  res.redirect('/superadmin/dashboard')
-})
 
 app.use("/api/v0.1/utils", utils_v01);
 app.use("/api/v0.1/dashboard", authenticateToken, authorizeRole(l1Access), dashboard_v01);
@@ -66,6 +63,9 @@ app.use(express.static('public'));
 
 app.use('/superadmin', saViews_v01)
 
+app.get('/*', (req, res) => {
+  res.redirect('/superadmin/dashboard')
+})
 
 app.listen(process.env.PORT, function () {
   console.log("Server is running on", process.env.PORT);
