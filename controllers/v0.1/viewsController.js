@@ -79,7 +79,6 @@ exports.restoreOrg = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations')
         }).catch(error => {
-            // console.log(error)
             res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
         })
     }
@@ -96,7 +95,6 @@ exports.deleteOrg = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations')
         }).catch(error => {
-            // console.log(error)
             res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
         })
     }
@@ -173,7 +171,6 @@ exports.registerOrg = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations')
         }).catch(error => {
-            console.log(error)
             res.redirect('/superadmin/organizations?error=true&type=register')
         })
     }
@@ -293,7 +290,7 @@ exports.registerUser = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/detail/' + orgId)
+            res.redirect('/superadmin/organizations/detail/' + orgId + '?type=users-page')
         }).catch(error => {
             res.redirect('/superadmin/organizations/detail/' + orgId)
         })

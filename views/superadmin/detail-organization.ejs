@@ -4,9 +4,20 @@
         <!-- Main Content -->
         <main class="col-md-9 col-lg-10">
             <div class="container my-5">
-                <h2 class="mb-4">Organization Detail</h2>
+                <h2 class="mb-4"><%= org.name %></h2>
+				<ul class="nav nav-tabs">
+					<li class="nav-item">
+						<a class="nav-link view-tab detail-tab active" aria-current="page" href="#"
+							onclick="changeInfo('detail')">Info</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link view-tab users-tab" aria-current="page" href="#"
+							onclick="changeInfo('users')">Users</a>
+					</li>
+				</ul>
                 <!-- Organization Details Form -->
-                <form id="/" class="mb-4" method="POST">
+                <form id="detail-view" class="my-4 view-containers" method="POST">
+					<h3 class="mb-4">Organization Detail</h3>
                     <div class="mb-3">
                         <label for="orgName" class="form-label">Organization Name</label>
                         <input type="text" class="form-control" name="name" id="orgName"
@@ -34,9 +45,20 @@
                         </select>
                     </div>					
 
+					<!-- <a href="/superadmin/organizations/users/<%= org.id %>" class="btn btn-info w-100 mb-2">Users</a> -->
+					<a href="/superadmin/organizations" class="btn btn-primary w-100 mb-2">Back to Organizations</a>
+					<a href="/superadmin/organizations/update/<%= org.id %>" class="btn btn-warning w-100">Edit Organization</a>
+
+	                <!-- License Extension -->
+	                <div>
+	                    <p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold"></span>
+	                        <%= new Date(org.expiredDate).toDateString() %>
+	                            </span>
+	                    </p>
+	                </div>
                 </form>
 
-				<div class="col-md-9 col-lg-10">
+				<div id="users-view" class="view-containers d-none mb-4">
 					<div class="content">
 		
 						<!-- <% if (errorMessage) { %>
@@ -45,9 +67,9 @@
 							</div>
 							<% } %> -->
 								<div class="d-flex justify-content-between align-items-center mb-4">
-									<h2>Users</h2>
+									<h3>Users</h3>
 									<button class="btn btn-primary" data-bs-toggle="modal"
-										data-bs-target="#addUsersModal">
+										data-bs-target="#addUsersModal" onclick="generatePassowrd()">
 										Add New User
 									</button>
 								</div>
@@ -109,73 +131,103 @@
 								</div>
 					</div>
 				</div>
-				<!-- Add User Modal -->
-				<div class="modal fade" id="addUsersModal" tabindex="-1" aria-labelledby="addUsersModalLabel"
-					aria-hidden="true">
-					<div class="modal-dialog">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="addUsersModalLabel">Add New User</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-							</div>
-							<div class="modal-body">
-								<form id="addUsersForm" action="/superadmin/organization/user/register/<%= org.id %>" method="POST">
-		
-									<div class="mb-3">
-										<label for="userName" class="form-label">Username</label>
-										<input type="text" class="form-control" name="name" id="userName"
-											placeholder="Enter user name" required>
-									</div>
-									<div class="mb-3">
-										<label for="orgName" class="form-label">Organization Name</label>
-										<input type="text" class="form-control" name="orgname" id="orgName"
-											placeholder="Enter Organization Name" value="<%= org.name %>" disabled>
-									</div>
-									<div class="mb-3">
-										<label for="userRole" class="form-label">User Role</label>
-										<select id="userRole" name="role" class="form-select" required>
-				
-											<% roles.forEach(role=> { %>
-												<option value="<%= role.name %>" >
-													<%= role.name %>
-												</option>
-												<% }); %>
-										</select>
-									</div>
-									<div class="mb-3">
-										<label for="userEmail" class="form-label">Email Address</label>
-										<input type="text" class="form-control" name="email" id="userEmail"
-											placeholder="Enter email address" required>
-									</div>
-									<div class="mb-3">
-										<label for="userPass" class="form-label">Password</label>
-										<input type="password" class="form-control" name="password" id="userPass"
-											placeholder="Enter password" required>
-									</div>
-									<div class="mb-3">
-										<label for="userPhone" class="form-label">Phone Number</label>
-										<input type="tel" class="form-control" id="userPhone" name="phone"
-											placeholder="Enter phone number" value="" required>
-									</div>
-									
-									<button type="submit" class="btn btn-primary w-100">Add User</button>
-								</form>
-							</div>
-						</div>
-					</div>
-				</div>
-				<!-- <a href="/superadmin/organizations/users/<%= org.id %>" class="btn btn-info w-100 mb-2">Users</a> -->
-				<a href="/superadmin/organizations" class="btn btn-primary w-100 mb-2">Back to Organizations</a>
-				<a href="/superadmin/organizations/update/<%= org.id %>" class="btn btn-warning w-100">Edit Organization</a>
 
-                <!-- License Extension -->
-                <div>
-                    <p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold"></span>
-                        <%= new Date(org.expiredDate).toDateString() %>
-                            </span>
-                    </p>
-                </div>
             </div>
         </main>
+		<script>
+            function changeInfo(type) {
+                const tabs = document.querySelectorAll('.view-tab');
+                tabs.forEach(tab => {
+                    tab.classList.remove('active');
+                })
+                document.querySelector(`.${type}-tab`).classList.add('active');
 
+                const containers = document.querySelectorAll('.view-containers');
+                containers.forEach(container => {
+                    container.classList.add('d-none');
+                })
+                document.getElementById(`${type}-view`).classList.remove('d-none');
+            }
+
+            function generatePassowrd() {
+                const password = Math.random().toString(36).slice(-8);
+                document.getElementById('userPassword').value = password;
+            }
+
+            function checkError() {
+                const searchParams = new URLSearchParams(window.location.search);
+                const errorType = searchParams.get('type')
+                if (errorType === 'users-page') {
+                    const tabs = document.querySelectorAll('.view-tab');
+                    tabs.forEach(tab => {
+                        tab.classList.remove('active');
+                    })
+                    document.querySelector(`.users-tab`).classList.add('active');
+
+                    const containers = document.querySelectorAll('.view-containers');
+                    containers.forEach(container => {
+                        container.classList.add('d-none');
+                    })
+                    document.getElementById(`users-view`).classList.remove('d-none');
+                }
+
+            }
+
+            checkError();
+        </script>
+		<!-- Add User Modal -->
+		<div class="modal fade" id="addUsersModal" tabindex="-1" aria-labelledby="addUsersModalLabel"
+			aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="addUsersModalLabel">Add New User</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<form id="addUsersForm" action="/superadmin/organization/user/register/<%= org.id %>" method="POST">
+
+							<div class="mb-3">
+								<label for="userName" class="form-label">Username</label>
+								<input type="text" class="form-control" name="name" id="userName"
+									placeholder="Enter user name" required>
+							</div>
+							<div class="mb-3">
+								<label for="orgName" class="form-label">Organization Name</label>
+								<input type="text" class="form-control" name="orgname" id="orgName"
+									placeholder="Enter Organization Name" value="<%= org.name %>" disabled>
+							</div>
+							<div class="mb-3">
+								<label for="userRole" class="form-label">User Role</label>
+								<select id="userRole" name="role" class="form-select" required>
+		
+									<% roles.forEach(role=> { %>
+										<option value="<%= role.name %>" >
+											<%= role.name %>
+										</option>
+										<% }); %>
+								</select>
+							</div>
+							<div class="mb-3">
+								<label for="userEmail" class="form-label">Email Address</label>
+								<input type="text" class="form-control" name="email" id="userEmail"
+									placeholder="Enter email address" required>
+							</div>
+							<div class="mb-3">
+								<label for="userPassword" class="form-label">Password</label>
+								<input type="text" class="form-control" name="password" id="userPassword"
+									placeholder="Enter password" readonly required>
+							</div>
+							<div class="mb-3">
+								<label for="userPhone" class="form-label">Phone Number</label>
+								<input type="tel" class="form-control" id="userPhone" name="phone"
+									placeholder="Enter phone number" value="" required>
+							</div>
+							
+							<button type="submit" class="btn btn-primary w-100">Add User</button>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
         <%- include('../partials/superadmin/footer.ejs') %>

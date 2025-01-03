@@ -237,9 +237,31 @@ exports.getOrg = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-
+	const { name, status = 'all', page = 1, pageSize = 10, expired = false } = req.query
     const orgId = req.params.id
-    db_connection.query("SELECT * FROM orgs WHERE id = ?", [orgId], (err, results) => {
+	let query = `SELECT * FROM orgs WHERE id = ?`
+	let queryParams = [orgId]
+	if (name) {
+        query += " AND name LIKE ?"
+        queryParams.push(`%${name}%`)
+    }
+
+    if (status != 'all') {
+        if (status) {
+            query += " AND status LIKE ?"
+            queryParams.push(`%${status}%`)
+        }
+
+        if (!expired) {
+            query += " AND expiredDate > NOW()"
+        } else {
+            query += " AND expiredDate < NOW()"
+        }
+    }
+	const offset = (page - 1) * pageSize
+    query += ' LIMIT ? OFFSET ?'
+    queryParams.push(parseInt(pageSize), offset)
+    db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -254,7 +276,7 @@ exports.getOrg = (req, res) => {
                 dev: "Organization not found"
             })
         }
-		db_connection.query("SELECT users.id, users.name, users.email, users.phone, users.role, users.status, users.registered, orgs.name AS organization_name FROM users LEFT JOIN orgs ON users.orgId = orgs.id WHERE users.orgId = ?", [ orgId ], (errUsers, resultUsers) => {
+		db_connection.query("SELECT users.id, users.name, users.email, users.phone, users.role, users.status, users.registered, orgs.name AS organization_name, COUNT(*) OVER () AS total FROM users LEFT JOIN orgs ON users.orgId = orgs.id WHERE users.orgId = ?", [ orgId ], (errUsers, resultUsers) => {
 			if (errUsers) {
 				return res.status(500).send({
 					success: false,
@@ -267,7 +289,13 @@ exports.getOrg = (req, res) => {
 	            message: 'Here is the organization',
 	            dev: "Good Job, Bro!",
 				data: results[0],
-				dataUsers: resultUsers
+				dataUsers: resultUsers,
+				pagination: {
+                    page: page,
+                    pageSize: pageSize,
+                    total: resultUsers[0].total,
+                    totalPage: Math.ceil(resultUsers[0].total / pageSize)
+                }
 			})
 		})
     })
