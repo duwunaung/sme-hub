@@ -1,0 +1,87 @@
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
+
+        <!-- Main Content -->
+        <main class="col-md-9 col-lg-10">
+            <div class="container my-5">
+                <h2 class="mb-4">Update Superadmin's Details</h2>
+
+                <% if (successMessage) { %>
+                <div id="successBox" class="alert alert-success" role="alert">
+                    <%= successMessage %>
+                </div>
+                <% } %>
+                <!-- user Details Form -->
+                <form id="/" class="mb-4" method="POST">
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Username</label>
+                        <input type="text" class="form-control" name="name" id="userName"
+                            placeholder="Enter username" value="<%= user.name %>" required>
+                    </div>
+					<div class="mb-3">
+                        <label for="userRole" class="form-label">Role</label>
+                        <select id="userRole" name="role" class="form-select" disabled>
+
+                            <% roles.forEach(role=> { %>
+                                <option value="<%= role.name %>" <%=role.name===user.role ? 'selected' : '' %> >
+                                    <%= role.name %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+					<div class="mb-3">
+                        <label for="userEmail" class="form-label">Email Address</label>
+                        <input type="text" class="form-control" name="email" id="userEmail"
+                            placeholder="Enter email address" value="<%= user.email %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="userPhone" name="phone"
+                            placeholder="Enter phone number" value="<%= user.phone %>" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userStatus" class="form-label">Status</label>
+                        <select id="userStatus" name="status" class="form-select" required>
+
+                            <% options.forEach(option=> { %>
+                                <option value="<%= option.name %>" <%=option.name===user.status ? 'selected' : '' %> >
+                                    <%= option.name.toUpperCase() %>
+                                </option>
+                                <% }); %>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-success w-100 mb-2">Update</button>
+                    <a href="/superadmin/users" id="buttonTwo"	class="btn  w-100"></a>
+					<div>
+                        <p class="my-2">Registered Date: <span id="currentRegisteredDate"
+                                class="fw-bold"></span>
+                            <%= new Date(user.registered).toDateString() %>
+                        </p>
+                        <p class="">Current Expiration Date: <span id="currentExpirationDate"
+                                class="fw-bold"></span>
+                            <%= new Date(user.expired).toDateString() %>
+                        </p>
+                    </div>
+                </form>
+            </div>
+			<script>
+				function buttonType() {
+	                const searchParams = new URLSearchParams(window.location.search);
+	                const type = searchParams.get('type')
+					const buttonTwo = document.getElementById("buttonTwo")
+	                if (type == 'update') {
+						buttonTwo.innerText = "Back"
+						buttonTwo.classList.add("btn-primary")
+	                }
+					else {
+						buttonTwo.innerText = "Cancel"
+						buttonTwo.classList.add("btn-danger")
+					}
+
+	            }
+
+	            buttonType();
+			</script>
+        </main>
+
+        <%- include('../partials/superadmin/footer.ejs') %>
