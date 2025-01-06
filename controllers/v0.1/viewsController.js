@@ -94,7 +94,6 @@ exports.deleteOrg = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations')
         }).catch(error => {
-            // console.log(error)
             res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
         })
     }
@@ -170,7 +169,6 @@ exports.registerOrg = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations')
         }).catch(error => {
-            console.log(error)
             res.redirect('/superadmin/organizations?error=true&type=register')
         })
     }
@@ -368,14 +366,15 @@ exports.deleteSuperadmin = (req, res) => {
 exports.restoreSuperadmin = (req, res) => {
     if (req.method == 'GET') {
         const userId = req.params.id
-        axios.put(`${process.env.API_URL}/users/restore/${userId}`, {
+        
+        // axios.delete(`${process.env.API_URL}/users/${userId}`, {
+        axios.get(`${process.env.API_URL}/users/restore/${userId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
             res.redirect('/superadmin/users?success=true&type=user-restore')
         }).catch(error => {
-            console.log(error)
             res.redirect('/superadmin/users?success=false&type=user-restore');
         })
     }

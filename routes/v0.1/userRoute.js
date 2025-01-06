@@ -9,5 +9,5 @@ router.get('/', listUsers);
 router.get('/:id', getUser);
 router.put('/:id', updateUser);
 router.delete('/:id', deleteUser);
-router.put('/restore/:id', restoreUser);
+router.get('/restore/:id', restoreUser);
 module.exports = router;

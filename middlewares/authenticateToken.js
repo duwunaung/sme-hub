@@ -6,7 +6,6 @@ const JWT_SECRET = process.env.JWT_SECRET
 
 const authenticateToken = (req, res, next) => {
     const authHeader = req.headers['authorization']
-
     if (!authHeader) {
         return res.status(401).send({
             success: false,

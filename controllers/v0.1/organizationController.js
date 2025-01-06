@@ -288,7 +288,6 @@ exports.restoreOrg = (req, res) => {
                 dev: "Organization not found"
             })
         }
-        console.log("RESTORE ORG");
         return res.status(200).send({
             success: true,
             message: 'Organization restored successfully',
