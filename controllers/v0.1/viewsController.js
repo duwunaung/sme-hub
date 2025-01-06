@@ -379,3 +379,53 @@ exports.restoreSuperadmin = (req, res) => {
         })
     }
 }
+
+exports.updateSuperadmin = (req, res) => {
+	if (req.method == 'GET') {
+        const userId = req.params.id
+		
+        axios.get(`${process.env.API_URL}/users/${userId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            const options = [
+                { id: 1, name: 'active' },
+                { id: 2, name: 'deleted' }
+            ];
+			const roles = [
+				{
+					id: 1,
+					name: 'superadmin'
+				}
+			]
+            const success = req.query.success;
+            const type = req.query.type;
+            if (success) {
+                if (type == 'update') {
+                    res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
+                } else {
+                    res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Extended!" });
+                }
+            } else {
+                res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
+            }
+        }).catch(error => {
+            res.redirect('/superadmin/users');
+        })
+    } else {
+        const orgId = 0
+		const role = "superadmin"
+		const userId = req.params.id
+        const { name, email, phone, status } = req.body;
+        axios.put(`${process.env.API_URL}/users/${userId}`, { name, email, phone, role, status, orgId }, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/users/update/' + userId + '?success=true&type=update')
+        }).catch(error => {
+            res.redirect('/superadmin/users');
+        })
+    }
+}
