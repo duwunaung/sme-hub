@@ -16,7 +16,6 @@ const authenticateToken = (req, res, next) => {
     }
 
     const token = authHeader
-
     jwt.verify(token, JWT_SECRET, (err, user) => {
         if (err) {
             return res.status(403).send({

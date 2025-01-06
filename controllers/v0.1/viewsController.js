@@ -78,7 +78,6 @@ exports.restoreOrg = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations')
         }).catch(error => {
-            // console.log(error)
             res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
         })
     }
@@ -305,12 +304,10 @@ exports.deleteUser = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-delete')
         }).catch(error => {
-            // console.log(error)
             res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
         })
     }
 }
-
 
 exports.createSuperAdmins = (req, res) => {
     if (req.method == 'GET') {
@@ -332,4 +329,54 @@ exports.createSuperAdmins = (req, res) => {
                 res.redirect('/superadmin/users?error=true&type=user-create')
             })
         }
+}
+
+exports.detailSuperadmin = (req , res) => {
+    if ( req.method = "GET") {
+        const userId = req.params.id
+        const options = [
+            { id: 1, name: 'active' },
+            { id: 2, name: 'deleted' }
+        ];
+        axios.get (`${process.env.API_URL}/users/${userId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.render('superadmin/detail-superadmin', {user: response.data.data, options: options, errorMessage: null})
+        }).catch (error => {
+            res.redirect('superadmin/superadmins?error=true&type=get-user', {errorMessage: "User not found!"})
+        })
+    }
+}
+
+exports.deleteSuperadmin = (req, res) => {
+    if (req.method == 'GET') {
+        const userId = req.params.id
+        axios.delete(`${process.env.API_URL}/users/${userId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/users?success=true&type=user-delete')
+        }).catch(error => {
+            res.redirect('/superadmin/users?success=false&type=user-delete', { token: req.session.token, user: req.session.user, errorMessage: "Cannot delete at the moment!" });
+        })
+    }
+}
+
+exports.restoreSuperadmin = (req, res) => {
+    if (req.method == 'GET') {
+        const userId = req.params.id
+        axios.put(`${process.env.API_URL}/users/restore/${userId}`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/users?success=true&type=user-restore')
+        }).catch(error => {
+            console.log(error)
+            res.redirect('/superadmin/users?success=false&type=user-restore');
+        })
+    }
 }

@@ -26,6 +26,7 @@ exports.register = async (req, res) => {
             [name, email, phone, hashedPassword, new Date(), 'active', expiredDate, remark, orgId, role],
             (err, result) => {
                 if (err) {
+                    console.log(err)
                     res.status(500).send({
                         success: false,
                         message: 'internal server error',

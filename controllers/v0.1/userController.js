@@ -33,8 +33,6 @@ exports.createUser = async (req, res) => {
                         dev: "Error while registering new user"
                     })
                 } else {
-
-
                     var transporter = nodemailer.createTransport({
                         service: 'gmail',
                         auth: {
@@ -57,8 +55,11 @@ exports.createUser = async (req, res) => {
                                 dev: error
                             })
                         } else {
-
-                            res.status(201).send({ success: true, message: 'User created successfully', data: { name, email, phone, role, status } })
+                            res.status(201).send({
+                                success: true,
+                                message: 'User created successfully',
+                                data: { name, email, phone, role, status }
+                            })
                         }
                     });
 
@@ -157,13 +158,52 @@ exports.listUsers = (req, res) => {
     });
 };
 
+exports.getUser = (req, res) => {
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "This user is from other organization not from us"
+        })
+    }
+    const userId = req.params.id
+    let query = `SELECT * FROM users WHERE users.id = ${userId}`;
+
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+        return res.status(200).send({
+            success: true,
+            message: "We found this user!",
+            dev: "Thanks bro, you`re awesome",
+            data: results[0]
+        })
+    });
+};
+
 exports.updateUser = (req, res) => {
     const userId = req.params.id;
     const { name, email, phone, role, status, orgId } = req.body;
 
     // Ensure superadmin is updating the user (validate org_id = 0 for superadmins)
     if (req.user.orgId !== 0) {
-        return res.status(403).send({ success: false, message: 'Access denied', dev: 'Outside organization cannot update user' });
+        return res.status(403).send({
+            success: false,
+            message: 'Access denied',
+            dev: 'Outside organization cannot update user' 
+        });
     }
 
     db_connection.query(
@@ -217,13 +257,63 @@ exports.deleteUser = (req, res) => {
     // Soft delete: change status to 'deleted'
     db_connection.query('UPDATE users SET status = "deleted" WHERE id = ?', [userId], (err, result) => {
         if (err) {
-            return res.status(500).send({ success: false, message: 'Failed to delete user', dev: err.message });
+            return res.status(500).send({ 
+                success: false,
+                message: 'Failed to delete user',
+                dev: err.message
+            });
         }
 
         if (result.affectedRows === 0) {
-            return res.status(404).send({ success: false, message: 'User not found', dev: 'User with the provided ID was not found' });
+            return res.status(404).send({ 
+                success: false,
+                message: 'User not found', 
+                dev: 'User with the provided ID was not found' 
+            });
         }
-
-        res.send({ success: true, message: 'User deleted successfully', dev: 'User deleted successfully' });
+        console.log("DELETE User");
+        res.send({ 
+            success: true,
+            message: 'User deleted successfully',
+            dev: 'User deleted successfully' 
+        });
     });
 };
+
+exports.restoreUser = ( req, res ) => {
+    const userId = req.params.id
+    console.log("ABC")
+    // Ensure superadmin is deleting the user (validate org_id = 0 for superadmins)
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'Access denied',
+            dev: 'Outside organization cannot restore user',
+        });
+    }
+    
+    // Soft delete: change status to 'active'
+    const query = `UPDATE users SET status = 'active' WHERE users.id = ${userId}`
+    db_connection.query(query, (err,results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'Internal server error',
+                dev: err
+            })
+        }
+        if (results.affectedRows === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+        console.log("RESTORE User");
+        res.send({
+            success: true,
+            message: 'Restored successfully!',
+            dev: 'Thanks bro, you`re awesome!'
+        })
+    })
+}
