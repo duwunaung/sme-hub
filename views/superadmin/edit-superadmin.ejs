@@ -20,7 +20,7 @@
                     </div>
 					<div class="mb-3">
                         <label for="userRole" class="form-label">Role</label>
-                        <select id="userRole" name="role" class="form-select" disabled>
+                        <select id="userRole" name="role" class="form-select" required>
 
                             <% roles.forEach(role=> { %>
                                 <option value="<%= role.name %>" <%=role.name===user.role ? 'selected' : '' %> >
