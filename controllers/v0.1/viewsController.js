@@ -401,6 +401,9 @@ exports.updateSuperadmin = (req, res) => {
 			]
             const success = req.query.success;
             const type = req.query.type;
+			if (response.data.data['orgId'] !== 0) {
+				throw error
+			}
             if (success) {
                 if (type == 'update') {
                     res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
@@ -415,9 +418,8 @@ exports.updateSuperadmin = (req, res) => {
         })
     } else {
         const orgId = 0
-		const role = "superadmin"
 		const userId = req.params.id
-        const { name, email, phone, status } = req.body;
+        const { name, email, phone, status, role } = req.body;
         axios.put(`${process.env.API_URL}/users/${userId}`, { name, email, phone, role, status, orgId }, {
             headers: {
                 'Authorization': `${req.session.token}`
