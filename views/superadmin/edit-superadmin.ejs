@@ -51,7 +51,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn btn-success w-100 mb-2">Update</button>
-                    <a href="/superadmin/users" id="buttonTwo"	class="btn  w-100"></a>
+                    <a href="/superadmin/users" id="resetBtn"	class="btn  w-100"></a>
 					<div>
                         <p class="my-2">Registered Date: <span id="currentRegisteredDate"
                                 class="fw-bold"></span>
@@ -68,14 +68,14 @@
 				function buttonType() {
 	                const searchParams = new URLSearchParams(window.location.search);
 	                const type = searchParams.get('type')
-					const buttonTwo = document.getElementById("buttonTwo")
+					const resetBtn = document.getElementById("resetBtn")
 	                if (type == 'update') {
-						buttonTwo.innerText = "Back"
-						buttonTwo.classList.add("btn-primary")
+						resetBtn.innerText = "Back"
+						resetBtn.classList.add("btn-primary")
 	                }
 					else {
-						buttonTwo.innerText = "Cancel"
-						buttonTwo.classList.add("btn-danger")
+						resetBtn.innerText = "Cancel"
+						resetBtn.classList.add("btn-danger")
 					}
 
 	            }

@@ -64,11 +64,4 @@
                 </form>
             </div>
         </main>
-
-        <script>
-            function generatePassowrd() {
-                const password = Math.random().toString(36).slice(-8);
-                document.getElementById('userPassword').value = password;
-            }
-        </script>
         <%- include('../partials/superadmin/footer.ejs') %>

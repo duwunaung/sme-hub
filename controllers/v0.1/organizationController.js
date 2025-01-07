@@ -138,7 +138,6 @@ exports.updateOrg = (req, res) => {
     })
 }
 
-
 exports.licenseOrg = (req, res) => {
     if (req.user.orgId !== 0) {
         return res.status(403).send({
@@ -193,7 +192,6 @@ exports.licenseOrg = (req, res) => {
         })
     })
 }
-
 
 exports.deleteOrg = (req, res) => {
     if (req.user.orgId !== 0) {
@@ -261,7 +259,6 @@ exports.getOrg = (req, res) => {
         })
     })
 }
-
 
 exports.restoreOrg = (req, res) => {
     if (req.user.orgId !== 0) {
