@@ -185,11 +185,31 @@ exports.getUser = (req, res) => {
                 dev: "User not found"
             })
         }
-        return res.status(200).send({
-            success: true,
-            message: "We found this user!",
-            dev: "Thanks bro, you`re awesome",
-            data: results[0]
+        const orgId = results[0].orgId
+        orgQuery = `SELECT name FROM orgs WHERE id = ${orgId}`;
+
+        db_connection.query(orgQuery, (err, orgResult) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: 'internal server error',
+                    dev: err
+                })
+            }
+            
+            if (results.length === 0) {
+                orgName = "Not available"
+            } else {
+                orgName = orgResult[0].name
+            }
+
+            results[0].orgName = orgName
+            return res.status(200).send({
+                success: true,
+                message: "We found this user!",
+                dev: "Thanks bro, you`re awesome",
+                data: results[0]
+            })
         })
     });
 };
