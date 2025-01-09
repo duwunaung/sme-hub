@@ -40,7 +40,7 @@
                         </select>
                     </div>
                     <button type="submit" class="btn btn-success w-100 mb-2">Update Organization</button>
-                    <a href="/superadmin/organizations" class="btn btn-danger w-100">Cancel</a>
+                    <a href="/superadmin/organizations" class="btn w-100" id="resetBtn"></a>
 
                 </form>
 
@@ -61,6 +61,24 @@
                         </span></p>
                 </div>
             </div>
+			<script>
+				function buttonType() {
+	                const searchParams = new URLSearchParams(window.location.search);
+	                const type = searchParams.get('type')
+					const resetBtn = document.getElementById("resetBtn")
+	                if (type == 'update') {
+						resetBtn.innerText = "Back"
+						resetBtn.classList.add("btn-primary")
+	                }
+					else {
+						resetBtn.innerText = "Cancel"
+						resetBtn.classList.add("btn-danger")
+					}
+
+	            }
+
+	            buttonType();
+			</script>
         </main>
 
         <%- include('../partials/superadmin/footer.ejs') %>
