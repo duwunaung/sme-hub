@@ -5,7 +5,7 @@
         <main class="col-md-9 col-lg-10">
             <div class="container my-5">
                 <h2 class="mb-4">Add New System Admin</h2>
-                <form class="mb-4" method="POST">
+                <form class="mb-4" method="POST" id="myForm">
                     
                     <div class="mb-3">
                         <label for="userName" class="form-label">Admin Name</label>
@@ -31,7 +31,7 @@
                             placeholder="Enter Admin Email"  required>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 mb-2">Add</button>
+                    <button type="submit" class="btn btn-success w-100 mb-2" id="addBtn" onclick="disabledBtn()">Add</button>
                     <a href="/superadmin/users" class="btn btn-danger w-100">Cancel</a>
     
                 </form>
@@ -40,11 +40,34 @@
 
         <script>
             
-            function generatePassword() {
-                const password = Math.random().toString(36).slice(-8);
-                document.getElementById('userPassword').value = password;
-            }
+			function generatePassword() {
+			    const password = Math.random().toString(36).slice(-8);
+			    document.getElementById('userPassword').value = password;
+			}
 
-            generatePassword()
+
+			const form = document.getElementById('myForm');
+			const addButton = document.getElementById('addBtn');
+			const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+
+			function checkInputs() {
+				let allFilled = true;
+				inputs.forEach(input => {
+				  if (!input.value.trim()) {
+				    allFilled = false;
+				  }
+				});
+				addButton.disabled = !allFilled;
+			}
+
+			inputs.forEach(input => {
+				input.addEventListener('input', checkInputs);
+			});
+
+			function disabledBtn() {
+				addButton.classList.add('disabled');
+			}
+			checkInputs();
+            generatePassword();
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>
