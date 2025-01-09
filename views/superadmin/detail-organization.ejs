@@ -131,11 +131,13 @@
                                                                     <%= new Date(users[i].registered).toDateString() %>
                                                                 </td>
                                                                 <td>
-                                                                    <a href="/superadmin/organizations/updateuser/<%= org.id %>/<%= users[i].id %>"
+                                                                    <a href="/superadmin/organizations/detail/<%= org.id %>/<%= users[i].id %>"
+                                                                        class="btn btn-primary btn-sm">View</a>
+                                                                    <a href="/superadmin/organizations/update/<%= org.id %>/<%= users[i].id %>"
                                                                         class="btn btn-warning btn-sm">Edit</a>
                                                                     <% if (users[i].status=='deleted' ) { %>
-                                                                        <a href="#"
-                                                                            class="btn btn-danger btn-sm disabled">Delete</a>
+                                                                        <a href="/superadmin/organizations/restoreuser/<%= users[i].id %>?orgId=<%= users[i].orgId %>"
+                                                                            class="btn btn-danger btn-sm">Restore</a>
                                                                         <% } else {%>
                                                                             <a href="/superadmin/organizations/deleteuser/<%= users[i].id %>?orgId=<%= users[i].orgId %>"
                                                                                 class="btn btn-danger btn-sm">Delete</a>
@@ -147,7 +149,6 @@
                                                     </tbody>
                                                 </table>
                                                 <% } %>
-
                                     </div>
                                 </div>
             </div>
@@ -194,6 +195,28 @@
             }
 
             checkError();
+
+            // Ensure users section 'active' in detail-organization ( While get query = 'activeUsers' )
+            function usersActive() {
+                const searchParams = new URLSearchParams(window.location.search);
+                const activeUsers = searchParams.get('activeUsers')
+                if (activeUsers) {
+                    const tabs = document.querySelectorAll('.view-tab');
+                    tabs.forEach(tab => {
+                        tab.classList.remove('active');
+                    })
+                    document.querySelector(`.users-tab`).classList.add('active');
+
+                    const containers = document.querySelectorAll('.view-containers');
+                    containers.forEach(container => {
+                        container.classList.add('d-none');
+                    })
+                    document.getElementById(`users-view`).classList.remove('d-none');
+                }
+            }
+
+            usersActive();
+
         </script>
         <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
             <div class="modal-dialog">

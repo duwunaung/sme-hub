@@ -13,7 +13,7 @@ exports.createUser = async (req, res) => {
     }
 
     try {
-        const { name, password, phone, role, email, orgId, status = 'active' } = req.body
+        const { name, password, phone, role, email, orgId, status } = req.body
         const hashedPassword = await bcrypt.hashSync(password, 10)
         if (role == 'superadmin') {
             return res.status(403).send({
@@ -167,6 +167,7 @@ exports.getUser = (req, res) => {
         })
     }
     const userId = req.params.id
+    
     let query = `SELECT * FROM users WHERE users.id = ${userId}`;
 
     db_connection.query(query, (err, results) => {
@@ -282,7 +283,6 @@ exports.deleteUser = (req, res) => {
 
 exports.restoreUser = ( req, res ) => {
     const userId = req.params.id
-    console.log("ABC")
     // Ensure superadmin is deleting the user (validate org_id = 0 for superadmins)
     if (req.user.orgId !== 0) {
         return res.status(403).send({
