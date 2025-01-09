@@ -236,7 +236,8 @@ exports.updateUser = (req, res) => {
                     {
                         success: false,
                         message: 'Failed to update user',
-                        dev: err.message
+                        dev: err.message,
+						code: err.code
                     }
                 );
             }
