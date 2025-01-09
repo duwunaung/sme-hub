@@ -11,6 +11,11 @@
                     <%= successMessage %>
                 </div>
                 <% } %>
+				<% if (errorMessage) { %>
+					<div id="errorBox" class="alert alert-danger" role="alert">
+						<%= errorMessage %>
+					</div>
+					<% } %>
                 <!-- user Details Form -->
                 <form class="mb-4" method="POST">
                     <div class="mb-3">
