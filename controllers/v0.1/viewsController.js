@@ -430,7 +430,7 @@ exports.detailSuperadmin = (req , res) => {
         }).then(response => {
             res.render('superadmin/detail-superadmin', {user: response.data.data, options: options, errorMessage: null})
         }).catch (error => {
-            res.redirect('superadmin/superadmins?error=true&type=get-user', {errorMessage: "User not found!"})
+            res.redirect('/superadmin/users?error=true&type=get-user')
         })
     }
 }
