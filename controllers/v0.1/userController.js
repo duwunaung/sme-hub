@@ -185,6 +185,7 @@ exports.getUser = (req, res) => {
                 dev: "User not found"
             })
         }
+
         const orgId = results[0].orgId
         orgQuery = `SELECT name FROM orgs WHERE id = ${orgId}`;
 
@@ -197,12 +198,11 @@ exports.getUser = (req, res) => {
                 })
             }
             
-            if (results.length === 0) {
-                orgName = "Not available"
+            if (orgResult.length === 0) {
+                orgName = ""
             } else {
                 orgName = orgResult[0].name
             }
-
             results[0].orgName = orgName
             return res.status(200).send({
                 success: true,
