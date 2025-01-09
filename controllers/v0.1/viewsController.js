@@ -430,7 +430,7 @@ exports.detailSuperadmin = (req , res) => {
         }).then(response => {
             res.render('superadmin/detail-superadmin', {user: response.data.data, options: options, errorMessage: null})
         }).catch (error => {
-            res.redirect('/superadmin/users?error=true&type=get-user')
+            res.redirect('/superadmin/users?foferror=true')
         })
     }
 }
@@ -478,33 +478,23 @@ exports.updateSuperadmin = (req, res) => {
                 { id: 1, name: 'active' },
                 { id: 2, name: 'deleted' }
             ];
-			const roles = [
-				{
-					id: 1,
-					name: 'superadmin'
-				}
-			]
             const success = req.query.success;
-            const type = req.query.type;
 			if (response.data.data['orgId'] !== 0) {
 				throw error
 			}
             if (success) {
-                if (type == 'update') {
-                    res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
-                } else {
-                    res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Extended!" });
-                }
+                res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
             } else {
-                res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
+                res.render('superadmin/edit-superadmin', { user: response.data.data, options: options,  errorMessage: null, successMessage: null });
             }
         }).catch(error => {
-            res.redirect('/superadmin/users');
+            res.redirect('/superadmin/users?foferror=true');
         })
     } else {
         const orgId = 0
 		const userId = req.params.id
-        const { name, email, phone, status, role } = req.body;
+		const role = "superadmin"
+        const { name, email, phone, status } = req.body;
         axios.put(`${process.env.API_URL}/users/${userId}`, { name, email, phone, role, status, orgId }, {
             headers: {
                 'Authorization': `${req.session.token}`
