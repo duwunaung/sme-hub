@@ -4,6 +4,7 @@
         <!-- Main Content -->
         <main class="col-md-9 col-lg-10">
             <div class="container my-5">
+				<div id="errMessage" class="alert alert-danger d-none" role="alert"></div>
                 <h2 class="mb-4">Add New System Admin</h2>
                 <form class="mb-4" method="POST" id="myForm">
                     
@@ -27,11 +28,11 @@
 
                     <div class="mb-3">
                         <label for="userEmail" class="form-label">Email</label>
-                        <input type="text" class="form-control" name="email" id="userEmail"
+                        <input type="email" class="form-control" name="email" id="userEmail"
                             placeholder="Enter Admin Email"  required>
                     </div>
 
-                    <button type="submit" class="btn btn-success w-100 mb-2" id="addBtn" onclick="disabledBtn()">Add</button>
+                    <button type="submit" class="btn btn-success w-100 mb-2" id="addBtn">Add</button>
                     <a href="/superadmin/users" class="btn btn-danger w-100">Cancel</a>
     
                 </form>
@@ -64,9 +65,22 @@
 				input.addEventListener('input', checkInputs);
 			});
 
-			function disabledBtn() {
-				addButton.classList.add('disabled');
-			}
+			form.addEventListener('submit', function (event) {
+			    addButton.disabled = true;
+			    addButton.textContent = 'Submitting...'; // Optionally change button text to indicate progress
+			});
+
+			function errorMessage() {
+                const searchParams = new URLSearchParams(window.location.search);
+				const error = searchParams.get('error')
+				const errMessage = document.getElementById('errMessage')
+				if ( error === "true") {
+					errMessage.innerText = "System Error!"
+					errMessage.classList.remove("d-none")
+				}
+            }
+
+            errorMessage();
 			checkInputs();
             generatePassword();
         </script>
