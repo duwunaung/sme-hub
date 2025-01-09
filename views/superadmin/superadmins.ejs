@@ -75,5 +75,21 @@
                             </table>
                         </div>
             </div>
+			<script>
+				function errorMessage() {
+	                const searchParams = new URLSearchParams(window.location.search);
+	                const type = searchParams.get('type')
+					const error = searchParams.get('error')
+					
+					if (error === "true") {
+						if (type === "get-user") {
+							alert("404 User not found!")
+						}
+					}
+
+	            }
+
+	            errorMessage();
+			</script>
         </main>
         <%- include('../partials/superadmin/footer.ejs') %>
