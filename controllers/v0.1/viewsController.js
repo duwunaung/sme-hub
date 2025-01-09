@@ -283,10 +283,8 @@ exports.createUser = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            console.log("success")
             res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&aciveUsers=true')
         }).catch(error => {
-            console.log("Error")
             res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create&aciveUsers=true')
         })
     }

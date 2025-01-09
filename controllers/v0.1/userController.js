@@ -292,7 +292,6 @@ exports.deleteUser = (req, res) => {
                 dev: 'User with the provided ID was not found' 
             });
         }
-        console.log("DELETE User");
         res.send({ 
             success: true,
             message: 'User deleted successfully',
@@ -329,7 +328,6 @@ exports.restoreUser = ( req, res ) => {
                 dev: "User not found"
             })
         }
-        console.log("RESTORE User");
         res.send({
             success: true,
             message: 'Restored successfully!',

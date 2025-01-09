@@ -3,7 +3,6 @@ const jwt = require('jsonwebtoken')
 const JWT_SECRET = process.env.JWT_SECRET
 
 const tmpSession = (req, res, next) => {
-    console.log("correctPath")
     if (req.session.token) {
         const token = req.session.token
         jwt.verify(token, JWT_SECRET, (err, user) => {
