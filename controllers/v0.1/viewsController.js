@@ -477,13 +477,19 @@ exports.updateSuperadmin = (req, res) => {
                 { id: 2, name: 'deleted' }
             ];
             const success = req.query.success;
+			const errorMsg = req.query.error;
+			const type = req.query.type;
 			if (response.data.data['orgId'] !== 0) {
 				throw error
 			}
             if (success) {
                 res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
             } else {
-                res.render('superadmin/edit-superadmin', { user: response.data.data, options: options,  errorMessage: null, successMessage: null });
+				if (errorMsg && type === "dup-email") {
+					res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, errorMessage: "Duplicate Email!", successMessage: null });
+				} else {
+                	res.render('superadmin/edit-superadmin', { user: response.data.data, options: options,  errorMessage: null, successMessage: null });
+				}
             }
         }).catch(error => {
             res.redirect('/superadmin/users?foferror=true');
@@ -500,7 +506,12 @@ exports.updateSuperadmin = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/users/update/' + userId + '?success=true&type=update')
         }).catch(error => {
-            res.redirect('/superadmin/users');
+			const errCode = error.response.data.code
+			if (errCode === "ER_DUP_ENTRY"){
+           		res.redirect('/superadmin/users/update/' + userId + '?error=true&type=dup-email');
+			} else {
+				res.redirect('/superadmin/users');
+			}
         })
     }
 }
