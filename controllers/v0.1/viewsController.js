@@ -408,7 +408,7 @@ exports.createSuperAdmins = (req, res) => {
             }).then(response => {
                 res.redirect('/superadmin/users')
             }).catch(error => {
-                res.redirect('/superadmin/users?error=true&type=user-create')
+                res.redirect('/superadmin/add-superadmin?error=true&type=user-create')
             })
         }
         
