@@ -12,7 +12,7 @@
                 </div>
                 <% } %>
                 <!-- Organization Details Form -->
-                <form class="mb-4" method="POST">
+                <form class="mb-4" method="POST" id="myForm">
                     <div class="mb-3">
                         <label for="orgName" class="form-label">Organization Name</label>
                         <input type="text" class="form-control" name="name" id="orgName"
@@ -39,7 +39,7 @@
                                 <% }); %>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-success w-100 mb-2">Update Organization</button>
+                    <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Organization</button>
                     <a href="/superadmin/organizations" class="btn w-100" id="resetBtn"></a>
 
                 </form>
@@ -78,6 +78,31 @@
 	            }
 
 	            buttonType();
+
+                const form = document.getElementById('myForm');
+                const addButton = document.getElementById('addBtn');
+                const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+
+                function checkInputs() {
+                    let allFilled = true;
+                    inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        allFilled = false;
+                    }
+                    });
+                    addButton.disabled = !allFilled;
+                }
+
+                inputs.forEach(input => {
+                    input.addEventListener('input', checkInputs);
+                });
+
+                form.addEventListener('submit', function (event) {
+                    addButton.disabled = true;
+                    addButton.textContent = 'Submitting...';
+                });
+
+                checkInputs();
 			</script>
         </main>
 

@@ -17,7 +17,7 @@
 					</div>
 					<% } %>
                 <!-- user Details Form -->
-                <form class="mb-4" method="POST">
+                <form class="mb-4" method="POST" id="myForm">
                     <div class="mb-3">
                         <label for="userName" class="form-label">Username</label>
                         <input type="text" class="form-control" name="name" id="userName"
@@ -44,7 +44,7 @@
                                 <% }); %>
                         </select>
                     </div>
-                    <button type="submit" class="btn btn-success w-100 mb-2">Update</button>
+                    <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update</button>
                     <a href="/superadmin/users" id="resetBtn"	class="btn  w-100"></a>
 					<div>
                         <p class="my-2">Registered Date: <span id="currentRegisteredDate"
@@ -75,6 +75,31 @@
 	            }
 
 	            buttonType();
+
+                const form = document.getElementById('myForm');
+                const addButton = document.getElementById('addBtn');
+                const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+
+                function checkInputs() {
+                    let allFilled = true;
+                    inputs.forEach(input => {
+                    if (!input.value.trim()) {
+                        allFilled = false;
+                    }
+                    });
+                    addButton.disabled = !allFilled;
+                }
+
+                inputs.forEach(input => {
+                    input.addEventListener('input', checkInputs);
+                });
+
+                form.addEventListener('submit', function (event) {
+                    addButton.disabled = true;
+                    addButton.textContent = 'Submitting...';
+                });
+
+                checkInputs();
 			</script>
         </main>
 

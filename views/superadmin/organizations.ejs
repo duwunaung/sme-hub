@@ -106,10 +106,36 @@
                                         <% }); %>
                                 </select>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Add Organization</button>
+                            <button type="submit" id="addBtn" class="btn btn-primary w-100">Add Organization</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
+            const form = document.getElementById('addOrganizationForm');
+            const addButton = document.getElementById('addBtn');
+            const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+
+            function checkInputs() {
+                let allFilled = true;
+                inputs.forEach(input => {
+                if (!input.value.trim()) {
+                    allFilled = false;
+                }
+                });
+                addButton.disabled = !allFilled;
+            }
+
+            inputs.forEach(input => {
+                input.addEventListener('input', checkInputs);
+            });
+
+            form.addEventListener('submit', function (event) {
+                addButton.disabled = true;
+                addButton.textContent = 'Submitting...';
+            });
+
+            checkInputs();
+        </script>
         <%- include('../partials/superadmin/footer.ejs') %>
