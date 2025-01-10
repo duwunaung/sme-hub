@@ -232,14 +232,24 @@ exports.updateUser = (req, res) => {
         [name, email, phone, role, status, orgId, userId],
         (err, result) => {
             if (err) {
-                return res.status(500).send(
-                    {
-                        success: false,
-                        message: 'Failed to update user',
-                        dev: err.message,
-						code: err.code
-                    }
-                );
+                if (err.code ==  "ER_DUP_ENTRY") {
+                    return res.status(409).send(
+                        {
+                            success: false,
+                            message: 'Email duplicate error',
+                            dev: err.message
+                        }
+                    );
+                } else {
+                    return res.status(500).send(
+                        {
+                            success: false,
+                            message: 'Failed to update user',
+                            dev: err.message,
+                            code: err.code
+                        }
+                    );
+                }
             }
 
             if (result.affectedRows === 0) {
