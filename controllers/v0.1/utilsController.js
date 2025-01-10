@@ -26,11 +26,19 @@ exports.register = async (req, res) => {
             [name, email, phone, hashedPassword, new Date(), 'active', expiredDate, remark, orgId, role],
             (err, result) => {
                 if (err) {
-                    res.status(500).send({
-                        success: false,
-                        message: 'internal server error',
-                        dev: "Error while registering new user"
-                    })
+                    if (err.code ==  "ER_DUP_ENTRY") {
+                        return res.status(409).send({
+                            success: false,
+                            message: 'Email duplicate error',
+                            dev: err.message
+                        });
+                    } else {
+                        return res.status(500).send({
+                            success: false,
+                            message: 'internal server error',
+                            dev: "Error while registering new user"
+                        })
+                    }
                 } else {
                     var transporter = nodemailer.createTransport({
                         service: 'gmail',

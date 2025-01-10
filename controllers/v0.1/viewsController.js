@@ -287,9 +287,9 @@ exports.createUser = (req, res) => {
             res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&aciveUsers=true')
         }).catch(error => {
             if (error.status === 409){
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&aciveUsers=true')
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email')
             } else {
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create&aciveUsers=true')
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create')
             }
         })
     }
@@ -408,7 +408,15 @@ exports.updateUser = (req, res) => {
 
 exports.createSuperAdmins = (req, res) => {
     if (req.method == 'GET') {
-        res.render('superadmin/add-superadmin', { errorMessage: null });
+        if (req.query.error) {
+            if ( req.query.type == 'dup-email') {
+                res.render('superadmin/add-superadmin', { errorMessage: "Duplicate error!" });
+            } else {
+                res.render('superadmin/add-superadmin', { errorMessage: "Internal server error!" });
+            }
+        } else {
+            res.render('superadmin/add-superadmin', { user: "", errorMessage: null });
+        }
     } else 
         if (req.method == 'POST') {
             const role = "superadmin"
@@ -423,8 +431,11 @@ exports.createSuperAdmins = (req, res) => {
             }).then(response => {
                 res.redirect('/superadmin/users')
             }).catch(error => {
-                console.log(error)
-                res.redirect('/superadmin/add-superadmin?error=true&type=user-create')
+                if (error.status === 409){
+                    res.redirect('/superadmin/add-superadmin?error=true&type=dup-email')
+                } else {
+                    res.redirect('/superadmin/add-superadmin?error=true&type=user-create')
+                }
             })
         }
         

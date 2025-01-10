@@ -4,7 +4,12 @@
         <!-- Main Content -->
         <main class="col-md-9 col-lg-10">
             <div class="container my-5">
-				<div id="errMessage" class="alert alert-danger d-none" role="alert"></div>
+                <% if (errorMessage) { %>
+                <div id="errorBox" class="alert alert-danger" role="alert">
+                    <%= errorMessage %>
+                </div>
+                <% } %>
+
                 <h2 class="mb-4">Add New System Admin</h2>
                 <form class="mb-4" method="POST" id="myForm">
                     
@@ -46,7 +51,6 @@
 			    document.getElementById('userPassword').value = password;
 			}
 
-
 			const form = document.getElementById('myForm');
 			const addButton = document.getElementById('addBtn');
 			const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
@@ -67,20 +71,9 @@
 
 			form.addEventListener('submit', function (event) {
 			    addButton.disabled = true;
-			    addButton.textContent = 'Submitting...'; // Optionally change button text to indicate progress
+			    addButton.textContent = 'Submitting...';
 			});
 
-			function errorMessage() {
-                const searchParams = new URLSearchParams(window.location.search);
-				const error = searchParams.get('error')
-				const errMessage = document.getElementById('errMessage')
-				if ( error === "true") {
-					errMessage.innerText = "System Error!"
-					errMessage.classList.remove("d-none")
-				}
-            }
-
-            errorMessage();
 			checkInputs();
             generatePassword();
         </script>
