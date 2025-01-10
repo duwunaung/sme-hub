@@ -177,7 +177,7 @@
             function checkError() {
                 const searchParams = new URLSearchParams(window.location.search);
                 const errorType = searchParams.get('type')
-                if (errorType == 'user-create') {
+                if (errorType == 'user-create' || errorType == 'dup-email') {
 
                     const tabs = document.querySelectorAll('.view-tab');
                     tabs.forEach(tab => {
@@ -242,12 +242,12 @@
 
                             <div class="mb-3">
                                 <label for="userPhone" class="form-label">Phone</label>
-                                <input type="text" class="form-control" name="phone" id="userPhone"
+                                <input type="tel" class="form-control" name="phone" id="userPhone"
                                     placeholder="Enter User Phone" value="" required>
                             </div>
                             <div class="mb-3">
                                 <label for="userEmail" class="form-label">Email</label>
-                                <input type="text" class="form-control" name="email" id="userEmail"
+                                <input type="email" class="form-control" name="email" id="userEmail"
                                     placeholder="Enter User Email" value="" required>
                             </div>
 

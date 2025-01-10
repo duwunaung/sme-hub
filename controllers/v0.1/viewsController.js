@@ -246,8 +246,25 @@ exports.superadmins = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.render('superadmin/superadmins', { users: response.data.data, errorMessage: null });
-
+            if (req.query.success) {
+                if (req.query.type == 'user-create') {
+                    res.render('superadmin/superadmins', { users: response.data.data, errorMessage: null, successMessage: "Successfully created." });
+                } else if (req.query.type == 'user-delete') {
+                    res.render('superadmin/superadmins', { users: response.data.data, errorMessage: null, successMessage: "Successfully deleted." });
+                } else if (req.query.type == 'user-restore') {
+                    res.render('superadmin/superadmins', { users: response.data.data, errorMessage: null, successMessage: "Successfully restored." });
+                }
+            } else if (req.query.error) {
+                if (req.query.type == 'user-create') {
+                    res.render('superadmin/superadmins', { users: response.data.data, errorMessage: "Cannot create at the moment!", successMessage: null });
+                } else if (req.query.type == 'user-delete') {
+                    res.render('superadmin/superadmins', { users: response.data.data, errorMessage: "Cannot delete at the moment!", successMessage: null });
+                } else if (req.query.type == 'user-restore') {
+                    res.render('superadmin/superadmins', { users: response.data.data, errorMessage: "Cannot restore at the moment!", successMessage: null });
+                }
+            } else {
+                res.render('superadmin/superadmins', { users: response.data.data, errorMessage: null, successMessage: null });
+            }
         }).catch(error => {
             res.render('superadmin/superadmins', { users: [], errorMessage: "System Error!" });
         })
@@ -414,6 +431,8 @@ exports.createSuperAdmins = (req, res) => {
             } else {
                 res.render('superadmin/add-superadmin', { errorMessage: "Internal server error!" });
             }
+        } else if (req.query.success) {
+            res.render('superadmin/add-superadmin', { user: "", errorMessage: null });
         } else {
             res.render('superadmin/add-superadmin', { user: "", errorMessage: null });
         }
@@ -429,7 +448,7 @@ exports.createSuperAdmins = (req, res) => {
                     'Authorization': `${req.session.token}`
                 }
             }).then(response => {
-                res.redirect('/superadmin/users')
+                res.redirect('/superadmin/users?success=true&type=user-create')
             }).catch(error => {
                 if (error.status === 409){
                     res.redirect('/superadmin/add-superadmin?error=true&type=dup-email')
@@ -470,7 +489,7 @@ exports.deleteSuperadmin = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/users?success=true&type=user-delete')
         }).catch(error => {
-            res.redirect('/superadmin/users?success=false&type=user-delete', { token: req.session.token, user: req.session.user, errorMessage: "Cannot delete at the moment!" });
+            res.redirect('/superadmin/users?error=true&type=user-delete', { token: req.session.token, user: req.session.user, errorMessage: "Cannot delete at the moment!" });
         })
     }
 }
@@ -485,7 +504,7 @@ exports.restoreSuperadmin = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/users?success=true&type=user-restore')
         }).catch(error => {
-            res.redirect('/superadmin/users?success=false&type=user-restore');
+            res.redirect('/superadmin/users?error=true&type=user-restore');
         })
     }
 }
