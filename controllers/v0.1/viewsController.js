@@ -48,17 +48,31 @@ exports.orgs = (req, res) => {
         }).then(response => {
             const error = req.query.error;
             const type = req.query.type;
-
+			const success = req.query.success;
             const options = [
                 { id: 1, name: 'active' },
                 { id: 2, name: 'deleted' }
             ];
             if (error) {
                 if (type == 'register') {
-                    res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: "Cannot register at the moment!" });
+                    res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: "Cannot register at the moment!" , successMessage: null});
+                } else if (type == '404Error') {
+                    res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: "404 Organization Not Found!" , successMessage: null});
+                } else if (type == 'sysError') {
+                    res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: "Internal Server Error!" , successMessage: null});
                 }
-            } else {
-                res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: null });
+            } else if (success) {
+				if (type === 'register') {
+					res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: null , successMessage: "Successfully created!"});
+				} else if (type === 'org-delete') {
+					res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: null , successMessage: "Successfully deleted!"});
+				} else if (type === 'org-restore') {
+					res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: null , successMessage: "Successfully restored!"});
+				}
+
+            }
+			else {
+                res.render('superadmin/organizations', { orgs: response.data.data, options: options, errorMessage: null , successMessage: null});
             }
 
         }).catch(error => {
@@ -76,9 +90,14 @@ exports.restoreOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations')
+            res.redirect('/superadmin/organizations?success=true&type=org-restore')
         }).catch(error => {
-            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+            if (error.status == 404) {
+				res.redirect('/superadmin/organizations?error=true&type=404Error')
+			}
+			else {
+				res.redirect('/superadmin/organizations?error=true&type=sysError')
+			}
         })
     }
 }
@@ -92,9 +111,15 @@ exports.deleteOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations')
+            res.redirect('/superadmin/organizations?success=true&type=org-delete')
         }).catch(error => {
-            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+			if (error.status == 404) {
+				res.redirect('/superadmin/organizations?error=true&type=404Error')
+			}
+			else {
+				res.redirect('/superadmin/organizations?error=true&type=sysError')
+			}
+            
         })
     }
 }
@@ -113,17 +138,28 @@ exports.updateOrg = (req, res) => {
             ];
             const success = req.query.success;
             const type = req.query.type;
+			const error = req.query.error;
             if (success) {
                 if (type == 'update') {
                     res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
                 } else {
                     res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Extended!" });
                 }
-            } else {
+            } else if (error) {
+				if (type == 'sysError') {
+					res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: "Internal Server Error!", successMessage: null });
+				}
+			}
+			else {
                 res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
-            res.render('superadmin/edit-organization', { org: {}, errorMessage: "System Error!", successMessage: null });
+			if (error.status == 404) {
+				res.redirect('/superadmin/organizations?error=true&type=404Error');
+			} else {
+				res.render('superadmin/edit-organization', { org: {}, errorMessage: "System Error!", successMessage: null });
+			}
+            
         })
     } else {
         const orgId = req.params.id
@@ -135,7 +171,7 @@ exports.updateOrg = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=update')
         }).catch(error => {
-            res.render('/superadmin/organizations/update/' + orgId, { org: {}, errorMessage: "System Error!" });
+            res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=sysError');
         })
     }
 
@@ -167,7 +203,7 @@ exports.registerOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations')
+            res.redirect('/superadmin/organizations?success=true&type=register')
         }).catch(error => {
             res.redirect('/superadmin/organizations?error=true&type=register')
         })
@@ -216,8 +252,10 @@ exports.detailOrg = (req, res) => {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot restore user at the moment!", successMessage: null });
                     } else if (req.query.type == 'dup-email') {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
+                    } else if (req.query.type == '404Error') {
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "404 User Not Found!", successMessage: null });
                     } else {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "System Error!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Internal Server Error!", successMessage: null });
                     }
                 } else {
                     if (req.query.type == 'user-create') {
@@ -234,7 +272,12 @@ exports.detailOrg = (req, res) => {
                 res.render('superadmin/detail-organization', { org: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
             })
         }).catch(error => {
-            res.render('superadmin/detail-organization', { org: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
+			if (error.status == 404) {
+				res.redirect('/superadmin/organizations?error=true&type=404Error')
+			} else {
+				res.render('superadmin/detail-organization', { org: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
+			}
+            
         })
     }
 }
@@ -319,6 +362,7 @@ exports.createUser = (req, res) => {
 exports.detailUser = (req , res) => {
     if ( req.method = "GET") {
         const userId = req.params.userId
+		const orgId = req.params.id
         const options = [
             { id: 1, name: 'active' },
             { id: 2, name: 'deleted' },
@@ -329,10 +373,20 @@ exports.detailUser = (req , res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.render('superadmin/detail-user', {user: response.data.data, options: options, errorMessage: null})
+			const id = response.data.data.orgId
+			if (id == orgId) {
+				res.render('superadmin/detail-user', {user: response.data.data, options: options, errorMessage: null});
+			} else {
+				res.redirect('/superadmin/organizations?error=true&type=404Error');
+			}
+            
         }).catch (error => {
 			console.log(error.status)
-            res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=get-user', {errorMessage: "User not found!"})
+			if (error.status == 404) {
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true')
+			} else{
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true')
+			}
         })
     }
 }
@@ -349,7 +403,12 @@ exports.deleteUser = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-delete&activeUsers=true')
         }).catch(error => {
-            res.render('superadmin/organizations/detail/' + orgId + '?activeUsers=true', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot delete at the moment!" });
+			if (error.status == 404) {
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true')
+			} else {
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true')
+			}
+            
         })
     }
 }
@@ -366,7 +425,11 @@ exports.restoreUser = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-restore&activeUsers=true')
         }).catch(error => {
-            res.render('superadmin/organizations/detail/' + orgId + '?activeUsers=true', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+            if (error.status == 404) {
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true')
+			} else {
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true')
+			}
         })
     }
 }
@@ -406,7 +469,14 @@ exports.updateUser = (req, res) => {
                 res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
-            res.redirect('/superadmin/organizations/detail/' + orgId );
+			if (error.status == 404)
+			{
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true' );
+			}
+			else {
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true' );
+			}
+            
         })
     } else {
         const orgId = req.params.id
