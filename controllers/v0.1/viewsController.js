@@ -206,7 +206,7 @@ exports.detailOrg = (req, res) => {
                 headers: {
                     'Authorization': `${req.session.token}`
                 }
-            }).then(users => {
+            }).then( users => {
                 if (error) {
                     if (req.query.type == 'user-create') {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot create user at the moment!", successMessage: null });
@@ -214,7 +214,9 @@ exports.detailOrg = (req, res) => {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot delete user at the moment!", successMessage: null });
                     } else if (req.query.type == 'user-restore') {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot restore user at the moment!", successMessage: null });
-                    }  else {
+                    } else if (req.query.type == 'dup-email') {
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
+                    } else {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "System Error!", successMessage: null });
                     }
                 } else {
@@ -228,7 +230,6 @@ exports.detailOrg = (req, res) => {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
                     }
                 }
-
             }).catch(error => {
                 res.render('superadmin/detail-organization', { org: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
             })
@@ -285,7 +286,11 @@ exports.createUser = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&aciveUsers=true')
         }).catch(error => {
-            res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create&aciveUsers=true')
+            if (error.status === 409){
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&aciveUsers=true')
+            } else {
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create&aciveUsers=true')
+            }
         })
     }
 }
