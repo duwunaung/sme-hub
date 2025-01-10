@@ -214,7 +214,7 @@ exports.detailOrg = (req, res) => {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot delete user at the moment!", successMessage: null });
                     } else if (req.query.type == 'user-restore') {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "Cannot restore user at the moment!", successMessage: null });
-                    } else {
+                    }  else {
                         res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, options: options, roles: roles, errorMessage: "System Error!", successMessage: null });
                     }
                 } else {
@@ -365,9 +365,16 @@ exports.updateUser = (req, res) => {
                 { id: 3, name: 'staff' }
 			];
             const success = req.query.success;
+            const errorMsg = req.query.error;
             const type = req.query.type;
             if (success) {
                 res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
+            } else if (errorMsg) {
+                if ( type == "dup-email") {
+                    res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
+                } else {
+                    res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: "Something went wrong!", successMessage: null });
+                }
             } else {
                 res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
             }
@@ -377,16 +384,19 @@ exports.updateUser = (req, res) => {
     } else {
         const orgId = req.params.id
 		const userId = req.params.userId
-        const orgName = "empty"
-        const { name, email, phone, status, role } = req.body;
+        const { name, email, phone, status, role, orgName } = req.body;
         axios.put(`${process.env.API_URL}/users/${userId}`, { name, orgName, email, phone, role, status, orgId }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/update/' + orgId  +  '/' + userId + '?success=true&type=update&activeUsers=true')
+            res.redirect('/superadmin/organizations/update/' + orgId +  '/' + userId + '?success=true&type=update&activeUsers=true')
         }).catch(error => {
-            res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=update&activeUsers=true')
+            if (error.status === 409){
+                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=dup-email');
+            } else {
+                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=404Error&activeUsers=true');
+            }
         })
     }
 }
@@ -408,6 +418,7 @@ exports.createSuperAdmins = (req, res) => {
             }).then(response => {
                 res.redirect('/superadmin/users')
             }).catch(error => {
+                console.log(error)
                 res.redirect('/superadmin/add-superadmin?error=true&type=user-create')
             })
         }
