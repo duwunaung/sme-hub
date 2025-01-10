@@ -261,7 +261,11 @@ exports.superadmins = (req, res) => {
                     res.render('superadmin/superadmins', { users: response.data.data, errorMessage: "Cannot delete at the moment!", successMessage: null });
                 } else if (req.query.type == 'user-restore') {
                     res.render('superadmin/superadmins', { users: response.data.data, errorMessage: "Cannot restore at the moment!", successMessage: null });
-                }
+                } else if (req.query.type == '404Error') {
+					res.render('superadmin/superadmins', { users: response.data.data, errorMessage: "404 User Not Found!", successMessage: null });
+				} else if (req.query.type == 'sysError') {
+					res.render('superadmin/superadmins', { users: response.data.data, errorMessage: "Internal Server Error!", successMessage: null });
+				}
             } else {
                 res.render('superadmin/superadmins', { users: response.data.data, errorMessage: null, successMessage: null });
             }
@@ -327,6 +331,7 @@ exports.detailUser = (req , res) => {
         }).then(response => {
             res.render('superadmin/detail-user', {user: response.data.data, options: options, errorMessage: null})
         }).catch (error => {
+			console.log(error.status)
             res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=get-user', {errorMessage: "User not found!"})
         })
     }
@@ -474,7 +479,11 @@ exports.detailSuperadmin = (req , res) => {
         }).then(response => {
             res.render('superadmin/detail-superadmin', {user: response.data.data, options: options, errorMessage: null})
         }).catch (error => {
-            res.redirect('/superadmin/users?foferror=true')
+			if (error.status === 404) {
+				res.redirect('/superadmin/users?error=true&type=404Error')
+			} else {
+				res.redirect('/superadmin/users?error=true&type=sysError')
+			}
         })
     }
 }
@@ -489,7 +498,7 @@ exports.deleteSuperadmin = (req, res) => {
         }).then(response => {
             res.redirect('/superadmin/users?success=true&type=user-delete')
         }).catch(error => {
-            res.redirect('/superadmin/users?error=true&type=user-delete', { token: req.session.token, user: req.session.user, errorMessage: "Cannot delete at the moment!" });
+            res.redirect('/superadmin/users?error=true&type=user-delete');
         })
     }
 }
@@ -531,8 +540,8 @@ exports.updateSuperadmin = (req, res) => {
             if ( errorMsg ) {
                 if (type === "dup-email") {
 					res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, errorMessage: "Duplicate Email!", successMessage: null });
-				} else {
-                	res.render('superadmin/edit-superadmin', { user: response.data.data, options: options,  errorMessage: "404 User not found!", successMessage: null });
+				} else if(type === "sysError") {
+                	res.render('superadmin/edit-superadmin', { user: response.data.data, options: options,  errorMessage: "Internal Server Error!", successMessage: null });
 				}
             } else if (success) {
                 res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
@@ -540,7 +549,11 @@ exports.updateSuperadmin = (req, res) => {
                 res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
-            res.redirect('/superadmin/users?foferror=true');
+			if (error.status === 404) {
+				res.redirect('/superadmin/users?error=true&type=404Error');
+			} else {
+				res.redirect('/superadmin/users?error=true&type=sysError');
+			}
         })
     } else {
         const orgId = 0
@@ -557,7 +570,7 @@ exports.updateSuperadmin = (req, res) => {
 			if (error.status === 409){
            		res.redirect('/superadmin/users/update/' + userId + '?error=true&type=dup-email');
 			} else {
-				res.redirect('/superadmin/users/update/' + userId + '?error=true&type=404Error');
+				res.redirect('/superadmin/users/update/' + userId + '?error=true&type=sysError');
 			}
         })
     }
