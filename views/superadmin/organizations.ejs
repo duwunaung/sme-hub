@@ -11,6 +11,11 @@
                         <%= errorMessage %>
                     </div>
                     <% } %>
+					<% if (successMessage) { %>
+                        <div id="successBox" class="alert alert-success" role="alert">
+                            <%= successMessage %>
+                        </div>
+                        <% } %>
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2>Organizations</h2>
                             <button class="btn btn-primary" data-bs-toggle="modal"
