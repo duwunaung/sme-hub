@@ -5,7 +5,6 @@
         <!-- Main Content -->
         <main class="col-md-9 col-lg-10">
             <div class="content">
-				<div id="errMessage" class="alert alert-danger d-none" role="alert"></div>
                 <% if (errorMessage) { %>
                     <div id="errorBox" class="alert alert-danger" role="alert">
                         <%= errorMessage %>
@@ -80,18 +79,5 @@
                             </table>
                         </div>
             </div>
-			<script>
-				function errorMessage() {
-	                const searchParams = new URLSearchParams(window.location.search);
-					const foferror = searchParams.get('foferror')
-					const errMessage = document.getElementById('errMessage')
-					if ( foferror === "true") {
-						errMessage.innerText = "404 User Not Found!"
-						errMessage.classList.remove("d-none")
-					}
-	            }
-
-	            errorMessage();
-			</script>
         </main>
         <%- include('../partials/superadmin/footer.ejs') %>
