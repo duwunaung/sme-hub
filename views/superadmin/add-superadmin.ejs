@@ -16,25 +16,26 @@
                     <div class="mb-3">
                         <label for="userName" class="form-label">Admin Name</label>
                         <input type="text" class="form-control" name="name" id="userName"
-                            placeholder="Enter Admin name" value="" required>
+                            placeholder="Enter Admin name" value="<%= user.name %>" required>
                     </div>
 
                     <div class="mb-3">
                         <label for="userPassword" class="form-label">Password</label>
                         <input type="password" class="form-control" name="password" id="userPassword"
                             placeholder="Enter Admin Password"  required readonly>
+						<input type="checkbox" class="me-2 mt-3" id="checkbox"><label for="checkbox">Show Password</label>
                     </div>
 
                     <div class="mb-3">
                         <label for="userPhone" class="form-label">Phone</label>
                         <input type="tel" class="form-control" name="phone" id="userPhone"
-                            placeholder="Enter Admin Phone Number"  required>
+                            placeholder="Enter Admin Phone Number" value="<%= user.phone %>" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="userEmail" class="form-label">Email</label>
+                        <label for="userEmail" class="form-label" id="labelEmail">Email</label>
                         <input type="email" class="form-control" name="email" id="userEmail"
-                            placeholder="Enter Admin Email"  required>
+                            placeholder="Enter Admin Email" value="<%= user.email %>" required>
                     </div>
 
                     <button type="submit" class="btn btn-success w-100 mb-2" id="addBtn">Add</button>
@@ -54,6 +55,20 @@
 			const form = document.getElementById('myForm');
 			const addButton = document.getElementById('addBtn');
 			const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+			const userEmail = document.getElementById('userEmail')
+			const labelEmail = document.getElementById('labelEmail')
+			const userPassword = document.getElementById('userPassword')
+			const checkbox = document.getElementById('checkbox')
+
+
+			checkbox.addEventListener('change', () => {
+			    if (checkbox.checked) {
+			        userPassword.type = 'text';
+			    } else {
+			        userPassword.type = 'password';
+			    }
+			});
+
 
 			function checkInputs() {
 				let allFilled = true;
@@ -73,9 +88,22 @@
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
 			});
-
+			function dupEmail() {
+				const searchParams = new URLSearchParams(window.location.search);
+                const type = searchParams.get('type')
+				const error = searchParams.get('error')
+				
+				if (error === 'true' && type === 'dup-email') {
+					userEmail.classList.add('border-danger')
+					labelEmail.style.color = '#bb2124'
+				} 
+			}
+			userEmail.addEventListener('input', function (event) {
+				userEmail.classList.remove('border-danger')
+				labelEmail.style.color = 'black'
+			})
 			checkInputs();
-            
+            dupEmail();
             generatePassword();
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>
