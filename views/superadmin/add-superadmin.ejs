@@ -88,29 +88,34 @@
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
 			});
-			function dupEmail() {
-				const searchParams = new URLSearchParams(window.location.search);
-                const type = searchParams.get('type')
-				const error = searchParams.get('error')
-				
-				if (error === 'true' && type === 'dup-email') {
-					userEmail.classList.add('border-danger')
-					labelEmail.style.color = '#bb2124'
-					userEmail.addEventListener('focus', function() {
-						userEmail.classList.add('dup-emailError')
-        	});
-					userEmail.addEventListener('blur', function() {
-						userEmail.classList.remove('dup-emailError')
-        	});
-				} 
-			}
+
+
 			userEmail.addEventListener('input', function (event) {
 				userEmail.classList.remove('border-danger')
 				labelEmail.style.color = 'black'
-				userEmail.classList.remove('dup-emailError')
+				userEmail.classList.remove('input-error')
 			})
+
 			checkInputs();
-            dupEmail();
             generatePassword();
+
+			// checking error types
+			const searchParams = new URLSearchParams(window.location.search);
+			const error = searchParams.get('error')
+
+			if (error === 'true') {
+				const type = searchParams.get('type')
+				if (type === 'dup-email') {
+					userEmail.classList.add('border-danger')
+					labelEmail.style.color = '#bb2124'
+					userEmail.addEventListener('focus', function() {
+						userEmail.classList.add('input-error')
+					});
+					userEmail.addEventListener('blur', function() {
+						userEmail.classList.remove('input-error')
+					});
+				}
+			}
+			
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>

@@ -284,7 +284,8 @@ exports.detailOrg = (req, res) => {
 
 exports.superadmins = (req, res) => {
     if (req.method == 'GET') {
-        axios.get(`${process.env.API_URL}/utils/users`, {
+        
+        axios.get(`${process.env.API_URL}/utils/users`,  {
             headers: {
                 'Authorization': `${req.session.token}`
             }
