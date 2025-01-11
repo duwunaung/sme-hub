@@ -501,10 +501,12 @@ exports.updateUser = (req, res) => {
 exports.createSuperAdmins = (req, res) => {
     if (req.method == 'GET') {
         if (req.query.error) {
+			let userData = req.session.userData || {};
+            req.session.userData = null;
             if ( req.query.type == 'dup-email') {
-                res.render('superadmin/add-superadmin', { errorMessage: "Duplicate error!" });
+                res.render('superadmin/add-superadmin', { user: userData, errorMessage: "Duplicate error!" });
             } else {
-                res.render('superadmin/add-superadmin', { errorMessage: "Internal server error!" });
+                res.render('superadmin/add-superadmin', { user: userData, errorMessage: "Internal server error!" });
             }
         } else if (req.query.success) {
             res.render('superadmin/add-superadmin', { user: "", errorMessage: null });
@@ -525,6 +527,7 @@ exports.createSuperAdmins = (req, res) => {
             }).then(response => {
                 res.redirect('/superadmin/users?success=true&type=user-create')
             }).catch(error => {
+				req.session.userData = { name, email, phone };
                 if (error.status === 409){
                     res.redirect('/superadmin/add-superadmin?error=true&type=dup-email')
                 } else {
