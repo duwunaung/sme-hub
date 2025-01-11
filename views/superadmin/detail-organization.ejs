@@ -236,8 +236,9 @@
 
                             <div class="mb-3">
                                 <label for="userPassword" class="form-label">Password</label>
-                                <input type="text" class="form-control" name="password" id="userPassword" placeholder=""
+                                <input type="password" class="form-control" name="password" id="userPassword" placeholder=""
                                     value="" readonly required>
+								<input type="checkbox" class="me-2 mt-3" id="checkbox"><label for="checkbox">Show Password</label>
                             </div>
 
                             <div class="mb-3">
@@ -271,6 +272,17 @@
             const form = document.getElementById('addUserForm');
             const addButton = document.getElementById('addBtn');
             const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+			const userPassword = document.getElementById('userPassword')
+			const checkbox = document.getElementById('checkbox')
+
+
+			checkbox.addEventListener('change', () => {
+			    if (checkbox.checked) {
+			        userPassword.type = 'text';
+			    } else {
+			        userPassword.type = 'password';
+			    }
+			});
 
             function checkInputs() {
                 let allFilled = true;
@@ -290,6 +302,7 @@
                 addButton.disabled = true;
                 addButton.textContent = 'Submitting...';
             });
+
 
             checkInputs();
         </script>
