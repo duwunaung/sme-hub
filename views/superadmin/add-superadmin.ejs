@@ -96,11 +96,18 @@
 				if (error === 'true' && type === 'dup-email') {
 					userEmail.classList.add('border-danger')
 					labelEmail.style.color = '#bb2124'
+					userEmail.addEventListener('focus', function() {
+						userEmail.classList.add('dup-emailError')
+        	});
+					userEmail.addEventListener('blur', function() {
+						userEmail.classList.remove('dup-emailError')
+        	});
 				} 
 			}
 			userEmail.addEventListener('input', function (event) {
 				userEmail.classList.remove('border-danger')
 				labelEmail.style.color = 'black'
+				userEmail.classList.remove('dup-emailError')
 			})
 			checkInputs();
             dupEmail();
