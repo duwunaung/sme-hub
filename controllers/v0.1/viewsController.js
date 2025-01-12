@@ -142,12 +142,16 @@ exports.updateOrg = (req, res) => {
             if (success) {
                 if (type == 'update') {
                     res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
-                } else {
+                } else if (type == 'extendLicense') {
                     res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Extended!" });
+                } else if (type == 'reduceLicense') {
+                    res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Reduced!" });
                 }
             } else if (error) {
 				if (type == 'sysError') {
 					res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: "Internal Server Error!", successMessage: null });
+				} else if (type == '406Error') {
+					res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: "Cannot Accept Your Request!", successMessage: null });
 				}
 			}
 			else {
@@ -182,14 +186,25 @@ exports.extendLicense = (req, res) => {
         const orgId = req.params.id
         const num = req.query.num
         const type = req.query.type
+
         axios.put(`${process.env.API_URL}/organizations/license/${orgId}`, { num, type }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=license')
+			if (num < 0)
+			{
+				res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=reduceLicense')
+			} else {
+				res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=extendLicense')
+			}
         }).catch(error => {
-            res.render('superadmin/organizations', { token: req.session.token, user: req.session.user, orgs: [], errorMessage: "Cannot restore at the moment!" });
+			if (error.status == 406){
+
+				res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=406Error')
+			} else {
+				res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=sysError')
+			}
         })
     }
 }
