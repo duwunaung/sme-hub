@@ -149,7 +149,7 @@ exports.licenseOrg = (req, res) => {
 
     const orgId = req.params.id
     const { num, type } = req.body
-
+	const today = new Date()
     db_connection.query("SELECT * FROM orgs WHERE id = ?", [orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -173,23 +173,32 @@ exports.licenseOrg = (req, res) => {
             expiry.setDate(expiry.getDate() + parseInt(num))
         }
 
-        db_connection.query("UPDATE orgs SET expiredDate = ? WHERE id = ?", [expiry, orgId], (err, results) => {
-            if (err) {
-                return res.status(500).send({
-                    success: false,
-                    message: 'internal server error',
-                    dev: err
-                })
-            }
-            res.status(200).send({
-                success: true,
-                message: 'Organization license updated successfully',
-                dev: "Good Job, Bro!",
-                data: {
-                    expiredDate: expiry
-                }
-            })
-        })
+		if ((expiry < today && parseInt(num) < 0) || parseInt(num) == 0 ) {
+			return res.status(406).send({
+				success: false,
+				message: 'not acceptable',
+				dev: err
+			})
+		} else {
+			db_connection.query("UPDATE orgs SET expiredDate = ? WHERE id = ?", [expiry, orgId], (err, results) => {
+				if (err) {
+					return res.status(500).send({
+						success: false,
+						message: 'internal server error',
+						dev: err
+					})
+				}
+				res.status(200).send({
+					success: true,
+					message: 'Organization license updated successfully',
+					dev: "Good Job, Bro!",
+					data: {
+						expiredDate: expiry
+					}
+				})
+			})
+		}
+        
     })
 }
 
