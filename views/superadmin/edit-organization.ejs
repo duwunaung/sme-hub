@@ -53,14 +53,14 @@
                 <div>
                     <h4>License Extension</h4>
                     <p>Extend the organization's license expiration date:</p>
-                    <div class="d-flex gap-2">
-                        <a href="/superadmin/organizations/license/<%= org.id %>?num=-1&type=month" class="btn btn-outline-secondary">-1 Months</a>
-                        <a href="/superadmin/organizations/license/<%= org.id %>?num=-7&type=day" class="btn btn-outline-secondary">-7 Days</a>
-                        <a href="/superadmin/organizations/license/<%= org.id %>?num=-1&type=day" class="btn btn-outline-secondary">-1 Day</a>
-                        <a href="/superadmin/organizations/license/<%= org.id %>?num=1&type=day" class="btn btn-outline-secondary">+1 Day</a>
-                        <a href="/superadmin/organizations/license/<%= org.id %>?num=7&type=day" class="btn btn-outline-secondary">+7 Days</a>
-                        <a href="/superadmin/organizations/license/<%= org.id %>?num=1&type=month" class="btn btn-outline-secondary">+1 Months</a>
-                    </div>
+                    <div class="d-flex gap-2" id="license-buttons">
+						<a href="/superadmin/organizations/license/<%= org.id %>?num=-1&type=month" class="btn btn-outline-secondary reduceLicense" data-type="month" data-num="-1">-1 Months</a>
+						<a href="/superadmin/organizations/license/<%= org.id %>?num=-7&type=day" class="btn btn-outline-secondary reduceLicense" data-type="day" data-num="-7">-7 Days</a>
+						<a href="/superadmin/organizations/license/<%= org.id %>?num=-1&type=day" class="btn btn-outline-secondary reduceLicense" data-type="day" data-num="-1">-1 Day</a>
+						<a href="/superadmin/organizations/license/<%= org.id %>?num=1&type=day" class="btn btn-outline-secondary" data-type="day" data-num="1">+1 Day</a>
+						<a href="/superadmin/organizations/license/<%= org.id %>?num=7&type=day" class="btn btn-outline-secondary" data-type="day" data-num="7">+7 Days</a>
+						<a href="/superadmin/organizations/license/<%= org.id %>?num=1&type=month" class="btn btn-outline-secondary" data-type="month" data-num="1">+1 Months</a>
+					</div>
                     <p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold"></span>
                             <%= new Date(org.expiredDate).toDateString() %>
                         </span></p>
@@ -107,6 +107,26 @@
                     addButton.textContent = 'Submitting...';
                 });
 
+
+				const orgExpiredDate = new Date("<%= org.expiredDate %>");
+			    const today = new Date();
+
+			    document.querySelectorAll('.reduceLicense').forEach(button => {
+			        const num = parseInt(button.dataset.num);
+			        const type = button.dataset.type;
+			        let newExpiry = new Date(orgExpiredDate);
+
+			        if (type === 'month') {
+			            newExpiry.setMonth(newExpiry.getMonth() + num);
+			        } else if (type === 'day') {
+			            newExpiry.setDate(newExpiry.getDate() + num);
+			        }
+
+			        if (newExpiry <= today) {
+			            button.classList.add('d-none');
+			            button.setAttribute('d-none', true);
+			        }
+			    });
                 checkInputs();
 			</script>
         </main>
