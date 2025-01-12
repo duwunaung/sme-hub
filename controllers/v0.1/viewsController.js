@@ -516,8 +516,10 @@ exports.updateUser = (req, res) => {
 exports.createSuperAdmins = (req, res) => {
     if (req.method == 'GET') {
         if (req.query.error) {
-			let userData = req.session.userData || {};
-            req.session.userData = null;
+			const name = req.query.name
+			const phone = req.query.phone
+			const email = req.query.email
+			const userData = {name, phone, email}
             if ( req.query.type == 'dup-email') {
                 res.render('superadmin/add-superadmin', { user: userData, errorMessage: "Duplicate error!" });
             } else {
@@ -542,11 +544,10 @@ exports.createSuperAdmins = (req, res) => {
             }).then(response => {
                 res.redirect('/superadmin/users?success=true&type=user-create')
             }).catch(error => {
-				req.session.userData = { name, email, phone };
                 if (error.status === 409){
-                    res.redirect('/superadmin/add-superadmin?error=true&type=dup-email')
+                    res.redirect('/superadmin/add-superadmin?error=true&type=dup-email&name=' + name + '&email=' + email +  '&phone=' + phone)
                 } else {
-                    res.redirect('/superadmin/add-superadmin?error=true&type=user-create')
+                    res.redirect('/superadmin/add-superadmin?error=true&type=user-create&name=' + name + '&email=' + email +  '&phone=' + phone)
                 }
             })
         }
