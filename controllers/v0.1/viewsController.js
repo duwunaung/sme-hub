@@ -200,7 +200,6 @@ exports.extendLicense = (req, res) => {
 			}
         }).catch(error => {
 			if (error.status == 406){
-
 				res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=406Error')
 			} else {
 				res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=sysError')
@@ -409,8 +408,8 @@ exports.detailUser = (req , res) => {
 
 exports.deleteUser = (req, res) => {
     if (req.method == 'GET') {
-        const userId = req.params.id
-        const orgId = req.query.orgId
+        const userId = req.params.userId
+        const orgId = req.params.id
 
         axios.delete(`${process.env.API_URL}/organizations/users/delete/${userId}`, {
             headers: {
@@ -431,8 +430,8 @@ exports.deleteUser = (req, res) => {
 
 exports.restoreUser = (req, res) => {
     if (req.method == 'GET') {
-        const userId = req.params.id
-        const orgId = req.query.orgId
+        const userId = req.params.userId
+        const orgId = req.params.id
 
         axios.get(`${process.env.API_URL}/users/restore/${userId}`, {
             headers: {
