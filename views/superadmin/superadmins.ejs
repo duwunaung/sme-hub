@@ -41,7 +41,7 @@
                                             <% for (let i=0; i < users.length; i++) { %>
                                                 <tr>
                                                     <td>
-                                                        <%= i+1 %>
+                                                        <%= i + (parseInt(pagination.page) - 1)*10 + 1 %>
                                                     </td>
 
                                                     <td>
@@ -78,21 +78,60 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <nav aria-label="...">
-                                    <ul class="pagination">
-                                        <li class="page-item disabled">
-                                            <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                        </li>
-                                        <li class="page-item"><a class="page-link" href="#">1</a></li>
-                                        <li class="page-item active">
-                                            <a class="page-link" href="#">2 <span class="sr-only"></span></a>
-                                        </li>
-                                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                                <nav aria-label="..." id="paginationNav">
+                                    <ul class="pagination d-flex">
                                         <li class="page-item">
-                                            <a class="page-link" href="#">Next</a>
+                                            <a class="page-link" id="prevBtn" href="/superadmin/users?page=<%= pagination.page -1 %>" tabindex="-1">Previous</a>
+                                        </li>
+                                        <li class="page-item prev"><a class="page-link" href="/superadmin/users?page=1">1</a></li>
+                                        <li class="page-item prev" id="prevDots"><a class="page-link">...</a></li>
+                                        <li class="page-item active">
+                                            <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
+                                        </li>
+                                        <li class="page-item next" id="nextDots"><a class="page-link">...</a></li>
+                                        <li class="page-item next"><a class="page-link" href="/superadmin/users?page=<%= pagination.totalPage %>"><%= pagination.totalPage %></a></li>
+                                        <li class="page-item">
+                                            <a class="page-link" id="nextBtn" href="/superadmin/users?page=<%= +pagination.page +1 %>">Next</a>
                                         </li>
                                     </ul>
                                 </nav>
             </div>
+            <script>
+
+                const paginationNav = document.getElementById('paginationNav');
+                const page = parseInt("<%= pagination.page %>", 10);
+                const totalPage = parseInt("<%= pagination.totalPage %>", 10);
+                const prevBtn = document.getElementById('prevBtn');
+                const nextBtn = document.getElementById('nextBtn');
+                const prevs = document.querySelectorAll('.prev');
+                const nexts = document.querySelectorAll('.next');
+                const prevDots = document.getElementById('prevDots');
+                const nextDots = document.getElementById('nextDots');
+
+                if (page <= 1) {
+                    prevBtn.classList.add('disabled');
+                    prevBtn.href = '#';
+                    prevs.forEach(prev => prev.classList.add('d-none'));
+                }
+
+                if (page == totalPage) {
+                    nextBtn.classList.add('disabled');
+                    nextBtn.href = '#';
+                    nexts.forEach(next => next.classList.add('d-none'));
+                }
+
+                if ( totalPage == 1 || Number.isNaN(page) || page > totalPage ) {
+                    paginationNav.classList.add('d-none');
+                }
+
+                if (page === 2) {
+                    prevDots.classList.add('d-none');
+                }
+
+                if (page === totalPage - 1) {
+                    nextDots.classList.add('d-none');
+                }
+
+            </script>
         </main>
         <%- include('../partials/superadmin/footer.ejs') %>
