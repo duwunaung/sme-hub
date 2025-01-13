@@ -97,8 +97,8 @@
                                                         <tr>
                                                             <th>#</th>
                                                             <th>Name</th>
+															<th>Email</th>
                                                             <th>Phone</th>
-                                                            <th>Email</th>
                                                             <th>Role</th>
                                                             <th>Status</th>
                                                             <th>Since</th>
@@ -113,13 +113,19 @@
                                                                     <%= i + (parseInt(pagination.page) - 1)*10 + 1 %>
                                                                 </td>
                                                                 <td>
-                                                                    <%= users[i].name %>
+                                                                    <%= users[i].name.length > 25 
+											                        ? users[i].name.substring(0, 25) + "..." 
+											                        : users[i].name %>
+                                                                </td>
+																<td>
+																	<%= users[i].email.length > 30 
+											                        ? users[i].email.substring(0, 30) + "..." 
+											                        : users[i].email %>
                                                                 </td>
                                                                 <td>
-                                                                    <%= users[i].phone %>
-                                                                </td>
-                                                                <td>
-                                                                    <%= users[i].email %>
+																	<%= users[i].phone.length > 15 
+											                        ? users[i].phone.substring(0, 15) + "..." 
+											                        : users[i].phone %>
                                                                 </td>
                                                                 <td>
                                                                     <%= users[i].role %>
@@ -282,8 +288,9 @@
 
                             <div class="mb-3">
                                 <label for="userName" class="form-label">User Name</label>
-                                <input type="text" class="form-control" name="name" id="userName"
+                                <input type="text" class="form-control" maxlength="100" name="name" id="userName"
                                     placeholder="Enter User name" value="" required>
+								<p id="messageBox" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
                             </div>
 
                             <div class="mb-3">
@@ -295,13 +302,15 @@
 
                             <div class="mb-3">
                                 <label for="userPhone" class="form-label">Phone</label>
-                                <input type="tel" class="form-control" name="phone" id="userPhone"
+                                <input type="tel" class="form-control" maxlength="45" name="phone" id="userPhone"
                                     placeholder="Enter User Phone" value="" required>
+								<p id="messageBox" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
                             </div>
                             <div class="mb-3">
                                 <label for="userEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" name="email" id="userEmail"
+                                <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
                                     placeholder="Enter User Email" value="" required>
+								<p id="messageBox" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
                             </div>
 
                             <div class="mb-3">
@@ -355,7 +364,18 @@
                 addButton.textContent = 'Submitting...';
             });
 
+			const messageBox = document.querySelectorAll('#messageBox')
 
+			inputs.forEach((input, index) => {
+			    const message = messageBox[index];
+			    input.addEventListener('input', () => {
+			      if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			      } else {
+			        message.classList.add('d-none');
+			      }
+			    });
+			});
             checkInputs();
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>

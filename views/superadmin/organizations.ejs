@@ -44,7 +44,9 @@
                                                 <%= i + (parseInt(pagination.page) - 1)*10 + 1 %>
                                             </td>
                                             <td>
-                                                <%= orgs[i].name %>
+												<%= orgs[i].name.length > 50 
+						                        ? orgs[i].name.substring(0, 50) + "..." 
+						                        : orgs[i].name %>
                                             </td>
                                             <td>
                                                 <%= orgs[i].status.toUpperCase() %>
@@ -104,18 +106,21 @@
 
                             <div class="mb-3">
                                 <label for="orgName" class="form-label">Organization Name</label>
-                                <input type="text" class="form-control" name="name" id="orgName"
+                                <input type="text" class="form-control" maxlength="145" name="name" id="orgName"
                                     placeholder="Enter organization name" value="" required>
+								<p id="messageBox" class="mt-2 d-none text-danger">*Organization Name can't exceed 145 characters!</p>
                             </div>
                             <div class="mb-3">
                                 <label for="orgAddress" class="form-label">Address</label>
-                                <textarea class="form-control" id="orgAddress" name="address" rows="2"
+                                <textarea class="form-control" id="orgAddress" maxlength="145" name="address" rows="2"
                                     placeholder="Enter organization address" required></textarea>
+								<p id="messageBox" class="mt-2 d-none text-danger">*Address can't exceed 145 characters!</p>
                             </div>
                             <div class="mb-3">
                                 <label for="orgPhone" class="form-label">Phone</label>
-                                <input type="tel" class="form-control" id="orgPhone" name="phone"
+                                <input type="tel" class="form-control" maxlength="45" id="orgPhone" name="phone"
                                     placeholder="Enter phone number" value="" required>
+								<p id="messageBox" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
                             </div>
                             <div class="mb-3">
                                 <label for="orgStatus" class="form-label">Status</label>
@@ -192,6 +197,18 @@
                 nextDots.classList.add('d-none');
             }
 
+			const messageBox = document.querySelectorAll('#messageBox')
+
+			inputs.forEach((input, index) => {
+			    const message = messageBox[index];
+			    input.addEventListener('input', () => {
+			      if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			      } else {
+			        message.classList.add('d-none');
+			      }
+			    });
+			});
             checkInputs();
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>

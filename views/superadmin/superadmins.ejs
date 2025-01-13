@@ -45,13 +45,19 @@
                                                     </td>
 
                                                     <td>
-                                                        <%= users[i].name %>
+														<%= users[i].name.length > 25 
+								                        ? users[i].name.substring(0, 25) + "..." 
+								                        : users[i].name %>
                                                     </td>
                                                     <td>
-                                                        <%= users[i].email %>
+														<%= users[i].email.length > 30 
+								                        ? users[i].email.substring(0, 30) + "..." 
+								                        : users[i].email %>
                                                     </td>
                                                     <td>
-                                                        <%= users[i].phone %>
+														<%= users[i].phone.length > 15 
+								                        ? users[i].phone.substring(0, 15) + "..." 
+								                        : users[i].phone %>
                                                     </td>
                                                     <td>
                                                         <%= users[i].status.toUpperCase() %>
