@@ -60,9 +60,9 @@
                                                 <% }); %>
                                         </select>
                                     </div>
-                                    <a href="/superadmin/organizations" class="btn btn-primary w-100 mb-2">Back to
+                                    <a href="/superadmin/organizations?page=<%= orgPage %>" class="btn btn-primary w-100 mb-2">Back to
                                         Organizations</a>
-                                    <a href="/superadmin/organizations/update/<%= org.id %>"
+                                    <a href="/superadmin/organizations/update/<%= org.id %>?page=<%= orgPage %>"
                                         class="btn btn-warning w-100">Edit
                                         Organization</a>
 
@@ -105,7 +105,7 @@
                                                             <th>Actions</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody id="organizationsTable">
+                                                    <tbody id="userTable">
                                                         <!-- Dynamic rows go here -->
                                                         <% for (let i=0; i < users.length; i++) { %>
                                                             <tr>
@@ -132,25 +132,26 @@
                                                                 </td>
                                                                 <td>
                                                                     <%= users[i].status %>
+                                                                    <%= users.length %>
                                                                 </td>
                                                                 <td>
                                                                     <%= new Date(users[i].registered).toDateString() %>
                                                                 </td>
                                                                 <td>
-                                                                    <a href="/superadmin/organizations/detail/<%= org.id %>/<%= users[i].id %>"
+                                                                    <a href="/superadmin/organizations/detail/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>"
                                                                         class="btn btn-primary btn-sm">View</a>
-                                                                    <a href="/superadmin/organizations/update/<%= org.id %>/<%= users[i].id %>"
+                                                                    <a href="/superadmin/organizations/update/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>"
                                                                         class="btn btn-warning btn-sm">Edit</a>
                                                                     <% if (users[i].status=='deleted' ) { %>
-                                                                        <a href="/superadmin/organizations/restoreuser/<%= users[i].orgId %>/<%= users[i].id %>"
+                                                                        <a href="/superadmin/organizations/restoreuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>"
                                                                             class="btn btn-danger btn-sm">Restore</a>
                                                                         <% } else {%>
-                                                                            <a href="/superadmin/organizations/deleteuser/<%= users[i].orgId %>/<%= users[i].id %>"
+                                                                            <a href="/superadmin/organizations/deleteuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>"
                                                                                 class="btn btn-danger btn-sm">Delete</a>
                                                                             <% } %>
                                                                 </td>
                                                             </tr>
-                                                            <% } %>
+                                                        <% } %>
 
                                                     </tbody>
                                                 </table>
@@ -158,17 +159,17 @@
                                                 <nav aria-label="..." id="paginationNav">
                                                     <ul class="pagination d-flex">
                                                         <li class="page-item">
-                                                            <a class="page-link" id="prevBtn" href="/superadmin/organizations/detail/<%= org.id %>?page=<%= pagination.page -1 %>&activeUsers=active" tabindex="-1">Previous</a>
+                                                            <a class="page-link" id="prevBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=active" tabindex="-1">Previous</a>
                                                         </li>
-                                                        <li class="page-item prev"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?page=1&activeUsers=active">1</a></li>
+                                                        <li class="page-item prev"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=1&activeUsers=active">1</a></li>
                                                         <li class="page-item prev" id="prevDots"><a class="page-link">...</a></li>
                                                         <li class="page-item active">
                                                             <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
                                                         </li>
                                                         <li class="page-item next" id="nextDots"><a class="page-link">...</a></li>
-                                                        <li class="page-item next"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?page=<%= pagination.totalPage %>&activeUsers=active"><%= pagination.totalPage %></a></li>
+                                                        <li class="page-item next"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.totalPage %>&activeUsers=active"><%= pagination.totalPage %></a></li>
                                                         <li class="page-item">
-                                                            <a class="page-link" id="nextBtn" href="/superadmin/organizations/detail/<%= org.id %>?page=<%= +pagination.page +1 %>&activeUsers=active">Next</a>
+                                                            <a class="page-link" id="nextBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=active">Next</a>
                                                         </li>
                                                     </ul>
                                                 </nav>
@@ -284,8 +285,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addUserForm" action="/superadmin/organizations/adduser/<%= org.id %>" method="POST">
-
+                            <form id="addUserForm"  action="/superadmin/organizations/adduser/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.totalPage %>" method="POST">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">User Name</label>
                                 <input type="text" class="form-control" maxlength="100" name="name" id="userName"

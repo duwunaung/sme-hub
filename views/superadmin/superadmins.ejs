@@ -17,7 +17,7 @@
                             <% } %>
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h2>System Admins</h2>
-                                    <a class="btn btn-primary" href="/superadmin/add-superadmin">
+                                    <a class="btn btn-primary" href="/superadmin/add-superadmin?page=<%= pagination.page %>">
                                         Add New System Admin
                                     </a>
                                 </div>
@@ -66,16 +66,16 @@
                                                         <%= new Date(users[i].registered).toDateString() %>
                                                     </td>
                                                     <td>
-                                                        <a href="/superadmin/users/detail/<%= users[i].id %>"
+                                                        <a href="/superadmin/users/detail/<%= users[i].id %>?page=<%= pagination.page %>"
                                                             class="btn btn-primary btn-sm">View</a>
-                                                        <a href="/superadmin/users/update/<%= users[i].id %>"
+                                                        <a href="/superadmin/users/update/<%= users[i].id %>?page=<%= pagination.page %>"
                                                             class="btn btn-warning btn-sm">Edit</a>
 
                                                         <% if (users[i].status=='deleted' ) { %>
-                                                            <a href="/superadmin/users/restore/<%= users[i].id %>"
+                                                            <a href="/superadmin/users/restore/<%= users[i].id %>?page=<%= pagination.page %>"
                                                                 class="btn btn-danger btn-sm">Restore</a>
                                                             <% } else {%>
-                                                                <a href="/superadmin/users/delete/<%= users[i].id %>"
+                                                                <a href="/superadmin/users/delete/<%= users[i].id %>?page=<%= pagination.page %>"
                                                                     class="btn btn-danger btn-sm">Delete</a>
                                                                 <% } %>
                                                     </td>
