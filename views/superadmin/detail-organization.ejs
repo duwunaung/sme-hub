@@ -132,7 +132,6 @@
                                                                 </td>
                                                                 <td>
                                                                     <%= users[i].status %>
-                                                                    <%= users.length %>
                                                                 </td>
                                                                 <td>
                                                                     <%= new Date(users[i].registered).toDateString() %>
@@ -285,7 +284,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                            <form id="addUserForm"  action="/superadmin/organizations/adduser/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.totalPage %>" method="POST">
+                            <form id="addUserForm"  action="/superadmin/organizations/adduser/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>" method="POST">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">User Name</label>
                                 <input type="text" class="form-control" maxlength="100" name="name" id="userName"

@@ -215,7 +215,9 @@ exports.extendLicense = (req, res) => {
 exports.registerOrg = (req, res) => {
     if (req.method == 'POST') {
         const page = req.query.page
-        const successPage = req.query.successPage
+        const totalPage = req.query.totalPage
+        const pageSize = req.query.pageSize
+        const total = req.query.total
 
         const { name, address, phone, status } = req.body;
         axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status }, {
@@ -223,7 +225,14 @@ exports.registerOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations?success=true&type=register&page=' + successPage )
+            const totalNum = (pageSize*totalPage)
+            if ( total == totalNum ) {
+                const successPage = +totalPage +1
+                res.redirect('/superadmin/organizations?success=true&type=register&page=' + successPage )
+            } else {
+                const successPage = totalPage
+                res.redirect('/superadmin/organizations?success=true&type=register&page=' + successPage )
+            }
         }).catch(error => {
             res.redirect('/superadmin/organizations?error=true&type=register&page=' + page )
         })
@@ -346,6 +355,9 @@ exports.createUser = (req, res) => {
     if (req.method == 'POST') {
         const orgPage = req.query.orgPage
         const userPage = req.query.userPage
+        const totalPage = req.query.totalPage
+        const pageSize = req.query.pageSize
+        const total = req.query.total
 
         const options = [
             { id: 1, name: 'active' },
@@ -375,7 +387,14 @@ exports.createUser = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&userPage=' + userPage + '&aciveUsers=true')
+            const totalNum = (pageSize*totalPage)
+            if ( total == totalNum ) {
+                const successPage = +totalPage +1
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&userPage=' + successPage + '&aciveUsers=true')
+            } else {
+                const successPage = totalPage
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&userPage=' + successPage + '&aciveUsers=true')
+            }
         }).catch(error => {
             if (error.status === 409){
                 res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&orgPage=' + orgPage + '&userPage=' + userPage + '&aciveUsers=true')
@@ -536,7 +555,7 @@ exports.updateUser = (req, res) => {
 
 exports.createSuperAdmins = (req, res) => {
     if (req.method == 'GET') {
-        const page = req.query.page || 1
+        const page = req.query.page
         if (req.query.error) {
 			const name = req.query.name
 			const phone = req.query.phone
@@ -558,14 +577,25 @@ exports.createSuperAdmins = (req, res) => {
             const { name, email, password, phone } = req.body;
             const orgId = 0
             const status = 'pending'
-            const page = req.query.page || 1
+            
+            const page = req.query.page
+            const totalPage = req.query.totalPage
+            const pageSize = req.query.pageSize
+            const total = req.query.total
 
             axios.post(`${process.env.API_URL}/utils/register`, { name, email, phone, password, role, orgId, status }, {
                 headers: {
                     'Authorization': `${req.session.token}`
                 }
             }).then(response => {
-                res.redirect('/superadmin/users?success=true&type=user-create&page=' + page)
+                const totalNum = (pageSize*totalPage)
+                if ( total == totalNum ) {
+                    const successPage = +totalPage +1
+                    res.redirect('/superadmin/users?success=true&type=user-create&page=' + successPage)
+                } else {
+                    const successPage = totalPage
+                    res.redirect('/superadmin/users?success=true&type=user-create&page=' + successPage)
+                }
             }).catch(error => {
                 if (error.status === 409){
                     res.redirect('/superadmin/add-superadmin?error=true&type=dup-email&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page)

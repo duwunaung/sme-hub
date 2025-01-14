@@ -102,7 +102,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addOrganizationForm" action="/superadmin/organization/register?page=<%= pagination.page %>&successPage=<%= pagination.totalPage %>" method="POST">
+                        <form id="addOrganizationForm" action="/superadmin/organization/register?page=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>" method="POST">
                             <div class="mb-3">
                                 <label for="orgName" class="form-label">Organization Name</label>
                                 <input type="text" class="form-control" maxlength="145" name="name" id="orgName"
