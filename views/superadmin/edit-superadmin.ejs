@@ -17,24 +17,24 @@
 					</div>
 					<% } %>
                 <!-- user Details Form -->
-                <form class="mb-4" method="POST" id="myForm">
+                <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
                     <div class="mb-3">
                         <label for="userName" class="form-label">Username</label>
                         <input type="text" class="form-control" maxlength="100" name="name" id="userName"
-                            placeholder="Enter username" value="<%= user.name %>" required>
-						<p id="messageBox" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
+                            placeholder="Enter username" value="<%= user.name %>" oninput="checkInputs('nameUserError', 'userName')" required>
+						<p id="nameUserError" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
                     </div>
 					<div class="mb-3">
-                        <label for="userEmail" class="form-label">Email Address</label>
+                        <label for="userEmail" class="form-label" id="labelEmail">Email Address</label>
                         <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
-                            placeholder="Enter email address" value="<%= user.email %>" required>
-						<p id="messageBox" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
+                            placeholder="Enter email address" value="<%= user.email %>" oninput="checkInputs('emailUserError', 'userEmail')" required>
+						<p id="emailUserError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
                     </div>
                     <div class="mb-3">
                         <label for="userPhone" class="form-label">Phone</label>
                         <input type="tel" class="form-control" maxlength="45" id="userPhone" name="phone"
-                            placeholder="Enter phone number" value="<%= user.phone %>" required>
-						<p id="messageBox" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+                            placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" required>
+						<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
                     </div
                     <div class="mb-3">
                         <label for="userStatus" class="form-label">Status</label>
@@ -82,40 +82,54 @@
                 const form = document.getElementById('myForm');
                 const addButton = document.getElementById('addBtn');
                 const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+				const userEmail = document.getElementById('userEmail')
+				const labelEmail = document.getElementById('labelEmail')
 
-                function checkInputs() {
-                    let allFilled = true;
-                    inputs.forEach(input => {
-                    if (!input.value.trim()) {
-                        allFilled = false;
-                    }
-                    });
-                    addButton.disabled = !allFilled;
-                }
-
-                inputs.forEach(input => {
-                    input.addEventListener('input', checkInputs);
-                });
-
-                form.addEventListener('submit', function (event) {
-                    addButton.disabled = true;
-                    addButton.textContent = 'Submitting...';
-                });
-
-
-				const messageBox = document.querySelectorAll('#messageBox')
-
-				inputs.forEach((input, index) => {
-				    const message = messageBox[index];
-				    input.addEventListener('input', () => {
-				      if (input.value.length === parseInt(input.maxLength)) {
+                function checkInputs(messageBox, inputField) {
+	                let allFilled = true;
+	                inputs.forEach(index => {
+	                if (!index.value.trim()) {
+	                    allFilled = false;
+	                }
+	                });
+	                addButton.disabled = !allFilled;
+					const message = document.getElementById(messageBox)
+					const input = document.getElementById(inputField)
+					if (input.value.length === parseInt(input.maxLength)) {
 				        message.classList.remove('d-none');
-				      } else {
+				    } else {
 				        message.classList.add('d-none');
-				      }
-				    });
-				});
-                checkInputs();
+				    }
+					if (inputField === 'userEmail')
+					{
+						userEmail.classList.remove('border-danger')
+						labelEmail.style.color = 'black'
+						userEmail.classList.remove('input-error')
+					}
+	            }
+
+
+                function submitForm(event) {
+				    addButton.disabled = true;
+				    addButton.textContent = 'Submitting...';
+				}
+
+				const searchParams = new URLSearchParams(window.location.search);
+				const error = searchParams.get('error')
+
+				if (error === 'true') {
+					const type = searchParams.get('type')
+					if (type === 'dup-email') {
+						userEmail.classList.add('border-danger')
+						labelEmail.style.color = '#bb2124'
+						userEmail.addEventListener('focus', function() {
+							userEmail.classList.add('input-error')
+						});
+						userEmail.addEventListener('blur', function() {
+							userEmail.classList.remove('input-error')
+						});
+					}
+				}
 			</script>
         </main>
 
