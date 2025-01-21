@@ -107,15 +107,14 @@
 
                 function checkInputs(messageBox, inputField) {
                     let allFilled = true;
-                    inputs.forEach(input => {
-                    if (!input.value.trim()) {
+                    inputs.forEach(index => {
+                    if (!index.value.trim()) {
                         allFilled = false;
                     }
                     });
                     addButton.disabled = !allFilled;
 					const message = document.getElementById(messageBox)
 					const input = document.getElementById(inputField)
-					console.log(input.maxLength)
 					if (input.value.length === parseInt(input.maxLength)) {
 				        message.classList.remove('d-none');
 				    } else {
