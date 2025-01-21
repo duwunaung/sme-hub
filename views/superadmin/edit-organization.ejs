@@ -57,6 +57,7 @@
                     <h4>License Extension</h4>
                     <p>Extend the organization's license expiration date:</p>
                     <div class="d-flex gap-2" id="license-buttons">
+						<a href="" class="btn btn-outline-secondary" onclick="expireNow()" id="expireNowBtn">Expire Now</a>
 						<a href="/superadmin/organizations/license/<%= org.id %>?num=-1&type=month&page=<%= page %>" class="btn btn-outline-secondary reduceLicense" data-type="month" data-num="-1">-1 Months</a>
 						<a href="/superadmin/organizations/license/<%= org.id %>?num=-7&type=day&page=<%= page %>" class="btn btn-outline-secondary reduceLicense" data-type="day" data-num="-7">-7 Days</a>
 						<a href="/superadmin/organizations/license/<%= org.id %>?num=-1&type=day&page=<%= page %>" class="btn btn-outline-secondary reduceLicense" data-type="day" data-num="-1">-1 Day</a>
@@ -70,6 +71,19 @@
                 </div>
             </div>
 			<script>
+				const orgExpiredDate = new Date("<%= org.expiredDate %>");
+			    const today = new Date();
+
+				function expireNow() {
+					const expireNowBtn = document.getElementById("expireNowBtn");
+					const timeDifference = orgExpiredDate - today;
+					const expireDays = (Math.ceil(timeDifference / (1000 * 60 * 60 * 24)));
+					const userConfirmed = confirm(`The license will expire now. Do you want to proceed?`);
+
+				    if (userConfirmed) {
+				        expireNowBtn.setAttribute('href', `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day&page=<%= page %>`);
+				    }
+				}
 				function buttonType() {
 	                const searchParams = new URLSearchParams(window.location.search);
 	                const type = searchParams.get('type')
@@ -111,8 +125,7 @@
                 });
 
 
-				const orgExpiredDate = new Date("<%= org.expiredDate %>");
-			    const today = new Date();
+				
 
 			    document.querySelectorAll('.reduceLicense').forEach(button => {
 			        const num = parseInt(button.dataset.num);
