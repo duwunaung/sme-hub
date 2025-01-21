@@ -683,10 +683,14 @@ exports.updateSuperadmin = (req, res) => {
 				throw error
 			}
             if ( errorMsg ) {
+				const name = req.query.name
+				const phone = req.query.phone
+				const email = req.query.email
+				const userData = {name, phone, email}
                 if (type === "dup-email") {
-					res.render('superadmin/edit-superadmin', { user: response.data.data, page: page, options: options, errorMessage: "Duplicate Email!", successMessage: null });
+					res.render('superadmin/edit-superadmin', { user: userData, page: page, options: options, errorMessage: "Duplicate Email!", successMessage: null });
 				} else if(type === "sysError") {
-                	res.render('superadmin/edit-superadmin', { user: response.data.data, page: page, options: options,  errorMessage: "Internal Server Error!", successMessage: null });
+                	res.render('superadmin/edit-superadmin', { user: userData, page: page, options: options,  errorMessage: "Internal Server Error!", successMessage: null });
 				}
             } else if (success) {
                 res.render('superadmin/edit-superadmin', { user: response.data.data, page: page, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
@@ -714,9 +718,9 @@ exports.updateSuperadmin = (req, res) => {
             res.redirect('/superadmin/users/update/' + userId + '?success=true&type=update&page='+ page)
         }).catch(error => {
 			if (error.status === 409){
-           		res.redirect('/superadmin/users/update/' + userId + '?error=true&type=dup-email&page='+ page);
+           		res.redirect('/superadmin/users/update/' + userId + '?error=true&type=dup-email&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page);
 			} else {
-				res.redirect('/superadmin/users/update/' + userId + '?error=true&type=sysError&page='+ page);
+				res.redirect('/superadmin/users/update/' + userId + '?error=true&type=sysError&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page);
 			}
         })
     }
