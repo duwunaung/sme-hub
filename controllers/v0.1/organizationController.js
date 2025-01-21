@@ -176,16 +176,15 @@ exports.licenseOrg = (req, res) => {
 		if ((expiry < today && parseInt(num) < 0) || parseInt(num) == 0 ) {
 			return res.status(406).send({
 				success: false,
-				message: 'not acceptable',
-				dev: err
+				message: 'not acceptable'
 			})
 		} else {
-			db_connection.query("UPDATE orgs SET expiredDate = ? WHERE id = ?", [expiry, orgId], (err, results) => {
-				if (err) {
+			db_connection.query("UPDATE orgs SET expiredDate = ? WHERE id = ?", [expiry, orgId], (error, results) => {
+				if (error) {
 					return res.status(500).send({
 						success: false,
 						message: 'internal server error',
-						dev: err
+						dev: error
 					})
 				}
 				res.status(200).send({
