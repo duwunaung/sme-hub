@@ -102,24 +102,24 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addOrganizationForm" action="/superadmin/organization/register?page=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>" method="POST">
+                        <form id="addOrganizationForm" action="/superadmin/organization/register?page=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>" method="POST" onsubmit="submitForm(event)">
                             <div class="mb-3">
                                 <label for="orgName" class="form-label">Organization Name</label>
                                 <input type="text" class="form-control" maxlength="145" name="name" id="orgName"
-                                    placeholder="Enter organization name" value="" required>
-								<p id="messageBox" class="mt-2 d-none text-danger">*Organization Name can't exceed 145 characters!</p>
+                                    placeholder="Enter organization name" value="" oninput="checkInputs('nameOrgError', 'orgName')" required>
+								<p id="nameOrgError" class="mt-2 d-none text-danger">*Organization Name can't exceed 145 characters!</p>
                             </div>
                             <div class="mb-3">
                                 <label for="orgAddress" class="form-label">Address</label>
                                 <textarea class="form-control" id="orgAddress" maxlength="145" name="address" rows="2"
-                                    placeholder="Enter organization address" required></textarea>
-								<p id="messageBox" class="mt-2 d-none text-danger">*Address can't exceed 145 characters!</p>
+                                    placeholder="Enter organization address" oninput="checkInputs('addressOrgError', 'orgAddress')" required></textarea>
+								<p id="addressOrgError" class="mt-2 d-none text-danger">*Address can't exceed 145 characters!</p>
                             </div>
                             <div class="mb-3">
                                 <label for="orgPhone" class="form-label">Phone</label>
                                 <input type="tel" class="form-control" maxlength="45" id="orgPhone" name="phone"
-                                    placeholder="Enter phone number" value="" required>
-								<p id="messageBox" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+                                    placeholder="Enter phone number" value="" oninput="checkInputs('phoneOrgError', 'orgPhone')" required>
+								<p id="phoneOrgError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
                             </div>
                             <div class="mb-3">
                                 <label for="orgStatus" class="form-label">Status</label>
@@ -143,24 +143,28 @@
             const addButton = document.getElementById('addBtn');
             const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
 
-            function checkInputs() {
+            function checkInputs(messageBox, inputField) {
                 let allFilled = true;
-                inputs.forEach(input => {
-                if (!input.value.trim()) {
+                inputs.forEach(index => {
+                if (!index.value.trim()) {
                     allFilled = false;
                 }
                 });
                 addButton.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			    } else {
+			        message.classList.add('d-none');
+			    }
             }
 
-            inputs.forEach(input => {
-                input.addEventListener('input', checkInputs);
-            });
 
-            form.addEventListener('submit', function (event) {
-                addButton.disabled = true;
-                addButton.textContent = 'Submitting...';
-            });
+            function submitForm(event) {
+			    addButton.disabled = true;
+			    addButton.textContent = 'Submitting...';
+			}
 
             const paginationNav = document.getElementById('paginationNav');
             const page = parseInt("<%= pagination.page %>", 10);
@@ -197,19 +201,5 @@
                 nextDots.classList.add('d-none');
             }
 
-			const messageBox = document.querySelectorAll('#messageBox')
-
-			inputs.forEach((input, index) => {
-			    const message = messageBox[index];
-			    input.addEventListener('input', () => {
-			      if (input.value.length === parseInt(input.maxLength)) {
-			        message.classList.remove('d-none');
-			      } else {
-			        message.classList.add('d-none');
-			      }
-			    });
-			});
-
-            checkInputs();
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>
