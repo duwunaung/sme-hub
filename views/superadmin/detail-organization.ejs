@@ -284,33 +284,35 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                            <form id="addUserForm"  action="/superadmin/organizations/adduser/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>" method="POST">
+                            <form id="addUserForm"  action="/superadmin/organizations/adduser/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>" method="POST" onsubmit="submitForm(event)">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">User Name</label>
                                 <input type="text" class="form-control" maxlength="100" name="name" id="userName"
-                                    placeholder="Enter User name" value="" required>
-								<p id="messageBox" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
+                                    placeholder="Enter User name" value="" oninput="checkInputs('nameUserError', 'userName')" required>
+								<p id="nameUserError" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
+                            </div>
+
+							<div class="mb-3">
+                                <label for="userEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
+                                    placeholder="Enter User Email" value=""  oninput="checkInputs('emailUserError', 'userEmail')" required>
+								<p id="emailUserError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
                             </div>
 
                             <div class="mb-3">
                                 <label for="userPassword" class="form-label">Password</label>
                                 <input type="password" class="form-control" name="password" id="userPassword" placeholder=""
                                     value="" readonly required>
-								<input type="checkbox" class="me-2 mt-3" id="checkbox"><label for="checkbox">Show Password</label>
+								<input type="checkbox" class="me-2 mt-3" id="checkbox" onchange="showPassword(this)"><label for="checkbox">Show Password</label>
                             </div>
 
                             <div class="mb-3">
                                 <label for="userPhone" class="form-label">Phone</label>
                                 <input type="tel" class="form-control" maxlength="45" name="phone" id="userPhone"
-                                    placeholder="Enter User Phone" value="" required>
-								<p id="messageBox" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+                                    placeholder="Enter User Phone" value="" oninput="checkInputs('phoneUserError', 'userPhone')" required>
+								<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
                             </div>
-                            <div class="mb-3">
-                                <label for="userEmail" class="form-label">Email</label>
-                                <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
-                                    placeholder="Enter User Email" value="" required>
-								<p id="messageBox" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
-                            </div>
+                            
 
                             <div class="mb-3">
                                 <label for="userRole" class="form-label">Role</label>
@@ -333,48 +335,39 @@
             const addButton = document.getElementById('addBtn');
             const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
 			const userPassword = document.getElementById('userPassword')
-			const checkbox = document.getElementById('checkbox')
+			
 
 
-			checkbox.addEventListener('change', () => {
-			    if (checkbox.checked) {
+			function showPassword(checkbox) {
+				if (checkbox.checked) {
 			        userPassword.type = 'text';
 			    } else {
 			        userPassword.type = 'password';
 			    }
-			});
+			}
 
-            function checkInputs() {
+            function checkInputs(messageBox, inputField) {
                 let allFilled = true;
-                inputs.forEach(input => {
-                if (!input.value.trim()) {
+                inputs.forEach(index => {
+                if (!index.value.trim()) {
                     allFilled = false;
                 }
                 });
                 addButton.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			    } else {
+			        message.classList.add('d-none');
+			    }
             }
 
-            inputs.forEach(input => {
-                input.addEventListener('input', checkInputs);
-            });
 
-            form.addEventListener('submit', function (event) {
-                addButton.disabled = true;
-                addButton.textContent = 'Submitting...';
-            });
+            function submitForm(event) {
+			    addButton.disabled = true;
+			    addButton.textContent = 'Submitting...';
+			}
 
-			const messageBox = document.querySelectorAll('#messageBox')
-
-			inputs.forEach((input, index) => {
-			    const message = messageBox[index];
-			    input.addEventListener('input', () => {
-			      if (input.value.length === parseInt(input.maxLength)) {
-			        message.classList.remove('d-none');
-			      } else {
-			        message.classList.add('d-none');
-			      }
-			    });
-			});
-            checkInputs();
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>
