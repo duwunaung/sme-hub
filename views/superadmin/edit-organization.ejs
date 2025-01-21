@@ -84,11 +84,12 @@
 				        expireNowBtn.setAttribute('href', `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day&page=<%= page %>`);
 				    }
 				}
+
 				function buttonType() {
 	                const searchParams = new URLSearchParams(window.location.search);
 	                const type = searchParams.get('type')
 					const resetBtn = document.getElementById("resetBtn")
-	                if (type == 'update') {
+	                if (type == 'update'  || type == "extendLicense" || type == "reduceLicense") {
 						resetBtn.innerText = "Back"
 						resetBtn.classList.add("btn-primary")
 	                }
@@ -98,7 +99,6 @@
 					}
 
 	            }
-
 	            buttonType();
 
                 const form = document.getElementById('myForm');
