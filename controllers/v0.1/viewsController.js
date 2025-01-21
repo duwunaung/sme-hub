@@ -513,10 +513,14 @@ exports.updateUser = (req, res) => {
             if (success) {
                 res.render('superadmin/edit-user', { user: response.data.data, userPage: userPage, orgPage: orgPage, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
             } else if (errorMsg) {
+				const name = req.query.name
+				const phone = req.query.phone
+				const email = req.query.email
+				const userData = {name, phone, email}
                 if ( type == "dup-email") {
-                    res.render('superadmin/edit-user', { user: response.data.data, userPage: userPage, orgPage: orgPage, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
+                    res.render('superadmin/edit-user', { user: userData, userPage: userPage, orgPage: orgPage, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
                 } else {
-                    res.render('superadmin/edit-user', { user: response.data.data, userPage: userPage, orgPage: orgPage, options: options, roles: roles, errorMessage: "Something went wrong!", successMessage: null });
+                    res.render('superadmin/edit-user', { user: userData, userPage: userPage, orgPage: orgPage, options: options, roles: roles, errorMessage: "Something went wrong!", successMessage: null });
                 }
             } else {
                 res.render('superadmin/edit-user', { user: response.data.data, userPage: userPage, orgPage: orgPage, options: options, roles: roles, errorMessage: null, successMessage: null });
@@ -545,9 +549,9 @@ exports.updateUser = (req, res) => {
             res.redirect('/superadmin/organizations/update/' + orgId +  '/' + userId + '?success=true&type=update&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage )
         }).catch(error => {
             if (error.status === 409){
-                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=dup-email&orgPage=' + orgPage + '&userPage=' + userPage );
+                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=dup-email&orgPage=' + orgPage + '&userPage=' + userPage + '&name=' + name + '&email=' + email +  '&phone=' + phone );
             } else {
-                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage );
+                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage + '&name=' + name + '&email=' + email +  '&phone=' + phone );
             }
         })
     }
