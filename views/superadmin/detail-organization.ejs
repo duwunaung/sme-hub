@@ -156,19 +156,25 @@
                                                 </table>
                                                 <% } %>
                                                 <nav aria-label="..." id="paginationNav">
-                                                    <ul class="pagination d-flex">
+                                                    <ul class="pagination d-flex justify-content-center">
                                                         <li class="page-item">
-                                                            <a class="page-link" id="prevBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=active" tabindex="-1">Previous</a>
+                                                            <a class="page-link" id="prevBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=true" tabindex="-1">Previous</a>
                                                         </li>
-                                                        <li class="page-item prev"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=1&activeUsers=active">1</a></li>
-                                                        <li class="page-item prev" id="prevDots"><a class="page-link">...</a></li>
-                                                        <li class="page-item active">
+                                                        <li class="page-item prev"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=1&activeUsers=true">1</a></li>
+                                                        <li class="page-item prev"><a class="page-link" id="prevDots" href="#">...</a></li>
+                                                        <li class="page-item prev" id="prevNum">
+                                                            <a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=true><%= pagination.page -1 %>"><%= pagination.page -1 %><span class="sr-only"></span></a>
+                                                        </li>
+                                                        <li class="page-item active" id="currentPage">
                                                             <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
                                                         </li>
-                                                        <li class="page-item next" id="nextDots"><a class="page-link">...</a></li>
-                                                        <li class="page-item next"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.totalPage %>&activeUsers=active"><%= pagination.totalPage %></a></li>
+                                                        <li class="page-item next" id="nextNum">
+                                                            <a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=true"><%= +pagination.page +1 %><span class="sr-only"></span></a>
+                                                        </li>
+                                                        <li class="page-item next"><a class="page-link" id="nextDots" href="#">...</a></li>
+                                                        <li class="page-item next"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.totalPage %>&activeUsers=true"><%= pagination.totalPage %></a></li>
                                                         <li class="page-item">
-                                                            <a class="page-link" id="nextBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=active">Next</a>
+                                                            <a class="page-link" id="nextBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=true">Next</a>
                                                         </li>
                                                     </ul>
                                                 </nav>
@@ -179,6 +185,28 @@
 
         <script>
             
+            // Ensure users section 'active' in detail-organization ( While get query = 'activeUsers' )
+            function usersActive() {
+                const searchParams = new URLSearchParams(window.location.search);
+                const activeUsers = searchParams.get('activeUsers')
+                if (activeUsers) {
+                    const tabs = document.querySelectorAll('.view-tab');
+                    tabs.forEach(tab => {
+                        tab.classList.remove('active');
+                    })
+                    document.querySelector(`.users-tab`).classList.add('active');
+
+                    const containers = document.querySelectorAll('.view-containers');
+                    containers.forEach(container => {
+                        container.classList.add('d-none');
+                    })
+                    document.getElementById(`users-view`).classList.remove('d-none');
+                }
+            }
+
+            usersActive();
+            // xxx
+            
             const paginationNav = document.getElementById('paginationNav');
             const page = parseInt("<%= pagination.page %>", 10);
             const totalPage = parseInt("<%= pagination.totalPage %>", 10);
@@ -188,6 +216,8 @@
             const nexts = document.querySelectorAll('.next');
             const prevDots = document.getElementById('prevDots');
             const nextDots = document.getElementById('nextDots');
+            const prevNum = document.getElementById('prevNum');
+            const nextNum = document.getElementById('nextNum');
 
             if (page <= 1) {
                 prevBtn.classList.add('disabled');
@@ -207,11 +237,24 @@
 
             if (page === 2) {
                 prevDots.classList.add('d-none');
+                prevNum.classList.add('d-none');
+            } else if (page === 3) {
+                prevDots.classList.add('d-none');
+            } else if (page === 4) {
+                prevDots.innerText = "2"
+                prevDots.href = "/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=2&activeUsers=true"
             }
 
             if (page === totalPage - 1) {
                 nextDots.classList.add('d-none');
+                nextNum.classList.add('d-none');
+            } else if (page === totalPage - 2) {
+                nextDots.classList.add('d-none');
+            } else if (page === totalPage - 3) {
+                nextDots.innerText = totalPage -1
+                nextDots.href = "/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +2 %>&activeUsers=true"
             }
+            // xxx
 
             function changeInfo(type) {
                 const tabs = document.querySelectorAll('.view-tab');
@@ -253,27 +296,6 @@
             }
 
             checkError();
-
-            // Ensure users section 'active' in detail-organization ( While get query = 'activeUsers' )
-            function usersActive() {
-                const searchParams = new URLSearchParams(window.location.search);
-                const activeUsers = searchParams.get('activeUsers')
-                if (activeUsers) {
-                    const tabs = document.querySelectorAll('.view-tab');
-                    tabs.forEach(tab => {
-                        tab.classList.remove('active');
-                    })
-                    document.querySelector(`.users-tab`).classList.add('active');
-
-                    const containers = document.querySelectorAll('.view-containers');
-                    containers.forEach(container => {
-                        container.classList.add('d-none');
-                    })
-                    document.getElementById(`users-view`).classList.remove('d-none');
-                }
-            }
-
-            usersActive();
 
         </script>
         <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
@@ -336,8 +358,6 @@
             const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
 			const userPassword = document.getElementById('userPassword')
 			
-
-
 			function showPassword(checkbox) {
 				if (checkbox.checked) {
 			        userPassword.type = 'text';
@@ -362,7 +382,6 @@
 			        message.classList.add('d-none');
 			    }
             }
-
 
             function submitForm(event) {
 			    addButton.disabled = true;

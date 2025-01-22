@@ -85,16 +85,22 @@
                                     </table>
                                 </div>
                                 <nav aria-label="..." id="paginationNav">
-                                    <ul class="pagination d-flex">
+                                    <ul class="pagination d-flex justify-content-center">
                                         <li class="page-item">
                                             <a class="page-link" id="prevBtn" href="/superadmin/users?page=<%= pagination.page -1 %>" tabindex="-1">Previous</a>
                                         </li>
                                         <li class="page-item prev"><a class="page-link" href="/superadmin/users?page=1">1</a></li>
-                                        <li class="page-item prev" id="prevDots"><a class="page-link">...</a></li>
-                                        <li class="page-item active">
+                                        <li class="page-item prev"><a class="page-link" id="prevDots" href="#">...</a></li>
+                                        <li class="page-item prev" id="prevNum">
+                                            <a class="page-link" href="/superadmin/users?page=<%= pagination.page -1 %>"><%= pagination.page -1 %><span class="sr-only"></span></a>
+                                        </li>
+                                        <li class="page-item active" id="currentPage">
                                             <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
                                         </li>
-                                        <li class="page-item next" id="nextDots"><a class="page-link">...</a></li>
+                                        <li class="page-item next" id="nextNum">
+                                            <a class="page-link" href="/superadmin/users?page=<%= +pagination.page +1 %>"><%= +pagination.page +1 %><span class="sr-only"></span></a>
+                                        </li>
+                                        <li class="page-item next"><a class="page-link" id="nextDots" href="#">...</a></li>
                                         <li class="page-item next"><a class="page-link" href="/superadmin/users?page=<%= pagination.totalPage %>"><%= pagination.totalPage %></a></li>
                                         <li class="page-item">
                                             <a class="page-link" id="nextBtn" href="/superadmin/users?page=<%= +pagination.page +1 %>">Next</a>
@@ -113,6 +119,8 @@
                 const nexts = document.querySelectorAll('.next');
                 const prevDots = document.getElementById('prevDots');
                 const nextDots = document.getElementById('nextDots');
+                const prevNum = document.getElementById('prevNum');
+                const nextNum = document.getElementById('nextNum');
 
                 if (page <= 1) {
                     prevBtn.classList.add('disabled');
@@ -132,10 +140,22 @@
 
                 if (page === 2) {
                     prevDots.classList.add('d-none');
+                    prevNum.classList.add('d-none');
+                } else if (page === 3) {
+                    prevDots.classList.add('d-none');
+                } else if (page === 4) {
+                    prevDots.innerText = "2"
+                    prevDots.href = "/superadmin/users?page=2"
                 }
 
                 if (page === totalPage - 1) {
                     nextDots.classList.add('d-none');
+                    nextNum.classList.add('d-none');
+                } else if (page === totalPage - 2) {
+                    nextDots.classList.add('d-none');
+                } else if (page === totalPage - 3) {
+                    nextDots.innerText = totalPage -1
+                    nextDots.href = "/superadmin/users?page=<%= +pagination.page +2 %>"
                 }
 
             </script>
