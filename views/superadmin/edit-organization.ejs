@@ -1,6 +1,6 @@
 <%- include('../partials/superadmin/header.ejs') %>
     <%- include('../partials/superadmin/navbar.ejs') %>
-
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
         <!-- Main Content -->
         <main class="col-md-9 col-lg-10">
             <div class="container my-5">
@@ -103,26 +103,19 @@
 	                if (confirmInput.value.toLowerCase() === "confirm") {
 	                    confirmBtn.disabled = false;
 	                    errorMsg.style.display = "none";
-	                    const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day&page=<%= page %>`;
-	                    expireNowBtn.setAttribute("href", newHref);
 	                } else {
 	                    confirmBtn.disabled = true;
 	                }
 	            };
 				function expireNow() {
-				    const expireNowBtn = document.getElementById("expireNowBtn");
-		            const modal = new bootstrap.Modal(document.getElementById("confirmationModal"));
-		            const timeDifference = orgExpiredDate - today;
-		            const expireDays = Math.ceil(timeDifference / (1000 * 60 * 60 * 24));
-
+		            const expireDays = Math.ceil(orgExpiredDate/ (1000 * 60 * 60 * 24)) - Math.ceil(today/ (1000 * 60 * 60 * 24));
 		            confirmInput.value = "";
 		            confirmBtn.disabled = true;
 		            errorMsg.style.display = "none";
 					
 		            confirmBtn.onclick = function () {
 		                const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day&page=<%= page %>`;
-		                window.location.href = newHref;
-		                modal.hide();
+		                window.location.href = newHref; 
 		            };
 				}
 
