@@ -1,5 +1,6 @@
 const bcrypt = require('bcryptjs')
 const db_connection = require('../../utils/connection')
+const { calculatedExpiryDate } = require("../../utils/others")
 
 var nodemailer = require('nodemailer');
 
@@ -15,6 +16,7 @@ exports.createUser = async (req, res) => {
     try {
         const { name, password, phone, role, email, orgId, status } = req.body
         const hashedPassword = await bcrypt.hashSync(password, 10)
+		const expiredDate = calculatedExpiryDate()
         if (role == 'superadmin') {
             return res.status(403).send({
                 success: false,
@@ -23,8 +25,8 @@ exports.createUser = async (req, res) => {
             });
         }
 
-        db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered) VALUES (?,?,?,?,?,?,?,?)',
-            [name, hashedPassword, phone, role, email, orgId, status, new Date()],
+        db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered, expired) VALUES (?,?,?,?,?,?,?,?,?)',
+            [name, hashedPassword, phone, role, email, orgId, status, new Date(), expiredDate],
             (err, result) => {
                 if (err) {
                     if (err.code ==  "ER_DUP_ENTRY") {
