@@ -1,5 +1,5 @@
 const express = require('express')
-const { login, logout } = require("../../controllers/v0.1/suViewsController")
+const { login, logout } = require("../../controllers/v0.1/subscribersController")
 
 const checkSubscriberSession = require('../../middlewares/viewSubscribers');
 const tmpSession = require('../../middlewares/tmp');
