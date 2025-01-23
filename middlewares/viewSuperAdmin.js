@@ -9,6 +9,9 @@ const checkSuperAdminSession = (req, res, next) => {
             if (err) {
                 res.redirect('/superadmin/login')
             }
+			if (user.role !== 'superadmin') {
+				res.redirect('/superadmin/login')
+			}
             next()
         })
     } else {
