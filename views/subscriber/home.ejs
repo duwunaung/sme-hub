@@ -1,0 +1,38 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+
+        <!-- Main Content -->
+        <main>
+
+            <div class="content">
+                <div id="errorBox" class="alert alert-danger" role="alert">
+                    အရမ်းကြမ်းတာတွေ လာတော့မှာမလို့ ခဏစောင့်ပေးကြပါ။
+                </div>
+                <h2>Welcome to the Dashboard</h2>
+                <p class="text-muted">Here are your system statistics:</p>
+
+                <div class="row mt-4">
+                    <!-- Total Organizations -->
+                    <div class="col-md-6">
+                        <div class="card text-center shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Expense</h5>
+                                <h2 id="totalOrganizations" class="text-primary">0</h2>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Total Users -->
+                    <div class="col-md-6">
+                        <div class="card text-center shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title">Income</h5>
+                                <h2 id="totalUsers" class="text-primary">0</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+        <%- include('../partials/subscriber/footer.ejs') %>
