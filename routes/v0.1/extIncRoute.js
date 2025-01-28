@@ -1,6 +1,6 @@
 const express = require("express")
 
-const { createIncome, updateIncome, deleteIncome, listIncomes, getMonthlyIncomes } =  require("../../controllers/v0.1/extTransController")
+const { createIncome, updateIncome, deleteIncome, listIncomes, getMonthlyIncomes , getIncome} =  require("../../controllers/v0.1/extTransController")
 
 const router = express.Router()
 
@@ -61,6 +61,7 @@ const router = express.Router()
 router.post('/create', createIncome)
 router.put('/update/:id', updateIncome)
 router.delete('/delete/:id', deleteIncome)
+router.get('/:id', getIncome)
 router.get('/', listIncomes)
 router.get('/monthly', getMonthlyIncomes)
 module.exports = router
