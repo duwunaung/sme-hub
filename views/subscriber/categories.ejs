@@ -1,0 +1,121 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		
+		<!-- Main Content -->
+        <main >
+            <div class="content">
+				<div class="container my-2">
+					<div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 600px; margin: 0 auto;">
+					  <a type="button" href="/subscriber/category/income" class="text-decoration-none btn <% if (cat === 'income' ) { %> btn-dark <% } else {%> btn-secondary <% } %> flex-grow-1" id="btnIncome" >Income</a>
+					  <a type="button" href="/subscriber/category/expense" class="text-decoration-none btn <% if (cat === 'expense' ) { %> btn-dark <% } else {%> btn-secondary <% } %> flex-grow-1" id="btnExpense" >Expense</a>
+					</div>
+				</div>
+
+				<div class="d-flex justify-content-between align-items-center mb-4">
+					<h2><% if (cat === 'income' ) { %> Income <% } else {%> Expensee <% } %> Categories</h2>
+					<button class="btn btn-primary" data-bs-toggle="modal"
+					data-bs-target="#addNewCategory">
+						Add New Category
+					</button>
+				</div>
+
+				<div class="table-responsive">
+					<table class="table table-striped table-hover">
+						<thead class="table-dark">
+						  <tr>
+							<th scope="col">#</th>
+							<th scope="col">Name</th>
+							<th scope="col">Created By</th>
+							<th scope="col">Actions</th>
+						  </tr>
+						</thead>
+						<tbody>
+							<tbody id="categoryTable">
+								<!-- Dynamic rows go here -->
+								<% for (let i=0; i < category.length; i++) { %>
+									<tr>
+										<td>
+											<%= i + 1 %>
+										</td>
+	
+										<td>
+											<%= category[i].name %>
+										</td>
+										<td>
+											<%= category[i].createdBy %>
+										</td>
+										<td>
+											<a href="#"
+												class="btn btn-primary btn-sm">View</a>
+											<a href="/subscriber/category/<%= cat %>/update/<%= category[i].id %>?cat=<%= cat %>"
+												class="btn btn-warning btn-sm">Edit</a>
+	
+											<% if (category[i].status=='deleted' ) { %>
+												<a href="/subscriber/category/<%= cat %>/restore/<%= category[i].id %>"
+													class="btn btn-danger btn-sm">Restore</a>
+												<% } else {%>
+													<a href="/subscriber/category/<%= cat %>/delete/<%= category[i].id %>"
+														class="btn btn-danger btn-sm">Delete</a>
+													<% } %>
+										</td>
+									</tr>
+									<% } %>
+							</tbody>
+						</tbody>
+					</table>
+				</div>
+				  
+            </div>
+        </main>
+		<div class="modal fade" id="addNewCategory" tabindex="-1" aria-labelledby="addNewCategoryModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addNewCategoryModalLabel">Add New Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addNewCategoryForm" action="/subscriber/category/<%= cat %>/create" method="POST" onsubmit="submitForm(event)">
+                            <div class="mb-3">
+                                <label for="catName" class="form-label">Category Name</label>
+                                <input type="text" class="form-control" maxlength="255" name="name" id="catName"
+                                    placeholder="Enter organization name" value="" oninput="checkInputs('catNameError', 'catName')" required>
+								<p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 255 characters!</p>
+                            </div>
+                            <button type="submit" id="addBtn" class="btn btn-primary w-100">Add Category</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+		<script>
+			const form = document.getElementById('addNewCategoryForm');
+            const addButton = document.getElementById('addBtn');
+            const inputs = form.querySelectorAll('.form-control[required]');
+
+            function checkInputs(messageBox, inputField) {
+                let allFilled = true;
+                inputs.forEach(index => {
+                if (!index.value.trim()) {
+                    allFilled = false;
+                }
+                });
+                addButton.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			    } else {
+			        message.classList.add('d-none');
+			    }
+            }
+
+
+            function submitForm(event) {
+			    addButton.disabled = true;
+			    addButton.textContent = 'Submitting...';
+			}
+		</script>
+        <%- include('../partials/subscriber/footer.ejs') %>
