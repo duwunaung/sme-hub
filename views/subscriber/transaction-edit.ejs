@@ -1,0 +1,119 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		<main class="col-md-9 col-lg-10">
+			<div class="container my-5">
+				<h2 class="mb-4">Update Organization</h2>
+		
+				<% if (errorMessage) { %>
+					<div id="errorBox" class="alert alert-danger" role="alert">
+						<%= errorMessage %>
+					</div>
+					<% } %>
+				<% if (successMessage) { %>
+				<div id="successBox" class="alert alert-success" role="alert">
+					<%= successMessage %>
+				</div>
+				<% } %>
+				<!-- Category Details Form -->
+				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+					<div class="mb-3">
+						<label for="transDescription" class="form-label">Description</label>
+						<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
+							placeholder="Enter description" value="<%= transaction.description %>" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
+						<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
+					</div>
+					<div class="mb-3">
+						<label for="transAmount" class="form-label">Amount</label>
+						<input type="number" class="form-control inputRequired" maxlength="11" name="amount" id="transAmount"
+							placeholder="Enter amount" value="<%= transaction.amount %>" oninput="checkInputs('transAmountError', 'transAmount')" required>
+						<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 11 characters!</p>
+					</div>
+					<div class="mb-3">
+						<label for="transCategory" class="form-label">Category</label>
+						<select id="transCategory" name="catId" class="form-select inputRequired" required>
+
+							<% category.forEach(option => { %>
+								<option value="<%= option.id %>" <%= option.id === transaction.catId ? 'selected' : '' %> >
+									<%= option.name %>
+								</option>
+							<% }); %>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label for="transDate" class="form-label">Date</label>
+						<input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
+							placeholder="Select date" value="" required>
+					</div>
+					<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
+					<a href="" class="btn w-100" id="resetBtn"></a>
+		
+				</form>
+		
+			</div>
+			<script>
+				let searchParams = new URLSearchParams(window.location.search);
+				let trans = searchParams.get('trans')
+				let isoString = '';
+				if (trans === 'income') {
+					isoString = "<%= transaction.incomeDate %>";
+				} else {
+					isoString = "<%= transaction.expenseDate %>";
+				}
+				let localDate = new Date(isoString);
+				let year = localDate.getFullYear();
+				let month = String(localDate.getMonth() + 1).padStart(2, '0');
+				let day = String(localDate.getDate()).padStart(2, '0');
+				let hours = String(localDate.getHours()).padStart(2, '0');
+				let minutes = String(localDate.getMinutes()).padStart(2, '0');
+				let seconds = String(localDate.getSeconds()).padStart(2, '0');
+				let formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+				document.getElementById('transDate').value = formattedDate;
+
+				function buttonType() {
+					searchParams = new URLSearchParams(window.location.search);
+					const type = searchParams.get('type')
+					const resetBtn = document.getElementById("resetBtn")
+					trans = searchParams.get('trans')
+					resetBtn.href = `/subscriber/transaction/${trans}`
+					if (type == 'update') {
+						resetBtn.innerText = "Back"
+						resetBtn.classList.add("btn-primary")
+					}
+					else {
+						resetBtn.innerText = "Cancel"
+						resetBtn.classList.add("btn-danger")
+					}
+		
+				}
+				buttonType();
+		
+				const addButton = document.getElementById('addBtn');
+				const form = document.getElementById('myForm');
+				const inputs = form.querySelectorAll('.form-control[required]');
+		
+				function checkInputs(messageBox, inputField) {
+					let allFilled = true;
+					inputs.forEach(index => {
+					if (!index.value.trim()) {
+						allFilled = false;
+					}
+					});
+					addButton.disabled = !allFilled;
+					const message = document.getElementById(messageBox)
+					const input = document.getElementById(inputField)
+					if (input.value.length === parseInt(input.maxLength)) {
+						message.classList.remove('d-none');
+					} else {
+						message.classList.add('d-none');
+					}
+				}
+		
+				function submitForm(event) {
+					addButton.disabled = true;
+					addButton.textContent = 'Submitting...';
+				}
+				
+			</script>
+		</main>
+        <%- include('../partials/subscriber/footer.ejs') %>
