@@ -75,7 +75,7 @@
                         </div>
                         <nav aria-label="..." id="paginationNav">
                             <div class="d-flex justify-content-center">
-                                <p> <%= (parseInt(pagination.page) - 1)*10 + 1 %>-<%= parseInt(pagination.page) *10 %> / <%= pagination.total %></p>
+                                <p> <%= (parseInt(pagination.page) - 1)*10 + 1 %>-<span id="lastNum"><%= parseInt(pagination.page) *10 %></span> / <%= pagination.total %></p>
                             </div>
                             <ul class="pagination d-flex justify-content-center">
                                 <li class="page-item">
@@ -169,15 +169,16 @@
 			    }
             }
 
-
             function submitForm(event) {
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
 			}
+            // xxx
 
             const paginationNav = document.getElementById('paginationNav');
             const page = parseInt("<%= pagination.page %>", 10);
             const totalPage = parseInt("<%= pagination.totalPage %>", 10);
+            const total = parseInt("<%= pagination.total %>", 10);
             const prevBtn = document.getElementById('prevBtn');
             const nextBtn = document.getElementById('nextBtn');
             const prevs = document.querySelectorAll('.prev');
@@ -186,41 +187,39 @@
             const nextDots = document.getElementById('nextDots');
             const prevNum = document.getElementById('prevNum');
             const nextNum = document.getElementById('nextNum');
-
-            if (page <= 1) {
-                prevBtn.classList.add('disabled');
-                prevBtn.href = '#';
-                prevs.forEach(prev => prev.classList.add('d-none'));
-            }
-
-            if (page == totalPage) {
-                nextBtn.classList.add('disabled');
-                nextBtn.href = '#';
-                nexts.forEach(next => next.classList.add('d-none'));
-            }
+            const lastNum = document.getElementById('lastNum');
 
             if ( totalPage == 1 || Number.isNaN(page) || page > totalPage ) {
                 paginationNav.classList.add('d-none');
             }
 
-            if (page === 2) {
+            if (page <= 1) {
+                prevBtn.classList.add('disabled');
+                prevBtn.href = '#';
+                prevs.forEach(prev => prev.classList.add('d-none'));
+            } else if (page === 2) {
                 prevDots.classList.add('d-none');
                 prevNum.classList.add('d-none');
             } else if (page === 3) {
                 prevDots.classList.add('d-none');
             } else if (page === 4) {
                 prevDots.innerText = "2"
-                prevDots.href = "/superadmin/organizations?page=2"
+                prevDots.href = "/superadmin/users?page=2"
             }
 
-            if (page === totalPage - 1) {
+            if (page == totalPage) {
+                nextBtn.classList.add('disabled');
+                nextBtn.href = '#';
+                nexts.forEach(next => next.classList.add('d-none'));
+                lastNum.innerHTML = total
+            } else if (page === totalPage - 1) {
                 nextDots.classList.add('d-none');
                 nextNum.classList.add('d-none');
             } else if (page === totalPage - 2) {
                 nextDots.classList.add('d-none');
             } else if (page === totalPage - 3) {
                 nextDots.innerText = totalPage -1
-                nextDots.href = "/superadmin/organizations?page=<%= +pagination.page +2 %>"
+                nextDots.href = "/superadmin/users?page=<%= +pagination.page +2 %>"
             }
 
         </script>
