@@ -1,22 +1,12 @@
 
 	        
-			<nav class="navbar navbar-dark bg-dark navbar-expand-lg "> 
-			  <button id="menuBtn" class="btn btn-dark menu-icon me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+			<nav class="navbar navbar-dark bg-dark navbar-expand-lg justify-content-center"> 
+				<button id="menuBtn" class="btn btn-dark menu-icon me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
 				☰
-			  </button>
-			  <a class="navbar-brand" href="#">Org Name</a>
-			  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-				<span class="navbar-toggler-icon"></span>
-			  </button>
-			
-			  <div class="collapse navbar-collapse" id="navbarSupportedContent">
-				<form class="form-inline ms-auto d-flex flex-row p-2 align-items-end me-4">
-					<i class="fas fa-search me-2 text-light" style="font-size: 28px;"></i>
-					<i class="fa fa-bell me-2 text-light" style="font-size: 28px;"></i>
-					<i class="fas fa-question-circle me-2 text-light" style="font-size: 28px;"></i>
-					<i class="fas fa-user-circle me-2 text-light" style="font-size: 28px;"></i>
-				</form>
-			  </div>
+				</button>
+				<div class="d-flex flex-grow-1 ">
+					<p class="navbar-brand m-0">Org Name</p>
+				</div>
 			</nav>
 			<!-- Sidebar -->
 			<div class="offcanvas offcanvas-start bg-dark" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel" data-bs-backdrop="false">
@@ -27,69 +17,13 @@
 				<div class="offcanvas-body">
 				  <ul class="list-unstyled">
 				    <li><a href="/subscriber/home" class="text-light d-block py-2">Dashboard</a></li>
-					<div class="dropdown d-block">
-						<a class="dropbtn text-light" id="btnTransaction" onclick="showContents('contentTransaction', 'redirectionTransaction')">Transaction</a><p style="display: inline-block;" class="text-light ms-2" id="redirectionTransaction">></p>
-						<div class="dropdown-content bg-light" id="contentTransaction">
-						  <a href="/subscriber/transaction/expense" class="text-dark d-block ms-3 my-2 me-4">Expense</a>
-						  <a href="/subscriber/transaction/income" class="text-dark d-block ms-3 my-2 me-4">Income</a>
-						</div>
-					</div>
-				    <div class="dropdown d-block">
-						<a class="dropbtn text-light" id="btnCategory" onclick="showContents('contentCategory', 'redirectionCategory')">Category</a><p style="display: inline-block;" class="text-light ms-2" id="redirectionCategory">></p>
-						<div class="dropdown-content bg-light" id="contentCategory">
-						  <a href="/subscriber/category/expense" class="text-dark d-block ms-3 my-2 me-4">Expense</a>
-						  <a href="/subscriber/category/income" class="text-dark d-block ms-3 my-2 me-4">Income</a>
-						</div>
-					</div>
-				    <div class="dropdown d-block">
-						<a class="dropbtn text-light" id="btnAccount" onclick="showContents('contentAccount', 'redirectionAccount')">Accounts</a><p style="display: inline-block;" class="text-light ms-2" id="redirectionAccount">></p>
-						<div class="dropdown-content bg-light" id="contentAccount">
-						  <a href="#" class="text-dark d-block ms-3 my-2">Link 1</a>
-						  <a href="#" class="text-dark d-block ms-3 my-2">Link 2</a>
-						  <a href="#" class="text-dark d-block ms-3 my-2">Link 3</a>
-						</div>
-					</div>
-				    <li><a href="#" class="text-light d-block">Report</a></li>
+					<li><a href="/subscriber/transaction/income" class="text-light d-block py-2">Transaction</a></li>
+					<li><a href="/subscriber/category/income" class="text-light d-block py-2">Category</a></li>
+				    <li><a href="#" class="text-light d-block py-2">Report</a></li>
 				    <li class="border-top my-3"></li>
 				    <li><a href="/subscriber/logout" class="text-light d-block py-2">Logout</a></li>
 				  </ul>
 				</div>
 			</div>
-			<script>
-				function showContents(contentName, redirectionName) {
-					const content = document.getElementById(contentName);
-					const redirection = document.getElementById(redirectionName);
-					if (content.style.display === 'none' || content.style.display === '') {
-						content.style.display = 'block'
-						redirection.innerText = '<'
-					} else {
-						content.style.display = 'none'
-						redirection.innerText = '>'
-					}
-				}
-				document.onclick = function (event) {
-					const contentCategory = document.getElementById('contentCategory');
-					const contentAccount = document.getElementById('contentAccount');
-					const redirectionCategory = document.getElementById('redirectionCategory');
-					const redirectionAccount = document.getElementById('redirectionAccount');
-
-					if (
-						!contentCategory.contains(event.target) &&
-						event.target.id !== 'btnCategory' &&
-						contentCategory.style.display === 'block'
-					) {
-						contentCategory.style.display = 'none';
-						redirectionCategory.innerText = '>';
-					}
-
-					if (
-						!contentAccount.contains(event.target) &&
-						event.target.id !== 'btnAccount' &&
-						contentAccount.style.display === 'block'
-					) {
-						contentAccount.style.display = 'none';
-						redirectionAccount.innerText = '>';
-					}
-				};
-			</script>
+			
 			
