@@ -46,7 +46,16 @@
 											<%= transaction[i].description %>
 										</td>
 										<td>
-											<%= transaction[i].amount %>
+											<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
+
+											<% if (transaction[i].baseCurrency === 'MMK') { %>
+											    <%= formattedAmount %> ks
+											<% } else if (transaction[i].baseCurrency === 'USD') { %>
+											    $ <%= formattedAmount %>
+											<% } else { %>
+											    <%= formattedAmount %> <%= transaction[i].baseCurrency %>
+											<% } %>
+
 										</td>
 										<td>
 											<%= new Date(trans === 'income' ? transaction[i].incomeDate : transaction[i].expenseDate)
