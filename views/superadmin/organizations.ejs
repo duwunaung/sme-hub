@@ -94,7 +94,7 @@
                         </div>
                         <nav aria-label="..." id="paginationNav">
                             <div class="d-flex justify-content-center">
-                                <p> <%= (parseInt(pagination.page) - 1)*10 + 1 %>-<span id="lastNum"><%= parseInt(pagination.page) *10 %></span> / <%= pagination.total %></p>
+                                <p> <%= (parseInt(pagination.page) - 1)*10 + 1 %><span id="lastNum">-<%= parseInt(pagination.page) *10 %></span> / <%= pagination.total %></p>
                             </div>
                             <ul class="pagination d-flex justify-content-center">
                                 <li class="page-item">
@@ -230,7 +230,10 @@
                 nextBtn.classList.add('disabled');
                 nextBtn.href = '#';
                 nexts.forEach(next => next.classList.add('d-none'));
-                lastNum.innerHTML = total
+                lastNum.innerHTML = "-" + total
+                if (( total%10 ) == 1) {
+                    lastNum.classList.add('d-none')
+                }
             } else if (page === totalPage - 1) {
                 nextDots.classList.add('d-none');
                 nextNum.classList.add('d-none');
