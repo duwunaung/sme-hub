@@ -29,7 +29,7 @@ router.use('/category/expense/restore/:id', checkSubscriberSession, restoreExpen
 router.use('/category/expense', checkSubscriberSession, listExpenseCat )
 
 router.use('/home', checkSubscriberSession, (req, res) => {
-    res.render('subscriber/home', { token: req.session.token, user: req.session.user })
+    res.render('subscriber/home', { token: req.session.token, user: req.session.user, organizationName: req.session.orgName })
 })
 
 module.exports = router;
