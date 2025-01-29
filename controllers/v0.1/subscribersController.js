@@ -8,7 +8,8 @@ exports.login = (req, res) => {
 				.then(response => {
 					if (response.data.success) {
 						req.session.token = response.data.data.token;
-						req.session.user = response.data.data.name;
+						req.session.user = response.data.data.user.name;
+						req.session.orgName = response.data.data.user.orgName;
 						res.redirect('/subscriber/home');
 					} else {
 						res.render('subscriber/login', { errorMessage: response.data.message });
@@ -361,7 +362,6 @@ exports.listIncomeTrans = (req, res) => {
 
 exports.createIncomeTrans = (req, res) => {
 	if (req.method == 'POST') {
-		
 		const { description, amount, incomeDate, catId } = req.body;
 		axios.post(`${process.env.API_URL}/subscribers/incomes/create`, { description, amount, incomeDate, catId }, {
 			headers: {
