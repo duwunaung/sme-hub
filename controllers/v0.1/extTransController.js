@@ -158,10 +158,12 @@ exports.listExpenses = (req, res) => {
     e.amount, 
     e.expenseDate, 
     c.name as category ,
-    u.name as createdBy
+    u.name as createdBy ,
+	o.baseCurrency as baseCurrency
     FROM exps e
     JOIN expcats c ON e.catId = c.id
     JOIN users u ON e.createdBy = u.id
+	JOIN orgs o ON e.orgId = o.id
     WHERE e.orgId = '${orgId}'`
 
     if (fromDate) {
@@ -415,8 +417,9 @@ exports.listIncomes = (req, res) => {
 	i.amount,
 	i.incomeDate,
 	c.name as category,
-	u.name as createdBy
-	FROM incs i JOIN inccats c ON i.catId = c.id JOIN users u ON i.createdBy = u.id WHERE i.orgId = '${orgId}'`
+	u.name as createdBy,
+	o.baseCurrency as baseCurrency
+	FROM incs i JOIN inccats c ON i.catId = c.id JOIN users u ON i.createdBy = u.id JOIN orgs o ON i.orgId = o.id WHERE i.orgId = '${orgId}'`
 	if (fromDate) {
 		sql += ` AND i.incomeDate >= '${fromDate}'`
 	}
