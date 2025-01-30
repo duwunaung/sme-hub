@@ -10,7 +10,7 @@
                     <div id="errorBox" class="alert alert-danger" role="alert">
                         <%= errorMessage %>
                     </div>
-                    <% } %>
+                <% } %>
                 <!-- xxx -->
 
                 <!-- Superadmin Details Form -->
@@ -52,7 +52,7 @@
                             <% }); %>
                         </select>
                     </div>
-                    <a href="/superadmin/organizations/detail/<%= user.orgId %>?orgPage=<%= orgPage %>&userPage=<%= userPage %>&activeUsers=true" class="btn btn-primary w-100 mt-1 mb-3">Back to
+                    <a href="/superadmin/organizations/detail/<%= user.orgId %>?orgPage=<%= orgPage %>&userPage=<%= userPage %>&activeUsers=true&status=<%= status %>&role<%= role %>" class="btn btn-primary w-100 mt-1 mb-3">Back to
                         Organization detail</a>
 
                     <!-- License Extension -->

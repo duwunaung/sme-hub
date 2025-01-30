@@ -317,7 +317,7 @@ exports.listUsers = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-    const { name, status = 'all', page = 1, pageSize = 10, expired = false } = req.query
+    const { name, status, role, page = 1, pageSize = 10, expired = 'false' } = req.query
 
     const orgId = req.params.id
 
@@ -328,23 +328,26 @@ exports.listUsers = (req, res) => {
         query += " AND name LIKE ?"
         queryParams.push(`%${name}%`)
     }
-
     if (status != 'all') {
-        if (status) {
-            query += " AND status LIKE ?"
-            queryParams.push(`%${status}%`)
-        }
+        query += " AND status LIKE ?"
+        queryParams.push(`%${status}%`)
+    } 
 
-        if (!expired) {
-            query += " AND expiredDate > NOW()"
-        } else {
-            query += " AND expiredDate < NOW()"
-        }
+    // if (!expired) {
+    //     query += " AND expiredDate > NOW()"
+    // } else {
+    //     query += " AND expiredDate < NOW()"
+    // }
+
+    if (role != 'all') {
+        query += " AND role LIKE ?"
+        queryParams.push(`%${role}%`)
     }
 
     const offset = (page - 1) * pageSize
     query += ' LIMIT ? OFFSET ?'
     queryParams.push(parseInt(pageSize), offset)
+
     db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -354,7 +357,34 @@ exports.listUsers = (req, res) => {
             })
         }
 
-        db_connection.query("SELECT COUNT(*) as total FROM users where orgId = ?", [orgId], (err, count) => {
+        let countQuery = "SELECT COUNT(*) as total FROM users where orgId = ?"
+        let countQueryParams = [orgId]
+
+        if (name) {
+            countQuery += " AND name LIKE ?"
+            countQueryParams.push(`%${name}%`)
+        }
+
+        if (status != 'all') {
+            countQuery += " AND status LIKE ?"
+            countQueryParams.push(`%${status}%`)
+        }
+        
+        // if (status == expired) {
+        //     countQuery += " AND expired < NOW()"
+        // } else {
+        //     countQuery += " AND expired > NOW()"
+        // }
+
+        if (role != 'all') {
+            countQuery += " AND role LIKE ?"
+            countQueryParams.push(`%${role}%`)
+        }
+        
+        countQuery += ' LIMIT ? OFFSET ?'
+        countQueryParams.push(parseInt(pageSize), offset)
+        
+        db_connection.query(countQuery, countQueryParams, (err, count) => {
             if (err) {
                 return res.status(500).send({
                     success: false,

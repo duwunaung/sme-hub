@@ -96,10 +96,10 @@
                                                     Role
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <a class="dropdown-item dropdown-active" href="#">All</a>
-                                                    <a class="dropdown-item" href="#">Manager</a>
-                                                    <a class="dropdown-item" href="#">Admin</a>
-                                                    <a class="dropdown-item" href="#">Staff</a>
+                                                    <a class="dropdown-item role dropdown-active" id="all" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&role=all&status=<%= status %>">All</a>
+                                                    <a class="dropdown-item role" id="manager" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&role=manager&status=<%= status %>">Manager</a>
+                                                    <a class="dropdown-item role" id="admin" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&role=admin&status=<%= status %>">Admin</a>
+                                                    <a class="dropdown-item role" id="staff" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&role=staff&status=<%= status %>">Staff</a>
                                                 </ul>
                                             </div>
                                             <div class="btn-group">
@@ -107,11 +107,10 @@
                                                     Filter
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <a class="dropdown-item dropdown-active" href="#">All</a>
-                                                    <a class="dropdown-item" href="#">Active</a>
-                                                    <a class="dropdown-item" href="#">Inactive</a>
-                                                    <a class="dropdown-item" href="#">Pending</a>
-                                                    <a class="dropdown-item" href="#">Expired</a>
+                                                    <a class="dropdown-item status dropdown-active" id="all" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&status=all&role=<%= role %>">All</a>
+                                                    <a class="dropdown-item status" id="active" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&status=active&role=<%= role %>">Active</a>
+                                                    <a class="dropdown-item status" id="deleted" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&status=deleted&role=<%= role %>">Inactive</a>
+                                                    <a class="dropdown-item status" id="pending" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&status=pending&role=<%= role %>">Pending</a>
                                                 </ul>
                                             </div>
                                         </div>
@@ -169,15 +168,15 @@
                                                                     <%= new Date(users[i].registered).toDateString() %>
                                                                 </td>
                                                                 <td>
-                                                                    <a href="/superadmin/organizations/detail/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>"
+                                                                    <a href="/superadmin/organizations/detail/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
                                                                         class="btn btn-primary btn-sm">View</a>
-                                                                    <a href="/superadmin/organizations/update/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>"
+                                                                    <a href="/superadmin/organizations/update/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
                                                                         class="btn btn-warning btn-sm">Edit</a>
                                                                     <% if (users[i].status=='deleted' ) { %>
-                                                                        <a href="/superadmin/organizations/restoreuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>"
+                                                                        <a href="/superadmin/organizations/restoreuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
                                                                             class="btn btn-danger btn-sm">Restore</a>
                                                                         <% } else {%>
-                                                                            <a href="/superadmin/organizations/deleteuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>"
+                                                                            <a href="/superadmin/organizations/deleteuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
                                                                                 class="btn btn-danger btn-sm">Delete</a>
                                                                             <% } %>
                                                                 </td>
@@ -193,23 +192,23 @@
                                                     </div>
                                                     <ul class="pagination d-flex justify-content-center">
                                                         <li class="page-item">
-                                                            <a class="page-link" id="prevBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=true" tabindex="-1"><</a>
+                                                            <a class="page-link" id="prevBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=true&status=<%= status %>&role=<%= role %>" tabindex="-1"><</a>
                                                         </li>
-                                                        <li class="page-item prev"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=1&activeUsers=true">1</a></li>
+                                                        <li class="page-item prev"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=1&activeUsers=true&status=<%= status %>&role=<%= role %>">1</a></li>
                                                         <li class="page-item prev"><a class="page-link" id="prevDots" href="#">...</a></li>
                                                         <li class="page-item prev" id="prevNum">
-                                                            <a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=true><%= pagination.page -1 %>"><%= pagination.page -1 %><span class="sr-only"></span></a>
+                                                            <a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=true><%= pagination.page -1 %>&status=<%= status %>&role=<%= role %>"><%= pagination.page -1 %><span class="sr-only"></span></a>
                                                         </li>
                                                         <li class="page-item active" id="currentPage">
                                                             <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
                                                         </li>
                                                         <li class="page-item next" id="nextNum">
-                                                            <a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=true"><%= +pagination.page +1 %><span class="sr-only"></span></a>
+                                                            <a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=true&status=<%= status %>&role=<%= role %>"><%= +pagination.page +1 %><span class="sr-only"></span></a>
                                                         </li>
                                                         <li class="page-item next"><a class="page-link" id="nextDots" href="#">...</a></li>
-                                                        <li class="page-item next"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.totalPage %>&activeUsers=true"><%= pagination.totalPage %></a></li>
+                                                        <li class="page-item next"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.totalPage %>&activeUsers=true&status=<%= status %>&role=<%= role %>"><%= pagination.totalPage %></a></li>
                                                         <li class="page-item">
-                                                            <a class="page-link" id="nextBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=true">></a>
+                                                            <a class="page-link" id="nextBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=true&status=<%= status %>&role=<%= role %>">></a>
                                                         </li>
                                                     </ul>
                                                 </nav>
@@ -221,25 +220,40 @@
         <script>
             
             // Ensure users section 'active' in detail-organization ( While get query = 'activeUsers' )
-            function usersActive() {
-                const searchParams = new URLSearchParams(window.location.search);
-                const activeUsers = searchParams.get('activeUsers')
-                if (activeUsers) {
-                    const tabs = document.querySelectorAll('.view-tab');
-                    tabs.forEach(tab => {
-                        tab.classList.remove('active');
-                    })
-                    document.querySelector(`.users-tab`).classList.add('active');
+            const searchParams = new URLSearchParams(window.location.search);
+            const activeUsers = searchParams.get('activeUsers')
+            if (activeUsers) {
+                const tabs = document.querySelectorAll('.view-tab');
+                tabs.forEach(tab => {
+                    tab.classList.remove('active');
+                })
+                document.querySelector(`.users-tab`).classList.add('active');
 
-                    const containers = document.querySelectorAll('.view-containers');
-                    containers.forEach(container => {
-                        container.classList.add('d-none');
-                    })
-                    document.getElementById(`users-view`).classList.remove('d-none');
-                }
+                const containers = document.querySelectorAll('.view-containers');
+                containers.forEach(container => {
+                    container.classList.add('d-none');
+                })
+                document.getElementById(`users-view`).classList.remove('d-none');
             }
 
-            usersActive();
+            const status = searchParams.get('status')
+            if (status) {
+                const statuses = document.querySelectorAll('.status');
+                statuses.forEach(status => {
+                    status.classList.remove('dropdown-active');
+                })
+                document.getElementById(`${status}`).classList.add('dropdown-active');
+            }
+
+            const role = searchParams.get('role')
+            if (role) {
+                const roles = document.querySelectorAll('.role');
+                roles.forEach(role => {
+                    role.classList.remove('dropdown-active');
+                })
+                document.getElementById(`${role}`).classList.add('dropdown-active');
+            }
+
             // xxx
             
             const paginationNav = document.getElementById('paginationNav');
@@ -312,27 +326,21 @@
                 document.getElementById('userPassword').value = password;
             }
 
-            function checkError() {
-                const searchParams = new URLSearchParams(window.location.search);
-                const errorType = searchParams.get('type')
-                if (errorType == 'user-create' || errorType == 'dup-email') {
+            const errorType = searchParams.get('type')
+            if (errorType == 'user-create' || errorType == 'dup-email') {
 
-                    const tabs = document.querySelectorAll('.view-tab');
-                    tabs.forEach(tab => {
-                        tab.classList.remove('active');
-                    })
-                    document.querySelector(`.users-tab`).classList.add('active');
+                const tabs = document.querySelectorAll('.view-tab');
+                tabs.forEach(tab => {
+                    tab.classList.remove('active');
+                })
+                document.querySelector(`.users-tab`).classList.add('active');
 
-                    const containers = document.querySelectorAll('.view-containers');
-                    containers.forEach(container => {
-                        container.classList.add('d-none');
-                    })
-                    document.getElementById(`users-view`).classList.remove('d-none');
-                }
-
+                const containers = document.querySelectorAll('.view-containers');
+                containers.forEach(container => {
+                    container.classList.add('d-none');
+                })
+                document.getElementById(`users-view`).classList.remove('d-none');
             }
-
-            checkError();
 
         </script>
         <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
@@ -343,7 +351,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                            <form id="addUserForm"  action="/superadmin/organizations/adduser/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>" method="POST" onsubmit="submitForm(event)">
+                            <form id="addUserForm"  action="/superadmin/organizations/adduser/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>&status=<%= status %>" method="POST" onsubmit="submitForm(event)">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">User Name</label>
                                 <input type="text" class="form-control" maxlength="100" name="name" id="userName"
