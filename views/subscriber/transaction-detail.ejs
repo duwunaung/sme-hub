@@ -1,0 +1,108 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		<main class="col-md-9 col-lg-10">
+			<div class="container my-5">
+				<h2 class="mb-4">Transaction Details</h2>
+		
+				<% if (errorMessage) { %>
+					<div id="errorBox" class="alert alert-danger" role="alert">
+						<%= errorMessage %>
+					</div>
+					<% } %>
+				<% if (successMessage) { %>
+				<div id="successBox" class="alert alert-success" role="alert">
+					<%= successMessage %>
+				</div>
+				<% } %>
+				<!-- Category Details Form -->
+				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+					<div class="mb-3">
+						<label for="transDescription" class="form-label">Description</label>
+						<div id="transAmount" class="form-control"><%= transaction.description %></div>
+					</div>
+					<div class="mb-3">
+						<label for="transAmount" class="form-label">Amount</label>
+						<div id="transAmount" class="form-control">
+							<% let formattedAmount = transaction.amount.toLocaleString(); %>
+						
+							<% if (transaction.baseCurrency === 'MMK') { %>
+								<%= formattedAmount %> ks
+							<% } else if (transaction.baseCurrency === 'USD') { %>
+								$ <%= formattedAmount %>
+							<% } else { %>
+								<%= formattedAmount %> <%= transaction.baseCurrency %>
+							<% } %>
+						</div>
+					</div>
+					<div class="mb-3">
+						<label for="transCategory" class="form-label">Category</label>
+						<select id="transCategory" name="catId" class="form-select inputRequired" disabled>
+
+							<% category.forEach(option => { %>
+								<option value="<%= option.id %>" <%= option.id === transaction.catId ? 'selected' : '' %> >
+									<%= option.name %>
+								</option>
+							<% }); %>
+						</select>
+					</div>
+					<div class="mb-3">
+						<label for="transDate" class="form-label">Date</label>
+						<div id="transDate" class="form-control"></div>
+					</div>
+					<div class="mb-3">
+						<label for="transUsername" class="form-label">Created By</label>
+						<div id="transUsername" class="form-control"><%= transaction.username %></div>
+					</div>
+					<a href="" class="btn w-100 btn-primary" id="resetBtn">Back</a>
+		
+				</form>
+		
+			</div>
+		</main>
+		<script>
+			let searchParams = new URLSearchParams(window.location.search);
+			let trans = searchParams.get('trans');
+			let cat = searchParams.get('cat');
+			let id = searchParams.get('id');
+
+			const resetBtn = document.getElementById('resetBtn');
+
+			if (resetBtn) {
+			    if (trans === 'income') {
+			        resetBtn.href = '/subscriber/transaction/income';
+			    } else if (trans === 'expense') {
+			        resetBtn.href = '/subscriber/transaction/expense';
+			    }
+			    else if (cat === 'income' && id) {
+			        resetBtn.href = `/subscriber/category/income/detail/${id}`;
+			    } else if (cat === 'expense' && id) {
+			        resetBtn.href = `/subscriber/category/expense/detail/${id}`;
+			    }
+			    else {
+			        resetBtn.href = '/subscriber/transaction/income';
+			    }
+			}
+
+			let isoString = '';
+			if (trans === 'income' || cat === 'income') {
+			    isoString = "<%= transaction.incomeDate %>";
+			} else {
+			    isoString = "<%= transaction.expenseDate %>";
+			}
+
+			let localDate = new Date(isoString);
+			let formattedDate = localDate.toLocaleString('en-US', {
+			    year: 'numeric',
+			    month: 'short',
+			    day: '2-digit',
+			    hour: '2-digit',
+			    minute: '2-digit',
+			    second: '2-digit',
+			    hour12: true
+			});
+
+			document.getElementById('transDate').innerText = formattedDate;
+			
+		</script>
+        <%- include('../partials/subscriber/footer.ejs') %>
