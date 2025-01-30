@@ -42,8 +42,7 @@ exports.logout = (req, res) => {
 
 exports.listExpenseCat = (req, res) => {
 	if (req.method == 'GET') {
-		const page = req.query.page || 1
-		axios.get(`${process.env.API_URL}/subscribers/categories/expense/list?page=${page}`, {
+		axios.get(`${process.env.API_URL}/subscribers/categories/expense/list`, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -79,7 +78,6 @@ exports.createExpenseCat = (req, res) => {
 exports.restoreExpenseCat = (req, res) => {
 	if (req.method == 'GET') {
 		const orgId = req.params.id
-		const page = req.query.page
 
 		axios.put(`${process.env.API_URL}/subscribers/categories/expense/restore/${orgId}`, {
 			headers: {
@@ -129,7 +127,6 @@ exports.updateExpenseCat = (req, res) => {
 		})
 	} else {
 		const id = req.params.id
-		const page = req.query.page
 		const { name } = req.body;
 		axios.put(`${process.env.API_URL}/subscribers/categories/expense/${id}`, { name }, {
 			headers: {
@@ -168,8 +165,7 @@ exports.detailExpenseCat = (req, res) => {
 
 exports.listIncomeCat = (req, res) => {
 	if (req.method == 'GET') {
-		const page = req.query.page || 1
-		axios.get(`${process.env.API_URL}/subscribers/categories/income/list?page=${page}`, {
+		axios.get(`${process.env.API_URL}/subscribers/categories/income/list`, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -205,7 +201,6 @@ exports.createIncomeCat = (req, res) => {
 exports.restoreIncomeCat = (req, res) => {
 	if (req.method == 'GET') {
 		const orgId = req.params.id
-		const page = req.query.page
 
 		axios.put(`${process.env.API_URL}/subscribers/categories/income/restore/${orgId}`, {
 			headers: {
@@ -254,7 +249,6 @@ exports.updateIncomeCat = (req, res) => {
 		})
 	} else {
 		const id = req.params.id
-		const page = req.query.page
 		const { name } = req.body;
 		axios.put(`${process.env.API_URL}/subscribers/categories/income/${id}`, { name }, {
 			headers: {
@@ -295,8 +289,7 @@ exports.detailIncomeCat = (req, res) => {
 
 exports.listExpenseTrans = (req, res) => {
 	if (req.method == 'GET') {
-		const page = req.query.page || 1
-		axios.get(`${process.env.API_URL}/subscribers/expenses?page=${page}`, {
+		axios.get(`${process.env.API_URL}/subscribers/expenses`, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -415,8 +408,7 @@ exports.detailExpenseTrans = (req, res) => {
 
 exports.listIncomeTrans = (req, res) => {
 	if (req.method == 'GET') {
-		const page = req.query.page || 1
-		axios.get(`${process.env.API_URL}/subscribers/incomes?page=${page}`, {
+		axios.get(`${process.env.API_URL}/subscribers/incomes`, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
