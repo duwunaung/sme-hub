@@ -52,10 +52,10 @@ exports.listExpenseCat = (req, res) => {
 				{ id: 1, name: 'active' },
 				{ id: 2, name: 'deleted' }
 			];
-			res.render('subscriber/categories', { category: response.data.data, cat: "expense", pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
+			res.render('subscriber/categories', { organizationName: req.session.orgName,category: response.data.data, cat: "expense", pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
 			
 		}).catch(error => {
-			res.render('subscriber/categories', { category: [], options: [], cat: "expense", pagination: {}, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/categories', { organizationName: null,category: [], options: [], cat: "expense", pagination: {}, errorMessage: "System Error!", successMessage: null });
 		})
 	}
 }
@@ -122,9 +122,9 @@ exports.updateExpenseCat = (req, res) => {
 			}
 		}).then(response => {
 			
-			res.render('subscriber/categories-edit', { category: response.data.data, options: options, errorMessage: null, successMessage: null });
+			res.render('subscriber/categories-edit', { organizationName: req.session.orgName,category: response.data.data, options: options, errorMessage: null, successMessage: null });
 		}).catch(error => {
-			res.render('subscriber/categories-edit', { category: {}, options: options, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/categories-edit', {organizationName: null, category: {}, options: options, errorMessage: "System Error!", successMessage: null });
 			
 		})
 	} else {
@@ -143,6 +143,29 @@ exports.updateExpenseCat = (req, res) => {
 	}
 }
 
+exports.detailExpenseCat = (req, res) => {
+	if (req.method == 'GET') {
+		const id = req.params.id
+		axios.get(`${process.env.API_URL}/subscribers/categories/expense/detail/${id}`, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			axios.get(`${process.env.API_URL}/subscribers/categories/expense/${id}`, {
+				headers: {
+					'Authorization': `${req.session.token}`
+				}
+			}).then(responseCategory => {
+				res.render('subscriber/categories-detail', {organizationName: req.session.orgName, category: responseCategory.data.data, transaction: response.data.data, cat: "expense", errorMessage: null, successMessage: null });
+			}).catch(error => {
+				res.render('subscriber/categories-detail', { organizationName: null, transaction: [], category: {}, errorMessage: "System Error!", cat: "expense", successMessage: null });
+			})
+		}).catch(error => {
+			res.render('subscriber/categories-detail', { organizationName: null, transaction: [], category: {}, errorMessage: "System Error!", cat: "expense", successMessage: null });         
+		})
+	}
+}
+
 exports.listIncomeCat = (req, res) => {
 	if (req.method == 'GET') {
 		const page = req.query.page || 1
@@ -155,10 +178,10 @@ exports.listIncomeCat = (req, res) => {
 				{ id: 1, name: 'active' },
 				{ id: 2, name: 'deleted' }
 			];
-			res.render('subscriber/categories', { category: response.data.data , cat: "income", pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
+			res.render('subscriber/categories', {organizationName: req.session.orgName, category: response.data.data , cat: "income", pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
 			
 		}).catch(error => {
-			res.render('subscriber/categories', { category: [], options: [] , cat: "income", pagination: {}, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/categories', {organizationName: null, category: [], options: [] , cat: "income", pagination: {}, errorMessage: "System Error!", successMessage: null });
 		})
 	}
 }
@@ -224,9 +247,9 @@ exports.updateIncomeCat = (req, res) => {
 				'Authorization': `${req.session.token}`
 			}
 		}).then(response => {
-			res.render('subscriber/categories-edit', { category: response.data.data, options: options, errorMessage: null, successMessage: null });
+			res.render('subscriber/categories-edit', {organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: null });
 		}).catch(error => {
-			res.render('subscriber/categories-edit', { category: {}, options: options, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/categories-edit', {organizationName: null, category: {}, options: options, errorMessage: "System Error!", successMessage: null });
 			
 		})
 	} else {
@@ -245,6 +268,30 @@ exports.updateIncomeCat = (req, res) => {
 	}
 }
 
+exports.detailIncomeCat = (req, res) => {
+	if (req.method == 'GET') {
+		const id = req.params.id
+		const num = req.query.num
+		const type = req.query.type
+		axios.get(`${process.env.API_URL}/subscribers/categories/income/detail/${id}?num=${num}&type=${type}`, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			axios.get(`${process.env.API_URL}/subscribers/categories/income/${id}`, {
+				headers: {
+					'Authorization': `${req.session.token}`
+				}
+			}).then(responseCategory => {
+				res.render('subscriber/categories-detail', {organizationName: req.session.orgName, category: responseCategory.data.data, transaction: response.data.data, cat: "income", errorMessage: null, successMessage: null });
+			}).catch(error => {
+				res.render('subscriber/categories-detail', { organizationName: null, transaction: [], category: {}, errorMessage: "System Error!", cat: "income", successMessage: null });
+			})
+		}).catch(error => {
+			res.render('subscriber/categories-detail', { organizationName: null, transaction: [], category: {}, errorMessage: "System Error!", cat: "income", successMessage: null });         
+		})
+	}
+}
 
 exports.listExpenseTrans = (req, res) => {
 	if (req.method == 'GET') {
@@ -259,12 +306,12 @@ exports.listExpenseTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				res.render('subscriber/transaction', { trans: "expense", category: responseCategory.data.data, transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+				res.render('subscriber/transaction', { organizationName: req.session.orgName ,trans: "expense", category: responseCategory.data.data, transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
 			}).catch(error => {
-				res.render('subscriber/transaction', {  trans: "expense", category: [], transaction: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction', {  organizationName: null, trans: "expense", category: [], transaction: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
-			res.render('subscriber/transaction', {  trans: "expense", category: [], transaction: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/transaction', { organizationName: null, trans: "expense", category: [], transaction: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
 		})
 	}
 }
@@ -314,25 +361,54 @@ exports.updateExpenseTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				res.render('subscriber/transaction-edit', { trans: "expense", transaction: response.data.data, category: responseCategory.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+				res.render('subscriber/transaction-edit', { organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
 			}).catch(error => {
-				res.render('subscriber/transaction-edit', { trans: "expense", transaction: {}, category: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction-edit', {organizationName: null, trans: "expense", transaction: {}, category: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
-			res.render('subscriber/transaction-edit', { trans: "expense", transaction: {}, category: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/transaction-edit', { organizationName: null,trans: "expense", transaction: {}, category: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
 			
 		})
 	} else {
 		const id = req.params.id
+		const cat = req.query.cat
+		const categoryId = req.query.id
 		const { description, amount, expenseDate, catId } = req.body;
 		axios.put(`${process.env.API_URL}/subscribers/expenses/update/${id}`, { description, amount, expenseDate, catId }, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
 		}).then(response => {
-			res.redirect('/subscriber/transaction/expense/update/' + id + '?success=true&type=update&trans=expense')
+			if (cat && categoryId){
+				res.redirect('/subscriber/transaction/expense/update/' + id + `?success=true&type=update&cat=expense&id=${categoryId}`)
+			} else {
+				res.redirect('/subscriber/transaction/expense/update/' + id + '?success=true&type=update&trans=expense')
+			}
 		}).catch(error => {
 			res.redirect('/subscriber/transaction/expense/update/' + id + '?error=true&type=sysError&trans=expense');
+		})
+	}
+}
+
+exports.detailExpenseTrans = (req, res) => {
+	if (req.method == 'GET') {
+		const id = req.params.id
+		axios.get(`${process.env.API_URL}/subscribers/expenses/${id}`, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			axios.get(`${process.env.API_URL}/subscribers/categories/expense/list`, {
+				headers: {
+					'Authorization': `${req.session.token}`
+				}
+			}).then(responseCategory => {
+				res.render('subscriber/transaction-detail', {organizationName: req.session.orgName, category: responseCategory.data.data ,transaction: response.data.data, trans: "expense", errorMessage: null, successMessage: null });
+			}).catch(error => {
+				res.render('subscriber/transaction-detail', {organizationName: null, category: [], transaction: {}, errorMessage: "System Error!", trans: "expense", successMessage: null });
+			})
+		}).catch(error => {
+			res.render('subscriber/transaction-detail', {organizationName: null, category: [], transaction: {}, errorMessage: "System Error!", trans: "expense", successMessage: null });         
 		})
 	}
 }
@@ -350,12 +426,12 @@ exports.listIncomeTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				res.render('subscriber/transaction', { trans: "income", category: responseCategory.data.data, transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+				res.render('subscriber/transaction', {organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
 			}).catch(error => {
-				res.render('subscriber/transaction', {  trans: "income", category: [], transaction: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction', { organizationName: null, trans: "income", category: [], transaction: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
-			res.render('subscriber/transaction', {  trans: "income", category: [], transaction: [],  pagination: {}, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/transaction', { organizationName: null, trans: "income", category: [], transaction: [],  pagination: {}, errorMessage: "System Error!", successMessage: null });
 		})
 	}
 }
@@ -388,25 +464,54 @@ exports.updateIncomeTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				res.render('subscriber/transaction-edit', {trans: "income", transaction: response.data.data, category: responseCategory.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+				res.render('subscriber/transaction-edit', {organizationName: req.session.orgName,trans: "income", transaction: response.data.data, category: responseCategory.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
 			}).catch(error => {
-				res.render('subscriber/transaction-edit', {trans: "income",  transaction: {}, category: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction-edit', {organizationName: null,trans: "income",  transaction: {}, category: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
-			res.render('subscriber/transaction-edit', { trans: "income", transaction: {}, category: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/transaction-edit', {organizationName: null, trans: "income", transaction: {}, category: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
 			
 		})
 	} else {
 		const id = req.params.id
+		const cat = req.query.cat
+		const categoryId = req.query.id
 		const { description, amount, incomeDate, catId } = req.body;
 		axios.put(`${process.env.API_URL}/subscribers/incomes/update/${id}`, { description, amount, incomeDate, catId }, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
 		}).then(response => {
-			res.redirect('/subscriber/transaction/income/update/' + id + '?success=true&type=update&trans=income')
+			if (cat && categoryId){
+				res.redirect('/subscriber/transaction/income/update/' + id + `?success=true&type=update&cat=income&id=${categoryId}`)
+			} else {
+				res.redirect('/subscriber/transaction/income/update/' + id + '?success=true&type=update&trans=income')
+			}
 		}).catch(error => {
 			res.redirect('/subscriber/transaction/income/update/' + id + '?error=true&type=sysError&trans=income');
+		})
+	}
+}
+
+exports.detailIncomeTrans = (req, res) => {
+	if (req.method == 'GET') {
+		const id = req.params.id
+		axios.get(`${process.env.API_URL}/subscribers/incomes/${id}`, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			axios.get(`${process.env.API_URL}/subscribers/categories/income/list`, {
+				headers: {
+					'Authorization': `${req.session.token}`
+				}
+			}).then(responseCategory => {
+				res.render('subscriber/transaction-detail', {organizationName: req.session.orgName, category: responseCategory.data.data , transaction: response.data.data, trans: "income", errorMessage: null, successMessage: null });
+			}).catch(error => {
+				res.render('subscriber/transaction-detail', { organizationName: null,category: [], transaction: {}, errorMessage: "System Error!", trans: "income", successMessage: null });
+			})
+		}).catch(error => {
+			res.render('subscriber/transaction-detail', { organizationName: null,category: [], transaction: {}, errorMessage: "System Error!", trans: "income", successMessage: null });         
 		})
 	}
 }
