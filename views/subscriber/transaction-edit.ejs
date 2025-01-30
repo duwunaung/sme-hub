@@ -3,7 +3,7 @@
 
 		<main class="col-md-9 col-lg-10">
 			<div class="container my-5">
-				<h2 class="mb-4">Update Organization</h2>
+				<h2 class="mb-4">Update Transaction</h2>
 		
 				<% if (errorMessage) { %>
 					<div id="errorBox" class="alert alert-danger" role="alert">
@@ -54,8 +54,11 @@
 			<script>
 				let searchParams = new URLSearchParams(window.location.search);
 				let trans = searchParams.get('trans')
+				let cat = searchParams.get('cat')
+				console.log(cat)
+				let id = searchParams.get('id')
 				let isoString = '';
-				if (trans === 'income') {
+				if (trans === 'income' || cat === 'income') {
 					isoString = "<%= transaction.incomeDate %>";
 				} else {
 					isoString = "<%= transaction.expenseDate %>";
@@ -75,7 +78,15 @@
 					const type = searchParams.get('type')
 					const resetBtn = document.getElementById("resetBtn")
 					trans = searchParams.get('trans')
-					resetBtn.href = `/subscriber/transaction/${trans}`
+					if (cat){
+						if (cat === 'income'){
+							resetBtn.href = `/subscriber/category/income/detail/${id}`
+						} else {
+							resetBtn.href = `/subscriber/category/expense/detail/${id}`
+						}
+					} else {
+						resetBtn.href = `/subscriber/transaction/${trans}`
+					}
 					if (type == 'update') {
 						resetBtn.innerText = "Back"
 						resetBtn.classList.add("btn-primary")
