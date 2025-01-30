@@ -132,7 +132,6 @@
                                                             <th>Phone</th>
                                                             <th>Role</th>
                                                             <th>Status</th>
-                                                            <th>Since</th>
                                                             <th>Actions</th>
                                                         </tr>
                                                     </thead>
@@ -163,9 +162,6 @@
                                                                 </td>
                                                                 <td>
                                                                     <%= users[i].status %>
-                                                                </td>
-                                                                <td>
-                                                                    <%= new Date(users[i].registered).toDateString() %>
                                                                 </td>
                                                                 <td>
                                                                     <a href="/superadmin/organizations/detail/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"

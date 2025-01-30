@@ -48,7 +48,6 @@
                                                 <th>Email</th>
                                                 <th>Phone</th>
                                                 <th>Status</th>
-                                                <th>Member Since</th>
                                                 <th>Actions</th>
                                             </tr>
                                         </thead>
@@ -77,9 +76,6 @@
                                                     </td>
                                                     <td>
                                                         <%= users[i].status.toUpperCase() %>
-                                                    </td>
-                                                    <td>
-                                                        <%= new Date(users[i].registered).toDateString() %>
                                                     </td>
                                                     <td>
                                                         <a href="/superadmin/users/detail/<%= users[i].id %>?page=<%= pagination.page %>"
