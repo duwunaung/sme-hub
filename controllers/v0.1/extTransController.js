@@ -121,7 +121,11 @@ exports.getExpense = (req, res) => {
         })
     }
     const id = req.params.id
-    let query = `SELECT * FROM exps WHERE exps.id = ${id}`;
+    let query = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, e.createdBy, o.baseCurrency AS baseCurrency , u.name AS username
+	FROM exps e 
+	JOIN orgs o ON e.orgId = o.id
+	JOIN users u ON e.createdBy = u.id
+	WHERE e.id = ${id}`;
 
     db_connection.query(query, (err, results) => {
         if (err) {
@@ -324,7 +328,7 @@ exports.updateIncome = (req, res) => {
 			}
 		)
 	}
-	const sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}', editedAt = NOW() WHERE id = '${id}' AND orgId = '${orgId}'`
+	const sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}' WHERE id = '${id}' AND orgId = '${orgId}'`
 	db_connection.query(sql, (err, results) => {
 		if (err) {
 			return res.status(500).send(
@@ -381,7 +385,11 @@ exports.getIncome = (req, res) => {
         })
     }
     const id = req.params.id
-    let query = `SELECT * FROM incs WHERE incs.id = ${id}`;
+    let query = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, i.createdBy, o.baseCurrency AS baseCurrency , u.name AS username
+	FROM incs i 
+	JOIN orgs o ON i.orgId = o.id
+	JOIN users u ON i.createdBy = u.id
+	WHERE i.id = ${id}`;
 
     db_connection.query(query, (err, results) => {
         if (err) {
