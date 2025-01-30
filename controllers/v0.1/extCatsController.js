@@ -88,6 +88,62 @@ exports.listExpenseCategory = (req, res) => {
     })
 }
 
+exports.getExpenseCategory = (req, res) => {
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "Superadmin cannot get the access to organization's data"
+        })
+    }
+    const id = req.params.id
+    
+    let query = `SELECT * FROM expcats WHERE expcats.id = ${id}`;
+
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Data not found',
+                dev: "Data not found"
+            })
+        }
+
+        const orgId = results[0].orgId
+        orgQuery = `SELECT name FROM orgs WHERE id = ${orgId}`;
+
+        db_connection.query(orgQuery, (err, orgResult) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: 'internal server error',
+                    dev: err
+                })
+            }
+            
+            if (orgResult.length === 0) {
+                orgName = ""
+            } else {
+                orgName = orgResult[0].name
+            }
+            results[0].orgName = orgName
+            return res.status(200).send({
+                success: true,
+                message: "We found the data!",
+                dev: "Thanks bro, you`re awesome",
+                data: results[0]
+            })
+        })
+    });
+};
+
 exports.updateExpenseCategory = (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
@@ -152,10 +208,38 @@ exports.deleteExpenseCategory = (req, res) => {
     })
 }
 
+exports.restoreExpenseCategory = (req, res) => {
+    const { id } = req.params.id;
+    const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
+
+    const query = `UPDATE expcats SET status = 'active' WHERE id = ? AND orgId = ?`;
+
+    db_connection.query(query, [id, orgId], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.affectedRows === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Expense Category not found',
+                dev: "Expense Category not found"
+            })
+        }
+        res.status(200).send({
+            success: true,
+            message: 'Expense Category restored successfully',
+            dev: "Good Job, Bro!",
+        })
+    })
+}
 exports.createIncomeCategory = (req, res) => {
     const { name } = req.body
     const orgId = req.user.orgId
-    const createdBy = req.user.userId
+    const createdBy = req.user.id
     if (!name) {
         return res.status(400).send({
             success: false,
@@ -186,6 +270,60 @@ exports.createIncomeCategory = (req, res) => {
     })
 }
 
+exports.getIncomeCategory = (req, res) => {
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "Superadmin cannot get the access to organization's data"
+        })
+    }
+    const id = req.params.id
+    let query = `SELECT * FROM inccats WHERE inccats.id = ${id}`;
+
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Data not found',
+                dev: "Data not found"
+            })
+        }
+        const orgId = results[0].orgId
+        orgQuery = `SELECT name FROM orgs WHERE id = ${orgId}`;
+
+        db_connection.query(orgQuery, (err, orgResult) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: 'internal server error',
+                    dev: err
+                })
+            }
+            
+            if (orgResult.length === 0) {
+                orgName = ""
+            } else {
+                orgName = orgResult[0].name
+            }
+            results[0].orgName = orgName
+            return res.status(200).send({
+                success: true,
+                message: "We found the data!",
+                dev: "Thanks bro, you`re awesome",
+                data: results[0]
+            })
+        })
+    });
+};
+
 exports.updateIncomeCategory = (req, res) => {
     const { id } = req.params;
     const { name } = req.body;
@@ -194,7 +332,7 @@ exports.updateIncomeCategory = (req, res) => {
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
-    const query = `UPDATE incats SET name = ? WHERE id = ? AND orgId = ?`;
+    const query = `UPDATE inccats SET name = ? WHERE id = ? AND orgId = ?`;
     db_connection.query(query, [name, id, orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -226,7 +364,7 @@ exports.deleteIncomeCategory = (req, res) => {
     const { id } = req.params;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
-    const query = `UPDATE incats SET status = 'deleted' WHERE id = ? AND orgId = ?`;
+    const query = `UPDATE inccats SET status = 'deleted' WHERE id = ? AND orgId = ?`;
 
     db_connection.query(query, [id, orgId], (err, results) => {
         if (err) {
@@ -251,6 +389,35 @@ exports.deleteIncomeCategory = (req, res) => {
     })
 }
 
+exports.restoreIncomeCategory = (req, res) => {
+    const { id } = req.params.id;
+    const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
+
+    const query = `UPDATE inccats SET status = 'active' WHERE id = ? AND orgId = ?`;
+
+    db_connection.query(query, [id, orgId], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.affectedRows === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Income Category not found',
+                dev: "Income Category not found"
+            })
+        }
+        res.status(200).send({
+            success: true,
+            message: 'Income Category restored successfully',
+            dev: "Good Job, Bro!",
+        })
+    })
+}
+
 exports.listIncomeCategory = (req, res) => {
 
     const { page = 1, pageSize = 10 } = req.query;
@@ -259,7 +426,7 @@ exports.listIncomeCategory = (req, res) => {
     const offset = (page - 1) * pageSize;
     const query = `
         SELECT ec.id, ec.name, u.name AS createdBy
-        FROM incats ec
+        FROM inccats ec
         JOIN users u ON ec.createdBy = u.id
         WHERE ec.orgId = ? AND ec.status = ?
         LIMIT ? OFFSET ?
@@ -274,7 +441,7 @@ exports.listIncomeCategory = (req, res) => {
             })
         }
 
-        const countQuery = `SELECT COUNT(*) AS total FROM incats WHERE orgId = ?`;
+        const countQuery = `SELECT COUNT(*) AS total FROM inccats WHERE orgId = ?`;
 
         db_connection.query(countQuery, [orgId], (err, countResults) => {
             if (err) {

@@ -1,0 +1,165 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		
+		<!-- Main Content -->
+        <main >
+            <div class="content">
+				<div class="container my-2">
+					<div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 600px; margin: 0 auto;">
+					  <a type="button" href="/subscriber/transaction/income" class="text-decoration-none btn <% if (trans === 'income' ) { %> btn-dark <% } else {%> btn-secondary <% } %> flex-grow-1" id="btnIncome" >Income</a>
+					  <a type="button" href="/subscriber/transaction/expense" class="text-decoration-none btn <% if (trans === 'expense' ) { %> btn-dark <% } else {%> btn-secondary <% } %> flex-grow-1" id="btnExpense" >Expense</a>
+					</div>
+				</div>
+
+				<div class="d-flex justify-content-between align-items-center mb-4">
+					<h2><% if (trans === 'income' ) { %> Income <% } else {%> Expense <% } %> Transactions</h2>
+					<button class="btn btn-primary" data-bs-toggle="modal"
+					data-bs-target="#addNewTransaction">
+						Add New Transaction
+					</button>
+				</div>
+
+				<div class="table-responsive">
+					<table class="table table-striped table-hover">
+						<thead class="table-dark">
+						  <tr>
+							<th scope="col">#</th>
+							<th scope="col">Description</th>
+							<th scope="col">Amount</th>
+							<th scope="col">Date</th>
+							<th scope="col">Category</th>
+							<th scope="col">Created By</th>
+							<th scope="col">Actions</th>
+						  </tr>
+						</thead>
+						<tbody>
+							<tbody id="transactionTable">
+								<!-- Dynamic rows go here -->
+								<% for (let i=0; i < transaction.length; i++) { %>
+									<tr>
+										<td>
+											<%= i + 1 %>
+										</td>
+	
+										<td>
+											<%= transaction[i].description %>
+										</td>
+										<td>
+											<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
+
+											<% if (transaction[i].baseCurrency === 'MMK') { %>
+											    <%= formattedAmount %> ks
+											<% } else if (transaction[i].baseCurrency === 'USD') { %>
+											    $ <%= formattedAmount %>
+											<% } else { %>
+											    <%= formattedAmount %> <%= transaction[i].baseCurrency %>
+											<% } %>
+
+										</td>
+										<td>
+											<%= new Date(trans === 'income' ? transaction[i].incomeDate : transaction[i].expenseDate)
+											    .toLocaleString('en-US', { 
+											        day: '2-digit', 
+											        month: 'short', 
+											        year: 'numeric', 
+											        hour: '2-digit', 
+											        minute: '2-digit', 
+											        second: '2-digit', 
+											        hour12: true 
+											    }) 
+											%>
+										</td>
+	
+										<td>
+											<%= transaction[i].category %>
+										</td>
+										<td>
+											<%= transaction[i].createdBy %>
+										</td>
+										<td>
+											<a href="#"
+												class="btn btn-primary btn-sm">View</a>
+											<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>"
+												class="btn btn-warning btn-sm">Edit</a>
+										</td>
+									</tr>
+									<% } %>
+							</tbody>
+						</tbody>
+					</table>
+				</div>
+				  
+            </div>
+        </main>
+		<div class="modal fade" id="addNewTransaction" tabindex="-1" aria-labelledby="addNewTransactionModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addNewTransactionModalLabel">Add New Category</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addNewTransactionForm" action="/subscriber/transaction/<%= trans %>/create" method="POST" onsubmit="submitForm(event)">
+                            <div class="mb-3">
+                                <label for="transDescription" class="form-label">Description</label>
+                                <input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
+                                    placeholder="Enter description" value="" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
+								<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
+                            </div>
+							<div class="mb-3">
+                                <label for="transAmount" class="form-label">Amount</label>
+                                <input type="number" class="form-control inputRequired" maxlength="11" name="amount" id="transAmount"
+                                    placeholder="Enter amount" value="" oninput="checkInputs('transAmountError', 'transAmount')" required>
+								<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 11 characters!</p>
+                            </div>
+							<div class="mb-3">
+                                <label for="transCategory" class="form-label">Category</label>
+                                <select id="transCategory" name="catId" class="form-select inputRequired" required>
+
+                                    <% category.forEach(option => { %>
+										<option value="<%= option.id %>"><%= option.name %></option>
+									<% }); %>
+                                </select>
+                            </div>
+							<div class="mb-3">
+                                <label for="transDate" class="form-label">Date</label>
+                                <input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
+                                    placeholder="Select date" value="" required>
+                            </div>
+                            <button type="submit" id="addBtn" class="btn btn-primary w-100">Add Transaction</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+		<script>
+			const form = document.getElementById('addNewTransactionForm');
+            const addButton = document.getElementById('addBtn');
+            const inputs = form.querySelectorAll('.inputRequired');
+
+            function checkInputs(messageBox, inputField) {
+                let allFilled = true;
+                inputs.forEach(index => {
+                if (!index.value.trim()) {
+                    allFilled = false;
+                }
+                });
+                addButton.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			    } else {
+			        message.classList.add('d-none');
+			    }
+            }
+
+
+            function submitForm(event) {
+			    addButton.disabled = true;
+			    addButton.textContent = 'Submitting...';
+			}
+		</script>
+        <%- include('../partials/subscriber/footer.ejs') %>

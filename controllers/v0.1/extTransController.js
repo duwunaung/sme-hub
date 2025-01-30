@@ -112,6 +112,41 @@ exports.deleteExpense = (req, res) => {
     })
 }
 
+exports.getExpense = (req, res) => {
+	if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "Superadmin cannot get the access to organization's data"
+        })
+    }
+    const id = req.params.id
+    let query = `SELECT * FROM exps WHERE exps.id = ${id}`;
+
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Data not found',
+                dev: "Data not found"
+            })
+        }
+		return res.status(200).send({
+			success: true,
+			message: "We found the data!",
+			dev: "Thanks bro, you`re awesome",
+			data: results[0]
+		})
+    });
+}
+
 exports.listExpenses = (req, res) => {
     const { page = 1, pageSize = 10, fromDate, toDate, catId } = req.query
     const orgId = req.user.orgId
@@ -123,11 +158,12 @@ exports.listExpenses = (req, res) => {
     e.amount, 
     e.expenseDate, 
     c.name as category ,
-    u.name as createdBy,
-    e.createdAt
+    u.name as createdBy ,
+	o.baseCurrency as baseCurrency
     FROM exps e
     JOIN expcats c ON e.catId = c.id
     JOIN users u ON e.createdBy = u.id
+	JOIN orgs o ON e.orgId = o.id
     WHERE e.orgId = '${orgId}'`
 
     if (fromDate) {
@@ -142,7 +178,7 @@ exports.listExpenses = (req, res) => {
         query += ` AND e.catId = '${catId}'`
     }
 
-    query += ` ORDER BY e.createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`
+    query += `LIMIT ${pageSize} OFFSET ${offset}`
 
     db_connection.query(query, (err, result) => {
         if (err) {
@@ -240,8 +276,8 @@ exports.getMonthlyExpenses = (req, res) => {
 exports.createIncome = (req, res) => {
 	const { description, amount, incomeDate, catId } = req.body
 	const orgId = req.user.orgId
-	const createdBy = req.user.userId
-	
+	const createdBy = req.user.id
+
 	if (!description || !amount || !incomeDate || !catId) {
 		return res.status(400).send(
 			{
@@ -251,8 +287,8 @@ exports.createIncome = (req, res) => {
 			}
 		)
 	}
-	const sql = 'INSERT into incs (description, amount, incomeDate, catId, orgId, createdBy, createdAt) VALUES (?,?,?,?,?,?,?)'
-	const values = [description, amount, incomeDate, catId, orgId, createdBy, new Date()]
+	const sql = 'INSERT into incs (description, amount, incomeDate, catId, orgId, createdBy) VALUES (?,?,?,?,?,?)'
+	const values = [description, amount, incomeDate, catId, orgId, createdBy]
 	db_connection.query(sql, values, (err, results) => {
 		if (err) {
 			return res.status(500).send(
@@ -336,6 +372,41 @@ exports.deleteIncome = (req, res) => {
 	})
 }
 
+exports.getIncome = (req, res) => {
+	if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "Superadmin cannot get the access to organization's data"
+        })
+    }
+    const id = req.params.id
+    let query = `SELECT * FROM incs WHERE incs.id = ${id}`;
+
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Data not found',
+                dev: "Data not found"
+            })
+        }
+		return res.status(200).send({
+			success: true,
+			message: "We found the data!",
+			dev: "Thanks bro, you`re awesome",
+			data: results[0]
+		})
+    });
+}
+
 exports.listIncomes = (req, res) => {
 	const {page = 1, pageSize = 10, fromDate, toDate, catId} = req.query
 	const orgId = req.user.orgId
@@ -347,8 +418,8 @@ exports.listIncomes = (req, res) => {
 	i.incomeDate,
 	c.name as category,
 	u.name as createdBy,
-	i.createdAt
-	FROM incs i JOIN inccats c ON i.catId = c.id JOIN users u ON i.createdBy = u.id WHERE i.orgId = '${orgId}'`
+	o.baseCurrency as baseCurrency
+	FROM incs i JOIN inccats c ON i.catId = c.id JOIN users u ON i.createdBy = u.id JOIN orgs o ON i.orgId = o.id WHERE i.orgId = '${orgId}'`
 	if (fromDate) {
 		sql += ` AND i.incomeDate >= '${fromDate}'`
 	}
@@ -358,7 +429,7 @@ exports.listIncomes = (req, res) => {
 	if (catId) {
 		sql += ` AND i.catId = '${catId}'`
 	}
-	sql += `ORDER BY i.createdAt DESC LIMIT ${pageSize} OFFSET ${offset}`
+	sql += `LIMIT ${pageSize} OFFSET ${offset}`
 	db_connection.query(sql, (err, results) => {
 		if (err) {
             return res.status(500).send(

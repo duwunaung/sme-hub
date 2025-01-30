@@ -1,7 +1,9 @@
 const express = require('express')
-const { createExpense, updateExpense, deleteExpense, listExpenses, getMonthlyExpenses } = require('../../controllers/v0.1/extTransController')
+const { createExpense, updateExpense, deleteExpense, listExpenses, getMonthlyExpenses, getExpense } = require('../../controllers/v0.1/extTransController')
 
 const router = express.Router()
+
+router.get('/:id', getExpense)
 
 router.get('/', listExpenses)
 

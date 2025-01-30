@@ -17,6 +17,7 @@ const user_v01 = require('./routes/v0.1/userRoute')
 const extCats_v01 = require('./routes/v0.1/extCatsRoute')
 
 const saViews_v01 = require('./routes/v0.1/saViewsRoute')
+const suViews_v01 = require('./routes/v0.1/suViewsRoute')
 
 // middlewares
 const authenticateToken = require('./middlewares/authenticateToken')
@@ -63,9 +64,7 @@ app.use(express.static('public'));
 
 app.use('/superadmin', saViews_v01)
 
-app.get('/*', (req, res) => {
-  res.redirect('/superadmin/dashboard')
-})
+app.use('/subscriber', suViews_v01)
 
 app.listen(process.env.PORT, function () {
   console.log("Server is running on", process.env.PORT);

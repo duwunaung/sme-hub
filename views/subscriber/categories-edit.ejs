@@ -1,0 +1,91 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		<main class="col-md-9 col-lg-10">
+			<div class="container my-5">
+				<h2 class="mb-4">Update Organization</h2>
+		
+				<% if (errorMessage) { %>
+					<div id="errorBox" class="alert alert-danger" role="alert">
+						<%= errorMessage %>
+					</div>
+					<% } %>
+				<% if (successMessage) { %>
+				<div id="successBox" class="alert alert-success" role="alert">
+					<%= successMessage %>
+				</div>
+				<% } %>
+				<!-- Category Details Form -->
+				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+					<div class="mb-3">
+						<label for="catName" class="form-label">Category Name</label>
+						<input type="text" class="form-control" maxlength="255" name="name" id="catName"
+							placeholder="Enter category name" value="<%= category.name %>" oninput="checkInputs('catNameError', 'catName')" required>
+						<p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 255 characters!</p>
+					</div>
+					<div class="mb-3">
+						<label for="catStatus" class="form-label">Status</label>
+						<select id="catStatus" name="status" class="form-select" required>
+		
+							<% options.forEach(option=> { %>
+								<option value="<%= option.name %>" <%=option.name===category.status ? 'selected' : '' %> >
+									<%= option.name.toUpperCase() %>
+								</option>
+								<% }); %>
+						</select>
+					</div>
+					<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
+					<a href="" class="btn w-100" id="resetBtn"></a>
+		
+				</form>
+		
+			</div>
+			<script>
+
+				function buttonType() {
+					const searchParams = new URLSearchParams(window.location.search);
+					const type = searchParams.get('type')
+					const resetBtn = document.getElementById("resetBtn")
+					const cat = searchParams.get('cat')
+					resetBtn.href = `/subscriber/category/${cat}`
+					if (type == 'update') {
+						resetBtn.innerText = "Back"
+						resetBtn.classList.add("btn-primary")
+					}
+					else {
+						resetBtn.innerText = "Cancel"
+						resetBtn.classList.add("btn-danger")
+					}
+		
+				}
+				buttonType();
+		
+				const addButton = document.getElementById('addBtn');
+				const form = document.getElementById('myForm');
+				const inputs = form.querySelectorAll('.form-control[required]');
+		
+				function checkInputs(messageBox, inputField) {
+					let allFilled = true;
+					inputs.forEach(index => {
+					if (!index.value.trim()) {
+						allFilled = false;
+					}
+					});
+					addButton.disabled = !allFilled;
+					const message = document.getElementById(messageBox)
+					const input = document.getElementById(inputField)
+					if (input.value.length === parseInt(input.maxLength)) {
+						message.classList.remove('d-none');
+					} else {
+						message.classList.add('d-none');
+					}
+				}
+		
+				function submitForm(event) {
+					addButton.disabled = true;
+					addButton.textContent = 'Submitting...';
+				}
+				
+			</script>
+		</main>
+        <%- include('../partials/subscriber/footer.ejs') %>
