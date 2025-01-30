@@ -131,8 +131,8 @@
 															<th>Email</th>
                                                             <th>Phone</th>
                                                             <th>Role</th>
-                                                            <th>Status</th>
-                                                            <th>Actions</th>
+                                                            <th class="text-center">Status</th>
+                                                            <th class="text-center">Actions</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody id="userTable">
@@ -160,10 +160,16 @@
                                                                 <td>
                                                                     <%= users[i].role %>
                                                                 </td>
-                                                                <td>
-                                                                    <%= users[i].status %>
+                                                                <td class="text-center">
+                                                                    <% if (users[i].status == 'active' ) { %>
+                                                                        <i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i>
+                                                                    <% } else if (users[i].status == 'deleted' ) { %>
+                                                                        <i class="fa-solid fa-circle-minus" style="color: red; font-size: 1.1rem;"></i>
+                                                                    <% } else { %>
+                                                                        <i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i>
+                                                                    <% } %>
                                                                 </td>
-                                                                <td>
+                                                                <td style="padding-left: 3%;">
                                                                     <a href="/superadmin/organizations/detail/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
                                                                         class="btn btn-primary btn-sm">View</a>
                                                                     <a href="/superadmin/organizations/update/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
@@ -171,7 +177,7 @@
                                                                     <% if (users[i].status=='deleted' ) { %>
                                                                         <a href="/superadmin/organizations/restoreuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
                                                                             class="btn btn-danger btn-sm">Restore</a>
-                                                                        <% } else {%>
+                                                                        <% } else { %>
                                                                             <a href="/superadmin/organizations/deleteuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
                                                                                 class="btn btn-danger btn-sm">Delete</a>
                                                                             <% } %>

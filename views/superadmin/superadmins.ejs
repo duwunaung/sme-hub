@@ -47,8 +47,8 @@
                                                 <th>Name</th>
                                                 <th>Email</th>
                                                 <th>Phone</th>
-                                                <th>Status</th>
-                                                <th>Actions</th>
+                                                <th class="text-center">Status</th>
+                                                <th class="text-center">Actions</th>
                                             </tr>
                                         </thead>
                                         <tbody id="organizationsTable">
@@ -74,10 +74,16 @@
 								                        ? users[i].phone.substring(0, 15) + "..." 
 								                        : users[i].phone %>
                                                     </td>
-                                                    <td>
-                                                        <%= users[i].status.toUpperCase() %>
+                                                    <td class="text-center">
+                                                        <% if (users[i].status == 'active' ) { %>
+                                                            <i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i>
+                                                        <% } else if (users[i].status == 'deleted' ) { %>
+                                                            <i class="fa-solid fa-circle-minus" style="color: red; font-size: 1.1rem;"></i>
+                                                        <% } else { %>
+                                                            <i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i>
+                                                        <% } %>
                                                     </td>
-                                                    <td>
+                                                    <td style="padding-left: 5%;">
                                                         <a href="/superadmin/users/detail/<%= users[i].id %>?page=<%= pagination.page %>"
                                                             class="btn btn-primary btn-sm">View</a>
                                                         <a href="/superadmin/users/update/<%= users[i].id %>?page=<%= pagination.page %>"
@@ -85,11 +91,11 @@
 
                                                         <% if (users[i].status=='deleted' ) { %>
                                                             <a href="/superadmin/users/restore/<%= users[i].id %>?page=<%= pagination.page %>"
-                                                                class="btn btn-danger btn-sm">Restore</a>
-                                                            <% } else {%>
-                                                                <a href="/superadmin/users/delete/<%= users[i].id %>?page=<%= pagination.page %>"
-                                                                    class="btn btn-danger btn-sm">Delete</a>
-                                                                <% } %>
+                                                            class="btn btn-danger btn-sm">Restore</a>
+                                                        <% } else {%>
+                                                            <a href="/superadmin/users/delete/<%= users[i].id %>?page=<%= pagination.page %>"
+                                                            class="btn btn-danger btn-sm">Delete</a>
+                                                        <% } %>
                                                     </td>
                                                 </tr>
                                                 <% } %>
