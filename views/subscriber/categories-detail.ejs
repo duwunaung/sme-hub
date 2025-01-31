@@ -10,17 +10,13 @@
 			.dropdown-btn {
 				cursor: pointer;
 			}
-		
-			.dropdown-btn:hover {
-				background-color: #2980b9;
-				border-color: #2980b9;
-			}
+	
 		
 			.dropdown-content {
 				display: none;
 				position: absolute;
 				top: 120%;
-				left: 0;
+				left: -100%;
 				background-color: white;
 				min-width: 160px;
 				box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
@@ -43,10 +39,17 @@
 			    display: flex;
 			    justify-content: flex-end;
 			}
+
+			.button-fixed-width {
+				max-width: 80px;
+				width: 80px;
+		        min-width: 60px;
+		        text-align: center;
+			}
 		</style>
 		
 		<div class="my-2">
-			<h2 class="mb-4">Category <strong><%= category.name %></strong></h2>
+			<h2 class="mb-4"><strong><%= category.name.toUpperCase() %></strong> Category (<%= cat %>)</h2>
 	
 			<% if (errorMessage) { %>
 			<div id="errorBox" class="alert alert-danger" role="alert">
@@ -60,14 +63,22 @@
 			<% } %>
 	
 			<div class="container-div">
-				<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>" class="btn btn-primary me-2">All</a>
-				<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>&num=1&type=month" class="btn btn-primary me-2">This Month</a>
 	
+				<div class="d-flex me-3">
+					<input type="text" class="form-control me-2" placeholder="Search..." id="searchInput">
+					<button class="btn btn-primary d-flex align-items-center" onclick="performSearch()">
+						Search <i class="fas fa-search ms-2"></i>
+					</button>
+				</div>
 				<div class="dropdown">
-					<a class="dropdown-btn btn btn-primary" onclick="toggleDropdown()">More Ranges</a>
+					<a class="dropdown-btn btn btn-primary d-flex align-items-center" onclick="toggleDropdown()">
+						<i class="fas fa-filter"></i> Filter
+					</a>
 					<div class="dropdown-content" id="dropdown-menu">
+						<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>">All</a>
 						<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>&num=1&type=day">Today</a>
 						<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>&num=1&type=week">This Week</a>
+						<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>&num=1&type=month">This Month</a>
 						<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>&num=7&type=day">Last 7 Days</a>
 						<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>&num=30&type=day">Last 30 Days</a>
 						<a href="/subscriber/category/<%= cat %>/detail/<%= category.id %>?cat=<%= cat %>&num=-1&type=month">Last Month</a>
@@ -127,10 +138,12 @@
 										<%= transaction[i].createdBy %>
 									</td>
 									<td>
-										<a href="/subscriber/transaction/<%= cat %>/detail/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>"
-											class="btn btn-primary btn-sm">View</a>
-										<a href="/subscriber/transaction/<%= cat %>/update/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>"
-											class="btn btn-warning btn-sm">Edit</a>
+										<div class="d-flex gap-2">
+											<a href="/subscriber/transaction/<%= cat %>/detail/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>"
+												class="btn btn-primary btn-sm w-100 button-fixed-width">View</a>
+											<a href="/subscriber/transaction/<%= cat %>/update/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>"
+												class="btn btn-warning btn-sm w-100 button-fixed-width">Edit</a>
+										</div>
 									</td>
 								</tr>
 								<% } %>
