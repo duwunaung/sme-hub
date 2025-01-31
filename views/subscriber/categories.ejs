@@ -1,7 +1,13 @@
 <%- include('../partials/subscriber/header.ejs') %>
     <%- include('../partials/subscriber/navbar.ejs') %>
 
-		
+		<style>
+			.btn-fixed-width {
+		        width: 80px;
+		        min-width: 60px;
+		        text-align: center;
+		    }
+		</style>
 		<!-- Main Content -->
         <main >
             <div class="content">
@@ -16,7 +22,7 @@
 					<h2><% if (cat === 'income' ) { %> Income <% } else {%> Expensee <% } %> Categories</h2>
 					<button class="btn btn-primary" data-bs-toggle="modal"
 					data-bs-target="#addNewCategory">
-						Add New Category
+						Add New
 					</button>
 				</div>
 
@@ -46,18 +52,22 @@
 											<%= category[i].createdBy %>
 										</td>
 										<td>
-											<a href="/subscriber/category/<%= cat %>/detail/<%= category[i].id %>?cat=<%= cat %>"
-												class="btn btn-primary btn-sm">View</a>
-											<a href="/subscriber/category/<%= cat %>/update/<%= category[i].id %>?cat=<%= cat %>"
-												class="btn btn-warning btn-sm">Edit</a>
-	
-											<% if (category[i].status=='deleted' ) { %>
-												<a href="/subscriber/category/<%= cat %>/restore/<%= category[i].id %>"
-													class="btn btn-danger btn-sm">Restore</a>
-												<% } else {%>
+											
+											<div class="d-flex flex-nowrap">
+												<a href="/subscriber/category/<%= cat %>/detail/<%= category[i].id %>?cat=<%= cat %>"
+													class="btn btn-primary btn-sm btn-fixed-width me-1">View</a>
+												<a href="/subscriber/category/<%= cat %>/update/<%= category[i].id %>?cat=<%= cat %>"
+													class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
+												
+												<% if (category[i].status == 'deleted') { %>
+													<a href="/subscriber/category/<%= cat %>/restore/<%= category[i].id %>"
+														class="btn btn-danger btn-sm btn-fixed-width">Restore</a>
+												<% } else { %>
 													<a href="/subscriber/category/<%= cat %>/delete/<%= category[i].id %>"
-														class="btn btn-danger btn-sm">Delete</a>
-													<% } %>
+														class="btn btn-danger btn-sm btn-fixed-width">Delete</a>
+												<% } %>
+											</div>
+											
 										</td>
 									</tr>
 									<% } %>
