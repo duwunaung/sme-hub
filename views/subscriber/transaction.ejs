@@ -1,7 +1,13 @@
 <%- include('../partials/subscriber/header.ejs') %>
     <%- include('../partials/subscriber/navbar.ejs') %>
 
-		
+		<style>
+			.btn-fixed-width {
+				width: 80px;
+				min-width: 60px;
+				text-align: center;
+			}
+		</style>
 		<!-- Main Content -->
         <main >
             <div class="content">
@@ -16,7 +22,7 @@
 					<h2><% if (trans === 'income' ) { %> Income <% } else {%> Expense <% } %> Transactions</h2>
 					<button class="btn btn-primary" data-bs-toggle="modal"
 					data-bs-target="#addNewTransaction">
-						Add New Transaction
+						Add New
 					</button>
 				</div>
 
@@ -78,10 +84,12 @@
 											<%= transaction[i].createdBy %>
 										</td>
 										<td>
-											<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>"
-												class="btn btn-primary btn-sm">View</a>
-											<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>"
-												class="btn btn-warning btn-sm">Edit</a>
+											<div class="d-flex flex-nowrap">
+												<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>"
+													class="btn btn-primary btn-sm btn-fixed-width me-1">View</a>
+												<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>"
+													class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
+											</div>
 										</td>
 									</tr>
 									<% } %>
