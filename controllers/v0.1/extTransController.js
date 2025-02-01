@@ -152,40 +152,54 @@ exports.getExpense = (req, res) => {
 }
 
 exports.listExpenses = (req, res) => {
-    const { page = 1, pageSize = 10, fromDate, toDate, catId } = req.query
-    const orgId = req.user.orgId
-    const offset = (page - 1) * pageSize
+    const {page = 1, pageSize = 10, fromDate, toDate, catId, num, type, search} = req.query
+	const orgId = req.user.orgId
+	const offset = (page - 1) * pageSize
+	const queryParams = []
 
-    let query = `SELECT 
-    e.id, 
-    e.description, 
-    e.amount, 
-    e.expenseDate, 
-    c.name as category ,
-    u.name as createdBy ,
+	let sql = `SELECT e.id,
+	e.description,
+	e.amount,
+	e.expenseDate,
+	c.name as category,
+	u.name as createdBy,
 	o.baseCurrency as baseCurrency
-    FROM exps e
-    JOIN expcats c ON e.catId = c.id
-    JOIN users u ON e.createdBy = u.id
-	JOIN orgs o ON e.orgId = o.id
-    WHERE e.orgId = '${orgId}'`
-
-    if (fromDate) {
-        query += ` AND e.expenseDate >= '${fromDate}'`
+	FROM exps e JOIN expcats c ON e.catId = c.id JOIN users u ON e.createdBy = u.id JOIN orgs o ON e.orgId = o.id WHERE e.orgId = '${orgId}'`
+	if (fromDate) {
+		sql += ` AND e.expenseDate >= '${fromDate}'`
+	}
+	if (toDate) {
+		sql += ` AND e.expenseDate <= '${toDate}'`
+	}
+	if (catId) {
+		sql += ` AND e.catId = '${catId}'`
+	}
+	if (search) {
+		sql += ` AND (e.description LIKE ? OR e.amount = ?)`;
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, search);
+	}
+	if (num && type && ["day", "week", "month"].includes(type)) {
+        if (type === "week") {
+            sql += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+        } else if (type === "month") {
+            if (parseInt(num) === 1) {
+                sql += ` AND expenseDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else if (parseInt(num) === -1) {
+                sql += ` AND expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                sql += ` AND expenseDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else {
+                sql += ` AND expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                queryParams.push(num - 1);
+            }
+        } else {
+            sql += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`;
+        }
+        queryParams.push(num);
     }
-
-    if (toDate) {
-        query += ` AND e.expenseDate <= '${toDate}'`
-    }
-
-    if (catId) {
-        query += ` AND e.catId = '${catId}'`
-    }
-
-    query += `LIMIT ${pageSize} OFFSET ${offset}`
-
-    db_connection.query(query, (err, result) => {
-        if (err) {
+	sql += `ORDER BY expenseDate DESC LIMIT ${pageSize} OFFSET ${offset}`
+	db_connection.query(sql, queryParams, (err, results) => {
+		if (err) {
             return res.status(500).send(
                 {
                     success: false,
@@ -194,34 +208,36 @@ exports.listExpenses = (req, res) => {
                 }
             )
         }
-
-        const countQuery = `SELECT COUNT(*) as total FROM exps WHERE orgId = '${orgId}'`
-        db_connection.query(countQuery, (err, countResult) => {
-            if (err) {
-                return res.status(500).send(
-                    {
-                        success: false,
-                        message: 'Internal server error',
-                        dev: err
-                    }
-                )
-            }
-
-            return res.status(200).send(
-                {
-                    success: true,
-                    message: 'Expenses fetched successfully',
+		const totalNum = results.length
+		const totalAmt = results.reduce((total, item) => total + item.amount, 0)
+		const countQuery = `SELECT COUNT(*) as total from exps WHERE orgId = '${orgId}'`
+		db_connection.query(countQuery, (err, totalResult)=> {
+			if (err) {
+				return res.status(500).send(
+					{
+						success: false,
+						message: 'Internal server error',
+						dev: err
+					}
+				)
+			}
+			return res.status(201).send(
+				{
+					success: true,
+                    message: 'Expense fetched successfully',
                     dev: 'Thanks bro, you are awesome',
-                    data: result,
+                    data: results,
+					totalNum: totalNum,
+					totalAmt: totalAmt,
                     pagination: {
-                        total: countResult[0].total,
+                        total: totalResult[0].total,
                         page: page,
                         pageSize: pageSize
                     }
-                }
-            )
-        })
-    })
+				}
+			)
+		})
+	})
 }
 
 exports.getMonthlyExpenses = (req, res) => {
@@ -416,9 +432,10 @@ exports.getIncome = (req, res) => {
 }
 
 exports.listIncomes = (req, res) => {
-	const {page = 1, pageSize = 10, fromDate, toDate, catId} = req.query
+	const {page = 1, pageSize = 10, fromDate, toDate, catId, num, type, search} = req.query
 	const orgId = req.user.orgId
 	const offset = (page - 1) * pageSize
+	const queryParams = []
 
 	let sql = `SELECT i.id,
 	i.description,
@@ -437,8 +454,31 @@ exports.listIncomes = (req, res) => {
 	if (catId) {
 		sql += ` AND i.catId = '${catId}'`
 	}
-	sql += `LIMIT ${pageSize} OFFSET ${offset}`
-	db_connection.query(sql, (err, results) => {
+	if (search) {
+		sql += ` AND (i.description LIKE ? OR i.amount = ?)`;
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, search);
+	}
+	if (num && type && ["day", "week", "month"].includes(type)) {
+        if (type === "week") {
+            sql += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+        } else if (type === "month") {
+            if (parseInt(num) === 1) {
+                sql += ` AND incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else if (parseInt(num) === -1) {
+                sql += ` AND incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                sql += ` AND incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else {
+                sql += ` AND incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                queryParams.push(num - 1);
+            }
+        } else {
+            sql += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`;
+        }
+        queryParams.push(num);
+    }
+	sql += `ORDER BY incomeDate DESC LIMIT ${pageSize} OFFSET ${offset}`
+	db_connection.query(sql, queryParams, (err, results) => {
 		if (err) {
             return res.status(500).send(
                 {
