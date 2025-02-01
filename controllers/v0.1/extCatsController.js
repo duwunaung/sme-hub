@@ -98,8 +98,8 @@ exports.detailExpenseCategory = (req, res) => {
     }
 
     const id = req.params.id;
-    const { num, type } = req.query;
-
+    const { num, type, page = 1, pageSize = 10 , search } = req.query;
+	const offset = (page - 1) * pageSize
     let sqlQuery = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, o.baseCurrency AS baseCurrency, u.name AS createdBy FROM exps e JOIN orgs o ON e.orgId=o.id JOIN users u ON e.createdBy=u.id WHERE catId = ?`;
     let queryParams = [id];
 
@@ -122,7 +122,12 @@ exports.detailExpenseCategory = (req, res) => {
         queryParams.push(num);
     }
 
-    sqlQuery += ` ORDER BY expenseDate DESC`;
+	if (search) {
+        sqlQuery += ` AND (e.description LIKE ? OR e.amount = ?)`;
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, search);
+    }
+    sqlQuery += ` ORDER BY expenseDate DESC LIMIT ${pageSize} OFFSET ${offset}`;
 
     db_connection.query(sqlQuery, queryParams, (err, results) => {
         if (err) {
@@ -340,7 +345,8 @@ exports.detailIncomeCategory = (req, res) => {
     }
 
     const id = req.params.id;
-    const { num, type } = req.query;
+    const { num, type, page = 1, pageSize = 10 , search } = req.query;
+	const offset = (page - 1) * pageSize
     let sqlQuery = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, o.baseCurrency AS baseCurrency, u.name AS createdBy FROM incs i JOIN orgs o ON i.orgId=o.id JOIN users u ON i.createdBy=u.id WHERE catId = ?`;
     let queryParams = [id];
 
@@ -363,7 +369,12 @@ exports.detailIncomeCategory = (req, res) => {
         queryParams.push(num);
     }
 
-    sqlQuery += ` ORDER BY incomeDate DESC`;
+	if (search) {
+        sqlQuery += ` AND (i.description LIKE ? OR i.amount = ?)`;
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, search);
+    }
+    sqlQuery += ` ORDER BY incomeDate DESC LIMIT ${pageSize} OFFSET ${offset}`;
 
     db_connection.query(sqlQuery, queryParams, (err, results) => {
         if (err) {
