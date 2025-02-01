@@ -88,6 +88,71 @@ exports.listExpenseCategory = (req, res) => {
     })
 }
 
+exports.detailExpenseCategory = (req, res) => {
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "The superadmin cannot access at the moment!"
+        });
+    }
+
+    const id = req.params.id;
+    const { num, type, page = 1, pageSize = 10 , search } = req.query;
+	const offset = (page - 1) * pageSize
+    let sqlQuery = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, o.baseCurrency AS baseCurrency, u.name AS createdBy FROM exps e JOIN orgs o ON e.orgId=o.id JOIN users u ON e.createdBy=u.id WHERE catId = ?`;
+    let queryParams = [id];
+
+    if (num && type && ["day", "week", "month"].includes(type)) {
+        if (type === "week") {
+            sqlQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+        } else if (type === "month") {
+            if (parseInt(num) === 1) {
+                sqlQuery += ` AND expenseDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else if (parseInt(num) === -1) {
+                sqlQuery += ` AND expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                sqlQuery += ` AND expenseDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else {
+                sqlQuery += ` AND expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                queryParams.push(num - 1);
+            }
+        } else {
+            sqlQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`;
+        }
+        queryParams.push(num);
+    }
+
+	if (search) {
+        sqlQuery += ` AND (e.description LIKE ? OR e.amount = ?)`;
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, search);
+    }
+    sqlQuery += ` ORDER BY expenseDate DESC LIMIT ${pageSize} OFFSET ${offset}`;
+
+    db_connection.query(sqlQuery, queryParams, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: "Internal server error",
+                error: err.message
+            });
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Data not found',
+                dev: "Data not found"
+            });
+        }
+        res.status(200).send({
+            success: true,
+            message: 'Expense Transaction list',
+            dev: "Good Job, Bro!",
+            data: results
+        });
+    });
+};
+
 exports.getExpenseCategory = (req, res) => {
     if (req.user.orgId === 0) {
         return res.status(403).send({
@@ -269,6 +334,73 @@ exports.createIncomeCategory = (req, res) => {
         })
     })
 }
+
+exports.detailIncomeCategory = (req, res) => {
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "The superadmin cannot access at the moment!"
+        });
+    }
+
+    const id = req.params.id;
+    const { num, type, page = 1, pageSize = 10 , search } = req.query;
+	const offset = (page - 1) * pageSize
+    let sqlQuery = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, o.baseCurrency AS baseCurrency, u.name AS createdBy FROM incs i JOIN orgs o ON i.orgId=o.id JOIN users u ON i.createdBy=u.id WHERE catId = ?`;
+    let queryParams = [id];
+
+    if (num && type && ["day", "week", "month"].includes(type)) {
+        if (type === "week") {
+            sqlQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+        } else if (type === "month") {
+            if (parseInt(num) === 1) {
+                sqlQuery += ` AND incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else if (parseInt(num) === -1) {
+                sqlQuery += ` AND incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                sqlQuery += ` AND incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else {
+                sqlQuery += ` AND incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                queryParams.push(num - 1);
+            }
+        } else {
+            sqlQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`;
+        }
+        queryParams.push(num);
+    }
+
+	if (search) {
+        sqlQuery += ` AND (i.description LIKE ? OR i.amount = ?)`;
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern, search);
+    }
+    sqlQuery += ` ORDER BY incomeDate DESC LIMIT ${pageSize} OFFSET ${offset}`;
+
+    db_connection.query(sqlQuery, queryParams, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: "Internal server error",
+                error: err.message
+            });
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Data not found',
+                dev: "Data not found"
+            });
+        }
+        res.status(200).send({
+            success: true,
+            message: 'Income Transaction list',
+            dev: "Good Job, Bro!",
+            data: results
+        });
+    });
+};
+
+
 
 exports.getIncomeCategory = (req, res) => {
     if (req.user.orgId === 0) {
