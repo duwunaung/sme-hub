@@ -60,20 +60,19 @@
                                                 <% }); %>
                                         </select>
                                     </div>
+                                    <div class="mb-4">
+                                        <p class="mt-3">Current Expiration Date : <span id="currentExpirationDate"
+                                                class="fw-bold mx-2">
+                                            <%= new Date(org.expiredDate).toDateString() %>
+                                                </span>
+                                        </p>
+                                    </div>
                                     <a href="/superadmin/organizations?page=<%= orgPage %>" class="btn btn-primary w-100 mb-2">Back to
                                         Organizations</a>
                                     <a href="/superadmin/organizations/update/<%= org.id %>?page=<%= orgPage %>"
                                         class="btn btn-warning w-100">Edit
                                         Organization</a>
 
-                                    <!-- License Extension -->
-                                    <div>
-                                        <p class="mt-3">Current Expiration Date: <span id="currentExpirationDate"
-                                                class="fw-bold"></span>
-                                            <%= new Date(org.expiredDate).toDateString() %>
-                                                </span>
-                                        </p>
-                                    </div>
                                 </form>
 
                                 <div id="users-view" class="view-containers d-none mb-4">
@@ -165,7 +164,7 @@
                                                                     <% if (users[i].status == 'active' ) { %>
                                                                         <i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i>
                                                                     <% } else if (users[i].status == 'deleted' ) { %>
-                                                                        <i class="fa-solid fa-circle-minus" style="color: red; font-size: 1.1rem;"></i>
+                                                                        <i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i>
                                                                     <% } else { %>
                                                                         <i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i>
                                                                     <% } %>

@@ -31,20 +31,8 @@
                             </form>
                             <div class="d-flex">
                                 <div style="margin-top: 7px;">
-                                    <span style="font-weight: 500;">Show expired</span>
-                                    <input style="transform: scale(1.2)" class="mx-2" type="checkbox" id="expiredCheckbox">
-                                </div>
-                                <div class="btn-group mx-2">
-                                    <button type="button" class="btn dropdown-toggle sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                        Expired in
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end">
-                                        <a class="dropdown-item dropdown-active" href="#">this month</a>
-                                        <a class="dropdown-item" href="#">last 30 days</a>
-                                        <a class="dropdown-item" href="#">last month</a>
-                                        <a class="dropdown-item" href="#">next 30 days</a>
-                                        <a class="dropdown-item" href="#">next month</a>
-                                    </ul>
+                                    <input style="transform: scale(1.2)" type="checkbox" id="expiredCheckbox">
+                                    <span style="font-weight: 500;" class="mx-2">Show expired</span>
                                 </div>
                                 <div class="btn-group">
                                     <button type="button" class="btn dropdown-toggle sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
@@ -55,6 +43,7 @@
                                         <a class="dropdown-item" href="#">Active</a>
                                         <a class="dropdown-item" href="#">Inactive</a>
                                         <a class="dropdown-item" href="#">Pending</a>
+                                        <a class="dropdown-item" href="#">Expired</a>
                                     </ul>
                                 </div>
                             </div>
@@ -92,7 +81,7 @@
                                                 <% if (orgs[i].status == 'active' ) { %>
                                                     <i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i>
                                                 <% } else if (orgs[i].status == 'deleted' ) { %>
-                                                    <i class="fa-solid fa-circle-minus" style="color: red; font-size: 1.1rem;"></i>
+                                                    <i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i>
                                                 <% } else { %>
                                                     <i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i>
                                                 <% } %>
