@@ -66,7 +66,7 @@
 						<a href="/superadmin/organizations/license/<%= org.id %>?num=7&type=day&page=<%= page %>" class="btn btn-outline-secondary" data-type="day" data-num="7">+7 Days</a>
 						<a href="/superadmin/organizations/license/<%= org.id %>?num=1&type=month&page=<%= page %>" class="btn btn-outline-secondary" data-type="month" data-num="1">+1 Months</a>
 					</div>
-                    <p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold"></span>
+                    <p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold">
                             <%= new Date(org.expiredDate).toDateString() %>
                         </span></p>
                 </div>

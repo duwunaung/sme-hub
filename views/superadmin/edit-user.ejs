@@ -35,7 +35,7 @@
 
                             <% roles.forEach(role=> { %>
                                 <option value="<%= role.name %>" <%=role.name===user.role ? 'selected' : '' %> >
-                                    <%= role.name %>
+                                    <%= role.name.charAt(0).toUpperCase() + role.name.slice(1).toLowerCase() %>
                                 </option>
                                 <% }); %>
                         </select>
@@ -65,10 +65,11 @@
                     </div>
                     <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update</button>
                     <a href="/superadmin/organizations/detail/<%= user.orgId %>?orgPage=<%= orgPage %>&userPage=<%= userPage %>&activeUsers=true&status=<%= status %>&role<%= role %>s" id="resetBtn"	class="btn  w-100"></a>
-					<div>
-                        <p class="my-2">Registered Date: <span id="currentRegisteredDate"
-                                class="fw-bold"></span>
+					<div class="mt-3">
+                        <p>Registered Date: <span id="currentRegisteredDate"
+                                class="fw-bold">
                             <%= new Date(user.registered).toDateString() %>
+                        </span>
                         </p>
                     </div>
                 </form>

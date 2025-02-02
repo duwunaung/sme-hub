@@ -35,7 +35,7 @@
                         <input type="tel" class="form-control" maxlength="45" id="userPhone" name="phone"
                             placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" required>
 						<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
-                    </div
+										</div>
                     <div class="mb-3">
                         <label for="userStatus" class="form-label">Status</label>
                         <select id="userStatus" name="status" class="form-select" required>
@@ -49,10 +49,11 @@
                     </div>
                     <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update</button>
                     <a href="/superadmin/users?page=<%= page %>" id="resetBtn"	class="btn  w-100"></a>
-					<div>
-                        <p class="my-2">Registered Date: <span id="currentRegisteredDate"
-                                class="fw-bold"></span>
+											<div class="mt-3">
+                        <p>Registered Date: <span id="currentRegisteredDate"
+                                class="fw-bold">
                             <%= new Date(user.registered).toDateString() %>
+													</span>
                         </p>
                     </div>
                 </form>
