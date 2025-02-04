@@ -71,7 +71,7 @@
 				let seconds = String(localDate.getSeconds()).padStart(2, '0');
 				let formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
 				document.getElementById('transDate').value = formattedDate;
-
+				const page = "<%= pagination.page %>"
 				function buttonType() {
 					searchParams = new URLSearchParams(window.location.search);
 					const type = searchParams.get('type')
@@ -79,12 +79,12 @@
 					trans = searchParams.get('trans')
 					if (cat){
 						if (cat === 'income'){
-							resetBtn.href = `/subscriber/category/income/detail/${id}`
+							resetBtn.href = `/subscriber/category/income/detail/${id}?page=${page}`
 						} else {
-							resetBtn.href = `/subscriber/category/expense/detail/${id}`
+							resetBtn.href = `/subscriber/category/expense/detail/${id}?page=${page}`
 						}
 					} else {
-						resetBtn.href = `/subscriber/transaction/${trans}`
+						resetBtn.href = `/subscriber/transaction/${trans}?page=${page}`
 					}
 					if (type == 'update') {
 						resetBtn.innerText = "Back"
