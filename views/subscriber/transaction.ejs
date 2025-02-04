@@ -245,7 +245,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addNewTransactionForm" action="/subscriber/transaction/<%= trans %>/create" method="POST" onsubmit="submitForm(event)">
+                        <form id="addNewTransactionForm" action="/subscriber/transaction/<%= trans %>/create" method="post" enctype="multipart/form-data" onsubmit="submitForm(event)">
                             <div class="mb-3">
                                 <label for="transDescription" class="form-label">Description</label>
                                 <input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
@@ -272,6 +272,10 @@
                                 <input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
                                     placeholder="Select date" value="" required>
                             </div>
+							<div class="mb-3">
+								<label for="transReceipt" class="form-label">Receipt</label>
+								<input type="file" class="form-control" name="receipt" id="transReceipt">
+							</div>
                             <button type="submit" id="addBtn" class="btn btn-primary w-100">Add Transaction</button>
                         </form>
                     </div>
