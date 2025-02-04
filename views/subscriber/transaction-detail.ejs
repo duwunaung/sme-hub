@@ -67,20 +67,20 @@
 			let id = searchParams.get('id');
 
 			const resetBtn = document.getElementById('resetBtn');
-
+			const page = "<%= pagination.page %>"
 			if (resetBtn) {
 			    if (trans === 'income') {
-			        resetBtn.href = '/subscriber/transaction/income';
+			        resetBtn.href = `/subscriber/transaction/income?page=${page}`;
 			    } else if (trans === 'expense') {
-			        resetBtn.href = '/subscriber/transaction/expense';
+			        resetBtn.href = `/subscriber/transaction/expense?page=${page}`;
 			    }
 			    else if (cat === 'income' && id) {
-			        resetBtn.href = `/subscriber/category/income/detail/${id}`;
+			        resetBtn.href = `/subscriber/category/income/detail/${id}?page=${page}`;
 			    } else if (cat === 'expense' && id) {
-			        resetBtn.href = `/subscriber/category/expense/detail/${id}`;
+			        resetBtn.href = `/subscriber/category/expense/detail/${id}?page=${page}`;
 			    }
 			    else {
-			        resetBtn.href = '/subscriber/transaction/income';
+			        resetBtn.href = `/subscriber/transaction/income?page=${page}`;
 			    }
 			}
 
