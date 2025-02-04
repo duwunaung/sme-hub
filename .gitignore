@@ -130,3 +130,7 @@ dist
 .pnp.*
 steps.txt
 routes/v0.1/To do
+
+
+# images files
+*.png
