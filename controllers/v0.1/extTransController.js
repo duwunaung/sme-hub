@@ -145,7 +145,8 @@ exports.createExpense = (req, res) => {
         )
     }
 
-    const query = `INSERT INTO exps (description, amount, expenseDate, catId, orgId, createdBy) VALUES ('${description}', '${amount}', '${expenseDate}', '${catId}', '${orgId}', '${createdBy}')`
+	const receiptFilename = req.body.receipt || null
+    const query = `INSERT INTO exps (description, amount, expenseDate, catId, orgId, createdBy, receipt) VALUES ('${description}', '${amount}', '${expenseDate}', '${catId}', '${orgId}', '${createdBy}', '${receiptFilename}')`
     db_connection.query(query, (err, result) => {
         if (err) {
             return res.status(500).send(
@@ -247,7 +248,7 @@ exports.getExpense = (req, res) => {
         })
     }
     const id = req.params.id
-    let query = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, e.createdBy, o.baseCurrency AS baseCurrency , u.name AS username
+    let query = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, e.createdBy, e.receipt, o.baseCurrency AS baseCurrency , u.name AS username
 	FROM exps e 
 	JOIN orgs o ON e.orgId = o.id
 	JOIN users u ON e.createdBy = u.id
@@ -449,8 +450,9 @@ exports.createIncome = (req, res) => {
 			}
 		)
 	}
-	const sql = 'INSERT into incs (description, amount, incomeDate, catId, orgId, createdBy) VALUES (?,?,?,?,?,?)'
-	const values = [description, amount, incomeDate, catId, orgId, createdBy]
+	const receiptFilename = req.body.receipt || null
+	const sql = 'INSERT into incs (description, amount, incomeDate, catId, orgId, createdBy, receipt) VALUES (?,?,?,?,?,?,?)'
+	const values = [description, amount, incomeDate, catId, orgId, createdBy, receiptFilename]
 	db_connection.query(sql, values, (err, results) => {
 		if (err) {
 			return res.status(500).send(
@@ -543,7 +545,7 @@ exports.getIncome = (req, res) => {
         })
     }
     const id = req.params.id
-    let query = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, i.createdBy, o.baseCurrency AS baseCurrency , u.name AS username
+    let query = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, i.createdBy, i.receipt, o.baseCurrency AS baseCurrency , u.name AS username
 	FROM incs i 
 	JOIN orgs o ON i.orgId = o.id
 	JOIN users u ON i.createdBy = u.id
