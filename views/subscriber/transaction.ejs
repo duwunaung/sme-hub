@@ -45,24 +45,44 @@
 			    display: flex;
 			    justify-content: flex-end;
 			}
+
+			.page-item a:hover {
+		    	cursor: pointer;
+			}
 		</style>
 		<!-- Main Content -->
         <main >
             <div class="content">
 				<div class="container my-2">
 					<div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 600px; margin: 0 auto;">
-					  <a type="button" href="/subscriber/transaction/income" class="text-decoration-none btn <% if (trans === 'income' ) { %> btn-dark <% } else {%> btn-secondary <% } %> flex-grow-1" id="btnIncome" >Income</a>
-					  <a type="button" href="/subscriber/transaction/expense" class="text-decoration-none btn <% if (trans === 'expense' ) { %> btn-dark <% } else {%> btn-secondary <% } %> flex-grow-1" id="btnExpense" >Expense</a>
+						<a type="button" href="/subscriber/transaction/income" 
+						   class="text-decoration-none btn <% if (trans === 'income') { %> btn-dark <% } else { %> btn-secondary <% } %> flex-grow-1" 
+						   id="btnIncome" onclick="handleClick('income', event)">Income</a>
+						<a type="button" href="/subscriber/transaction/expense" 
+						   class="text-decoration-none btn <% if (trans === 'expense') { %> btn-dark <% } else { %> btn-secondary <% } %> flex-grow-1" 
+						   id="btnExpense" onclick="handleClick('expense', event)">Expense</a>
 					</div>
+					
 				</div>
-
+				<% if (errorMessage) { %>
+					<div id="errorBox" class="alert alert-danger" role="alert">
+						<%= errorMessage %>
+					</div>
+					<% } %>
+					<% if (successMessage) { %>
+					<div id="successBox" class="alert alert-success" role="alert">
+						<%= successMessage %>
+					</div>
+					<% } %>
 				<div class="d-flex justify-content-between align-items-center mb-2">
-					<h2><% if (trans === 'income' ) { %> Income <% } else {%> Expense <% } %> Transactions</h2>
-					<button class="btn btn-primary" data-bs-toggle="modal"
-					data-bs-target="#addNewTransaction">
-						Add New
-					</button>
+					<h2><% if (trans === 'income' ) { %> Income <% } else if (trans === 'expense') {%> Expense <% } else if (trans === 'all') {%> All <% } %> Transactions</h2>
+					<% if (trans !== 'all') { %>
+						<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addNewTransaction">
+							Add New
+						</button>
+					<% } %>
 				</div>
+				
 				<div class="container-div my-2">
 	
 					<div class="d-flex me-3">
@@ -70,15 +90,17 @@
 						<button class="btn btn-primary d-flex align-items-center" onclick="performSearch()"><i class="fas fa-search ms-2"></i></button>
 					</div>
 					<div class="dropdown me-2">
-						<a class="dropdown-btn btn btn-primary d-flex align-items-center" onclick="toggleDropdown('dropdown-menu-category')">
-							<i class="fas fa-filter"></i> Category
-						</a>
+						<% if (trans !== 'all') { %>
+							<a class="dropdown-btn btn btn-primary d-flex align-items-center" onclick="toggleDropdown('dropdown-menu-category')">
+								<i class="fas fa-filter"></i> Category
+							</a>
+						<% } %>
 						<div class="dropdown-content" id="dropdown-menu-category">
 							<button class="btn btn-light w-100 mb-1" onclick="filterCategory('all')">
 								ALL
 							  </button>
 							<% for (let i = 0; i < category.length; i++) { %>
-							  <button class="btn btn-light w-100 mb-1" onclick="filterCategory('<%= category[i].id %>')">
+							  <button class="btn btn-light w-100 mb-1" id="categoryBtns" onclick="filterCategory('<%= category[i].id %>')" data-num="<%= category[i].id %>" value="<%= category[i].name %>" >
 								<%= category[i].name.toUpperCase() %>
 							  </button>
 							<% } %>
@@ -100,79 +122,118 @@
 						</div>
 					</div>
 				</div>
-
+				<div class="card mb-2 w-auto" style="max-width: 350px;">
+					<div class="card-body">
+					  <p class="small mb-1" >Date: <span id="summaryDate"></span></p>
+					  <p class="small mb-1" >Category: <span id="summaryCategory"></span></p>
+					  <p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
+					  <p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
+					</div>
+				</div>
 				<div class="table-responsive">
 					<table class="table table-striped table-hover">
 						<thead class="table-dark">
-						  <tr>
-							<th scope="col">#</th>
-							<th scope="col">Description</th>
-							<th scope="col">Amount</th>
-							<th scope="col">Date</th>
-							<th scope="col">Category</th>
-							<th scope="col">Created By</th>
-							<th scope="col">Actions</th>
-						  </tr>
+							<tr>
+								<th scope="col">#</th>
+								<th scope="col">Description</th>
+								<th scope="col">Amount</th>
+								<th scope="col">Date</th>
+								<th scope="col">Category</th>
+								<th scope="col">Created By</th>
+								<% if (trans !== 'all') { %>
+									<th scope="col">Actions</th>
+								<% } %>
+							</tr>
 						</thead>
-						<tbody>
-							<tbody id="transactionTable">
-								<!-- Dynamic rows go here -->
-								<% for (let i=0; i < transaction.length; i++) { %>
+						<tbody id="transactionTable">
+							<% 
+							    let totalSum = 0; 
+							    if (transaction.length > 0) { 
+							        for (let i = 0; i < transaction.length; i++) { 
+							            totalSum += transaction[i].amount;
+							        } 
+							    } 
+							%>
+							<% if (transaction.length > 0) { %>
+								<% for (let i = 0; i < transaction.length; i++) { %>
 									<tr>
-										<td>
-											<%= i + 1 %>
-										</td>
-	
-										<td>
-											<%= transaction[i].description %>
-										</td>
-										<td>
-											<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
-
-											<% if (transaction[i].baseCurrency === 'MMK') { %>
-											    <%= formattedAmount %> ks
-											<% } else if (transaction[i].baseCurrency === 'USD') { %>
-											    $ <%= formattedAmount %>
-											<% } else { %>
-											    <%= formattedAmount %> <%= transaction[i].baseCurrency %>
+										<td
+											<% if (trans === 'all' && transaction[i].transactionType === 'income') { %>
+												style="color: green;"
 											<% } %>
-
+										><%= i + 1 %></td>
+										<td
+											<% if (trans === 'all' && transaction[i].transactionType === 'income') { %>
+												style="color: green;"
+											<% } %>	
+										><%= transaction[i].description %></td>
+										<td
+											<% if (trans === 'all' && transaction[i].transactionType === 'income') { %>
+												style="color: green;"
+											<% } %>
+										>
+											<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
+											<% if (transaction[i].baseCurrency === 'MMK') { %>
+												<%= formattedAmount %> ks
+											<% } else if (transaction[i].baseCurrency === 'USD') { %>
+												$ <%= formattedAmount %>
+											<% } else { %>
+												<%= formattedAmount %> <%= transaction[i].baseCurrency %>
+											<% } %>
 										</td>
-										<td>
-											<%= new Date(trans === 'income' ? transaction[i].incomeDate : transaction[i].expenseDate)
-											    .toLocaleString('en-US', { 
-											        day: '2-digit', 
-											        month: 'short', 
-											        year: 'numeric', 
-											        hour: '2-digit', 
-											        minute: '2-digit', 
-											        second: '2-digit', 
-											        hour12: true 
-											    }) 
-											%>
+										<td
+											<% if (trans === 'all' && transaction[i].transactionType === 'income') { %>
+												style="color: green;"
+											<% } %>
+										>
+											<%= new Date(
+												trans === 'income' ? transaction[i].incomeDate :
+												trans === 'expense' ? transaction[i].expenseDate :
+												transaction[i].transactionDate  // Assuming you have a transactionDate for 'all'
+											).toLocaleString('en-US', { 
+												day: '2-digit', 
+												month: 'short', 
+												year: 'numeric', 
+												hour: '2-digit', 
+												minute: '2-digit', 
+												second: '2-digit', 
+												hour12: true 
+											}) %>
 										</td>
-	
-										<td>
+										<td
+											<% if (trans === 'all' && transaction[i].transactionType === 'income') { %>
+												style="color: green;"
+											<% } %>
+										>
 											<%= transaction[i].category %>
 										</td>
-										<td>
-											<%= transaction[i].createdBy %>
-										</td>
-										<td>
-											<div class="d-flex flex-nowrap">
-												<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>"
-													class="btn btn-primary btn-sm btn-fixed-width me-1">View</a>
-												<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>"
-													class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
-											</div>
-										</td>
+										<td
+											<% if (trans === 'all' && transaction[i].transactionType === 'income') { %>
+												style="color: green;"
+											<% } %>
+										><%= transaction[i].createdBy %></td>
+										<% if (trans !== 'all') { %>
+											<td>
+												<div class="d-flex flex-nowrap">
+													<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
+														class="btn btn-primary btn-sm btn-fixed-width me-1">View</a>
+													<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
+														class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
+												</div>
+											</td>
+										<% } %>
 									</tr>
-									<% } %>
-							</tbody>
+								<% } %>
+							<% } else { %>
+								<tr>
+									<td colspan="<%= trans === 'all' ? 6 : 7 %>" class="text-center text-muted">No transactions found.</td>
+								</tr>
+							<% } %>
 						</tbody>
 					</table>
 				</div>
-				  
+				
+				
             </div>
         </main>
 		<div class="modal fade" id="addNewTransaction" tabindex="-1" aria-labelledby="addNewTransactionModalLabel"
@@ -217,7 +278,83 @@
                 </div>
             </div>
         </div>
+		<nav aria-label="Pagination" id="paginationNav">
+			<ul class="pagination justify-content-center">
+				<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+					<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(1)' : '' %>><<</a>
+				</li>
+		
+				<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+					<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(' + (pagination.page - 1) + ')' : '' %>><</a>
+				</li>
+		
+				<% if (pagination.page > 2) { %>
+					<li class="page-item"><a class="page-link" onclick="goToPage(1)">1</a></li>
+					<% if (pagination.page > 3) { %>
+						<li class="page-item disabled"><a class="page-link">...</a></li>
+					<% } %>
+				<% } %>
+		
+				<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(pagination.totalPages, pagination.page + 1); i++) { %>
+					<li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+						<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
+					</li>
+				<% } %>
+		
+				<% if (pagination.page < pagination.totalPages - 1) { %>
+					<% if (pagination.page < pagination.totalPages - 2) { %>
+						<li class="page-item disabled"><a class="page-link">...</a></li>
+					<% } %>
+					<li class="page-item"><a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')"><%= pagination.totalPages %></a></li>
+				<% } %>
+		
+				<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+					<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + (pagination.page + 1) + ')' : '' %>>></a>
+				</li>
+		
+				<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+					<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + pagination.totalPages + ')' : '' %>>>></a>
+				</li>
+			</ul>
+		</nav>
+		
 		<script>
+		    
+			function goToPage(pageNumber) {
+			    const baseUrl = new URL(window.location.href);
+			    baseUrl.searchParams.set("page", pageNumber);
+			    window.location.href = baseUrl.toString();
+			}
+
+
+			function handleClick(buttonType, event) {
+			    event.preventDefault();
+
+			    const btnIncome = document.getElementById('btnIncome');
+			    const btnExpense = document.getElementById('btnExpense');
+			    if (buttonType === 'income') {
+			        if (btnIncome.classList.contains('btn-dark')) {
+			            window.location.href = '/subscriber/transaction/transactions';
+			        } else {
+			            btnIncome.classList.remove('btn-secondary');
+			            btnIncome.classList.add('btn-dark');
+			            btnExpense.classList.remove('btn-dark');
+			            btnExpense.classList.add('btn-secondary');
+			            window.location.href = '/subscriber/transaction/income';
+			        }
+			    } else if (buttonType === 'expense') {
+			        if (btnExpense.classList.contains('btn-dark')) {
+			            window.location.href = '/subscriber/transaction/transactions';
+			        } else {
+			            btnExpense.classList.remove('btn-secondary');
+			            btnExpense.classList.add('btn-dark');
+			            btnIncome.classList.remove('btn-dark');
+			            btnIncome.classList.add('btn-secondary');
+			            window.location.href = '/subscriber/transaction/expense';
+			        }
+			    }
+			}
+
 			const form = document.getElementById('addNewTransactionForm');
             const addButton = document.getElementById('addBtn');
             const inputs = form.querySelectorAll('.inputRequired');
@@ -306,6 +443,69 @@
 					url.searchParams.delete("type");
 			    }
 			    window.location.href = url.toString();
+			}
+
+			const searchParams = new URLSearchParams(window.location.search);
+			const type = searchParams.get('type')
+			const num = searchParams.get('num')
+			const catId = searchParams.get('catId')
+			let categoryBtns = document.querySelectorAll('#categoryBtns')
+			
+			const totalTrans = "<%= transaction.length %>"
+			if (totalTrans) {
+				document.getElementById('summaryTranTotal').innerText = totalTrans
+			} else {
+				document.getElementById('summaryTranTotal').innerText = "0"
+			}
+
+			const totalSum = "<%= totalSum %>";
+			if (parseInt(totalTrans) > 0 && totalSum) {
+				const currency = "<%= transaction.length > 0 ? transaction[0].baseCurrency : '' %>";
+				let formattedTotal = new Intl.NumberFormat('en-US').format(totalSum);
+
+			    if (currency === "MMK") {
+			        document.getElementById('summaryTotalSum').innerText = `${formattedTotal} ks`;
+			    } else if (currency === "USD") {
+			        document.getElementById('summaryTotalSum').innerText = `$ ${formattedTotal}`;
+			    } else {
+			        document.getElementById('summaryTotalSum').innerText = `${currency} ${formattedTotal}`;
+			    }
+			} else {
+			    document.getElementById('summaryTotalSum').innerText = "0";
+			}
+
+			if (catId) {
+				categoryBtns.forEach(categoryBtn => {
+					let categoryBtnId = categoryBtn.dataset.num
+					if (catId === categoryBtnId) {
+						const categoryName = categoryBtn.value.toUpperCase()
+						document.getElementById('summaryCategory').innerText = categoryName
+					}
+				})
+			} else if (!catId) {
+				document.getElementById('summaryCategory').innerText = "ALL"
+			}
+			
+			if (type === 'month') {
+				if (num === '0') {
+					document.getElementById('summaryDate').innerText = "ALL"
+				} else if (num === '1') {
+					document.getElementById('summaryDate').innerText = "This Month"
+				} else if (num === '3') {
+					document.getElementById('summaryDate').innerText = "Last 3 Months"
+				}
+			} else if (type === 'week') {
+				document.getElementById('summaryDate').innerText = "This Week"
+			} else if (type === 'day') {
+				if (num === '1') {
+					document.getElementById('summaryDate').innerText = "Today"
+				} else if (num === '7') {
+					document.getElementById('summaryDate').innerText = "Last 7 Days"
+				} else if (num === '30') {
+					document.getElementById('summaryDate').innerText = "Last 30 Days"
+				}
+			} else {
+				document.getElementById('summaryDate').innerText = "ALL"
 			}
 
 		</script>
