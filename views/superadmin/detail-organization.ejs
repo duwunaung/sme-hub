@@ -348,7 +348,7 @@
             const icons = document.querySelectorAll('.usericons')
             icons.forEach (icon => {
                 const tooltipColor = icon.getAttribute('data-tooltip-color')
-                icon.addEventListener('mouseenter', changeColor);
+                icon.addEventListener('mouseover', changeColor);
 
                 function changeColor() {
                     icon.style.setProperty('--tooltip-color', tooltipColor);
