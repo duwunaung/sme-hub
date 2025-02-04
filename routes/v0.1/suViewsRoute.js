@@ -1,5 +1,5 @@
 const express = require('express')
-const { login, logout, listExpenseCat, createExpenseCat, createIncomeCat, listIncomeCat , deleteIncomeCat, restoreIncomeCat , deleteExpenseCat, restoreExpenseCat , updateIncomeCat, updateExpenseCat, listIncomeTrans, listExpenseTrans , createIncomeTrans, createExpenseTrans , updateIncomeTrans, updateExpenseTrans , detailIncomeTrans, detailExpenseTrans, detailIncomeCat, detailExpenseCat} = require("../../controllers/v0.1/subscribersController")
+const { login, logout, listExpenseCat, createExpenseCat, createIncomeCat, listIncomeCat , deleteIncomeCat, restoreIncomeCat , deleteExpenseCat, restoreExpenseCat , updateIncomeCat, updateExpenseCat, listIncomeTrans, listExpenseTrans , createIncomeTrans, createExpenseTrans , updateIncomeTrans, updateExpenseTrans , detailIncomeTrans, detailExpenseTrans, detailIncomeCat, detailExpenseCat, listAllTransactions} = require("../../controllers/v0.1/subscribersController")
 
 const checkSubscriberSession = require('../../middlewares/viewSubscribers');
 const tmpSession = require('../../middlewares/tmp');
@@ -18,6 +18,8 @@ router.use('/transaction/expense/update/:id', checkSubscriberSession, updateExpe
 router.use('/transaction/expense/create', checkSubscriberSession, createExpenseTrans )
 router.use('/transaction/expense', checkSubscriberSession, listExpenseTrans )
 
+router.use('/transaction/transactions', checkSubscriberSession, listAllTransactions )
+
 router.use('/category/income/create', checkSubscriberSession, createIncomeCat )
 router.use('/category/income/detail/:id', checkSubscriberSession, detailIncomeCat )
 router.use('/category/income/update/:id', checkSubscriberSession, updateIncomeCat )
@@ -35,5 +37,9 @@ router.use('/category/expense', checkSubscriberSession, listExpenseCat )
 router.use('/home', checkSubscriberSession, (req, res) => {
     res.render('subscriber/home', { token: req.session.token, user: req.session.user, organizationName: req.session.orgName })
 })
+
+router.use('/', (req, res) => {
+    res.redirect('/subscriber/home');
+});
 
 module.exports = router;
