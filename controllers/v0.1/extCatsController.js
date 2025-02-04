@@ -37,21 +37,69 @@ exports.createExpenseCategory = (req, res) => {
     })
 }
 
-exports.listExpenseCategory = (req, res) => {
+exports.listAllCategories = (req, res) => {
+    const orgId = req.user.orgId;
+    const { status = 'active' } = req.query;
 
-    const { page = 1, pageSize = 10 } = req.query;
+    const incomeQuery = `
+        SELECT ic.id, ic.name, u.name AS createdBy
+        FROM inccats ic
+        JOIN users u ON ic.createdBy = u.id
+        WHERE ic.orgId = ? AND ic.status = ?
+    `;
+    
+    const expenseQuery = `
+        SELECT ec.id, ec.name, u.name AS createdBy
+        FROM expcats ec
+        JOIN users u ON ec.createdBy = u.id
+        WHERE ec.orgId = ? AND ec.status = ?
+    `;
+
+    Promise.all([
+        new Promise((resolve, reject) => {
+            db_connection.query(incomeQuery, [orgId, status], (err, incomeResults) => {
+                if (err) reject(err);
+                else resolve(incomeResults);
+            });
+        }),
+        new Promise((resolve, reject) => {
+            db_connection.query(expenseQuery, [orgId, status], (err, expenseResults) => {
+                if (err) reject(err);
+                else resolve(expenseResults);
+            });
+        })
+    ])
+    .then(([incomeCategories, expenseCategories]) => {
+        const allCategories = [...incomeCategories, ...expenseCategories];
+
+        res.status(200).send({
+            success: true,
+            message: 'All Categories list',
+            dev: "Good Job, Bro!",
+            data: { allCategories }
+        });
+    })
+    .catch(err => {
+        res.status(500).send({
+            success: false,
+            message: 'Internal server error',
+            dev: err
+        });
+    });
+};
+
+
+exports.listExpCat = (req, res) => {
     const orgId = req.user.orgId
     const { status = 'active' } = req.query;
-    const offset = (page - 1) * pageSize;
     const query = `
         SELECT ec.id, ec.name, u.name AS createdBy
         FROM expcats ec
         JOIN users u ON ec.createdBy = u.id
         WHERE ec.orgId = ? AND ec.status = ?
-        LIMIT ? OFFSET ?
     `;
 
-    db_connection.query(query, [orgId, status, pageSize, offset], (err, results) => {
+    db_connection.query(query, [orgId, status], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -60,32 +108,96 @@ exports.listExpenseCategory = (req, res) => {
             })
         }
 
-        const countQuery = `SELECT COUNT(*) AS total FROM expcats WHERE orgId = ?`;
+        res.status(200).send({
+            success: true,
+            message: 'Expense Category list',
+            dev: "Good Job, Bro!",
+            data: results
+        })
+    })
+}
 
-        db_connection.query(countQuery, [orgId], (err, countResults) => {
+exports.listIncCat = (req, res) => {
+    const orgId = req.user.orgId
+    const { status = 'active' } = req.query;
+    const query = `
+        SELECT ic.id, ic.name, u.name AS createdBy
+        FROM inccats ic
+        JOIN users u ON ic.createdBy = u.id
+        WHERE ic.orgId = ? AND ic.status = ?
+    `;
+
+    db_connection.query(query, [orgId, status], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        res.status(200).send({
+            success: true,
+            message: 'Expense Category list',
+            dev: "Good Job, Bro!",
+            data: results
+        })
+    })
+}
+
+exports.listExpenseCategory = (req, res) => {
+	const { page = 1, pageSize = 10 } = req.query;
+    const orgId = req.user.orgId;
+    const { status = 'active' } = req.query;
+    const offset = (page - 1) * pageSize;
+    const query = `
+        SELECT ec.id, ec.name, u.name AS createdBy
+        FROM expcats ec
+        JOIN users u ON ec.createdBy = u.id
+        WHERE ec.orgId = ? AND ec.status = ?
+        ORDER BY ec.name DESC
+        LIMIT ? OFFSET ?
+    `;
+
+    db_connection.query(query, [orgId, status, parseInt(pageSize), offset], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            });
+        }
+
+        const totalNum = results.length;
+
+        const countQuery = `SELECT COUNT(*) AS total FROM expcats WHERE orgId = ? AND status = ?`;
+        db_connection.query(countQuery, [orgId, status], (err, countResults) => {
             if (err) {
                 return res.status(500).send({
                     success: false,
                     message: 'internal server error',
                     dev: err
-                })
+                });
             }
+
             const total = countResults[0].total;
             const totalPages = Math.ceil(total / pageSize);
+
             res.status(200).send({
                 success: true,
                 message: 'Expense Category list',
                 dev: "Good Job, Bro!",
                 data: results,
+                totalNum: totalNum,
                 pagination: {
+                    total: total,
                     page: parseInt(page),
                     pageSize: parseInt(pageSize),
-                    total,
-                    totalPages,
+                    totalPages: totalPages
                 }
-            })
-        })
-    })
+            });
+        });
+    });
 }
 
 exports.detailExpenseCategory = (req, res) => {
@@ -96,16 +208,26 @@ exports.detailExpenseCategory = (req, res) => {
             dev: "The superadmin cannot access at the moment!"
         });
     }
-
     const id = req.params.id;
-    const { num, type, page = 1, pageSize = 10 , search } = req.query;
-	const offset = (page - 1) * pageSize
-    let sqlQuery = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, o.baseCurrency AS baseCurrency, u.name AS createdBy FROM exps e JOIN orgs o ON e.orgId=o.id JOIN users u ON e.createdBy=u.id WHERE catId = ?`;
+    const { num, type, page = 1, pageSize = 10, search } = req.query;
+    const offset = (page - 1) * pageSize;
+
+    let sqlQuery = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, o.baseCurrency AS baseCurrency, u.name AS createdBy 
+                    FROM exps e 
+                    JOIN orgs o ON e.orgId=o.id 
+                    JOIN users u ON e.createdBy=u.id 
+                    WHERE catId = ?`;
     let queryParams = [id];
 
     if (num && type && ["day", "week", "month"].includes(type)) {
         if (type === "week") {
-            sqlQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+            if (parseInt(num) === 1) {
+				sqlQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+            			AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+			} else {
+				sqlQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+				queryParams.push(num);
+			}
         } else if (type === "month") {
             if (parseInt(num) === 1) {
                 sqlQuery += ` AND expenseDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
@@ -117,17 +239,25 @@ exports.detailExpenseCategory = (req, res) => {
                 queryParams.push(num - 1);
             }
         } else {
-            sqlQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`;
+            if (type === "day") {
+				if (parseInt(num) === 1) {
+					sqlQuery += ` AND expenseDate >= CURDATE() AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+				} else {
+					sqlQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+					queryParams.push(num);
+				}
+			}
         }
-        queryParams.push(num);
     }
 
-	if (search) {
+    if (search) {
         sqlQuery += ` AND (e.description LIKE ? OR e.amount = ?)`;
         const searchPattern = `%${search}%`;
         queryParams.push(searchPattern, search);
     }
-    sqlQuery += ` ORDER BY expenseDate DESC LIMIT ${pageSize} OFFSET ${offset}`;
+
+    sqlQuery += ` ORDER BY expenseDate DESC LIMIT ? OFFSET ?`;
+    queryParams.push(parseInt(pageSize), offset);
 
     db_connection.query(sqlQuery, queryParams, (err, results) => {
         if (err) {
@@ -137,18 +267,83 @@ exports.detailExpenseCategory = (req, res) => {
                 error: err.message
             });
         }
-        if (results.length === 0) {
-            return res.status(404).send({
-                success: false,
-                message: 'Data not found',
-                dev: "Data not found"
-            });
+
+        const totalNum = results.length;
+        const totalAmt = results.reduce((total, item) => total + item.amount, 0);
+
+        let countQuery = `SELECT COUNT(*) as total FROM exps WHERE catId = ?`;
+        const countParams = [id];
+
+        if (num && type && ["day", "week", "month"].includes(type)) {
+            if (type === "week") {
+                if (parseInt(num) === 1) {
+					countQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+							AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+				} else {
+					countQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+					countParams.push(num);
+				}
+            } else if (type === "month") {
+                if (parseInt(num) === 1) {
+                    countQuery += ` AND expenseDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else if (parseInt(num) === -1) {
+                    countQuery += ` AND expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                    countQuery += ` AND expenseDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else {
+                    countQuery += ` AND expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                    countParams.push(num - 1);
+                }
+            } else {
+                if (type === "day") {
+					if (parseInt(num) === 1) {
+						countQuery += ` AND expenseDate >= CURDATE() AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+					} else {
+						countQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+						countParams.push(num);
+					}
+				}
+            }
         }
-        res.status(200).send({
-            success: true,
-            message: 'Expense Transaction list',
-            dev: "Good Job, Bro!",
-            data: results
+
+        if (search) {
+            countQuery += ` AND (description LIKE ? OR amount = ?)`;
+            countParams.push(`%${search}%`, search);
+        }
+
+        db_connection.query(countQuery, countParams, (err, totalResult) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: "Internal server error",
+                    error: err.message
+                });
+            }
+
+            const total = totalResult[0].total;
+            const totalPages = Math.ceil(total / pageSize);
+
+            if (total === 0) {
+                return res.status(404).send({
+                    success: false,
+                    message: 'Data not found',
+                    dev: "Data not found"
+                });
+            }
+
+            res.status(200).send({
+                success: true,
+                message: 'Expense Transaction list',
+                dev: "Good Job, Bro!",
+                data: results,
+                totalNum: totalNum,
+                totalAmt: totalAmt,
+                pagination: {
+                    total: total,
+                    page: parseInt(page),
+                    pageSize: parseInt(pageSize),
+                    totalPages: totalPages
+                }
+            });
         });
     });
 };
@@ -343,16 +538,26 @@ exports.detailIncomeCategory = (req, res) => {
             dev: "The superadmin cannot access at the moment!"
         });
     }
-
     const id = req.params.id;
-    const { num, type, page = 1, pageSize = 10 , search } = req.query;
-	const offset = (page - 1) * pageSize
-    let sqlQuery = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, o.baseCurrency AS baseCurrency, u.name AS createdBy FROM incs i JOIN orgs o ON i.orgId=o.id JOIN users u ON i.createdBy=u.id WHERE catId = ?`;
+    const { num, type, page = 1, pageSize = 10, search } = req.query;
+    const offset = (page - 1) * pageSize;
+
+    let sqlQuery = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, o.baseCurrency AS baseCurrency, u.name AS createdBy 
+                    FROM incs i 
+                    JOIN orgs o ON i.orgId=o.id 
+                    JOIN users u ON i.createdBy=u.id 
+                    WHERE catId = ?`;
     let queryParams = [id];
 
     if (num && type && ["day", "week", "month"].includes(type)) {
         if (type === "week") {
-            sqlQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+            if (parseInt(num) === 1) {
+				sqlQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+            			AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+			} else {
+				sqlQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+				queryParams.push(num);
+			}
         } else if (type === "month") {
             if (parseInt(num) === 1) {
                 sqlQuery += ` AND incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
@@ -364,17 +569,25 @@ exports.detailIncomeCategory = (req, res) => {
                 queryParams.push(num - 1);
             }
         } else {
-            sqlQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY)`;
+            if (type === "day") {
+				if (parseInt(num) === 1) {
+					sqlQuery += ` AND incomeDate >= CURDATE() AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+				} else {
+					sqlQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+					queryParams.push(num);
+				}
+			}
         }
-        queryParams.push(num);
     }
 
-	if (search) {
+    if (search) {
         sqlQuery += ` AND (i.description LIKE ? OR i.amount = ?)`;
         const searchPattern = `%${search}%`;
         queryParams.push(searchPattern, search);
     }
-    sqlQuery += ` ORDER BY incomeDate DESC LIMIT ${pageSize} OFFSET ${offset}`;
+
+    sqlQuery += ` ORDER BY incomeDate DESC LIMIT ? OFFSET ?`;
+    queryParams.push(parseInt(pageSize), offset);
 
     db_connection.query(sqlQuery, queryParams, (err, results) => {
         if (err) {
@@ -384,18 +597,83 @@ exports.detailIncomeCategory = (req, res) => {
                 error: err.message
             });
         }
-        if (results.length === 0) {
-            return res.status(404).send({
-                success: false,
-                message: 'Data not found',
-                dev: "Data not found"
-            });
+
+        const totalNum = results.length;
+        const totalAmt = results.reduce((total, item) => total + item.amount, 0);
+
+        let countQuery = `SELECT COUNT(*) as total FROM incs WHERE catId = ?`;
+        const countParams = [id];
+
+        if (num && type && ["day", "week", "month"].includes(type)) {
+            if (type === "week") {
+                if (parseInt(num) === 1) {
+					countQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+							AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+				} else {
+					countQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+					countParams.push(num);
+				}
+            } else if (type === "month") {
+                if (parseInt(num) === 1) {
+                    countQuery += ` AND incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else if (parseInt(num) === -1) {
+                    countQuery += ` AND incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                    countQuery += ` AND incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else {
+                    countQuery += ` AND incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                    countParams.push(num - 1);
+                }
+            } else {
+                if (type === "day") {
+					if (parseInt(num) === 1) {
+						countQuery += ` AND incomeDate >= CURDATE() AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+					} else {
+						countQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+						countParams.push(num);
+					}
+				}
+            }
         }
-        res.status(200).send({
-            success: true,
-            message: 'Income Transaction list',
-            dev: "Good Job, Bro!",
-            data: results
+
+        if (search) {
+            countQuery += ` AND (description LIKE ? OR amount = ?)`;
+            countParams.push(`%${search}%`, search);
+        }
+
+        db_connection.query(countQuery, countParams, (err, totalResult) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: "Internal server error",
+                    error: err.message
+                });
+            }
+
+            const total = totalResult[0].total;
+            const totalPages = Math.ceil(total / pageSize);
+
+            if (total === 0) {
+                return res.status(404).send({
+                    success: false,
+                    message: 'Data not found',
+                    dev: "Data not found"
+                });
+            }
+
+            res.status(200).send({
+                success: true,
+                message: 'Income Transaction list',
+                dev: "Good Job, Bro!",
+                data: results,
+                totalNum: totalNum,
+                totalAmt: totalAmt,
+                pagination: {
+                    total: total,
+                    page: parseInt(page),
+                    pageSize: parseInt(pageSize),
+                    totalPages: totalPages
+                }
+            });
         });
     });
 };
@@ -551,52 +829,56 @@ exports.restoreIncomeCategory = (req, res) => {
 }
 
 exports.listIncomeCategory = (req, res) => {
-
     const { page = 1, pageSize = 10 } = req.query;
-    const orgId = req.user.orgId
+    const orgId = req.user.orgId;
     const { status = 'active' } = req.query;
     const offset = (page - 1) * pageSize;
     const query = `
-        SELECT ec.id, ec.name, u.name AS createdBy
-        FROM inccats ec
-        JOIN users u ON ec.createdBy = u.id
-        WHERE ec.orgId = ? AND ec.status = ?
+        SELECT ic.id, ic.name, u.name AS createdBy
+        FROM inccats ic
+        JOIN users u ON ic.createdBy = u.id
+        WHERE ic.orgId = ? AND ic.status = ?
+        ORDER BY ic.name DESC
         LIMIT ? OFFSET ?
     `;
 
-    db_connection.query(query, [orgId, status, pageSize, offset], (err, results) => {
+    db_connection.query(query, [orgId, status, parseInt(pageSize), offset], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
                 dev: err
-            })
+            });
         }
 
-        const countQuery = `SELECT COUNT(*) AS total FROM inccats WHERE orgId = ?`;
+        const totalNum = results.length;
 
-        db_connection.query(countQuery, [orgId], (err, countResults) => {
+        const countQuery = `SELECT COUNT(*) AS total FROM inccats WHERE orgId = ? AND status = ?`;
+        db_connection.query(countQuery, [orgId, status], (err, countResults) => {
             if (err) {
                 return res.status(500).send({
                     success: false,
                     message: 'internal server error',
                     dev: err
-                })
+                });
             }
+
             const total = countResults[0].total;
             const totalPages = Math.ceil(total / pageSize);
+
             res.status(200).send({
                 success: true,
                 message: 'Income Category list',
                 dev: "Good Job, Bro!",
                 data: results,
+                totalNum: totalNum,
                 pagination: {
+                    total: total,
                     page: parseInt(page),
                     pageSize: parseInt(pageSize),
-                    total,
-                    totalPages,
+                    totalPages: totalPages
                 }
-            })
-        })
-    })
-}
+            });
+        });
+    });
+};
