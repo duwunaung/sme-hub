@@ -39,6 +39,56 @@
         .dropdown-active {
             color: #0d6efd !important;
         }
+
+        /* Tooltips */
+        .icons, .usericons{
+            position: relative;
+        }
+
+        .icons::before, .icons::after, .usericons::before, .usericons::after {
+            --scale: 0;
+            --arrow-size: 10px;
+
+            position: absolute;
+            transform: translateY(-50%) translateX(var(--translate-x, 0)) scale(var(--scale));
+            top: 50%;
+            transition: 150ms transform;
+            transform-origin: right;
+        }
+
+        .icons::before, .usericons::before {
+            --translate-x: calc(-100% - var(--arrow-size));
+
+            content: attr(data-tooltip);
+            color: #fff;
+            padding: 0 .5rem .3rem .5rem;
+            border-radius: .3rem;
+            width: max-content;
+            background-color: var(--tooltip-color);
+        }
+
+        .icons:hover::before, .icons:hover::after, .usericons:hover::before, .usericons:hover::after {
+            --scale: 1;
+        }
+
+        .icons::after, .usericons::after {
+            --translate-x: calc(-1 * var(--arrow-size));
+
+            content: '';
+            border: var(--arrow-size) solid transparent;
+            left: 25px;
+            border-left-color: var(--tooltip-color);
+            transform-origin: left center;
+        }
+
+        .icons::after {
+            left: 25px;
+        }
+
+        .usericons::after {
+            left: 18px;
+        }
+
     </style>
 </head>
 

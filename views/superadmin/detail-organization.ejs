@@ -162,11 +162,11 @@
                                                                 </td>
                                                                 <td class="text-center">
                                                                     <% if (users[i].status == 'active' ) { %>
-                                                                        <i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i>
+                                                                        <div class="usericons" data-tooltip="Active" data-tooltip-color="#28a745"><i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i></div>
                                                                     <% } else if (users[i].status == 'deleted' ) { %>
-                                                                        <i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i>
+                                                                        <div class="usericons" data-tooltip="Inactive" data-tooltip-color="#dc3545"><i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i></div>
                                                                     <% } else { %>
-                                                                        <i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i>
+                                                                        <div class="usericons" data-tooltip="Pending" data-tooltip-color="#ffc107"><i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i></div>
                                                                     <% } %>
                                                                 </td>
                                                                 <td style="padding-left: 3%;">
@@ -343,6 +343,17 @@
                 })
                 document.getElementById(`users-view`).classList.remove('d-none');
             }
+
+            // Tooltips
+            const icons = document.querySelectorAll('.usericons')
+            icons.forEach (icon => {
+                const tooltipColor = icon.getAttribute('data-tooltip-color')
+                icon.addEventListener('mouseenter', changeColor);
+
+                function changeColor() {
+                    icon.style.setProperty('--tooltip-color', tooltipColor);
+                }
+            })  
 
         </script>
         <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
