@@ -1,6 +1,6 @@
 const express = require('express')
 
-const { createExpenseCategory, listExpenseCategory, updateExpenseCategory, deleteExpenseCategory, createIncomeCategory, updateIncomeCategory, deleteIncomeCategory, listIncomeCategory, restoreIncomeCategory , restoreExpenseCategory , getIncomeCategory , getExpenseCategory , detailExpenseCategory, detailIncomeCategory} = require('../../controllers/v0.1/extCatsController')
+const { createExpenseCategory, listExpenseCategory, updateExpenseCategory, deleteExpenseCategory, createIncomeCategory, updateIncomeCategory, deleteIncomeCategory, listIncomeCategory, restoreIncomeCategory , restoreExpenseCategory , getIncomeCategory , getExpenseCategory , detailExpenseCategory, detailIncomeCategory, listIncCat, listExpCat, listAllCategories} = require('../../controllers/v0.1/extCatsController')
 
 const router = express.Router();
 
@@ -11,7 +11,7 @@ router.get('/expense/:id', getExpenseCategory);
 router.put('/expense/:id', updateExpenseCategory);
 router.delete('/expense/:id', deleteExpenseCategory);
 router.put('/expense/restore/:id', restoreExpenseCategory);
-
+router.get('/expense', listExpCat);
 
 
 router.post('/income/create', createIncomeCategory);
@@ -21,5 +21,8 @@ router.get('/income/:id', getIncomeCategory);
 router.put('/income/:id', updateIncomeCategory);
 router.delete('/income/:id', deleteIncomeCategory);
 router.put('/income/restore/:id', restoreIncomeCategory);
+router.get('/income', listIncCat);
+
+router.get('/', listAllCategories);
 
 module.exports = router;
