@@ -50,6 +50,12 @@
 						<label for="transDate" class="form-label">Date</label>
 						<div id="transDate" class="form-control"></div>
 					</div>
+					<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
+						<div class="mb-3">
+							<label for="transReceipt" class="form-label">Receipt</label>
+							<img src="#" alt="Receipt Image" class="img-fluid" />
+						</div>
+					<% } %>
 					<div class="mb-3">
 						<label for="transUsername" class="form-label">Created By</label>
 						<div id="transUsername" class="form-control"><%= transaction.username %></div>
