@@ -26,6 +26,7 @@ const authorizeRole = require('./middlewares/authorizeRole')
 
 const app = express();
 app.use(cors());
+app.use(express.static('uploads'))
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -65,9 +66,8 @@ app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
 app.use('/superadmin', saViews_v01)
-
 app.use('/subscriber', suViews_v01)
-
+// app.use('/', suViews_v01)
 app.listen(process.env.PORT, function () {
   console.log("Server is running on", process.env.PORT);
 })

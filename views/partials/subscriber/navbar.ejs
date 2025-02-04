@@ -1,11 +1,17 @@
 
+<style>
+	#com-name {
+		text-decoration: none;
+		color: white;
+	}
+</style>
 	        
 			<nav class="navbar navbar-dark bg-dark navbar-expand-lg justify-content-center"> 
 				<button id="menuBtn" class="btn btn-dark menu-icon me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
 				☰
 				</button>
 				<div class="d-flex flex-grow-1 ">
-					<p class="navbar-brand m-0"><%= organizationName.toUpperCase() %></p>
+					<p class="navbar-brand m-0"><a href="/subscriber" id="com-name"><%= organizationName.toUpperCase() %></a></p>
 				</div>
 			</nav>
 			<!-- Sidebar -->
@@ -17,8 +23,8 @@
 				<div class="offcanvas-body">
 				  <ul class="list-unstyled">
 				    <li><a href="/subscriber/home" class="text-light d-block py-2">Dashboard</a></li>
-					<li><a href="/subscriber/transaction/transactions" class="text-light d-block py-2">Transaction</a></li>
-					<li><a href="/subscriber/category/income" class="text-light d-block py-2">Category</a></li>
+					<li><a href="/subscriber/transaction/transactions" class="text-light d-block py-2">Transactions</a></li>
+					<li><a href="/subscriber/category/income" class="text-light d-block py-2">Categories</a></li>
 				    <li><a href="#" class="text-light d-block py-2">Report</a></li>
 				    <li class="border-top my-3"></li>
 				    <li><a href="/subscriber/logout" class="text-light d-block py-2">Logout</a></li>

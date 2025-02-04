@@ -1,6 +1,11 @@
 <%- include('../partials/subscriber/header.ejs') %>
     <%- include('../partials/subscriber/navbar.ejs') %>
 
+		<style>
+			#recepit {
+				max-height: 200px;
+			}
+		</style>
 		<main class="col-md-9 col-lg-10">
 			<div class="container my-5">
 				<h2 class="mb-4">Transaction Details</h2>
@@ -53,7 +58,7 @@
 					<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
 						<div class="mb-3">
 							<label for="transReceipt" class="form-label">Receipt</label>
-							<img src="#" alt="Receipt Image" class="img-fluid" />
+							<img src="/<%= transaction.receipt %>" id="recepit" alt="Receipt Image" class="img-fluid" />
 						</div>
 					<% } %>
 					<div class="mb-3">

@@ -361,28 +361,9 @@ exports.createUser = (req, res) => {
         const pageSize = req.query.pageSize
         const total = req.query.total
 
-        const options = [
-            { id: 1, name: 'active' },
-            { id: 2, name: 'deleted' },
-            { id: 3, name: 'pending' }
-        ];
-        const roles = [
-            {
-                id: 1,
-                name: 'admin'
-            },
-            {
-                id: 2,
-                name: 'manager'
-            },
-            {
-                id: 3,
-                name: 'staff'
-            }
-        ];
         const { name, email, password, role, phone } = req.body;
         const orgId = req.params.id
-        const status = 'pending'
+        const status = 'active'
 
         axios.post(`${process.env.API_URL}/users/create`, { name, email, phone, password, role, orgId, status }, {
             headers: {

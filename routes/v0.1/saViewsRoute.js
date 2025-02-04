@@ -32,5 +32,8 @@ router.use('/dashboard', checkSuperAdminSession, (req, res) => {
     res.render('superadmin/dashboard', { token: req.session.token, user: req.session.user })
 })
 
+router.use('/', (req, res) => {
+    res.redirect('/superadmin/dashboard');
+});
 
 module.exports = router;
