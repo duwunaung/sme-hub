@@ -7,9 +7,13 @@
 		        min-width: 60px;
 		        text-align: center;
 		    }
+			.page-item a:hover {
+		    	cursor: pointer;
+			}
 		</style>
 		<!-- Main Content -->
         <main >
+			
             <div class="content">
 				<div class="container my-2">
 					<div class="d-flex flex-wrap justify-content-center gap-2" style="max-width: 600px; margin: 0 auto;">
@@ -17,7 +21,16 @@
 					  <a type="button" href="/subscriber/category/expense" class="text-decoration-none btn <% if (cat === 'expense' ) { %> btn-dark <% } else {%> btn-secondary <% } %> flex-grow-1" id="btnExpense" >Expense</a>
 					</div>
 				</div>
-
+				<% if (errorMessage) { %>
+					<div id="errorBox" class="alert alert-danger" role="alert">
+						<%= errorMessage %>
+					</div>
+					<% } %>
+					<% if (successMessage) { %>
+					<div id="successBox" class="alert alert-success" role="alert">
+						<%= successMessage %>
+					</div>
+					<% } %>
 				<div class="d-flex justify-content-between align-items-center mb-4">
 					<h2><% if (cat === 'income' ) { %> Income <% } else {%> Expensee <% } %> Categories</h2>
 					<button class="btn btn-primary" data-bs-toggle="modal"
@@ -38,39 +51,35 @@
 						</thead>
 						<tbody>
 							<tbody id="categoryTable">
-								<!-- Dynamic rows go here -->
-								<% for (let i=0; i < category.length; i++) { %>
-									<tr>
-										<td>
-											<%= i + 1 %>
-										</td>
-	
-										<td>
-											<%= category[i].name %>
-										</td>
-										<td>
-											<%= category[i].createdBy %>
-										</td>
-										<td>
-											
-											<div class="d-flex flex-nowrap">
-												<a href="/subscriber/category/<%= cat %>/detail/<%= category[i].id %>?cat=<%= cat %>"
-													class="btn btn-primary btn-sm btn-fixed-width me-1">View</a>
-												<a href="/subscriber/category/<%= cat %>/update/<%= category[i].id %>?cat=<%= cat %>"
-													class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
-												
-												<% if (category[i].status == 'deleted') { %>
-													<a href="/subscriber/category/<%= cat %>/restore/<%= category[i].id %>"
-														class="btn btn-danger btn-sm btn-fixed-width">Restore</a>
-												<% } else { %>
-													<a href="/subscriber/category/<%= cat %>/delete/<%= category[i].id %>"
-														class="btn btn-danger btn-sm btn-fixed-width">Delete</a>
-												<% } %>
-											</div>
-											
-										</td>
-									</tr>
+								<% if (category.length > 0) { %>
+									<% for (let i = 0; i < category.length; i++) { %>
+										<tr>
+											<td><%= i + 1 %></td>
+											<td><%= category[i].name %></td>
+											<td><%= category[i].createdBy %></td>
+											<td>
+												<div class="d-flex flex-nowrap">
+													<a href="/subscriber/category/<%= cat %>/detail/<%= category[i].id %>?cat=<%= cat %>"
+														class="btn btn-primary btn-sm btn-fixed-width me-1">View</a>
+													<a href="/subscriber/category/<%= cat %>/update/<%= category[i].id %>?cat=<%= cat %>&page=<%= pagination.page %>"
+														class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
+													
+													<% if (category[i].status == 'deleted') { %>
+														<a href="/subscriber/category/<%= cat %>/restore/<%= category[i].id %>"
+															class="btn btn-danger btn-sm btn-fixed-width">Restore</a>
+													<% } else { %>
+														<a href="/subscriber/category/<%= cat %>/delete/<%= category[i].id %>"
+															class="btn btn-danger btn-sm btn-fixed-width">Delete</a>
+													<% } %>
+												</div>
+											</td>
+										</tr>
 									<% } %>
+								<% } else { %>
+									<tr>
+										<td colspan="4" class="text-center text-muted">No categories found.</td>
+									</tr>
+								<% } %>
 							</tbody>
 						</tbody>
 					</table>
@@ -100,7 +109,53 @@
                 </div>
             </div>
         </div>
+		<nav aria-label="Pagination" id="paginationNav">
+			<ul class="pagination justify-content-center">
+				<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+					<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(1)' : '' %>><<</a>
+				</li>
+		
+				<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+					<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(' + (pagination.page - 1) + ')' : '' %>><</a>
+				</li>
+		
+				<% if (pagination.page > 2) { %>
+					<li class="page-item"><a class="page-link" onclick="goToPage(1)">1</a></li>
+					<% if (pagination.page > 3) { %>
+						<li class="page-item disabled"><a class="page-link">...</a></li>
+					<% } %>
+				<% } %>
+		
+				<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(pagination.totalPages, pagination.page + 1); i++) { %>
+					<li class="page-item <%= i === pagination.page ? 'active' : '' %>">
+						<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
+					</li>
+				<% } %>
+		
+				<% if (pagination.page < pagination.totalPages - 1) { %>
+					<% if (pagination.page < pagination.totalPages - 2) { %>
+						<li class="page-item disabled"><a class="page-link">...</a></li>
+					<% } %>
+					<li class="page-item"><a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')"><%= pagination.totalPages %></a></li>
+				<% } %>
+		
+				<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+					<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + (pagination.page + 1) + ')' : '' %>>></a>
+				</li>
+		
+				<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+					<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + pagination.totalPages + ')' : '' %>>>></a>
+				</li>
+			</ul>
+		</nav>
 		<script>
+
+			function goToPage(pageNumber) {
+			    const baseUrl = new URL(window.location.href);
+			    baseUrl.searchParams.set("page", pageNumber);
+			    window.location.href = baseUrl.toString();
+			}
+
 			const form = document.getElementById('addNewCategoryForm');
             const addButton = document.getElementById('addBtn');
             const inputs = form.querySelectorAll('.form-control[required]');
