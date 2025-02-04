@@ -445,25 +445,14 @@ exports.listExpenseTrans = (req, res) => {
 
 exports.createExpenseTrans = (req, res) => {
 	if (req.method == 'POST') {
-
-		const { description, amount, expenseDate, catId } = req.body;
-		axios.post(`${process.env.API_URL}/subscribers/expenses/create`, { description, amount, expenseDate, catId }, {
-			headers: {
-				'Authorization': `${req.session.token}`
-			}
-		}).then(response => {
-				res.redirect('/subscriber/transaction/income')
-		}).catch(error => {
-			res.redirect('/subscriber/transaction/income')
-		})
-	}
-}
-
-exports.createExpenseTrans = (req, res) => {
-	if (req.method == 'POST') {
 		
 		const { description, amount, expenseDate, catId } = req.body;
-		axios.post(`${process.env.API_URL}/subscribers/expenses/create`, { description, amount, expenseDate, catId }, {
+		const receipt = req.file ? req.file.filename : null
+		let parameters = { description, amount, expenseDate, catId }
+		if (receipt) {
+			parameters.receipt = receipt;
+		}
+		axios.post(`${process.env.API_URL}/subscribers/expenses/create`, parameters, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -595,7 +584,12 @@ exports.listIncomeTrans = (req, res) => {
 exports.createIncomeTrans = (req, res) => {
 	if (req.method == 'POST') {
 		const { description, amount, incomeDate, catId } = req.body;
-		axios.post(`${process.env.API_URL}/subscribers/incomes/create`, { description, amount, incomeDate, catId }, {
+		const receipt = req.file ? req.file.filename : null
+		let parameters = { description, amount, incomeDate, catId }
+		if (receipt) {
+			parameters.receipt = receipt;
+		}
+		axios.post(`${process.env.API_URL}/subscribers/incomes/create`,parameters, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
