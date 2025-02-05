@@ -381,9 +381,6 @@ exports.listUsers = (req, res) => {
             countQueryParams.push(`%${role}%`)
         }
         
-        countQuery += ' LIMIT ? OFFSET ?'
-        countQueryParams.push(parseInt(pageSize), offset)
-        
         db_connection.query(countQuery, countQueryParams, (err, count) => {
             if (err) {
                 return res.status(500).send({
