@@ -77,23 +77,26 @@
 				<div class="d-flex me-3">
 					<input type="text" class="form-control me-2" placeholder="Search..." id="searchInput" onkeydown="searchKey(event)">
 					<button class="btn btn-primary d-flex align-items-center" onclick="performSearch()">
-						Search <i class="fas fa-search ms-2"></i>
+						<i class="fas fa-search"></i>
 					</button>
 				</div>
-				<div class="dropdown">
-					<a class="dropdown-btn btn btn-primary d-flex align-items-center" onclick="toggleDropdown()">
-						<i class="fas fa-filter"></i> &nbsp;&nbsp;Date
-					</a>
-					<div class="dropdown-content" id="dropdown-menu">
-						<button class="btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
-						<button class="btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
-						<button class="btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
-						<button class="btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
-						<button class="btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
-						<button class="btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
-						<button class="btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
-						<button class="btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
-					</div>
+				<div class="btn-group">
+					<button type="button" 
+							class="btn btn-primary dropdown-toggle" 
+							data-bs-toggle="dropdown" 
+							aria-expanded="false">
+						<i class="fas fa-calendar me-1"></i>Date
+					</button>
+					<ul class="dropdown-menu dropdown-menu-end">
+						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+					</ul>
 				</div>
 			</div>
 			<div class="card mb-2 w-auto" style="max-width: 350px;">
@@ -108,29 +111,31 @@
 				<table class="table table-striped table-hover">
 					<thead class="table-dark">
 						<tr>
-							<th scope="col">#</th>
-							<th scope="col">Description</th>
-							<th scope="col">Amount</th>
-							<th scope="col">Date</th>
-							<th scope="col">Created By</th>
-							<th scope="col">Actions</th>
+							<th style="min-width: 40px">#</th>
+							<th style="min-width: 150px">Description</th>
+							<th style="min-width: 120px">Amount</th>
+							<th style="min-width: 180px">Date</th>
+							<th style="min-width: 120px">Created By</th>
+							<th style="min-width: 130px">Actions</th>
 						</tr>
 					</thead>
 					<tbody id="transactionTable">
 						<% 
-						    let totalSum = 0; 
-						    if (transaction.length > 0) { 
-						        for (let i = 0; i < transaction.length; i++) { 
-						            totalSum += transaction[i].amount;
-						        } 
-						    } 
+							let totalSum = 0; 
+							if (transaction.length > 0) { 
+								for (let i = 0; i < transaction.length; i++) { 
+									totalSum += transaction[i].amount;
+								} 
+							} 
 						%>
 						<% if (transaction.length > 0) { %>
 							<% for (let i = 0; i < transaction.length; i++) { %>
 								<tr>
-									<td><%= i + 1 %></td>
-									<td><%= transaction[i].description %></td>
-									<td>
+									<td class="text-nowrap"><%= i + 1 %></td>
+									<td class="text-nowrap" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+										<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
+									</td>
+									<td class="text-nowrap">
 										<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
 										<% if (transaction[i].baseCurrency === 'MMK') { %>
 											<%= formattedAmount %> ks
@@ -140,7 +145,7 @@
 											<%= formattedAmount %> <%= transaction[i].baseCurrency %>
 										<% } %>
 									</td>
-									<td>
+									<td class="text-nowrap">
 										<%= new Date(cat === 'income' ? transaction[i].incomeDate : transaction[i].expenseDate)
 											.toLocaleString('en-US', { 
 												day: '2-digit', 
@@ -153,7 +158,7 @@
 											}) 
 										%>
 									</td>
-									<td><%= transaction[i].createdBy %></td>
+									<td class="text-nowrap"><%= transaction[i].createdBy %></td>
 									<td>
 										<div class="d-flex gap-2">
 											<a href="/subscriber/transaction/<%= cat %>/detail/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>&page=<%= pagination.page %>"
@@ -172,6 +177,7 @@
 					</tbody>
 				</table>
 			</div>
+			
 			
 		</div>
 		<nav aria-label="Pagination" id="paginationNav">
