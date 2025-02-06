@@ -45,7 +45,7 @@
 						  <tr>
 							<th scope="col">#</th>
 							<th scope="col">Name</th>
-							<th scope="col">Created By</th>
+							<th scope="col" style="min-width: 100px;">Created By</th>
 							<th scope="col">Actions</th>
 						  </tr>
 						</thead>
@@ -54,9 +54,9 @@
 								<% if (category.length > 0) { %>
 									<% for (let i = 0; i < category.length; i++) { %>
 										<tr>
-											<td><%= i + 1 %></td>
-											<td><%= category[i].name %></td>
-											<td><%= category[i].createdBy %></td>
+											<td class="text-nowrap"><%= i + 1 %></td>
+											<td class="text-nowrap"><%= category[i].name.length > 30 ? category[i].name.substring(0, 30) + '...' : category[i].name %></td>
+											<td class="text-nowrap"><%= category[i].createdBy %></td>
 											<td>
 												<div class="d-flex flex-nowrap">
 													<a href="/subscriber/category/<%= cat %>/detail/<%= category[i].id %>?cat=<%= cat %>"
@@ -99,9 +99,9 @@
                         <form id="addNewCategoryForm" action="/subscriber/category/<%= cat %>/create" method="POST" onsubmit="submitForm(event)">
                             <div class="mb-3">
                                 <label for="catName" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" maxlength="255" name="name" id="catName"
+                                <input type="text" class="form-control" maxlength="100" name="name" id="catName"
                                     placeholder="Enter category name" value="" oninput="checkInputs('catNameError', 'catName')" required>
-								<p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 255 characters!</p>
+								<p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
                             </div>
                             <button type="submit" id="addBtn" class="btn btn-primary w-100">Add Category</button>
                         </form>
