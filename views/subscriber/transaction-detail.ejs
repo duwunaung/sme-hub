@@ -2,9 +2,32 @@
     <%- include('../partials/subscriber/navbar.ejs') %>
 
 		<style>
-			#recepit {
-				max-height: 200px;
+			#receipt {
+			    max-height: 200px;
+			    border-radius: 10px;
+			    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			    border: 1px solid #ddd;
+			    padding: 5px;
+			    background: #fff;
+			    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 			}
+
+			#receipt:hover {
+			    transform: scale(1.05);
+			    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+			}
+			@media (max-width: 768px) {
+		        .modal-dialog {
+		            max-width: 95% !important;
+		            margin: auto;
+		        }
+		    }
+
+		    @media (max-width: 480px) {
+		        #modalReceiptImage {
+		            max-height: 70vh;
+		        }
+		    }
 		</style>
 		<main class="col-md-9 col-lg-10">
 			<div class="container my-5">
@@ -42,14 +65,16 @@
 					</div>
 					<div class="mb-3">
 						<label for="transCategory" class="form-label">Category</label>
-						<select id="transCategory" name="catId" class="form-select inputRequired" disabled>
-
-							<% category.forEach(option => { %>
-								<option value="<%= option.id %>" <%= option.id === transaction.catId ? 'selected' : '' %> >
-									<%= option.name %>
-								</option>
-							<% }); %>
-						</select>
+						<div id="transCategory" class="form-control bg-light text-dark">
+							<% 
+								const Category = category.find(option => option.id === transaction.catId);
+								if (Category) { 
+							%>
+								<%= Category.name %>
+							<% } else { %>
+								No Category
+							<% } %>
+						</div>
 					</div>
 					<div class="mb-3">
 						<label for="transDate" class="form-label">Date</label>
@@ -57,8 +82,8 @@
 					</div>
 					<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
 						<div class="mb-3">
-							<label for="transReceipt" class="form-label">Receipt</label>
-							<img src="/<%= transaction.receipt %>" id="recepit" alt="Receipt Image" class="img-fluid" />
+							<label for="transReceipt" class="form-label">Receipt</label><br>
+							<img src="/<%= transaction.receipt %>" data-bs-toggle="modal" data-bs-target="#receiptModal" id="receipt" alt="Receipt Image" class="img-fluid" />
 						</div>
 					<% } %>
 					<div class="mb-3">
@@ -69,6 +94,20 @@
 		
 				</form>
 		
+			</div>
+			<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-xl">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="receiptModalLabel">Receipt Preview</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body text-center">
+							<img src="/<%= transaction.receipt %>" class="img-fluid" id="modalReceiptImage" alt="Receipt Image"
+								style="width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);" />
+						</div>
+					</div>
+				</div>
 			</div>
 		</main>
 		<script>
