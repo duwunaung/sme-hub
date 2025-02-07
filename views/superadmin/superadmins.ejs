@@ -31,15 +31,20 @@
                                             Filter
                                         </button>
                                         <ul class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item dropdown-active" href="#">All</a>
-                                            <a class="dropdown-item" href="/superadmin/users?status=active">Active</a>
-                                            <a class="dropdown-item" href="/superadmin/users?status=deleted">Inactive</a>
-                                            <a class="dropdown-item" href="/superadmin/users?status=pending">Pending</a>
+                                            <a class="dropdown-item status dropdown-active" id="all" onclick="changeStatus('all')">All</a>
+                                            <a class="dropdown-item status" id="active" onclick="changeStatus('active')">Active</a>
+                                            <a class="dropdown-item status" id="deleted" onclick="changeStatus('deleted')">Inactive</a>
+                                            <a class="dropdown-item status" id="pending" onclick="changeStatus('pending')">Pending</a>
                                         </ul>
                                     </div>
                                 </nav>
                                 <!-- Organizations Table -->
                                 <div class="table-responsive">
+                                    <% if ( users.length==0 && pagination.page == 1 ) { %>
+                                        <div class="alert alert-warning" role="alert">
+                                            No users found.
+                                        </div>
+                                        <% } else {%>
                                     <table class="table table-striped table-hover">
                                         <thead class="table-dark">
                                             <tr>
@@ -98,7 +103,7 @@
                                                         <% } %>
                                                     </td>
                                                 </tr>
-                                                <% } %>
+                                            <% } } %>
                                         </tbody>
                                     </table>
                                 </div>
@@ -187,7 +192,31 @@
                     icons.forEach (icon => {
                         icon.style.setProperty('--tooltip-color', tooltipColor);
                     })
-                }  
+                }
+
+                // Change status in filter
+                function changeStatus(status) {
+                    let url = new URL(window.location.href);
+                    
+                    if ( status != 'all' ) {
+                        url.searchParams.set('status', status);
+                        url.searchParams.set('page', 1);
+                    } else {
+                        url.searchParams.set('status', 'all');
+                        url.searchParams.set('page', 1);
+                    }
+                    window.location.href = url.toString();
+                }
+
+                const searchParams = new URLSearchParams(window.location.search)
+                const statusQuery = searchParams.get('status')
+                if (statusQuery) {
+                    const statuses = document.querySelectorAll('.status');
+                    statuses.forEach(status => {
+                        status.classList.remove('dropdown-active');
+                    })
+                    document.getElementById(`${statusQuery}`).classList.add('dropdown-active');
+                }
 
             </script>
         </main>

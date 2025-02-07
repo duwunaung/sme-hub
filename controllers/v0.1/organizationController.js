@@ -10,8 +10,7 @@ exports.listOrg = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-    const { name, status = 'all', page = 1, pageSize = 10, expired = false } = req.query
-
+    const { name, status, page = 1, pageSize = 10, expired = false } = req.query
     let query = "SELECT * FROM orgs WHERE 1=1"
     let queryParams = []
 
@@ -21,16 +20,14 @@ exports.listOrg = (req, res) => {
     }
 
     if (status != 'all') {
-        if (status) {
-            query += " AND status LIKE ?"
-            queryParams.push(`%${status}%`)
-        }
+        query += " AND status LIKE ?"
+        queryParams.push(`%${status}%`)
 
-        if (!expired) {
-            query += " AND expiredDate > NOW()"
-        } else {
-            query += " AND expiredDate < NOW()"
-        }
+        // if (!expired) {
+        //     query += " AND expiredDate > NOW()"
+        // } else {
+        //     query += " AND expiredDate < NOW()"
+        // }
     }
 
     const offset = (page - 1) * pageSize
@@ -45,7 +42,27 @@ exports.listOrg = (req, res) => {
             })
         }
 
-        db_connection.query("SELECT COUNT(*) as total FROM orgs", (err, count) => {
+        let countQuery = "SELECT COUNT(*) as total FROM orgs WHERE 1=1"
+        let countQueryParams = []
+
+        if (name) {
+            countQuery += " AND name LIKE ?"
+            countQueryParams.push(`%${name}%`)
+        }
+    
+        if (status != 'all') {
+            if (status) {
+                countQuery += " AND status LIKE ?"
+                countQueryParams.push(`%${status}%`)
+            }
+    
+            // if (!expired) {
+            //     query += " AND expiredDate > NOW()"
+            // } else {
+            //     query += " AND expiredDate < NOW()"
+            // }
+        }
+        db_connection.query( countQuery, countQueryParams, (err, count) => {
             if (err) {
                 return res.status(500).send({
                     success: false,

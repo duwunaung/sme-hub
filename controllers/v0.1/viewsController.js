@@ -41,8 +41,9 @@ exports.logout = (req, res) => {
 
 exports.orgs = (req, res) => {
     if (req.method == 'GET') {
+        const status = req.query.status || 'all'
         const page = req.query.page || 1
-        axios.get(`${process.env.API_URL}/organizations?page=${page}`, {
+        axios.get(`${process.env.API_URL}/organizations?page=${page}&status=${status}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
@@ -56,26 +57,26 @@ exports.orgs = (req, res) => {
             ];
             if (error) {
                 if (type == 'register') {
-                    res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, options: options, errorMessage: "Cannot register at the moment!" , successMessage: null});
+                    res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, status: status, options: options, errorMessage: "Cannot register at the moment!" , successMessage: null});
                 } else if (type == '404Error') {
-                    res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, options: options, errorMessage: "404 Organization Not Found!" , successMessage: null});
+                    res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, status: status, options: options, errorMessage: "404 Organization Not Found!" , successMessage: null});
                 } else if (type == 'sysError') {
-                    res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, options: options, errorMessage: "Internal Server Error!" , successMessage: null});
+                    res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, status: status, options: options, errorMessage: "Internal Server Error!" , successMessage: null});
                 }
             } else if (success) {
 				if (type === 'register') {
-					res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully created!"});
+					res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, status: status, options: options, errorMessage: null , successMessage: "Successfully created!"});
 				} else if (type === 'org-delete') {
-					res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully deleted!"});
+					res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, status: status, options: options, errorMessage: null , successMessage: "Successfully deleted!"});
 				} else if (type === 'org-restore') {
-					res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully restored!"});
+					res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, status: status, options: options, errorMessage: null , successMessage: "Successfully restored!"});
 				}
             }
 			else {
-                res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
+                res.render('superadmin/organizations', { orgs: response.data.data, pagination: response.data.pagination, status: status, options: options, errorMessage: null , successMessage: null});
             }
         }).catch(error => {
-            res.render('superadmin/organizations', { orgs: [], options: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+            res.render('superadmin/organizations', { orgs: [], status: {}, options: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
         })
     }
 }
@@ -318,8 +319,9 @@ exports.superadmins = (req, res) => {
     if (req.method == 'GET') {
 
         const page = req.query.page || 1
+        const status = req.query.status || 'all'
 
-        axios.get(`${process.env.API_URL}/utils/users?page=${ page }`, {
+        axios.get(`${process.env.API_URL}/utils/users?page=${ page }&status=${ status }`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }

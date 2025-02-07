@@ -170,7 +170,15 @@ exports.getSuperAdmins = (req, res) => {
                 dev: err
             })
         }
-        db_connection.query("SELECT COUNT(*) as total FROM users WHERE role = 'superadmin' AND orgId = 0", (err, count) => {
+
+        let countQuery = "SELECT COUNT(*) as total FROM users WHERE role = 'superadmin' AND orgId = 0"
+        let countQueryParams = []
+        if (status != 'all') {
+            countQuery += " AND status LIKE ?"
+            countQueryParams.push(`%${status}%`)
+        }
+
+        db_connection.query(countQuery, countQueryParams, (err, count) => {
             if (err) {
                 return res.status(500).send({
                     success: false,
