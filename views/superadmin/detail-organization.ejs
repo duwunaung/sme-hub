@@ -96,10 +96,10 @@
                                                     Role
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <a class="dropdown-item role dropdown-active" id="all" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&role=all&status=<%= status %>">All</a>
-                                                    <a class="dropdown-item role" id="manager" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&role=manager&status=<%= status %>">Manager</a>
-                                                    <a class="dropdown-item role" id="admin" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&role=admin&status=<%= status %>">Admin</a>
-                                                    <a class="dropdown-item role" id="staff" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&role=staff&status=<%= status %>">Staff</a>
+                                                    <a class="dropdown-item roles dropdown-active" id="all" onclick="changeRole('all')">All</a>
+                                                    <a class="dropdown-item roles" id="manager" onclick="changeRole('manager')">Manager</a>
+                                                    <a class="dropdown-item roles" id="admin" onclick="changeRole('admin')">Admin</a>
+                                                    <a class="dropdown-item rolse" id="staff" onclick="changeRole('staff')">Staff</a>
                                                 </ul>
                                             </div>
                                             <div class="btn-group">
@@ -107,10 +107,10 @@
                                                     Filter
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <a class="dropdown-item status dropdown-active" id="all" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&status=all&role=<%= role %>">All</a>
-                                                    <a class="dropdown-item status" id="active" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&status=active&role=<%= role %>">Active</a>
-                                                    <a class="dropdown-item status" id="deleted" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&status=deleted&role=<%= role %>">Inactive</a>
-                                                    <a class="dropdown-item status" id="pending" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<% orgPage %>&userPage=<%= pagination.page %>&activeUsers=true&status=pending&role=<%= role %>">Pending</a>
+                                                    <a class="dropdown-item status dropdown-active" id="all" onclick="changeStatus('all')">All</a>
+                                                    <a class="dropdown-item status" id="active" onclick="changeStatus('active')">Active</a>
+                                                    <a class="dropdown-item status" id="deleted" onclick="changeStatus('deleted')">Inactive</a>
+                                                    <a class="dropdown-item status" id="pending" onclick="changeStatus('pending')">Pending</a>
                                                 </ul>
                                             </div>
                                         </div>
@@ -162,11 +162,11 @@
                                                                 </td>
                                                                 <td class="text-center">
                                                                     <% if (users[i].status == 'active' ) { %>
-                                                                        <div class="usericons" data-tooltip="Active" data-tooltip-color="#28a745"><i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i></div>
+                                                                        <div class="usericons" data-tooltip="Active" onmouseover="changeColor('#28a745')"><i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i></div>
                                                                     <% } else if (users[i].status == 'deleted' ) { %>
-                                                                        <div class="usericons" data-tooltip="Inactive" data-tooltip-color="#dc3545"><i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i></div>
+                                                                        <div class="usericons" data-tooltip="Inactive" onmouseover="changeColor('#dc3545')"><i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i></div>
                                                                     <% } else { %>
-                                                                        <div class="usericons" data-tooltip="Pending" data-tooltip-color="#ffc107"><i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i></div>
+                                                                        <div class="usericons" data-tooltip="Pending" onmouseover="changeColor('#ffc107')"><i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i></div>
                                                                     <% } %>
                                                                 </td>
                                                                 <td style="padding-left: 3%;">
@@ -271,6 +271,8 @@
             const prevNum = document.getElementById('prevNum');
             const nextNum = document.getElementById('nextNum');
             const lastNum = document.getElementById('lastNum');
+            const orgId = "<%= org.id %>"
+            const orgPage = "<%= orgPage %>"
 
             if ( totalPage == 1 || Number.isNaN(page) || page > totalPage ) {
                 paginationNav.classList.add('d-none');
@@ -287,7 +289,7 @@
                 prevDots.classList.add('d-none');
             } else if (page === 4) {
                 prevDots.innerText = "2"
-                prevDots.href = "/superadmin/users?page=2"
+                prevDots.href = "/superadmin/organizations/detail/" + orgId + "?orgPage=" + orgPage + "&userPage=2"
             }
 
             if (page == totalPage) {
@@ -305,7 +307,7 @@
                 nextDots.classList.add('d-none');
             } else if (page === totalPage - 3) {
                 nextDots.innerText = totalPage -1
-                nextDots.href = "/superadmin/users?page=<%= +pagination.page +2 %>"
+                nextDots.href = "/superadmin/organizations/detail/" + orgId + "?orgPage=" + orgPage + "&userPage=<%= +pagination.page +2 %>&activeUsers=true"
             }
             // xxx
 
@@ -345,15 +347,57 @@
             }
 
             // Tooltips
-            const icons = document.querySelectorAll('.usericons')
-            icons.forEach (icon => {
-                const tooltipColor = icon.getAttribute('data-tooltip-color')
-                icon.addEventListener('mouseover', changeColor);
-
-                function changeColor() {
+            function changeColor(tooltipColor) {
+                const icons = document.querySelectorAll('.usericons')
+                icons.forEach (icon => {
                     icon.style.setProperty('--tooltip-color', tooltipColor);
+                })
+            }
+
+            // Change status in filter
+            let url = new URL(window.location.href);
+            function changeStatus(status) {
+                
+                if ( status != 'all' ) {
+                    url.searchParams.set('status', status);
+                    url.searchParams.set('activeUsers', 'true');
+                    url.searchParams.set('userPage', 1);
+                } else {
+                    url.searchParams.set('status', 'all');
+                    url.searchParams.set('activeUsers', 'true');
+                    url.searchParams.set('userPage', 1);
                 }
-            })  
+                window.location.href = url.toString();
+            }
+            function changeRole(role) {
+                
+                if ( role != 'all' ) {
+                    url.searchParams.set('role', role);
+                    url.searchParams.set('activeUsers', 'true');
+                } else {
+                    url.searchParams.set('role', 'all');
+                    url.searchParams.set('activeUsers', 'true');
+                }
+                window.location.href = url.toString();
+            }
+
+            const statusQuery = searchParams.get('status')
+            if (statusQuery) {
+                const statuses = document.querySelectorAll('.status');
+                statuses.forEach(status => {
+                    status.classList.remove('dropdown-active');
+                })
+                document.getElementById(`${statusQuery}`).classList.add('dropdown-active');
+            }
+            const roleQuery = searchParams.get('role')
+            if (roleQuery) {
+                const roles = document.querySelectorAll('.role');
+                roles.forEach(role => {
+                    role.classList.remove('dropdown-active');
+                })
+                document.getElementById(`${roleQuery}`).classList.add('dropdown-active');
+            }
+
 
         </script>
         <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
