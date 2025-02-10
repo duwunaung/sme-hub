@@ -155,7 +155,7 @@ exports.listExpenseCategory = (req, res) => {
         FROM expcats ec
         JOIN users u ON ec.createdBy = u.id
         WHERE ec.orgId = ? AND ec.status = ?
-        ORDER BY ec.name DESC
+        ORDER BY ec.id DESC
         LIMIT ? OFFSET ?
     `;
 
@@ -838,7 +838,7 @@ exports.listIncomeCategory = (req, res) => {
         FROM inccats ic
         JOIN users u ON ic.createdBy = u.id
         WHERE ic.orgId = ? AND ic.status = ?
-        ORDER BY ic.name DESC
+        ORDER BY ic.id DESC
         LIMIT ? OFFSET ?
     `;
 
