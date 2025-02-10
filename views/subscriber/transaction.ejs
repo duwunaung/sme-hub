@@ -120,6 +120,23 @@
 				
 				<div class="container-div my-2">
 					<div class="row align-items-center">
+
+						<!-- Search Bar -->
+						<div class="col-auto mb-2">
+							<div class="d-flex">
+								<input type="text" 
+									   class="form-control me-2" 
+									   placeholder="Search..." 
+									   id="searchInput" 
+									   onkeydown="searchKey(event)"
+									   style="width: 250px;">
+								<button class="btn btn-primary d-flex align-items-center px-3" onclick="performSearch()">
+									<i class="fas fa-search"></i>
+								</button>
+							</div>
+						</div>
+
+						
 						<!-- Filter Buttons -->
 						<div class="col-auto me-auto mb-2">
 							<div class="d-flex gap-2">
@@ -168,20 +185,7 @@
 							</div>
 						</div>
 				
-						<!-- Search Bar -->
-						<div class="col-auto mb-2">
-							<div class="d-flex">
-								<input type="text" 
-									   class="form-control me-2" 
-									   placeholder="Search..." 
-									   id="searchInput" 
-									   onkeydown="searchKey(event)"
-									   style="width: 250px;">
-								<button class="btn btn-primary d-flex align-items-center px-3" onclick="performSearch()">
-									<i class="fas fa-search"></i>
-								</button>
-							</div>
-						</div>
+						
 					</div>
 				</div>
 				<div class="card mb-2 w-auto" style="max-width: 350px;">
