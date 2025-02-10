@@ -10,7 +10,7 @@ exports.listOrg = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-    const { name, status, page = 1, pageSize = 10, expired = false } = req.query
+    const { name, status, page = 1, pageSize = 10, expired } = req.query
     let query = "SELECT * FROM orgs WHERE 1=1"
     let queryParams = []
 
@@ -22,12 +22,10 @@ exports.listOrg = (req, res) => {
     if (status != 'all') {
         query += " AND status LIKE ?"
         queryParams.push(`%${status}%`)
+    }
 
-        // if (!expired) {
-        //     query += " AND expiredDate > NOW()"
-        // } else {
-        //     query += " AND expiredDate < NOW()"
-        // }
+    if (expired == 'false') {
+        query += " AND expiredDate > NOW()"
     }
 
     const offset = (page - 1) * pageSize
@@ -51,17 +49,14 @@ exports.listOrg = (req, res) => {
         }
     
         if (status != 'all') {
-            if (status) {
-                countQuery += " AND status LIKE ?"
-                countQueryParams.push(`%${status}%`)
-            }
-    
-            // if (!expired) {
-            //     query += " AND expiredDate > NOW()"
-            // } else {
-            //     query += " AND expiredDate < NOW()"
-            // }
+            countQuery += " AND status LIKE ?"
+            countQueryParams.push(`%${status}%`)
         }
+        
+        if (expired == 'false') {
+            countQuery += " AND expiredDate > NOW()"
+        }
+
         db_connection.query( countQuery, countQueryParams, (err, count) => {
             if (err) {
                 return res.status(500).send({

@@ -42,9 +42,10 @@ exports.logout = (req, res) => {
 exports.orgs = (req, res) => {
     if (req.method == 'GET') {
         const name = req.query.name || ""
+        const expired = req.query.expired || 'false'
         const status = req.query.status || 'all'
         const page = req.query.page || 1
-        axios.get(`${process.env.API_URL}/organizations?page=${page}&name=${name}&status=${status}`, {
+        axios.get(`${process.env.API_URL}/organizations?page=${page}&name=${name}&expired=${expired}&status=${status}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }

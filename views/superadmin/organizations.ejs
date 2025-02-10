@@ -32,7 +32,7 @@
                             </div>
                             <div class="d-flex">
                                 <div style="margin-top: 7px;">
-                                    <input style="transform: scale(1.2)" type="checkbox" id="expiredCheckbox">
+                                    <input style="transform: scale(1.2)" type="checkbox" id="expiredCheckbox" onclick="showExpired()">
                                     <span style="font-weight: 500;" class="mx-2">Show expired</span>
                                 </div>
                                 <div class="btn-group">
@@ -272,7 +272,7 @@
 
             // Refresh
             function refresh() {
-                window.location.href = "http://localhost:3000/superadmin/organizations"
+                window.location.href = "http://localhost:3000/superadmin/organizations?expired=false"
             }
 
             // Search
@@ -294,7 +294,18 @@
                     search()
                 }
             }
-            
+
+            // Show expired
+            function showExpired() {
+                let url = new URL(window.location.href);
+                if ( url.searchParams.get('expired') == 'true' ) {
+                    url.searchParams.set('expired', false);
+                } else {
+                    url.searchParams.set('expired', true);
+                }
+                window.location.href = url.toString();
+            }
+
             // Change status in filter
             function changeStatus(status) {
                 let url = new URL(window.location.href);
