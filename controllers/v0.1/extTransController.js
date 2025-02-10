@@ -10,83 +10,88 @@ exports.listAllTransactions = (req, res) => {
     const offset = (page - 1) * pageSize;
     const queryParams = [];
 
-    let sql = `
-	    SELECT * FROM (
-	        SELECT id, description, amount, transactionDate, category, createdBy, baseCurrency, 'expense' AS transactionType 
-	        FROM (
-	            SELECT e.id, e.description, e.amount, e.expenseDate AS transactionDate, c.name AS category, u.name AS createdBy, o.baseCurrency AS baseCurrency
-	            FROM exps e
-	            JOIN expcats c ON e.catId = c.id
-	            JOIN users u ON e.createdBy = u.id
-	            JOIN orgs o ON e.orgId = o.id
-	            WHERE e.orgId = ?
-	        ) AS expenses
+    let baseSQL = `
+        SELECT * FROM (
+            SELECT id, description, amount, transactionDate, category, createdBy, baseCurrency, 'expense' AS transactionType 
+            FROM (
+                SELECT e.id, e.description, e.amount, e.expenseDate AS transactionDate, c.name AS category, u.name AS createdBy, o.baseCurrency AS baseCurrency
+                FROM exps e
+                JOIN expcats c ON e.catId = c.id
+                JOIN users u ON e.createdBy = u.id
+                JOIN orgs o ON e.orgId = o.id
+                WHERE e.orgId = ?
+            ) AS expenses
 
-	        UNION ALL
+            UNION ALL
 
-	        SELECT id, description, amount, transactionDate, category, createdBy, baseCurrency, 'income' AS transactionType 
-	        FROM (
-	            SELECT i.id, i.description, i.amount, i.incomeDate AS transactionDate, c.name AS category, u.name AS createdBy, o.baseCurrency AS baseCurrency
-	            FROM incs i
-	            JOIN inccats c ON i.catId = c.id
-	            JOIN users u ON i.createdBy = u.id
-	            JOIN orgs o ON i.orgId = o.id
-	            WHERE i.orgId = ?
-	        ) AS incomes
-	    ) AS combined_transactions
-	    WHERE 1=1
-	`;
+            SELECT id, description, amount, transactionDate, category, createdBy, baseCurrency, 'income' AS transactionType 
+            FROM (
+                SELECT i.id, i.description, i.amount, i.incomeDate AS transactionDate, c.name AS category, u.name AS createdBy, o.baseCurrency AS baseCurrency
+                FROM incs i
+                JOIN inccats c ON i.catId = c.id
+                JOIN users u ON i.createdBy = u.id
+                JOIN orgs o ON i.orgId = o.id
+                WHERE i.orgId = ?
+            ) AS incomes
+        ) AS combined_transactions
+        WHERE 1=1
+    `;
 
     queryParams.push(orgId, orgId);
 
     if (fromDate) {
-        sql += ` AND transactionDate >= ?`;
+        baseSQL += ` AND transactionDate >= ?`;
         queryParams.push(fromDate);
     }
     if (toDate) {
-        sql += ` AND transactionDate <= ?`;
+        baseSQL += ` AND transactionDate <= ?`;
         queryParams.push(toDate);
     }
     if (search) {
-        sql += ` AND (description LIKE ? OR amount = ?)`;
+        baseSQL += ` AND (description LIKE ? OR amount = ?)`;
         const searchPattern = `%${search}%`;
         queryParams.push(searchPattern, search);
     }
     if (num && type && ["day", "week", "month"].includes(type)) {
         if (type === "week") {
             if (parseInt(num) === 1) {
-				sql += ` AND transactionDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
-            			AND transactionDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
-			} else {
-				sql += ` AND transactionDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
-				queryParams.push(num);
-			}
+                baseSQL += ` AND transactionDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                            AND transactionDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+            } else {
+                baseSQL += ` AND transactionDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+                queryParams.push(num);
+            }
         } else if (type === "month") {
             if (parseInt(num) === 1) {
-                sql += ` AND transactionDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                baseSQL += ` AND transactionDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
             } else if (parseInt(num) === -1) {
-                sql += ` AND transactionDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
-                sql += ` AND transactionDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                baseSQL += ` AND transactionDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                baseSQL += ` AND transactionDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
             } else {
-                sql += ` AND transactionDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                baseSQL += ` AND transactionDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
                 queryParams.push(num - 1);
             }
         } else {
             if (type === "day") {
-				if (parseInt(num) === 1) {
-					sql += ` AND transactionDate >= CURDATE() AND transactionDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
-				} else {
-					sql += ` AND transactionDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND transactionDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
-					queryParams.push(num);
-				}
-			}
+                if (parseInt(num) === 1) {
+                    baseSQL += ` AND transactionDate >= CURDATE() AND transactionDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                } else {
+                    baseSQL += ` AND transactionDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND transactionDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                    queryParams.push(num);
+                }
+            }
         }
     }
 
-    sql += ` ORDER BY transactionDate DESC LIMIT ? OFFSET ?`;
-    queryParams.push(parseInt(pageSize), offset);
+    // Create count query using the same filters
+    const countSQL = `SELECT COUNT(*) as total FROM (${baseSQL}) as filtered_transactions`;
+    
+    // Create final query for data
+    const dataSQL = baseSQL + ` ORDER BY transactionDate DESC LIMIT ? OFFSET ?`;
+    const dataParams = [...queryParams, parseInt(pageSize), offset];
 
-    db_connection.query(sql, queryParams, (err, results) => {
+    // Execute count query first
+    db_connection.query(countSQL, queryParams, (err, countResult) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -94,15 +99,12 @@ exports.listAllTransactions = (req, res) => {
                 dev: err
             });
         }
-        
-        const totalNum = results.length;
-        const totalAmt = results.reduce((total, item) => total + item.amount, 0);
-        
-        const countQuery = `
-            SELECT (SELECT COUNT(*) FROM exps WHERE orgId = ?) + (SELECT COUNT(*) FROM incs WHERE orgId = ?) AS total
-        `;
 
-        db_connection.query(countQuery, [orgId, orgId], (err, totalResult) => {
+        const total = countResult[0].total;
+        const totalPages = Math.ceil(total / pageSize);
+
+        // Then execute data query
+        db_connection.query(dataSQL, dataParams, (err, results) => {
             if (err) {
                 return res.status(500).send({
                     success: false,
@@ -110,25 +112,25 @@ exports.listAllTransactions = (req, res) => {
                     dev: err
                 });
             }
-			const total = totalResult[0].total;
-			const totalPages = Math.ceil(total / pageSize);
+
+            const totalAmt = results.reduce((total, item) => total + item.amount, 0);
+            
             return res.status(200).send({
                 success: true,
                 message: 'All transactions fetched successfully',
                 data: results,
-                totalNum: totalNum,
+                totalNum: results.length,
                 totalAmt: totalAmt,
                 pagination: {
                     total: total,
                     page: parseInt(page),
                     pageSize: parseInt(pageSize),
-					totalPages: totalPages
+                    totalPages: totalPages
                 }
             });
         });
     });
 };
-
 
 exports.createExpense = (req, res) => {
     const { description, amount, expenseDate, catId } = req.body
@@ -335,7 +337,6 @@ exports.listExpenses = (req, res) => {
 				}
 			}
         }
-        queryParams.push(num);
     }
 	sql += `ORDER BY expenseDate DESC LIMIT ${pageSize} OFFSET ${offset}`
 	db_connection.query(sql, queryParams, (err, results) => {
@@ -350,8 +351,53 @@ exports.listExpenses = (req, res) => {
         }
 		const totalNum = results.length
 		const totalAmt = results.reduce((total, item) => total + item.amount, 0)
-		const countQuery = `SELECT COUNT(*) as total from exps WHERE orgId = '${orgId}'`
-		db_connection.query(countQuery, (err, totalResult)=> {
+		let countQuery = `SELECT COUNT(*) as total from exps WHERE orgId = '${orgId}'`
+		let countParams = []
+		if (fromDate) {
+			countQuery += ` AND e.expenseDate >= '${fromDate}'`
+		}
+		if (toDate) {
+			countQuery += ` AND e.expenseDate <= '${toDate}'`
+		}
+		if (catId) {
+			countQuery += ` AND e.catId = '${catId}'`
+		}
+		if (search) {
+			countQuery += ` AND (e.description LIKE ? OR e.amount = ?)`;
+			const searchPattern = `%${search}%`;
+			countParams.push(searchPattern, search);
+		}
+		if (num && type && ["day", "week", "month"].includes(type)) {
+			if (type === "week") {
+				if (parseInt(num) === 1) {
+					countQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+							AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+				} else {
+					countQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+					countParams.push(num);
+				}
+			} else if (type === "month") {
+				if (parseInt(num) === 1) {
+					countQuery += ` AND expenseDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+				} else if (parseInt(num) === -1) {
+					countQuery += ` AND expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+					countQuery += ` AND expenseDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+				} else {
+					countQuery += ` AND expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+					countParams.push(num - 1);
+				}
+			} else {
+				if (type === "day") {
+					if (parseInt(num) === 1) {
+						countQuery += ` AND expenseDate >= CURDATE() AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+					} else {
+						countQuery += ` AND expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+						countParams.push(num);
+					}
+				}
+			}
+		}
+		db_connection.query(countQuery,countParams, (err, totalResult)=> {
 			if (err) {
 				return res.status(500).send(
 					{
@@ -646,8 +692,53 @@ exports.listIncomes = (req, res) => {
         }
 		const totalNum = results.length
 		const totalAmt = results.reduce((total, item) => total + item.amount, 0)
-		const countQuery = `SELECT COUNT(*) as total from incs WHERE orgId = '${orgId}'`
-		db_connection.query(countQuery, (err, totalResult)=> {
+		let countQuery = `SELECT COUNT(*) as total from incs WHERE orgId = '${orgId}'`
+		let countParams = []
+		if (fromDate) {
+			countQuery += ` AND i.incomeDate >= '${fromDate}'`
+		}
+		if (toDate) {
+			countQuery += ` AND i.incomeDate <= '${toDate}'`
+		}
+		if (catId) {
+			countQuery += ` AND i.catId = '${catId}'`
+		}
+		if (search) {
+			countQuery += ` AND (i.description LIKE ? OR i.amount = ?)`;
+			const searchPattern = `%${search}%`;
+			countParams.push(searchPattern, search);
+		}
+		if (num && type && ["day", "week", "month"].includes(type)) {
+			if (type === "week") {
+				if (parseInt(num) === 1) {
+					countQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+							AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+				} else {
+					countQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+					countParams.push(num);
+				}
+			} else if (type === "month") {
+				if (parseInt(num) === 1) {
+					countQuery += ` AND incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+				} else if (parseInt(num) === -1) {
+					countQuery += ` AND incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+					countQuery += ` AND incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+				} else {
+					countQuery += ` AND incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+					countParams.push(num - 1);
+				}
+			} else {
+				if (type === "day") {
+					if (parseInt(num) === 1) {
+						countQuery += ` AND incomeDate >= CURDATE() AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+					} else {
+						countQuery += ` AND incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+						countParams.push(num);
+					}
+				}
+			}
+		}
+		db_connection.query(countQuery,countParams, (err, totalResult)=> {
 			if (err) {
 				return res.status(500).send(
 					{
