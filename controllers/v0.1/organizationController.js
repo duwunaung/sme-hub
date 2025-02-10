@@ -19,13 +19,15 @@ exports.listOrg = (req, res) => {
         queryParams.push(`%${name}%`)
     }
 
-    if (status != 'all') {
-        query += " AND status LIKE ?"
-        queryParams.push(`%${status}%`)
+    if (expired != 'true' && status != 'expire') {
+        query += " AND expiredDate > NOW() "
     }
 
-    if (expired == 'false') {
-        query += " AND expiredDate > NOW()"
+    if (status != 'all' && status != 'expire') {
+        query += " AND status LIKE ?"
+        queryParams.push(`%${status}%`)
+    } else if (status == 'expire') {
+        query += " AND expiredDate < NOW()"
     }
 
     const offset = (page - 1) * pageSize
@@ -47,14 +49,16 @@ exports.listOrg = (req, res) => {
             countQuery += " AND name LIKE ?"
             countQueryParams.push(`%${name}%`)
         }
-    
-        if (status != 'all') {
+        
+        if (expired != 'true') {
+            countQuery += " AND expiredDate > NOW() "
+        }
+
+        if (status != 'all' && status != 'expire') {
             countQuery += " AND status LIKE ?"
             countQueryParams.push(`%${status}%`)
-        }
-        
-        if (expired == 'false') {
-            countQuery += " AND expiredDate > NOW()"
+        } else if (status == 'expire') {
+            countQuery += " AND expiredDate < NOW()"
         }
 
         db_connection.query( countQuery, countQueryParams, (err, count) => {
