@@ -149,13 +149,20 @@
 											<i class="fas fa-filter me-1"></i>Category
 										</button>
 									<% } %>
-									<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-category">
+									<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-category" style="max-height: 280px; overflow-y: auto;">
+										<!-- Search Bar -->
+										<% if (category.length > 8 ) { %>
+											<li class="p-2">
+												<input type="text" class="form-control" id="categorySearch" placeholder="Search category..." onkeyup="filterCategories()">
+											</li>
+										<%} %>
+										
+										<!-- ALL Button -->
 										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterCategory('all')">
 											ALL
 										</button>
 										<% for (let i = 0; i < category.length; i++) { %>
-											<button class="dropdown-item btn btn-light w-100 mb-1" 
-													id="categoryBtns" 
+											<button class="dropdown-item btn btn-light w-100 mb-1 category-item" 
 													onclick="filterCategory('<%= category[i].id %>')" 
 													data-num="<%= category[i].id %>" 
 													value="<%= category[i].name %>">
@@ -391,6 +398,16 @@
 		<% } %>
 		
 		<script>
+			function filterCategories() {
+		        let input = document.getElementById('categorySearch').value.toLowerCase();
+		        let items = document.querySelectorAll('.category-item');
+
+		        items.forEach(item => {
+		            let text = item.getAttribute('value').toLowerCase();
+		            item.style.display = text.includes(input) ? 'block' : 'none';
+		        });
+		    }
+
 		    function setCurrentDateTime(event) {
 		        event.preventDefault();
 
