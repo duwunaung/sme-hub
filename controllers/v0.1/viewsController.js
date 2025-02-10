@@ -250,7 +250,7 @@ exports.detailOrg = (req, res) => {
         const userPage = req.query.userPage
         const name = req.query.name || ""
         const status = req.query.status || 'all'
-        const role = req.query.role || 'all'
+        const role = req.query.role || 'allRoles'
 
         const options = [
             { id: 1, name: 'active' },

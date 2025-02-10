@@ -342,12 +342,14 @@ exports.listUsers = (req, res) => {
     let queryParams = [orgId]
 
     if (name) {
-        query += " AND name OR email LIKE ?"
+        query += " AND (name LIKE ? OR email LIKE ?)"
+        queryParams.push(`%${name}%`)
         queryParams.push(`%${name}%`)
     }
+
     if (status != 'all') {
-        query += " AND status LIKE ?"
-        queryParams.push(`%${status}%`)
+        query += " AND status = ?"
+        queryParams.push(`${status}`)
     } 
 
     // if (!expired) {
@@ -356,9 +358,9 @@ exports.listUsers = (req, res) => {
     //     query += " AND expiredDate < NOW()"
     // }
 
-    if (role != 'all') {
-        query += " AND role LIKE ?"
-        queryParams.push(`%${role}%`)
+    if (role != 'allRoles') {
+        query += " AND role = ?"
+        queryParams.push(`${role}`)
     }
 
     const offset = (page - 1) * pageSize
@@ -378,15 +380,14 @@ exports.listUsers = (req, res) => {
         let countQueryParams = [orgId]
 
         if (name) {
-            countQuery += " AND name LIKE ?"
+            countQuery += " AND (name LIKE ? OR email LIKE ?)"
             countQueryParams.push(`%${name}%`)
-            countQuery += " AND email LIKE ?"
             countQueryParams.push(`%${name}%`)
         }
 
         if (status != 'all') {
-            countQuery += " AND status LIKE ?"
-            countQueryParams.push(`%${status}%`)
+            countQuery += " AND status = ?"
+            countQueryParams.push(`${status}`)
         }
         
         // if (status == expired) {
@@ -395,9 +396,9 @@ exports.listUsers = (req, res) => {
         //     countQuery += " AND expired > NOW()"
         // }
 
-        if (role != 'all') {
-            countQuery += " AND role OR email LIKE ?"
-            countQueryParams.push(`%${role}%`)
+        if (role != 'allRoles') {
+            countQuery += " AND role = ?"
+            countQueryParams.push(`${role}`)
         }
         
         db_connection.query(countQuery, countQueryParams, (err, count) => {

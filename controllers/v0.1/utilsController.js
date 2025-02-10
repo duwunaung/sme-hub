@@ -157,7 +157,8 @@ exports.getSuperAdmins = (req, res) => {
     let queryParams = []
 
     if (name) {
-        query += " AND name OR email LIKE ?"
+        query += " AND (name LIKE ? OR email LIKE ?)"
+        queryParams.push(`%${name}%`)
         queryParams.push(`%${name}%`)
     }
 
@@ -182,9 +183,8 @@ exports.getSuperAdmins = (req, res) => {
         let countQueryParams = []
 
         if (name) {
-            countQuery += " AND name LIKE ?"
+            countQuery += " AND (name LIKE ? OR email LIKE ?)"
             countQueryParams.push(`%${name}%`)
-            countQuery += " AND email LIKE ?"
             countQueryParams.push(`%${name}%`)
         }
 
