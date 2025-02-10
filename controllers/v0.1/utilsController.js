@@ -144,7 +144,7 @@ exports.login = (req, res) => {
 }
 
 exports.getSuperAdmins = (req, res) => {
-    const { status = 'all', page = 1, pageSize = 10 } = req.query
+    const { status = 'all', name, page = 1, pageSize = 10 } = req.query
     if (req.user.orgId !== 0) {
         return res.status(403).send({
             success: false,
@@ -155,10 +155,17 @@ exports.getSuperAdmins = (req, res) => {
     let query = 'SELECT * FROM users WHERE role = "superadmin" AND orgId = 0'
 
     let queryParams = []
+
+    if (name) {
+        query += " AND name LIKE ?"
+        queryParams.push(`%${name}%`)
+    }
+
     if (status != 'all') {
         query += " AND status LIKE ?"
         queryParams.push(`%${status}%`)
     }
+
     const offset = (page - 1) * pageSize
     query += ' LIMIT ? OFFSET ?'
     queryParams.push(parseInt(pageSize), offset)
@@ -173,6 +180,12 @@ exports.getSuperAdmins = (req, res) => {
 
         let countQuery = "SELECT COUNT(*) as total FROM users WHERE role = 'superadmin' AND orgId = 0"
         let countQueryParams = []
+
+        if (name) {
+            countQuery += " AND name LIKE ?"
+            countQueryParams.push(`%${name}%`)
+        }
+
         if (status != 'all') {
             countQuery += " AND status LIKE ?"
             countQueryParams.push(`%${status}%`)

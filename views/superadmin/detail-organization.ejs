@@ -86,20 +86,20 @@
                                     </div>
                                     <!-- xxx -->
                                     <nav class="mb-4 d-flex w-100 justify-content-between">
-                                        <form class="d-flex searchBar" role="search">
+                                        <div class="d-flex searchBar" role="search">
                                             <input class="form-control me-2" type="search" id="searchValue" placeholder="Enter username (or) email address" aria-label="Search" required>
-                                            <button class="btn btn-primary" id="searchBtn" type="submit">Search</button>
-                                        </form>
+                                            <button class="btn btn-primary" id="searchBtn" type="submit" onclick="search()">Search</button>
+                                        </div>
                                         <div>
                                             <div class="btn-group">
                                                 <button type="button" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Role
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <a class="dropdown-item roles dropdown-active" id="all" onclick="changeRole('all')">All</a>
+                                                    <a class="dropdown-item roles dropdown-active" id="allRoles" onclick="changeRole('all')">All</a>
                                                     <a class="dropdown-item roles" id="manager" onclick="changeRole('manager')">Manager</a>
                                                     <a class="dropdown-item roles" id="admin" onclick="changeRole('admin')">Admin</a>
-                                                    <a class="dropdown-item rolse" id="staff" onclick="changeRole('staff')">Staff</a>
+                                                    <a class="dropdown-item roles" id="staff" onclick="changeRole('staff')">Staff</a>
                                                 </ul>
                                             </div>
                                             <div class="btn-group">
@@ -120,7 +120,7 @@
 
                                         <% if ( users.length==0 && pagination.page == 1 ) { %>
                                             <div class="alert alert-warning" role="alert">
-                                                No users found.
+                                                No user found.
                                             </div>
                                             <% } else {%>
                                                 <table class="table table-striped table-hover">
@@ -354,6 +354,22 @@
                 })
             }
 
+            // Search
+            function search() {
+                let url = new URL(window.location.href);
+                let searchValue = document.getElementById("searchValue").value.trim()
+                let searchBtn = document.getElementById('searchBtn')
+                
+                if (searchValue) {
+                    url.searchParams.set("name", searchValue)
+                    url.searchParams.set("activeUsers", true)
+                } else {
+                    url.searchParams.delete("name")
+                    url.searchParams.set("activeUsers", true)
+                }
+                window.location.href = url.toString();
+            }
+
             // Change status in filter
             let url = new URL(window.location.href);
             function changeStatus(status) {
@@ -389,9 +405,10 @@
                 })
                 document.getElementById(`${statusQuery}`).classList.add('dropdown-active');
             }
+
             const roleQuery = searchParams.get('role')
             if (roleQuery) {
-                const roles = document.querySelectorAll('.role');
+                const roles = document.querySelectorAll('.roles');
                 roles.forEach(role => {
                     role.classList.remove('dropdown-active');
                 })
