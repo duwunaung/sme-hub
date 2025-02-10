@@ -88,7 +88,8 @@
                                     <nav class="mb-4 d-flex w-100 justify-content-between">
                                         <div class="d-flex searchBar" role="search">
                                             <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter username (or) email address" value="<%= name %>" aria-label="Search" required>
-                                            <button class="btn btn-primary" id="searchBtn" type="submit" onclick="search()">Search</button>
+                                            <button class="btn btn-primary" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
+                                            <button class="btn btn-outline-primary mx-2" id="refresh" onclick="refresh()"><i class="fa-solid fa-arrows-rotate"></i></button>
                                         </div>
                                         <div>
                                             <div class="btn-group">
@@ -96,7 +97,7 @@
                                                     Role
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
-                                                    <a class="dropdown-item roles dropdown-active" id="allRoles" onclick="changeRole('all')">All</a>
+                                                    <a class="dropdown-item roles dropdown-active" id="allRoles" onclick="changeRole('allRoles')">All</a>
                                                     <a class="dropdown-item roles" id="manager" onclick="changeRole('manager')">Manager</a>
                                                     <a class="dropdown-item roles" id="admin" onclick="changeRole('admin')">Admin</a>
                                                     <a class="dropdown-item roles" id="staff" onclick="changeRole('staff')">Staff</a>
@@ -354,15 +355,20 @@
                 })
             }
 
+            // Refresh
+            function refresh() {
+                window.location.href = "http://localhost:3000/superadmin/organizations/detail/" + orgId + "?orgPage=" + orgPage + "&userPage=1&activeUsers=true"
+            }
+
             // Search
             function search() {
                 let url = new URL(window.location.href);
                 let searchValue = document.getElementById("searchValue").value.trim()
-                let searchBtn = document.getElementById('searchBtn')
                 
                 if (searchValue) {
                     url.searchParams.set("name", searchValue)
                     url.searchParams.set("activeUsers", true)
+                    url.searchParams.set('userPage', 1);
                 } else {
                     url.searchParams.delete("name")
                     url.searchParams.set("activeUsers", true)
@@ -393,11 +399,11 @@
             }
             function changeRole(role) {
                 
-                if ( role != 'all' ) {
+                if ( role != 'allRoles' ) {
                     url.searchParams.set('role', role);
                     url.searchParams.set('activeUsers', 'true');
                 } else {
-                    url.searchParams.set('role', 'all');
+                    url.searchParams.set('role', 'allRoles');
                     url.searchParams.set('activeUsers', 'true');
                 }
                 window.location.href = url.toString();

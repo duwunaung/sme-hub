@@ -25,6 +25,7 @@
                                     <div class="d-flex searchBar" role="search">
                                         <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter username (or) email address" value="<%= name %>" aria-label="Search" required>
                                         <button class="btn btn-primary" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
+                                        <button class="btn btn-outline-primary mx-2" id="refresh" onclick="refresh()"><i class="fa-solid fa-arrows-rotate"></i></button>
                                     </div>
                                     <div class="btn-group">
                                         <button type="button" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
@@ -192,6 +193,11 @@
                     icons.forEach (icon => {
                         icon.style.setProperty('--tooltip-color', tooltipColor);
                     })
+                }
+
+                // Refresh
+                function refresh() {
+                    window.location.href = "http://localhost:3000/superadmin/users"
                 }
 
                 // Search
