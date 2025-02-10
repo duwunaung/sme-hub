@@ -131,7 +131,7 @@
 						<% if (transaction.length > 0) { %>
 							<% for (let i = 0; i < transaction.length; i++) { %>
 								<tr>
-									<td class="text-nowrap"><%= i + 1 %></td>
+									<td class="text-nowrap"><%= i + (parseInt(pagination.page) - 1)*10 + 1 %></td>
 									<td class="text-nowrap" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
 										<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
 									</td>
@@ -199,7 +199,7 @@
 					<% } %>
 					
 					<% if (pagination.page > 1) { %>
-						<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(pagination.totalPages, pagination.page + 1); i++) { %>
+						<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(parseInt(pagination.totalPages), parseInt(pagination.page) + 1); i++) { %>
 							<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
 								<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
 							</li>
