@@ -1,6 +1,22 @@
 <%- include('../partials/subscriber/header.ejs') %>
     <%- include('../partials/subscriber/navbar.ejs') %>
+	<style>
+		#receipt {
+			    max-height: 200px;
+			    border-radius: 10px;
+			    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			    border: 1px solid #ddd;
+			    padding: 5px;
+			    background: #fff;
+			    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+			}
 
+			#receipt:hover {
+			    transform: scale(1.05);
+			    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+				cursor: pointer;
+			}
+	</style>
 		<main class="col-md-9 col-lg-10">
 			<div class="container my-5">
 				<h2 class="mb-4">Update Transaction</h2>
@@ -16,7 +32,7 @@
 				</div>
 				<% } %>
 				<!-- Category Details Form -->
-				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+				<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)">
 					<div class="mb-3">
 						<label for="transDescription" class="form-label">Description</label>
 						<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
@@ -35,7 +51,7 @@
 
 							<% category.forEach(option => { %>
 								<option value="<%= option.id %>" <%= option.id === transaction.catId ? 'selected' : '' %> >
-									<%= option.name %>
+									<%= option.name.length > 30 ? option.name.substring(0, 30) + '...' : option.name %>
 								</option>
 							<% }); %>
 						</select>
@@ -45,11 +61,34 @@
 						<input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
 							placeholder="Select date" value="" required>
 					</div>
+					<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
+						<div class="mb-3">
+							<label for="transReceipt" class="form-label">Receipt</label><br>
+							<img src="/<%= transaction.receipt %>" data-bs-toggle="modal" data-bs-target="#receiptModal" id="receipt" alt="Receipt Image" class="img-fluid" />
+							<br>
+							<label for="transReceipt" class="form-label mt-3">Update Receipt</label><br>
+							<input type="file" class="form-control" name="receipt" id="transReceipt">
+						</div>
+					<% } %>
 					<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
 					<a href="" class="btn w-100" id="resetBtn"></a>
 		
 				</form>
 		
+			</div>
+			<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+				<div class="modal-dialog modal-dialog-centered modal-xl">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="receiptModalLabel">Receipt Preview</h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body text-center">
+							<img src="/<%= transaction.receipt %>" class="img-fluid" id="modalReceiptImage" alt="Receipt Image"
+								style="width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);" />
+						</div>
+					</div>
+				</div>
 			</div>
 			<script>
 				let searchParams = new URLSearchParams(window.location.search);
