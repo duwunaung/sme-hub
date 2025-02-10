@@ -184,8 +184,13 @@ exports.updateExpense = (req, res) => {
             }
         )
     }
-
-    const query = `UPDATE exps SET description = '${description}', amount = '${amount}', expenseDate = '${expenseDate}', catId = '${catId}' WHERE id = '${id}' AND orgId = '${orgId}'`
+	const receiptFilename = req.body.receipt
+	let query = ''
+	if (receiptFilename) {
+		query = `UPDATE exps SET description = '${description}', amount = '${amount}', expenseDate = '${expenseDate}', catId = '${catId}', receipt = '${receiptFilename}' WHERE id = '${id}' AND orgId = '${orgId}'`
+	} else {
+		query = `UPDATE exps SET description = '${description}', amount = '${amount}', expenseDate = '${expenseDate}', catId = '${catId}' WHERE id = '${id}' AND orgId = '${orgId}'`
+	}
     db_connection.query(query, (err, result) => {
         if (err) {
             return res.status(500).send(
@@ -349,9 +354,18 @@ exports.listExpenses = (req, res) => {
                 }
             )
         }
+		if (results.length <= 0) {
+			return res.status(404).send(
+                {
+                    success: false,
+                    message: 'Internal server error',
+                    dev: err
+                }
+            )
+		}
 		const totalNum = results.length
 		const totalAmt = results.reduce((total, item) => total + item.amount, 0)
-		let countQuery = `SELECT COUNT(*) as total from exps WHERE orgId = '${orgId}'`
+		let countQuery = `SELECT COUNT(*) as total from exps e WHERE orgId = '${orgId}'`
 		let countParams = []
 		if (fromDate) {
 			countQuery += ` AND e.expenseDate >= '${fromDate}'`
@@ -399,6 +413,7 @@ exports.listExpenses = (req, res) => {
 		}
 		db_connection.query(countQuery,countParams, (err, totalResult)=> {
 			if (err) {
+				console.log(err)
 				return res.status(500).send(
 					{
 						success: false,
@@ -534,7 +549,14 @@ exports.updateIncome = (req, res) => {
 			}
 		)
 	}
-	const sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}' WHERE id = '${id}' AND orgId = '${orgId}'`
+	const receiptFilename = req.body.receipt
+	let sql = ''
+	if (receiptFilename) {
+		sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}', receipt = '${receiptFilename}' WHERE id = '${id}' AND orgId = '${orgId}'`
+	} else {
+		sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}' WHERE id = '${id}' AND orgId = '${orgId}'`
+	}
+	
 	db_connection.query(sql, (err, results) => {
 		if (err) {
 			return res.status(500).send(
@@ -690,9 +712,18 @@ exports.listIncomes = (req, res) => {
                 }
             )
         }
+		if (results.length <= 0) {
+			return res.status(404).send(
+                {
+                    success: false,
+                    message: 'Internal server error',
+                    dev: err
+                }
+            )
+		}
 		const totalNum = results.length
 		const totalAmt = results.reduce((total, item) => total + item.amount, 0)
-		let countQuery = `SELECT COUNT(*) as total from incs WHERE orgId = '${orgId}'`
+		let countQuery = `SELECT COUNT(*) as total from incs i WHERE orgId = '${orgId}'`
 		let countParams = []
 		if (fromDate) {
 			countQuery += ` AND i.incomeDate >= '${fromDate}'`
