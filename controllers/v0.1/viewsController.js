@@ -282,37 +282,37 @@ exports.detailOrg = (req, res) => {
             }).then( users => {
                 if (error) {
                     if (req.query.type == 'user-create') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot create user at the moment!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot create user at the moment!", successMessage: null });
                     } else if (req.query.type == 'user-delete') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot delete user at the moment!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot delete user at the moment!", successMessage: null });
                     } else if (req.query.type == 'user-restore') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot restore user at the moment!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot restore user at the moment!", successMessage: null });
                     } else if (req.query.type == 'dup-email') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
                     } else if (req.query.type == '404Error') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "404 User Not Found!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "404 User Not Found!", successMessage: null });
                     } else {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Internal Server Error!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Internal Server Error!", successMessage: null });
                     }
                 } else {
                     if (req.query.type == 'user-create') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Created" });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Created" });
                     } else if (req.query.type == 'user-delete') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Deleted" });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Deleted" });
                     } else if (req.query.type == 'user-restore') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Restored" });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Restored" });
                     } else {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: null });
                     }
                 }
             }).catch(error => {
-                res.render('superadmin/detail-organization', { org: {}, users: [], orgPage: orgPage, pagination: {}, errorMessage: "System Error!", options: options, status: status, role: role, roles: roles, successMessage: null });
+                res.render('superadmin/detail-organization', { org: {}, users: [], name: {}, orgPage: orgPage, pagination: {}, errorMessage: "System Error!", options: options, status: status, role: role, roles: roles, successMessage: null });
             })
         }).catch(error => {
 			if (error.status == 404) {
-				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role + '&name=' + name )
 			} else {
-				res.render('superadmin/detail-organization', { org: {}, users: [], orgPage: {}, status: {}, role: {}, pagination: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
+				res.render('superadmin/detail-organization', { org: {}, users: [], name: {}, orgPage: {}, status: {}, role: {}, pagination: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
 			}            
         })
     }

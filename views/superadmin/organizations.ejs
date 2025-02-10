@@ -26,7 +26,7 @@
                         <!-- xxx -->
                         <nav class="mb-4 d-flex w-100 justify-content-between">
                             <div class="d-flex searchBar" role="search">
-                                <input class="form-control me-2" type="search" id="searchValue" placeholder="Enter organization name" aria-label="Search" value="<%= name %>" required>
+                                <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter organization name" aria-label="Search" value="<%= name %>" required>
                                 <button class="btn btn-primary" id="searchBtn" onclick="search()">Search</button>
                             </div>
                             <div class="d-flex">
@@ -282,6 +282,12 @@
                 window.location.href = url.toString();
             }
 
+            function checkEnter(event) {
+                if (event.key === 'Enter') {
+                    search()
+                }
+            }
+            
             // Change status in filter
             function changeStatus(status) {
                 let url = new URL(window.location.href);
