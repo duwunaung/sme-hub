@@ -47,14 +47,28 @@
 					</div>
 					<div class="mb-3">
 						<label for="transCategory" class="form-label">Category</label>
-						<select id="transCategory" name="catId" class="form-select inputRequired" required>
-
-							<% category.forEach(option => { %>
-								<option value="<%= option.id %>" <%= option.id === transaction.catId ? 'selected' : '' %> >
-									<%= option.name.length > 30 ? option.name.substring(0, 30) + '...' : option.name %>
-								</option>
-							<% }); %>
-						</select>
+						<div class="mb-3">
+							<div class="dropdown">
+								<button type="button" class="form-control dropdown-toggle" type="button" id="dropdownCategory" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 100px;">
+									<%= transaction.category.length > 25 ? transaction.category.substring(0, 25) + '...' : transaction.category %>
+								</button>
+								<ul class="dropdown-menu w-100 mt-2" id="categoryDropdownMenu" style="min-width: 250px; max-height: 300px; overflow-y: auto;">
+									<!-- Search bar -->
+									<li class="p-2">
+										<input type="text" class="form-control" id="categorySearch" placeholder="Search category..." oninput="filterCategories()">
+									</li>
+									<li><hr class="dropdown-divider"></li>
+									<% category.forEach(option => { %>
+										<li>
+											<button class="dropdown-item category-item" onclick="selectCategory('<%= option.id %>', '<%= option.name %>')">
+												<%= option.name.length > 20 ? option.name.substring(0, 20) + '...' : option.name %>
+											</button>
+										</li>
+									<% }); %>
+								</ul>
+							</div>
+							<input type="hidden" name="catId" id="selectedCategory">
+						</div>
 					</div>
 					<div class="mb-3">
 						<label for="transDate" class="form-label">Date</label>
@@ -91,6 +105,23 @@
 				</div>
 			</div>
 			<script>
+
+				function filterCategories() {
+			        let input = document.getElementById("categorySearch").value.toLowerCase();
+			        let items = document.getElementsByClassName("category-item");
+			        
+			        for (let i = 0; i < items.length; i++) {
+			            let text = items[i].textContent.toLowerCase();
+			            items[i].style.display = text.includes(input) ? "" : "none";
+			        }
+			    }
+
+			    function selectCategory(id, name) {
+					event.preventDefault(); 
+			        document.getElementById("dropdownCategory").textContent = name;
+			        document.getElementById("selectedCategory").value = id;
+			    }
+
 				let searchParams = new URLSearchParams(window.location.search);
 				let trans = searchParams.get('trans')
 				let cat = searchParams.get('cat')
