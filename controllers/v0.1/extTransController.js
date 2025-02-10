@@ -255,10 +255,11 @@ exports.getExpense = (req, res) => {
         })
     }
     const id = req.params.id
-    let query = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, e.createdBy, e.receipt, o.baseCurrency AS baseCurrency , u.name AS username
+    let query = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, e.createdBy, e.receipt, o.baseCurrency AS baseCurrency , u.name AS username, ec.name AS category
 	FROM exps e 
 	JOIN orgs o ON e.orgId = o.id
 	JOIN users u ON e.createdBy = u.id
+	JOIN expcats ec ON e.catId = ec.id
 	WHERE e.id = ${id}`;
 
     db_connection.query(query, (err, results) => {
@@ -613,10 +614,11 @@ exports.getIncome = (req, res) => {
         })
     }
     const id = req.params.id
-    let query = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, i.createdBy, i.receipt, o.baseCurrency AS baseCurrency , u.name AS username
+    let query = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, i.createdBy, i.receipt, o.baseCurrency AS baseCurrency , u.name AS username, ic.name as category
 	FROM incs i 
 	JOIN orgs o ON i.orgId = o.id
 	JOIN users u ON i.createdBy = u.id
+	JOIN inccats ic ON i.catId = ic.id
 	WHERE i.id = ${id}`;
 
     db_connection.query(query, (err, results) => {
