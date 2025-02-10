@@ -342,7 +342,7 @@ exports.listUsers = (req, res) => {
     let queryParams = [orgId]
 
     if (name) {
-        query += " AND name LIKE ?"
+        query += " AND name OR email LIKE ?"
         queryParams.push(`%${name}%`)
     }
     if (status != 'all') {
@@ -378,7 +378,7 @@ exports.listUsers = (req, res) => {
         let countQueryParams = [orgId]
 
         if (name) {
-            countQuery += " AND name LIKE ?"
+            countQuery += " AND name OR email LIKE ?"
             countQueryParams.push(`%${name}%`)
         }
 
@@ -394,7 +394,7 @@ exports.listUsers = (req, res) => {
         // }
 
         if (role != 'all') {
-            countQuery += " AND role LIKE ?"
+            countQuery += " AND role OR email LIKE ?"
             countQueryParams.push(`%${role}%`)
         }
         
