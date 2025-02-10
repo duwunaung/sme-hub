@@ -136,7 +136,7 @@
 							</div>
 						</div>
 
-						
+
 						<!-- Filter Buttons -->
 						<div class="col-auto me-auto mb-2">
 							<div class="d-flex gap-2">
@@ -159,7 +159,7 @@
 													onclick="filterCategory('<%= category[i].id %>')" 
 													data-num="<%= category[i].id %>" 
 													value="<%= category[i].name %>">
-												<%= category[i].name.toUpperCase() %>
+												<%= category[i].name.length > 20 ? category[i].name.substring(0, 20).toUpperCase() + '...' : category[i].name.toUpperCase() %>
 											</button>
 										<% } %>
 									</ul>
@@ -224,7 +224,7 @@
 								<% for (let i = 0; i < transaction.length; i++) { %>
 									<tr>
 										<td class="text-nowrap <%= trans === 'all' && transaction[i].transactionType === 'income' ? 'text-success' : '' %>">
-											<%= i + 1 %>
+											<%= i + (parseInt(pagination.page) - 1)*10 + 1 %>
 										</td>
 										<td class="text-nowrap <%= trans === 'all' && transaction[i].transactionType === 'income' ? 'text-success' : '' %>" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
 											<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
@@ -349,7 +349,7 @@
 					<% } %>
 					
 					<% if (pagination.page > 1) { %>
-						<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(pagination.totalPages, pagination.page + 1); i++) { %>
+						<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(parseInt(pagination.totalPages), parseInt(pagination.page) + 1); i++) { %>
 							<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
 								<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
 							</li>
@@ -502,8 +502,10 @@
 			    
 			    if (input) {
 			        url.searchParams.set("search", input);
+					url.searchParams.delete("page");
 			    } else {
 			        url.searchParams.delete("search");
+					url.searchParams.delete("page");
 			    }
 			    window.location.href = url.toString();
 			}
@@ -512,8 +514,10 @@
 			    let url = new URL(window.location.href);
 			    if (category_name && category_name !== 'all') {
 			        url.searchParams.set("catId", category_name);
+					url.searchParams.delete("page");
 			    } else {
 			        url.searchParams.delete("catId");
+					url.searchParams.delete("page");
 			    }
 			    window.location.href = url.toString();
 			}
@@ -523,9 +527,11 @@
 			    if (num && type && num !== 0) {
 			        url.searchParams.set("num", num);
 					url.searchParams.set("type", type);
+					url.searchParams.delete("page");
 			    } else {
 			        url.searchParams.delete("num");
 					url.searchParams.delete("type");
+					url.searchParams.delete("page");
 			    }
 			    window.location.href = url.toString();
 			}
