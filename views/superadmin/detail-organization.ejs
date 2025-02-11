@@ -195,23 +195,23 @@
                                                     </div>
                                                     <ul class="pagination d-flex justify-content-center">
                                                         <li class="page-item">
-                                                            <a class="page-link" id="prevBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=true&status=<%= status %>&role=<%= role %>" tabindex="-1"><</a>
+                                                            <a class="page-link" id="prevBtn" href="#" onclick="pagination('userPage','<%= pagination.page -1 %>')" tabindex="-1"><</a>
                                                         </li>
-                                                        <li class="page-item prev"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=1&activeUsers=true&status=<%= status %>&role=<%= role %>">1</a></li>
-                                                        <li class="page-item prev"><a class="page-link" id="prevDots" href="#">...</a></li>
+                                                        <li class="page-item prev"><a class="page-link" href="#" onclick="pagination('userPage',1)" >1</a></li>
+                                                        <li class="page-item prev"><a class="page-link" href="#" onclick="pagination('userPage',2)" id="prevDots" href="#">...</a></li>
                                                         <li class="page-item prev" id="prevNum">
-                                                            <a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page -1 %>&activeUsers=true><%= pagination.page -1 %>&status=<%= status %>&role=<%= role %>"><%= pagination.page -1 %><span class="sr-only"></span></a>
+                                                            <a class="page-link" href="#" onclick="pagination('userPage','<%= pagination.page -1 %>')"><%= pagination.page -1 %><span class="sr-only"></span></a>
                                                         </li>
                                                         <li class="page-item active" id="currentPage">
                                                             <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
                                                         </li>
                                                         <li class="page-item next" id="nextNum">
-                                                            <a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=true&status=<%= status %>&role=<%= role %>"><%= +pagination.page +1 %><span class="sr-only"></span></a>
+                                                            <a class="page-link" href="#" onclick="pagination('userPage','<%= +pagination.page +1 %>')"><%= +pagination.page +1 %><span class="sr-only"></span></a>
                                                         </li>
-                                                        <li class="page-item next"><a class="page-link" id="nextDots" href="#">...</a></li>
-                                                        <li class="page-item next"><a class="page-link" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.totalPage %>&activeUsers=true&status=<%= status %>&role=<%= role %>"><%= pagination.totalPage %></a></li>
+                                                        <li class="page-item next"><a class="page-link" id="nextDots" href="#" onclick="pagination('userPage','<%= +pagination.page +2 %>')">...</a></li>
+                                                        <li class="page-item next"><a class="page-link" href="#" onclick="pagination('userPage','<%= pagination.totalPage %>')"><%= pagination.totalPage %></a></li>
                                                         <li class="page-item">
-                                                            <a class="page-link" id="nextBtn" href="/superadmin/organizations/detail/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= +pagination.page +1 %>&activeUsers=true&status=<%= status %>&role=<%= role %>">></a>
+                                                            <a class="page-link" id="nextBtn" href="#" onclick="pagination('userPage','<%= +pagination.page +1 %>')">></a>
                                                         </li>
                                                     </ul>
                                                 </nav>
@@ -518,6 +518,14 @@
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
 			}
+
+            // Pagination
+            function pagination( type, num ) {
+                let url = new URL(window.location.href);
+                url.searchParams.set( type, num)
+                url.searchParams.set( orgPage, '<%= orgPage %>')
+                window.location.href = url.toString();
+            }
 
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>
