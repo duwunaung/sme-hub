@@ -71,7 +71,7 @@
 				<%= successMessage %>
 			</div>
 			<% } %>
-	
+			<!-- Search Bar and Filter -->
 			<div class="container-div">
 	
 				<div class="d-flex me-3">
@@ -99,23 +99,30 @@
 					</ul>
 				</div>
 			</div>
+			<!-- Summary Card -->
 			<div class="card mb-2 w-auto" style="max-width: 350px;">
 				<div class="card-body">
-				  <p class="small mb-1" >Date: <span id="summaryDate"></span></p>
-				  <p class="small mb-1" >Category: <span id="summaryCategory"></span></p>
-				  <p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
-				  <p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
+					<div class="d-flex justify-content-between align-items-center">
+						<p class="small mb-1">Date: <span id="summaryDate"></span></p>
+						<button class="btn btn-sm btn-outline-dark" id="refreshButton" onclick="refreshAction()">
+							<i class="fa fa-sync"></i>
+						</button>
+					</div>
+					<p class="small mb-1">Category: <span id="summaryCategory"></span></p>
+					<p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
+					<p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
 				</div>
 			</div>
+			<!-- Transaction Table -->
 			<div class="table-responsive mt-3">
 				<table class="table table-striped table-hover">
 					<thead class="table-dark">
 						<tr>
-							<th style="min-width: 40px">#</th>
-							<th style="min-width: 150px">Description</th>
-							<th style="min-width: 120px">Amount</th>
-							<th style="min-width: 180px">Date</th>
-							<th style="min-width: 120px">Created By</th>
+							<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)"># <span></span></th>
+							<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Description <span></span></th>
+							<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Amount <span></span></th>
+							<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(3, 'date', this)">Date <span></span></th>
+							<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
 							<th style="min-width: 130px">Actions</th>
 						</tr>
 					</thead>
@@ -131,7 +138,7 @@
 						<% if (transaction.length > 0) { %>
 							<% for (let i = 0; i < transaction.length; i++) { %>
 								<tr>
-									<td class="text-nowrap"><%= i + 1 %></td>
+									<td class="text-nowrap"><%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %></td>
 									<td class="text-nowrap" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
 										<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
 									</td>
@@ -177,50 +184,129 @@
 					</tbody>
 				</table>
 			</div>
-			
-			
 		</div>
-		<nav aria-label="Pagination" id="paginationNav">
-			<ul class="pagination justify-content-center">
-				<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
-					<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(1)' : '' %>><<</a>
-				</li>
-		
-				<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
-					<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(' + (pagination.page - 1) + ')' : '' %>><</a>
-				</li>
-		
-				<% if (pagination.page > 2) { %>
-					<li class="page-item"><a class="page-link" onclick="goToPage(1)">1</a></li>
-					<% if (pagination.page > 3) { %>
-						<li class="page-item disabled"><a class="page-link">...</a></li>
-					<% } %>
-				<% } %>
-		
-				<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(pagination.totalPages, pagination.page + 1); i++) { %>
-					<li class="page-item <%= i === pagination.page ? 'active' : '' %>">
-						<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
-					</li>
-				<% } %>
-		
-				<% if (pagination.page < pagination.totalPages - 1) { %>
-					<% if (pagination.page < pagination.totalPages - 2) { %>
-						<li class="page-item disabled"><a class="page-link">...</a></li>
-					<% } %>
-					<li class="page-item"><a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')"><%= pagination.totalPages %></a></li>
-				<% } %>
-		
-				<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
-					<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + (pagination.page + 1) + ')' : '' %>>></a>
-				</li>
-		
-				<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
-					<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + pagination.totalPages + ')' : '' %>>>></a>
-				</li>
+		<!-- PageSize -->
+		<div class="btn-group my-2" style="max-width: 100px;">
+			<button type="button" 
+					class="btn btn-outline-dark dropdown-toggle" 
+					data-bs-toggle="dropdown" 
+					aria-expanded="false">
+				Page Size
+			</button>
+			<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-pageSize" style="max-height: 280px; overflow-y: auto;">
+				
+				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(5)">
+					5
+				</button>
+				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(10)">
+					10
+				</button>
+				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(15)">
+					15
+				</button>
+				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(20)">
+					20
+				</button>
+				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(30)">
+					30
+				</button>
 			</ul>
-		</nav>
+		</div>
+		<!-- Pagination -->
+		<% if (pagination && pagination.totalPages > 1) { %>
+			<nav aria-label="Pagination" id="paginationNav">
+				<ul class="pagination justify-content-center">
+					<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+						<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(1)' : '' %>><<</a>
+					</li>
+		   
+					<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+						<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(' + (pagination.page - 1) + ')' : '' %>><</a>
+					</li>
+		   
+					<% if (pagination.page > 2) { %>
+						<li class="page-item"><a class="page-link" onclick="goToPage(1)">1</a></li>
+						<% if (pagination.page > 3) { %>
+							<li class="page-item disabled"><a class="page-link">...</a></li>
+						<% } %>
+					<% } %>
+					
+					<% if (pagination.page > 1) { %>
+						<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(parseInt(pagination.totalPages), parseInt(pagination.page) + 1); i++) { %>
+							<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
+								<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
+							</li>
+						<% } %>
+					<% } else { %>
+						<% for (let i = 1; i <= Math.min(2, pagination.totalPages); i++) { %>
+							<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
+								<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
+							</li>
+						<% } %>
+					<% } %>
+		   
+					<% if (pagination.page < pagination.totalPages - 1) { %>
+						<% if (pagination.page < pagination.totalPages - 2) { %>
+							<li class="page-item disabled"><a class="page-link">...</a></li>
+							<li class="page-item">
+								<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
+									<%= pagination.totalPages %>
+								</a>
+							</li>
+						<% } else if (pagination.page < pagination.totalPages) { %>
+							<li class="page-item">
+								<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
+									<%= pagination.totalPages %>
+								</a>
+							</li>
+						<% } %>
+					<% } %>
+		   
+					<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+						<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + (parseInt(pagination.page) + 1) + ')' : '' %>>></a>
+					</li>
+		   
+					<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+						<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + pagination.totalPages + ')' : '' %>>>></a>
+					</li>
+				</ul>
+			</nav>
+		<% } %>
 	
 		<script>
+
+			let sortDirections = {};
+
+			function sortTable(columnIndex, type, headerElement) {
+				let table = document.getElementById("transactionTable");
+				let rows = Array.from(table.getElementsByTagName("tr"));
+				let ascending = !sortDirections[columnIndex];
+				sortDirections[columnIndex] = ascending;
+
+				rows.sort((rowA, rowB) => {
+					let cellA = rowA.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+					let cellB = rowB.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+
+					if (type === "number") {
+						cellA = parseFloat(cellA.replace(/[^0-9.-]/g, "")) || 0;
+						cellB = parseFloat(cellB.replace(/[^0-9.-]/g, "")) || 0;
+						return ascending ? cellA - cellB : cellB - cellA;
+					} else if (type === "date") {
+						cellA = new Date(cellA).getTime() || 0;
+						cellB = new Date(cellB).getTime() || 0;
+						return ascending ? cellA - cellB : cellB - cellA;
+					} else {
+						return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+					}
+				});
+				rows.forEach(row => table.appendChild(row));
+				document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
+				headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
+			}
+
+			function refreshAction() {
+			    window.location.href = window.location.pathname;
+			}
 
 			function goToPage(pageNumber) {
 			    const baseUrl = new URL(window.location.href);
@@ -240,25 +326,16 @@
 				}
 			}
 			
-			window.onclick = function (event) {
-				if (!event.target.matches('.dropdown-btn')) {
-					let dropdowns = document.getElementsByClassName("dropdown-content");
-					for (let i = 0; i < dropdowns.length; i++) {
-						let openDropdown = dropdowns[i];
-						if (openDropdown.style.display === "block") {
-							openDropdown.style.display = "none";
-						}
-					}
-				}
-			};
 			function performSearch() {
 			    let input = document.getElementById("searchInput").value.trim();
 			    let url = new URL(window.location.href);
 			    
 			    if (input) {
 			        url.searchParams.set("search", input);
+					url.searchParams.delete("page");
 			    } else {
 			        url.searchParams.delete("search");
+					url.searchParams.delete("page");
 			    }
 			    window.location.href = url.toString();
 			}
@@ -268,9 +345,23 @@
 			    if (num && type && num !== 0) {
 			        url.searchParams.set("num", num);
 					url.searchParams.set("type", type);
+					url.searchParams.delete("page");
 			    } else {
 			        url.searchParams.delete("num");
 					url.searchParams.delete("type");
+					url.searchParams.delete("page");
+			    }
+			    window.location.href = url.toString();
+			}
+
+			function setPageSize(pagesize) {
+				let url = new URL(window.location.href);
+			    if (pagesize && pagesize !== 10) {
+			        url.searchParams.set("pageSize", pagesize);
+					url.searchParams.delete("page");
+			    } else {
+			        url.searchParams.delete("pageSize");
+					url.searchParams.delete("page");
 			    }
 			    window.location.href = url.toString();
 			}

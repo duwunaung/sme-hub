@@ -146,20 +146,29 @@ exports.listIncCat = (req, res) => {
 }
 
 exports.listExpenseCategory = (req, res) => {
-	const { page = 1, pageSize = 10 } = req.query;
+	const { page = 1, pageSize = 10, search } = req.query;
     const orgId = req.user.orgId;
     const { status = 'active' } = req.query;
     const offset = (page - 1) * pageSize;
-    const query = `
+	const queryParams = []
+    let query = `
         SELECT ec.id, ec.name, u.name AS createdBy
         FROM expcats ec
         JOIN users u ON ec.createdBy = u.id
         WHERE ec.orgId = ? AND ec.status = ?
-        ORDER BY ec.name DESC
-        LIMIT ? OFFSET ?
     `;
 
-    db_connection.query(query, [orgId, status, parseInt(pageSize), offset], (err, results) => {
+	queryParams.push(orgId)
+	queryParams.push(status)
+	if (search) {
+		query += ` AND (ec.name LIKE ? )`;
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern);
+	}
+	query += ` ORDER BY ec.id DESC LIMIT ? OFFSET ?`
+	queryParams.push(parseInt(pageSize))
+	queryParams.push(offset)
+    db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -169,9 +178,17 @@ exports.listExpenseCategory = (req, res) => {
         }
 
         const totalNum = results.length;
-
-        const countQuery = `SELECT COUNT(*) AS total FROM expcats WHERE orgId = ? AND status = ?`;
-        db_connection.query(countQuery, [orgId, status], (err, countResults) => {
+        let countQuery = `SELECT COUNT(*) AS total FROM expcats WHERE orgId = ? AND status = ?`;
+		const countParams = []
+		countParams.push(orgId)
+		countParams.push(status)
+		if (search) {
+			countQuery += ` AND (expcats.name LIKE ? )`;
+			const searchPattern = `%${search}%`;
+			countParams.push(searchPattern);
+		}
+		
+        db_connection.query(countQuery, countParams, (err, countResults) => {
             if (err) {
                 return res.status(500).send({
                     success: false,
@@ -829,20 +846,28 @@ exports.restoreIncomeCategory = (req, res) => {
 }
 
 exports.listIncomeCategory = (req, res) => {
-    const { page = 1, pageSize = 10 } = req.query;
+    const { page = 1, pageSize = 10 , search} = req.query;
     const orgId = req.user.orgId;
     const { status = 'active' } = req.query;
     const offset = (page - 1) * pageSize;
-    const query = `
+	const queryParams = []
+    let query = `
         SELECT ic.id, ic.name, u.name AS createdBy
         FROM inccats ic
         JOIN users u ON ic.createdBy = u.id
         WHERE ic.orgId = ? AND ic.status = ?
-        ORDER BY ic.name DESC
-        LIMIT ? OFFSET ?
     `;
-
-    db_connection.query(query, [orgId, status, parseInt(pageSize), offset], (err, results) => {
+	queryParams.push(orgId)
+	queryParams.push(status)
+	if (search) {
+		query += ` AND (ic.name LIKE ? )`;
+        const searchPattern = `%${search}%`;
+        queryParams.push(searchPattern);
+	}
+	query += ` ORDER BY ic.id DESC LIMIT ? OFFSET ?`
+	queryParams.push(parseInt(pageSize))
+	queryParams.push(offset)
+    db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -853,8 +878,16 @@ exports.listIncomeCategory = (req, res) => {
 
         const totalNum = results.length;
 
-        const countQuery = `SELECT COUNT(*) AS total FROM inccats WHERE orgId = ? AND status = ?`;
-        db_connection.query(countQuery, [orgId, status], (err, countResults) => {
+        let countQuery = `SELECT COUNT(*) AS total FROM inccats WHERE orgId = ? AND status = ?`;
+		const countParams = []
+		countParams.push(orgId)
+		countParams.push(status)
+		if (search) {
+			countQuery += ` AND (inccats.name LIKE ? )`;
+			const searchPattern = `%${search}%`;
+			countParams.push(searchPattern);
+		}
+        db_connection.query(countQuery, countParams, (err, countResults) => {
             if (err) {
                 return res.status(500).send({
                     success: false,

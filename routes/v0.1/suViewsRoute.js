@@ -10,12 +10,12 @@ router.use('/login', login)
 router.use('/logout', logout)
 
 router.use('/transaction/income/detail/:id', checkSubscriberSession, detailIncomeTrans )
-router.use('/transaction/income/update/:id', checkSubscriberSession, updateIncomeTrans )
+router.use('/transaction/income/update/:id', checkSubscriberSession,upload.single("receipt"), updateIncomeTrans )
 router.use('/transaction/income/create', checkSubscriberSession,upload.single("receipt"), createIncomeTrans )
 router.use('/transaction/income', checkSubscriberSession, listIncomeTrans )
 
 router.use('/transaction/expense/detail/:id', checkSubscriberSession, detailExpenseTrans )
-router.use('/transaction/expense/update/:id', checkSubscriberSession, updateExpenseTrans )
+router.use('/transaction/expense/update/:id', checkSubscriberSession,upload.single("receipt"), updateExpenseTrans )
 router.use('/transaction/expense/create', checkSubscriberSession, upload.single("receipt"),  createExpenseTrans )
 router.use('/transaction/expense', checkSubscriberSession, listExpenseTrans )
 
