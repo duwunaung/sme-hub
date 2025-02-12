@@ -39,15 +39,14 @@
                     <div class="mb-3">
                         <label for="userStatus" class="form-label">Status</label>
                         <select id="userStatus" name="status" class="form-select" disabled>
-                            <% options.forEach(option=> { %>
-                                <option value="<%= option.name %>" <%=option.name===user.status
-                                    ? 'selected' : '' %> >
+                            <% options.forEach(option => { %>
+                                <option value="<%= option.name %>" <%=option.name===user.status ? 'selected' : '' %> >
                                     <%= option.name.toUpperCase() %>
                                 </option>
                             <% }); %>
                         </select>
                     </div>
-                    <a href="/superadmin/users?page=<%= page %>" class="btn btn-primary w-100 mt-1 mb-3">Back to
+                    <a onclick="clickBtn()" href="#" class="btn btn-primary w-100 mt-1 mb-3">Back to
                         System Admins</a>
 
                     <div>
@@ -59,5 +58,31 @@
                     </div>
                 </form>
             </div>
+            <script>
+                // Click Btns
+                function clickBtn() {
+                    let url = new URL(window.location.href);
+                    let name = url.searchParams.get( 'name' )
+                    let status = url.searchParams.get( 'status' )
+                    let page = url.searchParams.get( 'page' )
+                    let query = "?"
+                    
+                    if (page) {
+                        query += "page=" + page
+                    } else {
+                        query += "page=1"
+                    }
+
+                    if (name) {
+                        query += "&name=" + name
+                    }
+
+                    if (status) {
+                        query += "&status=" + status
+                    }
+
+                    window.location.href = "/superadmin/users/" + query
+                }
+            </script>
         </main>
         <%- include('../partials/superadmin/footer.ejs') %>

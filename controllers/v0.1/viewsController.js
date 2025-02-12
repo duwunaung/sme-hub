@@ -563,19 +563,19 @@ exports.createSuperAdmins = (req, res) => {
     if (req.method == 'GET') {
         const page = req.query.page
         if (req.query.error) {
-			const name = req.query.name
+			const name = req.query.userName
 			const phone = req.query.phone
 			const email = req.query.email
 			const userData = {name, phone, email}
             if ( req.query.type == 'dup-email') {
-                res.render('superadmin/add-superadmin', { user: userData, page: page, errorMessage: "Duplicate error!" });
+                res.render('superadmin/add-superadmin', { user: userData, errorMessage: "Duplicate error!" });
             } else {
-                res.render('superadmin/add-superadmin', { user: userData, page: page, errorMessage: "Internal server error!" });
+                res.render('superadmin/add-superadmin', { user: userData, errorMessage: "Internal server error!" });
             }
         } else if (req.query.success) {
-            res.render('superadmin/add-superadmin', { user: "", page: page, errorMessage: null });
+            res.render('superadmin/add-superadmin', { user: "", errorMessage: null });
         } else {
-            res.render('superadmin/add-superadmin', { user: "", page: page, errorMessage: null });
+            res.render('superadmin/add-superadmin', { user: "", errorMessage: null });
         }
     } else 
         if (req.method == 'POST') {
@@ -583,30 +583,27 @@ exports.createSuperAdmins = (req, res) => {
             const { name, email, password, phone } = req.body;
             const orgId = 0
             const status = 'pending'
+
+            const urlName = req.query.name || ""
+            const urlStatus = req.query.status || ""
             
             const page = req.query.page
-            const totalPage = req.query.totalPage
-            const pageSize = req.query.pageSize
-            const total = req.query.total
+            // const totalPage = req.query.totalPage
+            // const successPage = +totalPage +1
+            // const pageSize = req.query.pageSize
+            // const total = req.query.total
 
             axios.post(`${process.env.API_URL}/utils/register`, { name, email, phone, password, role, orgId, status }, {
                 headers: {
                     'Authorization': `${req.session.token}`
                 }
             }).then(response => {
-                const totalNum = (pageSize*totalPage)
-                if ( total == totalNum ) {
-                    const successPage = +totalPage +1
-                    res.redirect('/superadmin/users?success=true&type=user-create&page=' + successPage)
-                } else {
-                    const successPage = totalPage
-                    res.redirect('/superadmin/users?success=true&type=user-create&page=' + successPage)
-                }
+                res.redirect('/superadmin/users?success=true&type=user-create&page=1' )
             }).catch(error => {
                 if (error.status === 409){
-                    res.redirect('/superadmin/add-superadmin?error=true&type=dup-email&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page)
+                    res.redirect('/superadmin/add-superadmin?error=true&type=dup-email&userName=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page + "&name=" + urlName + "&status=" + urlStatus )
                 } else {
-                    res.redirect('/superadmin/add-superadmin?error=true&type=user-create&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page)
+                    res.redirect('/superadmin/add-superadmin?error=true&type=user-create&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page + "&name=" + urlName + "&status=" + urlStatus )
                 }
             })
         }
@@ -619,7 +616,8 @@ exports.detailSuperadmin = (req , res) => {
         const page = req.query.page || 1
         const options = [
             { id: 1, name: 'active' },
-            { id: 2, name: 'deleted' }
+            { id: 2, name: 'deleted' },
+            { id: 3, name: 'pending' }
         ];
         axios.get (`${process.env.API_URL}/users/${userId}`, {
             headers: {
@@ -641,14 +639,17 @@ exports.deleteSuperadmin = (req, res) => {
     if (req.method == 'GET') {
         const userId = req.params.id
         const page = req.query.page || 1
+        const name = req.query.name || ""
+        const status = req.query.status || "all"
+
         axios.delete(`${process.env.API_URL}/users/${userId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/users?success=true&type=user-delete&page=' + page )
+            res.redirect('/superadmin/users?success=true&type=user-delete&page=' + page + "&name=" + name + "&status=" + status );
         }).catch(error => {
-            res.redirect('/superadmin/users?error=true&type=user-delete&page=' + page);
+            res.redirect('/superadmin/users?error=true&type=user-delete&page=' + page + "&name=" + name + "&status=" + status );
         })
     }
 }
@@ -657,14 +658,16 @@ exports.restoreSuperadmin = (req, res) => {
     if (req.method == 'GET') {
         const userId = req.params.id
         const page = req.query.page || 1
+        const name = req.query.name || ""
+        const status = req.query.status || 'all'
         axios.get(`${process.env.API_URL}/users/restore/${userId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/users?success=true&type=user-restore&page=' + page )
+            res.redirect('/superadmin/users?success=true&type=user-restore&page=' + page + "&name=" + name + "&status=" + status )
         }).catch(error => {
-            res.redirect('/superadmin/users?error=true&type=user-restore&page=' + page );
+            res.redirect('/superadmin/users?error=true&type=user-restore&page=' + page + "&name=" + name + "&status=" + status );
         })
     }
 }
@@ -673,6 +676,9 @@ exports.updateSuperadmin = (req, res) => {
 	if (req.method == 'GET') {
         const userId = req.params.id
 		const page = req.query.page || 1
+        const urlName = req.query.name || ""
+        const urlStatus = req.query.status || "all"
+
         axios.get(`${process.env.API_URL}/users/${userId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
@@ -680,7 +686,8 @@ exports.updateSuperadmin = (req, res) => {
         }).then(response => {
             const options = [
                 { id: 1, name: 'active' },
-                { id: 2, name: 'deleted' }
+                { id: 2, name: 'deleted' },
+                { id: 3, name: 'pending' }
             ];
             const success = req.query.success;
 			const errorMsg = req.query.error;
@@ -694,26 +701,29 @@ exports.updateSuperadmin = (req, res) => {
 				const email = req.query.email
 				const userData = {name, phone, email}
                 if (type === "dup-email") {
-					res.render('superadmin/edit-superadmin', { user: userData, page: page, options: options, errorMessage: "Duplicate Email!", successMessage: null });
+					res.render('superadmin/edit-superadmin', { user: userData, options: options, errorMessage: "Duplicate Email!", successMessage: null });
 				} else if(type === "sysError") {
-                	res.render('superadmin/edit-superadmin', { user: userData, page: page, options: options,  errorMessage: "Internal Server Error!", successMessage: null });
+                	res.render('superadmin/edit-superadmin', { user: userData, options: options,  errorMessage: "Internal Server Error!", successMessage: null });
 				}
             } else if (success) {
-                res.render('superadmin/edit-superadmin', { user: response.data.data, page: page, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
+                res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
             } else {
-                res.render('superadmin/edit-superadmin', { user: response.data.data, page: page, options: options, errorMessage: null, successMessage: null });
+                res.render('superadmin/edit-superadmin', { user: response.data.data, options: options, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
 			if (error.status === 404) {
-				res.redirect('/superadmin/users?error=true&type=404Error&page='+ page);
+				res.redirect('/superadmin/users?error=true&type=404Error&page=' + page + '&name=' + urlName + '&status=' + urlStatus );
 			} else {
-				res.redirect('/superadmin/users?error=true&type=sysError&page='+ page);
+				res.redirect('/superadmin/users?error=true&type=sysError&page=' + page + '&name=' + urlName + '&status=' + urlStatus );
 			}
         })
     } else {
         const orgId = 0
 		const userId = req.params.id
         const page = req.query.page || 1
+        const urlName = req.query.name || ""
+        const urlStatus = req.query.status || "all"
+
 		const role = "superadmin"
         const { name, email, phone, status } = req.body;
         axios.put(`${process.env.API_URL}/users/${userId}`, { name, email, phone, role, status, orgId }, {
@@ -721,12 +731,12 @@ exports.updateSuperadmin = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/users/update/' + userId + '?success=true&type=update&page='+ page)
+            res.redirect('/superadmin/users/update/' + userId + '?success=true&type=update&page=' + page + '&name=' + urlName + '&status=' + urlStatus)
         }).catch(error => {
 			if (error.status === 409){
-           		res.redirect('/superadmin/users/update/' + userId + '?error=true&type=dup-email&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page);
+           		res.redirect('/superadmin/users/update/' + userId + '?error=true&type=dup-email&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page + '&name=' + urlName + '&status=' + urlStatus);
 			} else {
-				res.redirect('/superadmin/users/update/' + userId + '?error=true&type=sysError&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page);
+				res.redirect('/superadmin/users/update/' + userId + '?error=true&type=sysError&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page + '&name=' + urlName + '&status=' + urlStatus);
 			}
         })
     }

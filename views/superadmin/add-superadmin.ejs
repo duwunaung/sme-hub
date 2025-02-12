@@ -41,7 +41,7 @@
                     </div>
 
                     <button type="submit" class="btn btn-success w-100 mb-2" id="addBtn">Add</button>
-                    <a href="/superadmin/users?page=<%= page %>" class="btn btn-danger w-100">Cancel</a>
+                    <a onclick="clickBtn()" href="#" class="btn btn-danger w-100">Cancel</a>
     
                 </form>
             </div>
@@ -121,7 +121,30 @@
 				}
 			}
 			
-			
+				// Click Btns
+				function clickBtn() {
+					let url = new URL(window.location.href);
+					let name = url.searchParams.get( 'name' )
+					let status = url.searchParams.get( 'status' )
+					let page = url.searchParams.get( 'page' )
+					let query = "?"
+					
+					if (page) {
+							query += "page=" + page
+					} else {
+							query += "page=1"
+					}
+
+					if (name) {
+							query += "&name=" + name
+					}
+
+					if (status) {
+							query += "&status=" + status
+					}
+
+					window.location.href = "/superadmin/users" + query
+				}
 			
         </script>
         <%- include('../partials/superadmin/footer.ejs') %>

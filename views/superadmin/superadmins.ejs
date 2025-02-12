@@ -17,7 +17,7 @@
                             <% } %>
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h2>System Admins</h2>
-                                    <a class="btn btn-primary" href="/superadmin/add-superadmin?page=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>">
+                                    <a class="btn btn-primary" onclick="clickBtn('add', 1)" href="#">
                                         Add New System Admin
                                     </a>
                                 </div>
@@ -90,16 +90,16 @@
                                                         <% } %>
                                                     </td>
                                                     <td style="padding-left: 5%;">
-                                                        <a href="/superadmin/users/detail/<%= users[i].id %>?page=<%= pagination.page %>"
+                                                        <a onclick="clickBtn('detail', '<%= users[i].id %>')" href="#"
                                                             class="btn btn-primary btn-sm">View</a>
-                                                        <a href="/superadmin/users/update/<%= users[i].id %>?page=<%= pagination.page %>"
+                                                        <a onclick="clickBtn('update', '<%= users[i].id %>')" href="#"
                                                             class="btn btn-warning btn-sm">Edit</a>
 
                                                         <% if (users[i].status=='deleted' ) { %>
-                                                            <a href="/superadmin/users/restore/<%= users[i].id %>?page=<%= pagination.page %>"
+                                                            <a onclick="clickBtn('restore', '<%= users[i].id %>')" href="#"
                                                             class="btn btn-danger btn-sm">Restore</a>
                                                         <% } else {%>
-                                                            <a href="/superadmin/users/delete/<%= users[i].id %>?page=<%= pagination.page %>"
+                                                            <a onclick="clickBtn('delete', '<%= users[i].id %>')" href="#"
                                                             class="btn btn-danger btn-sm">Delete</a>
                                                         <% } %>
                                                     </td>
@@ -250,6 +250,35 @@
                     let url = new URL(window.location.href);
                     url.searchParams.set( type, num)
                     window.location.href = url.toString();
+                }
+
+                // Click Btns
+                let url = new URL(window.location.href);
+                let name = url.searchParams.get( 'name' )
+                let status = url.searchParams.get( 'status' )
+                let urlPage = url.searchParams.get( 'page' )
+                let query = "?"
+                
+                if (urlPage) {
+                    query += "page=" + urlPage
+                } else {
+                    query += "page=1"
+                }
+
+                if (name) {
+                    query += "&name=" + name
+                }
+
+                if (status) {
+                    query += "&status=" + status
+                }
+
+                function clickBtn(type, num) {
+                    if (type === 'add') {
+                        window.location.href = "/superadmin/add-superadmin" + query + "&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>"
+                    } else {
+                        window.location.href = "/superadmin/users/" + type + "/" + num + query
+                    }
                 }
 
             </script>
