@@ -45,11 +45,12 @@ exports.listAllTransactions = (req, res) => {
     if (req.method == 'GET') {
         const { num, type, search, catId } = req.query;
 		const page = req.query.page || 1;
-
+		const pageSize = req.query.pageSize || 10;
         let transactionsUrl = `${process.env.API_URL}/subscribers/transactions`;
 
         const queryParams = [];
-		queryParams.push(`page=${page}`)
+		if (page) queryParams.push(`page=${page}`)
+		if (pageSize) queryParams.push(`pageSize=${pageSize}`)
         if (num) queryParams.push(`num=${num}`);
         if (type) queryParams.push(`type=${type}`);
         if (search) queryParams.push(`search=${search}`);
@@ -86,8 +87,24 @@ exports.listAllTransactions = (req, res) => {
 
 exports.listExpenseCat = (req, res) => {
 	if (req.method == 'GET') {
+		const { search } = req.query
 		const page = req.query.page || 1
-		axios.get(`${process.env.API_URL}/subscribers/categories/expense/list?page=${page}`, {
+		const pageSize = req.query.pageSize || 10
+		let url_api = `${process.env.API_URL}/subscribers/categories/expense/list`
+		const queryParams = [];
+		if (page) {
+			queryParams.push(`page=${page}`);
+		}
+		if (pageSize) {
+			queryParams.push(`pageSize=${pageSize}`);
+		}
+		if (search) {
+			queryParams.push(`search=${search}`);
+		}
+		if (queryParams.length > 0) {
+			url_api += `?${queryParams.join('&')}`;
+		}
+		axios.get(url_api, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -206,6 +223,7 @@ exports.detailExpenseCat = (req, res) => {
 		const id = req.params.id
 		const {num, type, search } = req.query
 		const page = req.query.page || 1
+		const pageSize = req.query.pageSize || 10
 		axios.get(`${process.env.API_URL}/subscribers/categories/expense/${id}`, {
 			headers: {
 				'Authorization': `${req.session.token}`
@@ -215,6 +233,9 @@ exports.detailExpenseCat = (req, res) => {
 			const queryParams = [];
 			if (page) {
 				queryParams.push(`page=${page}`);
+			}
+			if (pageSize) {
+				queryParams.push(`pageSize=${pageSize}`);
 			}
 			if (num) {
 				queryParams.push(`num=${num}`);
@@ -250,8 +271,24 @@ exports.detailExpenseCat = (req, res) => {
 
 exports.listIncomeCat = (req, res) => {
 	if (req.method == 'GET') {
+		const { search } = req.query
 		const page = req.query.page || 1
-		axios.get(`${process.env.API_URL}/subscribers/categories/income/list?page=${page}`, {
+		const pageSize = req.query.pageSize || 10
+		let url_api = `${process.env.API_URL}/subscribers/categories/income/list`
+		const queryParams = [];
+		if (page) {
+			queryParams.push(`page=${page}`);
+		}
+		if (pageSize) {
+			queryParams.push(`pageSize=${pageSize}`);
+		}
+		if (search) {
+			queryParams.push(`search=${search}`);
+		}
+		if (queryParams.length > 0) {
+			url_api += `?${queryParams.join('&')}`;
+		}
+		axios.get(url_api, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -370,6 +407,7 @@ exports.detailIncomeCat = (req, res) => {
 		const id = req.params.id
 		const {num, type, search } = req.query
 		const page = req.query.page || 1
+		const pageSize = req.query.pageSize || 10
 		axios.get(`${process.env.API_URL}/subscribers/categories/income/${id}`, {
 			headers: {
 				'Authorization': `${req.session.token}`
@@ -379,6 +417,9 @@ exports.detailIncomeCat = (req, res) => {
 			const queryParams = [];
 			if (page) {
 				queryParams.push(`page=${page}`)
+			}
+			if (pageSize) {
+				queryParams.push(`pageSize=${pageSize}`)
 			}
 			if (num) {
 				queryParams.push(`num=${num}`);
@@ -416,10 +457,14 @@ exports.listExpenseTrans = (req, res) => {
 	if (req.method == 'GET') {
 		const {num, type, search, catId } = req.query
 		const page = req.query.page || 1
+		const pageSize = req.query.pageSize || 10
 		let url_api = `${process.env.API_URL}/subscribers/expenses`
 		const queryParams = [];
 		if (page) {
 			queryParams.push(`page=${page}`);
+		}
+		if (pageSize) {
+			queryParams.push(`pageSize=${pageSize}`);
 		}
 		if (num) {
 			queryParams.push(`num=${num}`);
@@ -579,10 +624,14 @@ exports.listIncomeTrans = (req, res) => {
 	if (req.method == 'GET') {
 		const {num, type, search, catId } = req.query
 		const page = req.query.page || 1
+		const pageSize = req.query.pageSize || 10
 		let url_api = `${process.env.API_URL}/subscribers/incomes`
 		const queryParams = [];
 		if (page) {
 			queryParams.push(`page=${page}`);
+		}
+		if (pageSize) {
+			queryParams.push(`pageSize=${pageSize}`);
 		}
 		if (num) {
 			queryParams.push(`num=${num}`);
