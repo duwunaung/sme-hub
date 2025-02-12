@@ -178,7 +178,7 @@ exports.getUser = (req, res) => {
     }
     const userId = req.params.id
     
-    let query = `SELECT name, email, role, phone, orgId, registered, remark, expired FROM users WHERE users.id = ${userId}`;
+    let query = `SELECT name, email, role, phone, orgId, status, registered, remark, expired FROM users WHERE users.id = ${userId}`;
 
     db_connection.query(query, (err, results) => {
         if (err) {
