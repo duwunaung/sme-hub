@@ -87,20 +87,23 @@ exports.orgs = (req, res) => {
 exports.restoreOrg = (req, res) => {
     if (req.method == 'GET') {
         const orgId = req.params.id
-        const page = req.query.page
+        const page = req.query.orgPage || 1
+        const name = req.query.orgName || ""
+        const expired = req.query.expired || 'false'
+        const status = req.query.orgStatus || 'all'
 
         axios.get(`${process.env.API_URL}/organizations/restore/${orgId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations?success=true&type=org-restore&page=' + page)
+            res.redirect('/superadmin/organizations?success=true&type=org-restore&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
         }).catch(error => {
             if (error.status == 404) {
-				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + page)
+				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
 			}
 			else {
-				res.redirect('/superadmin/organizations?error=true&type=sysError&page=' + page)
+				res.redirect('/superadmin/organizations?error=true&type=sysError&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
 			}
         })
     }
@@ -109,20 +112,23 @@ exports.restoreOrg = (req, res) => {
 exports.deleteOrg = (req, res) => {
     if (req.method == 'GET') {
         const orgId = req.params.id
-        const page = req.query.page
+        const page = req.query.orgPage || 1
+        const name = req.query.orgName || ""
+        const expired = req.query.expired || 'false'
+        const status = req.query.orgStatus || 'all'
 
         axios.delete(`${process.env.API_URL}/organizations/delete/${orgId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations?success=true&type=org-delete&page=' + page)
+            res.redirect('/superadmin/organizations?success=true&type=org-delete&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
         }).catch(error => {
 			if (error.status == 404) {
-				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + page)
+				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
 			}
 			else {
-				res.redirect('/superadmin/organizations?error=true&type=sysError&page=' + page)
+				res.redirect('/superadmin/organizations?error=true&type=sysError&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
 			}
             
         })
@@ -219,9 +225,9 @@ exports.extendLicense = (req, res) => {
 exports.registerOrg = (req, res) => {
     if (req.method == 'POST') {
         const page = req.query.page
-        const totalPage = req.query.totalPage
-        const pageSize = req.query.pageSize
-        const total = req.query.total
+        // const totalPage = req.query.totalPage
+        // const pageSize = req.query.pageSize
+        // const total = req.query.total
 
         const { name, address, phone, status } = req.body;
         axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status }, {
@@ -229,14 +235,7 @@ exports.registerOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            const totalNum = (pageSize*totalPage)
-            if ( total == totalNum ) {
-                const successPage = +totalPage +1
-                res.redirect('/superadmin/organizations?success=true&type=register&page=' + successPage )
-            } else {
-                const successPage = totalPage
-                res.redirect('/superadmin/organizations?success=true&type=register&page=' + successPage )
-            }
+            res.redirect('/superadmin/organizations?success=true&type=register&page=1' )
         }).catch(error => {
             res.redirect('/superadmin/organizations?error=true&type=register&page=' + page )
         })
