@@ -414,7 +414,6 @@ exports.listExpenses = (req, res) => {
 		}
 		db_connection.query(countQuery,countParams, (err, totalResult)=> {
 			if (err) {
-				console.log(err)
 				return res.status(500).send(
 					{
 						success: false,
