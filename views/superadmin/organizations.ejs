@@ -322,6 +322,13 @@
             }
 
             let searchParams = new URLSearchParams(window.location.search);
+            let expired = searchParams.get('expired')
+            if ( expired === 'true' ) {
+                let expiredCheckbox = document.getElementById('expiredCheckbox')
+                console.log("Run")
+                expiredCheckbox.checked = true
+            }
+            
             const statusQuery = searchParams.get('status')
             if (statusQuery) {
                 const statuses = document.querySelectorAll('.status');
