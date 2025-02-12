@@ -54,10 +54,12 @@
 								</button>
 								<ul class="dropdown-menu w-100 mt-2" id="categoryDropdownMenu" style="min-width: 250px; max-height: 300px; overflow-y: auto;">
 									<!-- Search bar -->
-									<li class="p-2">
-										<input type="text" class="form-control" id="categorySearch" placeholder="Search category..." oninput="filterCategories()">
-									</li>
-									<li><hr class="dropdown-divider"></li>
+									 <% if (category.length > 8) { %>
+										<li class="p-2">
+											<input type="text" class="form-control" id="categorySearch" placeholder="Search category..." oninput="filterCategories()" >
+										</li>
+										<li><hr class="dropdown-divider"></li>
+									<% } %>
 									<% category.forEach(option => { %>
 										<li>
 											<button class="dropdown-item category-item" onclick="selectCategory('<%= option.id %>', '<%= option.name %>')">
@@ -67,7 +69,7 @@
 									<% }); %>
 								</ul>
 							</div>
-							<input type="hidden" name="catId" id="selectedCategory">
+							<input type="hidden" name="catId" id="selectedCategory" value="<%= transaction.catId %>">
 						</div>
 					</div>
 					<div class="mb-3">
@@ -80,10 +82,13 @@
 							<label for="transReceipt" class="form-label">Receipt</label><br>
 							<img src="/<%= transaction.receipt %>" data-bs-toggle="modal" data-bs-target="#receiptModal" id="receipt" alt="Receipt Image" class="img-fluid" />
 							<br>
-							<label for="transReceipt" class="form-label mt-3">Update Receipt</label><br>
-							<input type="file" class="form-control" name="receipt" id="transReceipt">
+							
 						</div>
 					<% } %>
+					<div class="mb-3">
+						<label for="transReceipt" class="form-label"><% if (transaction.receipt && transaction.receipt !== 'null' ) { %> Update Receipt <% } else { %> Upload Receipt <%} %></label><br>
+						<input type="file" class="form-control" name="receipt" id="transReceipt">
+					</div>
 					<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
 					<a href="" class="btn w-100" id="resetBtn"></a>
 		
