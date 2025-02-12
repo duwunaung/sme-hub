@@ -165,7 +165,8 @@ exports.licenseOrg = (req, res) => {
 
     const orgId = req.params.id
     const { num, type } = req.body
-	const today = new Date()
+	
+    const today = new Date()
 	const year = today.getFullYear();
 	const month = String(today.getMonth() + 1).padStart(2, '0');
 	const day = String(today.getDate()).padStart(2, '0');
@@ -186,7 +187,11 @@ exports.licenseOrg = (req, res) => {
             })
         }
         const org = results[0]
-        let expiry = new Date()
+        let expiry = new Date(org.expiredDate)
+        if (expiry < today) {
+            expiry = new Date()
+        }
+
 		const yearExpiry = today.getFullYear();
 		const monthExpiry = String(today.getMonth() + 1).padStart(2, '0');
 		const dayExpiry = String(today.getDate()).padStart(2, '0');
