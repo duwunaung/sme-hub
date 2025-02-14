@@ -47,9 +47,8 @@
                                 <% }); %>
                         </select>
                     </div>
-                    <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Organization</button>
-                    <a href="/superadmin/organizations?page=<%= page %>" class="btn w-100" id="resetBtn"></a>
-
+                    <button onclick="clickBtn()" type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Organization</button>
+										<a onclick="Back()" id="resetBtn" class="btn btn-primary w-100 mb-2">Back to organizations</a>
                 </form>
 
                 <!-- License Extension -->
@@ -102,44 +101,6 @@
 				</div>
             </div>
 			<script>
-				// License Extension
-				const page = "<%= page %>"
-				const orgId = "<%= org.id %>"
-
-				function extLicense(type,num) {
-					const newExpirationDate = document.getElementById('newExpirationDate')
-					const newDate = new Date(orgExpiredDate)
-					if (type == 'month') {
-						newDate.setMonth(newDate.getMonth() + num);
-						newExpirationDate.innerHTML = newDate.toDateString()
-					} else if (type == 'day') {
-						newDate.setDate(newDate.getDate() + num);
-						newExpirationDate.innerHTML = newDate.toDateString()
-					} else {
-						newExpirationDate.innerHTML = 'Now'
-					}
-
-					const licType = document.getElementById('licType')
-					if (num > 0) {
-						licType.innerHTML = 'extended'
-					} else if (num < 0) {
-						licType.innerHTML = 'reduced'
-					}
-
-					const confirmBtn = document.getElementById('confirmBtn')
-
-					confirmBtn.onclick = () => {
-						if (!type && !num) {
-							const expireDays = Math.ceil(orgExpiredDate/ (1000 * 60 * 60 * 24)) - Math.ceil(today/ (1000 * 60 * 60 * 24));
-							const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day&page=<%= page %>`;
-		          window.location.href = newHref; 
-						} else {
-							const newURL = 'http://localhost:3000/superadmin/organizations/license/' + orgId + '?num=' + num + '&type=' + type + '&page=' + orgId
-							window.location.href = newURL; 
-						}
-					}
-				}
-
 				const orgExpiredDate = new Date("<%= org.expiredDate %>");
 			  const today = new Date();
 				document.querySelectorAll('.reduceLicense').forEach(button => {
@@ -198,6 +159,77 @@
 				function submitForm(event) {
 					addButton.disabled = true;
 					addButton.textContent = 'Submitting...';
+				}
+
+				// Click Btns
+				let url = new URL(window.location.href);
+				let name = url.searchParams.get( 'orgName' )
+				let status = url.searchParams.get( 'orgStatus' )
+				let expired = url.searchParams.get( 'expired' )
+				let orgPage = url.searchParams.get( 'orgPage' )
+
+				const orgId = "<%= org.id %>"
+				let query = "?"
+				
+				if (orgPage) {
+						query += "orgPage=" + orgPage
+				} else {
+						query += "orgPage=1"
+				}
+
+				if (name) {
+						query += "&orgName=" + name
+				}
+
+				if (status) {
+						query += "&orgStatus=" + status
+				}
+
+				if (expired) {
+						query += "&expired=" + expired
+				}
+
+				function clickBtn() {
+					window.location.href = "/superadmin/organizations/update/" + orgId + query
+				}
+
+				function Back () {
+					window.location.href = "/superadmin/organizations" + query
+				}
+
+				// License Extension
+				function extLicense(type,num) {
+					const newExpirationDate = document.getElementById('newExpirationDate')
+					const newDate = new Date(orgExpiredDate)
+					if (type == 'month') {
+						newDate.setMonth(newDate.getMonth() + num);
+						newExpirationDate.innerHTML = newDate.toDateString()
+					} else if (type == 'day') {
+						newDate.setDate(newDate.getDate() + num);
+						newExpirationDate.innerHTML = newDate.toDateString()
+					} else {
+						newExpirationDate.innerHTML = 'Now'
+					}
+
+					const licType = document.getElementById('licType')
+					if (num > 0) {
+						licType.innerHTML = 'extended'
+					} else if (num < 0) {
+						licType.innerHTML = 'reduced'
+					}
+
+					const confirmBtn = document.getElementById('confirmBtn')
+
+					confirmBtn.onclick = () => {
+						if (!type && !num) {
+							const expireDays = Math.ceil(orgExpiredDate/ (1000 * 60 * 60 * 24)) - Math.ceil(today/ (1000 * 60 * 60 * 24));
+							const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day` + query ;
+		          window.location.href = newHref; 
+						} else {
+							const newURL = 'http://localhost:3000/superadmin/organizations/license/' + orgId + '?num=' + num + '&type=' + type + query;
+							window.location.href = newURL; 
+						}
+					}
 				}
 
 			</script>

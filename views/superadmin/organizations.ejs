@@ -93,14 +93,14 @@
                                                 <% } %>
                                             </td>
                                             <td style="padding-left: 5%;">
-                                                <!-- <a onclick="clickBtn('detail', '<%= orgs[i].id %>')" href="#"
+                                                <a onclick="clickBtn('detail', '<%= orgs[i].id %>')" href="#"
                                                     class="btn btn-primary btn-sm">View</a>
                                                 <a onclick="clickBtn('update', '<%= orgs[i].id %>')" href="#"
-                                                    class="btn btn-warning btn-sm">Edit</a> -->
-                                                <a onclick="" href="/superadmin/organizations/detail/<%= orgs[i].id %>?orgPage=<%= pagination.page %>&userPage=1"
+                                                    class="btn btn-warning btn-sm">Edit</a>
+                                                <!-- <a onclick="" href="/superadmin/organizations/detail/<%= orgs[i].id %>?orgPage=<%= pagination.page %>&userPage=1"
                                                     class="btn btn-primary btn-sm">View</a>
                                                 <a href="/superadmin/organizations/update/<%= orgs[i].id %>?page=<%= pagination.page %>"
-                                                    class="btn btn-warning btn-sm">Edit</a>
+                                                    class="btn btn-warning btn-sm">Edit</a> -->
                                                 <% if (orgs[i].status=='deleted' ) { %>
                                                     <a onclick="clickBtn('restore', '<%= orgs[i].id %>')" href="#"
                                                         class="btn btn-danger btn-sm">Restore</a>
@@ -120,23 +120,23 @@
                             </div>
                             <ul class="pagination d-flex justify-content-center">
                                 <li class="page-item">
-                                    <a class="page-link" id="prevBtn" href="#" onclick="pagination('page','<%= pagination.page -1 %>')" tabindex="-1"><</a>
+                                    <a class="page-link" id="prevBtn" href="#" onclick="pagination('orgPage','<%= pagination.page -1 %>')" tabindex="-1"><</a>
                                 </li>
-                                <li class="page-item prev"><a class="page-link" href="#" onclick="pagination('page',1)" >1</a></li>
-                                <li class="page-item prev"><a class="page-link" href="#" onclick="pagination('page',2)" id="prevDots" href="#">...</a></li>
+                                <li class="page-item prev"><a class="page-link" href="#" onclick="pagination('orgPage',1)" >1</a></li>
+                                <li class="page-item prev"><a class="page-link" href="#" onclick="pagination('orgPage',2)" id="prevDots" href="#">...</a></li>
                                 <li class="page-item prev" id="prevNum">
-                                    <a class="page-link" href="#" onclick="pagination('page','<%= pagination.page -1 %>')"><%= pagination.page -1 %><span class="sr-only"></span></a>
+                                    <a class="page-link" href="#" onclick="pagination('orgPage','<%= pagination.page -1 %>')"><%= pagination.page -1 %><span class="sr-only"></span></a>
                                 </li>
                                 <li class="page-item active" id="currentPage">
                                     <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
                                 </li>
                                 <li class="page-item next" id="nextNum">
-                                    <a class="page-link" href="#" onclick="pagination('page','<%= +pagination.page +1 %>')"><%= +pagination.page +1 %><span class="sr-only"></span></a>
+                                    <a class="page-link" href="#" onclick="pagination('orgPage','<%= +pagination.page +1 %>')"><%= +pagination.page +1 %><span class="sr-only"></span></a>
                                 </li>
-                                <li class="page-item next"><a class="page-link" id="nextDots" href="#" onclick="pagination('page','<%= +pagination.page +2 %>')">...</a></li>
-                                <li class="page-item next"><a class="page-link" href="#" onclick="pagination('page','<%= pagination.totalPage %>')"><%= pagination.totalPage %></a></li>
+                                <li class="page-item next"><a class="page-link" id="nextDots" href="#" onclick="pagination('orgPage','<%= +pagination.page +2 %>')">...</a></li>
+                                <li class="page-item next"><a class="page-link" href="#" onclick="pagination('orgPage','<%= pagination.totalPage %>')"><%= pagination.totalPage %></a></li>
                                 <li class="page-item">
-                                    <a class="page-link" id="nextBtn" href="#" onclick="pagination('page','<%= +pagination.page +1 %>')">></a>
+                                    <a class="page-link" id="nextBtn" href="#" onclick="pagination('orgPage','<%= +pagination.page +1 %>')">></a>
                                 </li>
                             </ul>
                         </nav>
@@ -263,7 +263,7 @@
                 nextDots.classList.add('d-none');
             } else if (page === totalPage - 3) {
                 nextDots.innerText = totalPage -1
-                nextDots.href = "/superadmin/organizations?page=<%= +pagination.page +2 %>"
+                nextDots.href = "/superadmin/organizations?orgPage=<%= +pagination.page +2 %>"
             }
 
             // Tooltips
@@ -285,10 +285,10 @@
                 const searchValue = document.getElementById("searchValue")
                 
                 if (searchValue.value.trim()) {
-                    url.searchParams.set("name", searchValue.value.trim())
-                    url.searchParams.set('page', 1);
+                    url.searchParams.set("orgName", searchValue.value.trim())
+                    url.searchParams.set('orgPage', 1);
                 } else {
-                    url.searchParams.delete("name")
+                    url.searchParams.delete("orgName")
                 }
                 window.location.href = url.toString();
             }
@@ -304,10 +304,10 @@
                 let url = new URL(window.location.href);
                 if ( url.searchParams.get('expired') == 'true' ) {
                     url.searchParams.set('expired', false);
-                    url.searchParams.set('page', 1);
+                    url.searchParams.set('orgPage', 1);
                 } else {
                     url.searchParams.set('expired', true);
-                    url.searchParams.set('page', 1);
+                    url.searchParams.set('orgPage', 1);
                 }
                 window.location.href = url.toString();
             }
@@ -317,11 +317,11 @@
                 let url = new URL(window.location.href);
                 
                 if ( status != 'all' ) {
-                    url.searchParams.set('status', status);
-                    url.searchParams.set('page', 1);
+                    url.searchParams.set('orgStatus', status);
+                    url.searchParams.set('orgPage', 1);
                 } else {
-                    url.searchParams.set('status', 'all')
-                    url.searchParams.set('page', 1);
+                    url.searchParams.set('orgStatus', 'all')
+                    url.searchParams.set('orgPage', 1);
                 }
                 window.location.href = url.toString();
             }
@@ -330,11 +330,10 @@
             let expired = searchParams.get('expired')
             if ( expired === 'true' ) {
                 let expiredCheckbox = document.getElementById('expiredCheckbox')
-                console.log("Run")
                 expiredCheckbox.checked = true
             }
 
-            const statusQuery = searchParams.get('status')
+            const statusQuery = searchParams.get('orgStatus')
             if (statusQuery) {
                 const statuses = document.querySelectorAll('.status');
                 statuses.forEach(status => {
@@ -352,9 +351,9 @@
 
             // Click Btns
             let url = new URL(window.location.href);
-            let name = url.searchParams.get( 'name' )
-            let status = url.searchParams.get( 'status' )
-            let orgPage = url.searchParams.get( 'page' )
+            let name = url.searchParams.get( 'orgName' )
+            let status = url.searchParams.get( 'orgStatus' )
+            let orgPage = url.searchParams.get( 'orgPage' )
             let query = "?"
             
             if (orgPage) {
