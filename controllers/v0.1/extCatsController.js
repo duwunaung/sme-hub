@@ -17,6 +17,13 @@ exports.createExpenseCategory = (req, res) => {
 
     db_connection.query(query, [name, orgId, createdBy, 'active'], (err, results) => {
         if (err) {
+			if (err.code === "ER_DUP_ENTRY") {
+				return res.status(501).send({
+					success: false,
+					message: 'duplicate_name',
+					dev: err
+				})
+			}
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -148,22 +155,25 @@ exports.listIncCat = (req, res) => {
 exports.listExpenseCategory = (req, res) => {
 	const { page = 1, pageSize = 10, search } = req.query;
     const orgId = req.user.orgId;
-    const { status = 'active' } = req.query;
+    const { status } = req.query;
     const offset = (page - 1) * pageSize;
 	const queryParams = []
     let query = `
-        SELECT ec.id, ec.name, u.name AS createdBy
+        SELECT ec.id, ec.name, u.name AS createdBy, ec.status
         FROM expcats ec
         JOIN users u ON ec.createdBy = u.id
-        WHERE ec.orgId = ? AND ec.status = ?
+        WHERE ec.orgId = ?
     `;
 
 	queryParams.push(orgId)
-	queryParams.push(status)
 	if (search) {
 		query += ` AND (ec.name LIKE ? )`;
         const searchPattern = `%${search}%`;
         queryParams.push(searchPattern);
+	}
+	if (status) {
+		query += ` AND ec.status = ?`;
+		queryParams.push(status);
 	}
 	query += ` ORDER BY ec.id DESC LIMIT ? OFFSET ?`
 	queryParams.push(parseInt(pageSize))
@@ -178,16 +188,18 @@ exports.listExpenseCategory = (req, res) => {
         }
 
         const totalNum = results.length;
-        let countQuery = `SELECT COUNT(*) AS total FROM expcats WHERE orgId = ? AND status = ?`;
+        let countQuery = `SELECT COUNT(*) AS total FROM expcats WHERE orgId = ?`;
 		const countParams = []
 		countParams.push(orgId)
-		countParams.push(status)
 		if (search) {
 			countQuery += ` AND (expcats.name LIKE ? )`;
 			const searchPattern = `%${search}%`;
 			countParams.push(searchPattern);
 		}
-		
+		if (status) {
+			countQuery += ` AND expcats.status = ?`;
+			countParams.push(status);
+		}
         db_connection.query(countQuery, countParams, (err, countResults) => {
             if (err) {
                 return res.status(500).send({
@@ -486,7 +498,7 @@ exports.deleteExpenseCategory = (req, res) => {
 }
 
 exports.restoreExpenseCategory = (req, res) => {
-    const { id } = req.params.id;
+    const { id } = req.params;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
     const query = `UPDATE expcats SET status = 'active' WHERE id = ? AND orgId = ?`;
@@ -513,6 +525,7 @@ exports.restoreExpenseCategory = (req, res) => {
         })
     })
 }
+
 exports.createIncomeCategory = (req, res) => {
     const { name } = req.body
     const orgId = req.user.orgId
@@ -527,6 +540,13 @@ exports.createIncomeCategory = (req, res) => {
     const query = `INSERT INTO inccats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`;
     db_connection.query(query, [name, orgId, createdBy, 'active'], (err, results) => {
         if (err) {
+			if (err.code === "ER_DUP_ENTRY") {
+				return res.status(501).send({
+					success: false,
+					message: 'duplicate_name',
+					dev: err
+				})
+			}
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
@@ -695,7 +715,75 @@ exports.detailIncomeCategory = (req, res) => {
     });
 };
 
+exports.getIncCat = (req, res) => {
+	if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "Superadmin cannot get the access to organization's data"
+        })
+    }
+    const {name} = req.params
+    let query = `SELECT * FROM inccats WHERE inccats.name = '${name}'`;
 
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Data not found',
+                dev: "Data not found"
+            })
+        }
+        return res.status(200).send({
+            success: true,
+            message: "We found the data!",
+            dev: "Thanks bro, you`re awesome",
+            data: results[0]
+        })
+    });
+}
+
+exports.getExpCat = (req, res) => {
+	if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "Superadmin cannot get the access to organization's data"
+        })
+    }
+    const {name} = req.params
+    let query = `SELECT * FROM expcats WHERE expcats.name = '${name}'`;
+
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Data not found',
+                dev: "Data not found"
+            })
+        }
+        return res.status(200).send({
+            success: true,
+            message: "We found the data!",
+            dev: "Thanks bro, you`re awesome",
+            data: results[0]
+        })
+    });
+}
 
 exports.getIncomeCategory = (req, res) => {
     if (req.user.orgId === 0) {
@@ -817,7 +905,7 @@ exports.deleteIncomeCategory = (req, res) => {
 }
 
 exports.restoreIncomeCategory = (req, res) => {
-    const { id } = req.params.id;
+    const { id } = req.params;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
     const query = `UPDATE inccats SET status = 'active' WHERE id = ? AND orgId = ?`;
@@ -848,21 +936,24 @@ exports.restoreIncomeCategory = (req, res) => {
 exports.listIncomeCategory = (req, res) => {
     const { page = 1, pageSize = 10 , search} = req.query;
     const orgId = req.user.orgId;
-    const { status = 'active' } = req.query;
+    const { status } = req.query;
     const offset = (page - 1) * pageSize;
 	const queryParams = []
     let query = `
-        SELECT ic.id, ic.name, u.name AS createdBy
+        SELECT ic.id, ic.name, u.name AS createdBy, ic.status
         FROM inccats ic
         JOIN users u ON ic.createdBy = u.id
-        WHERE ic.orgId = ? AND ic.status = ?
+        WHERE ic.orgId = ?
     `;
 	queryParams.push(orgId)
-	queryParams.push(status)
 	if (search) {
 		query += ` AND (ic.name LIKE ? )`;
         const searchPattern = `%${search}%`;
         queryParams.push(searchPattern);
+	}
+	if (status) {
+		query += ` AND ic.status = ?`;
+		queryParams.push(status);
 	}
 	query += ` ORDER BY ic.id DESC LIMIT ? OFFSET ?`
 	queryParams.push(parseInt(pageSize))
@@ -878,14 +969,17 @@ exports.listIncomeCategory = (req, res) => {
 
         const totalNum = results.length;
 
-        let countQuery = `SELECT COUNT(*) AS total FROM inccats WHERE orgId = ? AND status = ?`;
+        let countQuery = `SELECT COUNT(*) AS total FROM inccats WHERE orgId = ?`;
 		const countParams = []
 		countParams.push(orgId)
-		countParams.push(status)
 		if (search) {
 			countQuery += ` AND (inccats.name LIKE ? )`;
 			const searchPattern = `%${search}%`;
 			countParams.push(searchPattern);
+		}
+		if (status) {
+			countQuery += ` AND inccats.status = ?`;
+			countParams.push(status);
 		}
         db_connection.query(countQuery, countParams, (err, countResults) => {
             if (err) {
