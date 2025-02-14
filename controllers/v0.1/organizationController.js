@@ -30,6 +30,8 @@ exports.listOrg = (req, res) => {
         query += " AND expiredDate < NOW()"
     }
 
+    query += " ORDER BY id DESC"
+
     const offset = (page - 1) * pageSize
     query += ' LIMIT ? OFFSET ?'
     queryParams.push(parseInt(pageSize), offset)
@@ -354,18 +356,13 @@ exports.listUsers = (req, res) => {
     if (status != 'all') {
         query += " AND status = ?"
         queryParams.push(`${status}`)
-    } 
-
-    // if (!expired) {
-    //     query += " AND expiredDate > NOW()"
-    // } else {
-    //     query += " AND expiredDate < NOW()"
-    // }
+    }
 
     if (role != 'allRoles') {
         query += " AND role = ?"
         queryParams.push(`${role}`)
     }
+    query += " ORDER BY id DESC"
 
     const offset = (page - 1) * pageSize
     query += ' LIMIT ? OFFSET ?'
@@ -393,12 +390,6 @@ exports.listUsers = (req, res) => {
             countQuery += " AND status = ?"
             countQueryParams.push(`${status}`)
         }
-        
-        // if (status == expired) {
-        //     countQuery += " AND expired < NOW()"
-        // } else {
-        //     countQuery += " AND expired > NOW()"
-        // }
 
         if (role != 'allRoles') {
             countQuery += " AND role = ?"

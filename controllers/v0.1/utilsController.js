@@ -166,6 +166,7 @@ exports.getSuperAdmins = (req, res) => {
         query += " AND status LIKE ?"
         queryParams.push(`%${status}%`)
     }
+    query += " ORDER BY id DESC"
 
     const offset = (page - 1) * pageSize
     query += ' LIMIT ? OFFSET ?'
