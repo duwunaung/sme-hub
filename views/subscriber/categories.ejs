@@ -65,7 +65,7 @@
 					<table class="table table-striped table-hover">
 						<thead class="table-dark">
 						  <tr>
-							<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)"># <span></span></th>
+							<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">ID <span></span></th>
 							<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
 							<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
 							<th style="min-width: 130px">Actions</th>
@@ -86,10 +86,10 @@
 													<a href="/subscriber/category/<%= cat %>/update/<%= category[i].id %>?cat=<%= cat %>&page=<%= pagination.page %>"
 														class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
 													
-													<% if (category[i].status == 'deleted') { %>
+													<% if (category[i].status === 'deleted') { %>
 														<a href="/subscriber/category/<%= cat %>/restore/<%= category[i].id %>"
 															class="btn btn-danger btn-sm btn-fixed-width">Restore</a>
-													<% } else { %>
+													<% } else if (category[i].status === 'active') { %>
 														<a href="#" class="btn btn-danger btn-sm btn-fixed-width" 
 														   data-bs-toggle="modal" 
 														   data-bs-target="#confirmationModal" 
@@ -113,6 +113,23 @@
 				  
             </div>
         </main>
+		<!-- Modal for duplicate name -->
+		<div class="modal fade" id="duplicateNameModal" tabindex="-1" aria-labelledby="duplicateNameLabel" aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title" id="duplicateNameLabel">Duplicate Category Name</h5>
+						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<p></p>
+					</div>
+					<div class="modal-footer">
+						<button></button>
+					</div>
+				</div>
+			</div>
+		</div>
 		<!-- Modal for confirmation box -->
 		<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
 			<div class="modal-dialog">
@@ -243,6 +260,7 @@
 				</ul>
 			</nav>
 		<% } %>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 		<script>
 
 			let sortDirections = {};
@@ -351,5 +369,55 @@
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
 			}
+
+			function goToDirection(id, type) {
+			    const pathname = window.location.pathname;
+			    let newUrl;
+
+			    if (type === 'view') {
+			        newUrl = `${pathname}/detail/${id}`;
+			    } else if (type === 'edit') {
+			        newUrl = `${pathname}/update/${id}`;
+			    } else if (type === 'restore') {
+			        newUrl = `${pathname}/restore/${id}`;
+			    }
+			    if (newUrl) {
+			        window.location.href = newUrl;
+			    } else {
+			        console.error('Invalid type provided');
+			    }
+			}
+
+			const params = new URLSearchParams(window.location.search);
+			if (params.get("type") === "duplicate-name") {
+			    const id = params.get("id");
+			    const name = params.get("name");
+			    const status = params.get("status");
+			    if (id && name && status) {
+			        const modalElement = document.getElementById('duplicateNameModal');
+			        if (modalElement) {
+			            const modalBody = modalElement.querySelector('.modal-body p');
+			            const modalFooter = modalElement.querySelector('.modal-footer');
+			            modalFooter.innerHTML = '';
+
+			            if (status === 'active') {
+			                modalBody.innerHTML = `The category name <strong>${name}</strong> already exists.`;
+			                modalFooter.innerHTML = `
+			                    <button type="button" class="btn btn-primary" onclick="goToDirection(${id}, 'view')">View</button>
+			                    <button type="button" class="btn btn-warning" onclick="goToDirection(${id}, 'edit')">Edit</button>
+			                `;
+			            } else if (status === 'deleted') {
+			                modalBody.innerHTML = `The category name <strong>${name}</strong> already exists. Do you want to restore?`;
+			                modalFooter.innerHTML = `
+			                    <button type="button" class="btn btn-danger" onclick="goToDirection(${id}, 'restore')">Restore</button>
+			                `;
+			            }
+			            new bootstrap.Modal(modalElement).show();
+			        } else {
+			            console.error("Modal element not found.");
+			        }
+			    }
+			}
+			
 		</script>
         <%- include('../partials/subscriber/footer.ejs') %>
