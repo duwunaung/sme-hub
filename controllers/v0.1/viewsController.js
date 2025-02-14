@@ -41,10 +41,10 @@ exports.logout = (req, res) => {
 
 exports.orgs = (req, res) => {
     if (req.method == 'GET') {
-        const name = req.query.name || ""
+        const name = req.query.orgName || ""
         const expired = req.query.expired || 'false'
-        const status = req.query.status || 'all'
-        const page = req.query.page || 1
+        const status = req.query.orgStatus || 'all'
+        const page = req.query.orgPage || 1
         axios.get(`${process.env.API_URL}/organizations?page=${page}&name=${name}&expired=${expired}&status=${status}`, {
             headers: {
                 'Authorization': `${req.session.token}`
@@ -97,13 +97,13 @@ exports.restoreOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations?success=true&type=org-restore&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
+            res.redirect('/superadmin/organizations?success=true&type=org-restore&orgPage=' + page + '&orgName=' + name + '&expired=' + expired + '&orgStatus=' + status )
         }).catch(error => {
             if (error.status == 404) {
-				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
+				res.redirect('/superadmin/organizations?error=true&type=404Error&orgPage=' + page + '&orgName=' + name + '&expired=' + expired + '&orgStatus=' + status )
 			}
 			else {
-				res.redirect('/superadmin/organizations?error=true&type=sysError&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
+				res.redirect('/superadmin/organizations?error=true&type=sysError&orgPage=' + page + '&orgName=' + name + '&expired=' + expired + '&orgStatus=' + status )
 			}
         })
     }
@@ -122,23 +122,27 @@ exports.deleteOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations?success=true&type=org-delete&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
+            res.redirect('/superadmin/organizations?success=true&type=org-delete&orgPage=' + page + '&orgName=' + name + '&expired=' + expired + '&orgStatus=' + status )
         }).catch(error => {
 			if (error.status == 404) {
-				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
+				res.redirect('/superadmin/organizations?error=true&type=404Error&orgPage=' + page + '&orgName=' + name + '&expired=' + expired + '&orgStatus=' + status )
 			}
 			else {
-				res.redirect('/superadmin/organizations?error=true&type=sysError&page=' + page + '&name=' + name + '&expired=' + expired + '&status=' + status )
+				res.redirect('/superadmin/organizations?error=true&type=sysError&orgPage=' + page + '&orgName=' + name + '&expired=' + expired + '&orgStatus=' + status )
 			}
             
         })
     }
 }
 
-exports.updateOrg = (req, res) => {
+exports.updateOrg = (req, res) => {    
+    const orgId = req.params.id
+    const orgPage = req.query.orgPage || 1
+    const orgName = req.query.orgName || ''
+    const orgStatus = req.query.orgStatus || 'all'
+    const expired = req.query.expired || 'false'
+
     if (req.method == 'GET') {
-        const orgId = req.params.id
-        const page = req.query.page
         axios.get(`${process.env.API_URL}/organizations/${orgId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
@@ -146,60 +150,63 @@ exports.updateOrg = (req, res) => {
         }).then(response => {
             const options = [
                 { id: 1, name: 'active' },
-                { id: 2, name: 'deleted' }
+                { id: 2, name: 'deleted' },
+                { id: 3, name: 'pending' }
             ];
             const success = req.query.success;
             const type = req.query.type;
 			const error = req.query.error;
             if (success) {
                 if (type == 'update') {
-                    res.render('superadmin/edit-organization', { org: response.data.data, page: page, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
+                    res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Updated!" });
                 } else if (type == 'extendLicense') {
-                    res.render('superadmin/edit-organization', { org: response.data.data, page: page, options: options, errorMessage: null, successMessage: "Successfully Extended!" });
+                    res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Extended!" });
                 } else if (type == 'reduceLicense') {
-                    res.render('superadmin/edit-organization', { org: response.data.data, page: page, options: options, errorMessage: null, successMessage: "Successfully Reduced!" });
+                    res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: "Successfully Reduced!" });
                 }
             } else if (error) {
 				if (type == 'sysError') {
-					res.render('superadmin/edit-organization', { org: response.data.data, page: page, options: options, errorMessage: "Internal Server Error!", successMessage: null });
+					res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: "Internal Server Error!", successMessage: null });
 				} else if (type == '406Error') {
-					res.render('superadmin/edit-organization', { org: response.data.data, page: page, options: options, errorMessage: "Cannot Accept Your Request!", successMessage: null });
+					res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: "Cannot Accept Your Request!", successMessage: null });
 				}
 			}
 			else {
-                res.render('superadmin/edit-organization', { org: response.data.data, page: page, options: options, errorMessage: null, successMessage: null });
+                res.render('superadmin/edit-organization', { org: response.data.data, options: options, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
 			if (error.status == 404) {
-				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + page);
+				res.redirect('/superadmin/organizations?error=true&type=404Error&orgPage=' + orgPage + '&orgName=' + orgName + '&expired=' + expired + '&orgStatus=' + orgStatus )
 			} else {
-				res.render('superadmin/edit-organization', { org: {}, page: page, errorMessage: "System Error!", successMessage: null });
+				res.render('superadmin/edit-organization', { org: {}, errorMessage: "System Error!", successMessage: null });
 			}
             
         })
-    } else {
-        const orgId = req.params.id
-        const page = req.query.page
+    } else {        
         const { name, address, phone, status } = req.body;
         axios.put(`${process.env.API_URL}/organizations/update/${orgId}`, { name, address, phone, status }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=update&page=' + page)
+            res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=update&orgPage=' + orgPage  + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired );
         }).catch(error => {
-            res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=sysError&page=' + page);
+            res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=sysError&orgPage=' + orgPage  + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired );
         })
     }
-
 }
 
 exports.extendLicense = (req, res) => {
     if (req.method == 'GET') {
+        
         const orgId = req.params.id
+        const orgPage = req.query.orgPage || 1
+        const orgName = req.query.orgName || ''
+        const orgStatus = req.query.orgStatus || 'all'
+        const expired = req.query.expired || 'false'
+
         const num = req.query.num
         const type = req.query.type
-        const page = req.query.page || 1
 
         axios.put(`${process.env.API_URL}/organizations/license/${orgId}`, { num, type }, {
             headers: {
@@ -208,15 +215,15 @@ exports.extendLicense = (req, res) => {
         }).then(response => {
 			if (num < 0)
 			{
-				res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=reduceLicense&page=' + page)
+				res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=reduceLicense&orgPage=' + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired )
 			} else {
-				res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=extendLicense&page=' + page)
+				res.redirect('/superadmin/organizations/update/' + orgId + '?success=true&type=extendLicense&orgPage=' + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired )
 			}
         }).catch(error => {
 			if (error.status == 406){
-				res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=406Error&page=' + page)
+				res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=406Error&orgPage=' + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired )
 			} else {
-				res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=sysError&page=' + page)
+				res.redirect('/superadmin/organizations/update/' + orgId + '?error=true&type=sysError&orgPage=' + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired )
 			}
         })
     }
@@ -225,9 +232,6 @@ exports.extendLicense = (req, res) => {
 exports.registerOrg = (req, res) => {
     if (req.method == 'POST') {
         const page = req.query.page
-        // const totalPage = req.query.totalPage
-        // const pageSize = req.query.pageSize
-        // const total = req.query.total
 
         const { name, address, phone, status } = req.body;
         axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status }, {
@@ -363,9 +367,6 @@ exports.createUser = (req, res) => {
     if (req.method == 'POST') {
         const orgPage = req.query.orgPage
         const userPage = req.query.userPage
-        const totalPage = req.query.totalPage
-        const pageSize = req.query.pageSize
-        const total = req.query.total
 
         const { name, email, password, role, phone } = req.body;
         const orgId = req.params.id
@@ -376,14 +377,7 @@ exports.createUser = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            const totalNum = (pageSize*totalPage)
-            if ( total == totalNum ) {
-                const successPage = +totalPage +1
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&userPage=' + successPage + '&aciveUsers=true')
-            } else {
-                const successPage = totalPage
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&userPage=' + successPage + '&aciveUsers=true')
-            }
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&userPage=1&aciveUsers=true')
         }).catch(error => {
             if (error.status === 409){
                 res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&orgPage=' + orgPage + '&userPage=' + userPage + '&aciveUsers=true')
