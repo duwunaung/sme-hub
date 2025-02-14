@@ -28,7 +28,6 @@
                             <div class="d-flex searchBar" role="search">
                                 <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter organization name" aria-label="Search" value="<%= name %>" required>
                                 <button class="btn btn-primary" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
-                                <button class="btn btn-outline-primary mx-2" id="refresh" onclick="refresh()"><i class="fa-solid fa-arrows-rotate"></i></button>
                             </div>
                             <div class="d-flex">
                                 <div style="margin-top: 7px;">
@@ -47,6 +46,7 @@
                                         <a class="dropdown-item status" id="expire" onclick="changeStatus('expire')">Expired</a>
                                     </ul>
                                 </div>
+                                <button class="btn sortBtn mx-2" id="refresh" onclick="refresh()">Refresh</button>
                             </div>
                         </nav>
                         <!-- xxx -->
@@ -61,7 +61,7 @@
                             <table class="table table-striped table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th>#</th>
+                                        <th>Id</th>
                                         <th>Organization Name</th>
                                         <th>Expiration Date</th>
                                         <th class="text-center">Status</th>

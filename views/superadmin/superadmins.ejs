@@ -25,18 +25,20 @@
                                     <div class="d-flex searchBar" role="search">
                                         <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter username (or) email address" value="<%= name %>" aria-label="Search" required>
                                         <button class="btn btn-primary" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
-                                        <button class="btn btn-outline-primary mx-2" id="refresh" onclick="refresh()"><i class="fa-solid fa-arrows-rotate"></i></button>
                                     </div>
-                                    <div class="btn-group">
-                                        <button type="button" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                            Filter
-                                        </button>
-                                        <ul class="dropdown-menu dropdown-menu-end">
-                                            <a class="dropdown-item status dropdown-active" id="all" onclick="changeStatus('all')">All</a>
-                                            <a class="dropdown-item status" id="active" onclick="changeStatus('active')">Active</a>
-                                            <a class="dropdown-item status" id="deleted" onclick="changeStatus('deleted')">Inactive</a>
-                                            <a class="dropdown-item status" id="pending" onclick="changeStatus('pending')">Pending</a>
-                                        </ul>
+                                    <div>
+                                        <div class="btn-group">
+                                            <button type="button" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Filter
+                                            </button>
+                                            <ul class="dropdown-menu dropdown-menu-end">
+                                                <a class="dropdown-item status dropdown-active" id="all" onclick="changeStatus('all')">All</a>
+                                                <a class="dropdown-item status" id="active" onclick="changeStatus('active')">Active</a>
+                                                <a class="dropdown-item status" id="deleted" onclick="changeStatus('deleted')">Inactive</a>
+                                                <a class="dropdown-item status" id="pending" onclick="changeStatus('pending')">Pending</a>
+                                            </ul>
+                                        </div>
+                                        <button class="btn sortBtn" id="refresh" onclick="refresh()">Refresh</button>
                                     </div>
                                 </nav>
                                 <!-- Organizations Table -->
@@ -49,7 +51,7 @@
                                     <table class="table table-striped table-hover">
                                         <thead class="table-dark">
                                             <tr>
-                                                <th>#</th>
+                                                <th>Id</th>
                                                 <th>Name</th>
                                                 <th>Email</th>
                                                 <th>Phone</th>
