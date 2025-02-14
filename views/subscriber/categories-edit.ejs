@@ -47,8 +47,11 @@
 					const searchParams = new URLSearchParams(window.location.search);
 					const type = searchParams.get('type')
 					const resetBtn = document.getElementById("resetBtn")
-					const cat = searchParams.get('cat')
-					resetBtn.href = `/subscriber/category/${cat}?page=${page}`
+					const pathname = window.location.pathname;
+					const basePath = pathname.split('/update')[0];
+			    	let newUrl;
+					newUrl = `${basePath}?page=${page}`
+					resetBtn.href = `${newUrl}`
 					if (type == 'update') {
 						resetBtn.innerText = "Back"
 						resetBtn.classList.add("btn-primary")
