@@ -62,6 +62,7 @@ app.use("/api/v0.1/subscribers/incomes", authenticateToken, authorizeRole(subscr
 app.use("/api/v0.1/subscribers/expenses", authenticateToken, authorizeRole(subscribers), extExp_v01);
 app.use("/api/v0.1/subscribers/transactions", authenticateToken, authorizeRole(subscribers), extTrans_v01);
 app.use("/api/v0.1/subscribers/organization", authenticateToken, authorizeRole(subscribers), extOrg_v01);
+app.use("/api/v0.1/subscribers/user", authenticateToken, authorizeRole(subscribers), extUser_v01);
 
 // view engine setup
 app.set('view engine', 'ejs');
