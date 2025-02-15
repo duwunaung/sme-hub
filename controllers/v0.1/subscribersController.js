@@ -1,6 +1,7 @@
 const axios = require('axios');
 const e = require('express');
-
+const { use } = require('../../routes/v0.1/utilsRoute');
+const bcrypt = require('bcryptjs');
 
 exports.login = (req, res) => {
 	if (req.method === 'POST') {
@@ -40,6 +41,73 @@ exports.logout = (req, res) => {
 		});
 	} else {
 		res.redirect('login'); // If no session, redirect to login
+	}
+}
+
+exports.editUsrProfile = (req, res) => {
+	if (req.method == 'GET') {
+		axios.get(`${process.env.API_URL}/subscribers/user/profile`, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			const {success, error, type} = req.query
+			if (success === 'true') {
+				if (type === 'update') {
+					res.render('subscriber/user-profile', { logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: "Successfully Updated!", errorMessage: null }); 
+				}
+			} else if (error === 'true') {
+				if (type === 'invalidPassword') {
+					res.render('subscriber/user-profile', { logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "Invalid Password!" });
+				} else if (type === 'sysError') {
+					res.render('subscriber/user-profile', { logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "System Error!" });
+				}
+			} else {
+				res.render('subscriber/user-profile', { logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: null }); 
+			}
+		}).catch(error => {
+			res.render('subscriber/user-profile', { logo: req.session.orgLogo,  organizationName: req.session.orgName,  user: {}, successMessage: null, errorMessage: null });         
+		})
+	} else {
+		const {name, email, phone } = req.body
+		const {currentPassword, newPassword, confirmPassword } = req.body
+		let parameters = { name, email, phone }
+
+        const updateProfile = async () => {
+            try {
+                if (currentPassword) {
+                    const resPass = await axios.get(`${process.env.API_URL}/subscribers/user/profile/check`, {
+                        headers: {
+                            'Authorization': `${req.session.token}`
+                        }
+                    });
+                    
+                    const hashedPassword = resPass.data.data.password;
+                    const isPasswordValid = await bcrypt.compare(currentPassword, hashedPassword);
+                    
+                    if (!isPasswordValid) {
+                        return res.redirect('/subscriber/user/profile?error=true&type=invalidPassword');
+                    }
+                    if (newPassword && newPassword === confirmPassword) {
+                        parameters.password = await bcrypt.hash(newPassword, 10);
+                    }
+                }
+                await axios.put(
+                    `${process.env.API_URL}/subscribers/user/profile/update`, 
+                    parameters, 
+                    {
+                        headers: {
+                            'Authorization': `${req.session.token}`
+                        }
+                    }
+                );
+
+                res.redirect('/subscriber/user/profile?success=true&type=update');
+            } catch (error) {
+                res.redirect('/subscriber/user/profile?error=true&type=sysError');
+            }
+        };
+        updateProfile();
 	}
 }
 
@@ -83,7 +151,6 @@ exports.editOrgProfile = (req, res) => {
 			req.session.orgLogo = response.data.data.logo
 			res.redirect('/subscriber/organization/profile'  + `?success=true&type=update`)
 		}).catch(error => {
-			console.log(error.status)
 			res.redirect('/subscriber/organization/profile' + `?error=true&type=sysError`);
 		})
 	}
@@ -223,7 +290,6 @@ exports.restoreExpenseCat = (req, res) => {
 		}).then(response => {
 			res.redirect('/subscriber/category/expense'+ '?success=true&type=restore')
 		}).catch(error => {
-			console.log(error.status)
 			res.redirect('/subscriber/category/expense' + '?error=true&type=sysError')
 		})
 	}
