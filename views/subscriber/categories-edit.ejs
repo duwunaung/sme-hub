@@ -19,9 +19,9 @@
 				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
 					<div class="mb-3">
 						<label for="catName" class="form-label">Category Name</label>
-						<input type="text" class="form-control" maxlength="255" name="name" id="catName"
+						<input type="text" class="form-control" maxlength="100" name="name" id="catName"
 							placeholder="Enter category name" value="<%= category.name %>" oninput="checkInputs('catNameError', 'catName')" required>
-						<p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 255 characters!</p>
+						<p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
 					</div>
 					<div class="mb-3">
 						<label for="catStatus" class="form-label">Status</label>
