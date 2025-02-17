@@ -168,7 +168,6 @@
                     prevDots.classList.add('d-none');
                 } else if (page === 4) {
                     prevDots.innerText = "2"
-                    prevDots.href = "/superadmin/users?page=2"
                 }
 
                 if (page == totalPage) {
@@ -186,7 +185,6 @@
                     nextDots.classList.add('d-none');
                 } else if (page === totalPage - 3) {
                     nextDots.innerText = totalPage -1
-                    nextDots.href = "/superadmin/users?page=<%= +pagination.page +2 %>"
                 }
 
                 // Tooltips

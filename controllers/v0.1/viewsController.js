@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { query } = require('express');
 
 exports.login = (req, res) => {
     if (req.method === 'POST') {
@@ -250,15 +251,21 @@ exports.detailOrg = (req, res) => {
     if (req.method == 'GET') {
         const orgId = req.params.id
         const error = req.query.error
-        const orgPage = req.query.orgPage
-        const userPage = req.query.userPage
-        const name = req.query.name || ""
-        const status = req.query.status || 'all'
-        const role = req.query.role || 'allRoles'
+        
+        const orgPage = req.query.orgPage || 1
+        const orgName = req.query.orgName || ''
+        const orgStatus = req.query.orgStatus || 'all'
+        const expired = req.query.expired || 'false'
+
+        const userPage = req.query.userPage || 1
+        const userName = req.query.userName || ""
+        const userStatus = req.query.userStatus || 'all'
+        const userRole = req.query.userRole || 'allRoles'
 
         const options = [
             { id: 1, name: 'active' },
-            { id: 2, name: 'deleted' }
+            { id: 2, name: 'deleted' },
+            { id: 3, name: 'pending' }
         ];
         const roles = [
             {
@@ -279,42 +286,42 @@ exports.detailOrg = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            axios.get(`${process.env.API_URL}/organizations/users/${orgId}?page=${userPage}&name=${name}&status=${status}&role=${role}`, {
+            axios.get(`${process.env.API_URL}/organizations/users/${orgId}?page=${userPage}&name=${userName}&status=${userStatus}&role=${userRole}`, {
                 headers: {
                     'Authorization': `${req.session.token}`
                 }
             }).then( users => {
                 if (error) {
                     if (req.query.type == 'user-create') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot create user at the moment!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: "Cannot create user at the moment!", successMessage: null });
                     } else if (req.query.type == 'user-delete') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot delete user at the moment!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: "Cannot delete user at the moment!", successMessage: null });
                     } else if (req.query.type == 'user-restore') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Cannot restore user at the moment!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: "Cannot restore user at the moment!", successMessage: null });
                     } else if (req.query.type == 'dup-email') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
                     } else if (req.query.type == '404Error') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "404 User Not Found!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: "404 User Not Found!", successMessage: null });
                     } else {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: "Internal Server Error!", successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: "Internal Server Error!", successMessage: null });
                     }
                 } else {
                     if (req.query.type == 'user-create') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Created" });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: null, successMessage: "User Created" });
                     } else if (req.query.type == 'user-delete') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Deleted" });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: null, successMessage: "User Deleted" });
                     } else if (req.query.type == 'user-restore') {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: "User Restored" });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: null, successMessage: "User Restored" });
                     } else {
-                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: name, orgPage: orgPage, pagination: users.data.pagination, options: options, status: status, role: role, roles: roles, errorMessage: null, successMessage: null });
+                        res.render('superadmin/detail-organization', { org: response.data.data, users: users.data.data, name: userName, orgPage: orgPage, pagination: users.data.pagination, options: options, status: userStatus, role: userRole, roles: roles, errorMessage: null, successMessage: null });
                     }
                 }
             }).catch(error => {
-                res.render('superadmin/detail-organization', { org: {}, users: [], name: {}, orgPage: orgPage, pagination: {}, errorMessage: "System Error!", options: options, status: status, role: role, roles: roles, successMessage: null });
+                res.render('superadmin/detail-organization', { org: {}, users: [], name: {}, orgPage: orgPage, pagination: {}, errorMessage: "System Error!", options: options, status: userStatus, role: userRole, roles: roles, successMessage: null });
             })
         }).catch(error => {
 			if (error.status == 404) {
-				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role + '&name=' + name )
+				res.redirect('/superadmin/organizations?error=true&type=404Error&page=' + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired' + expired + '&userPage=' + userPage + '&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName )
 			} else {
 				res.render('superadmin/detail-organization', { org: {}, users: [], name: {}, orgPage: {}, status: {}, role: {}, pagination: {}, errorMessage: "System Error!", options: options, roles: roles, successMessage: null });
 			}            
@@ -379,6 +386,7 @@ exports.createUser = (req, res) => {
         }).then(response => {
                 res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&userPage=1&aciveUsers=true')
         }).catch(error => {
+            console.log(error)
             if (error.status === 409){
                 res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&orgPage=' + orgPage + '&userPage=' + userPage + '&aciveUsers=true')
             } else {
@@ -394,8 +402,6 @@ exports.detailUser = (req , res) => {
 		const orgId = req.params.id
         const orgPage = req.query.orgPage
         const userPage = req.query.userPage
-        const status = req.query.status || 'all'
-        const role = req.query.role || 'all'
 
         const options = [
             { id: 1, name: 'active' },
@@ -409,16 +415,16 @@ exports.detailUser = (req , res) => {
         }).then(response => {
 			const id = response.data.data.orgId
 			if (id == orgId) {
-				res.render('superadmin/detail-user', {user: response.data.data, userPage: userPage, orgPage: orgPage, status: status, role: role, options: options, errorMessage: null});
+				res.render('superadmin/detail-user', {user: response.data.data, options: options, errorMessage: null});
 			} else {
-				res.redirect('/superadmin/organizations?error=true&type=404Error&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role);
+				res.redirect('/superadmin/organizations?error=true&type=404Error&orgpage=' + orgPage + '&userPage=' + userPage );
 			}
             
         }).catch (error => {
 			if (error.status == 404) {
-				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage )
 			} else{
-				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage )
 			}
         })
     }
@@ -428,24 +434,29 @@ exports.deleteUser = (req, res) => {
     if (req.method == 'GET') {
         const userId = req.params.userId
         const orgId = req.params.id
+
         const orgPage = req.query.orgPage
-        const userPage = req.query.userPage
-        const status = req.query.status || 'all'
-        const role = req.query.role || 'all'
+        const orgName = req.query.orgName || ""
+        const orgStatus = req.query.orgStatus || "all"
+        const expired = req.query.expired || false
+
+        const userPage = req.query.userPage || 1
+        const userName = req.query.userName || ""
+        const userStatus = req.query.userStatus || "all"
+        const userRole = req.query.userRole || "allRoles"
 
         axios.delete(`${process.env.API_URL}/organizations/users/delete/${userId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-delete&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+            res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-delete&activeUsers=true&orgPage=' + orgPage + '&orgName' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
         }).catch(error => {
 			if (error.status == 404) {
-				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&orgName' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
 			} else {
-				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true&orgPage=' + orgPage + '&orgName' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
 			}
-            
         })
     }
 }
@@ -454,35 +465,41 @@ exports.restoreUser = (req, res) => {
     if (req.method == 'GET') {
         const userId = req.params.userId
         const orgId = req.params.id
+
         const orgPage = req.query.orgPage
-        const userPage = req.query.userPage
-        const status = req.query.status || 'all'
-        const role = req.query.role || 'all'
+        const orgName = req.query.orgName || ""
+        const orgStatus = req.query.orgStatus || "all"
+        const expired = req.query.expired || false
+
+        const userPage = req.query.userPage || 1
+        const userName = req.query.userName || ""
+        const userStatus = req.query.userStatus || "all"
+        const userRole = req.query.userRole || "allRoles"
 
         axios.get(`${process.env.API_URL}/users/restore/${userId}`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-restore&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+            res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-restore&activeUsers=true&orgPage=' + orgPage + '&orgName' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
         }).catch(error => {
             if (error.status == 404) {
-				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&orgName' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
 			} else {
-				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true&orgpage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role )
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true&orgPage=' + orgPage + '&orgName' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
 			}
         })
     }
 }
 
 exports.updateUser = (req, res) => {
+    const orgId = req.params.id
+    const userId = req.params.userId
+    
+    const orgPage = req.query.orgPage
+    const userPage = req.query.userPage || 1
+
 	if (req.method == 'GET') {
-        const orgId = req.params.id
-        const userId = req.params.userId
-        const orgPage = req.query.orgPage
-        const userPage = req.query.userPage
-        const status = req.query.status || 'all'
-        const role = req.query.role || 'all'
 		
         axios.get(`${process.env.API_URL}/users/${userId}`, {
             headers: {
@@ -503,50 +520,51 @@ exports.updateUser = (req, res) => {
             const errorMsg = req.query.error;
             const type = req.query.type;
             if (success) {
-                res.render('superadmin/edit-user', { user: response.data.data, userPage: userPage, orgPage: orgPage, status: status, role: role, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
+                res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
             } else if (errorMsg) {
 				const name = req.query.name
 				const phone = req.query.phone
 				const email = req.query.email
 				const userData = {name, phone, email}
                 if ( type == "dup-email") {
-                    res.render('superadmin/edit-user', { user: userData, userPage: userPage, orgPage: orgPage, status: status, role: role, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
+                    res.render('superadmin/edit-user', { user: userData, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
                 } else {
-                    res.render('superadmin/edit-user', { user: userData, userPage: userPage, orgPage: orgPage, status: status, role: role, options: options, roles: roles, errorMessage: "Something went wrong!", successMessage: null });
+                    res.render('superadmin/edit-user', { user: userData, options: options, roles: roles, errorMessage: "Something went wrong!", successMessage: null });
                 }
             } else {
-                res.render('superadmin/edit-user', { user: response.data.data, userPage: userPage, orgPage: orgPage, status: status, role: role, options: options, roles: roles, errorMessage: null, successMessage: null });
+                res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
 			if (error.status == 404)
 			{
-				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role );
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage );
 			}
 			else {
-				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage + '&status=' + status + '&role=' + role );
+				res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=sysError&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage );
 			}
-            
         })
     } else {
-        const orgId = req.params.id
-		const userId = req.params.userId
-        const orgPage = req.query.orgPage
-        const userPage = req.query.userPage
-        const queryStatus = req.query.status || 'all'
-        const queryRole = req.query.role || 'all'
-
         const { name, email, phone, status, role, orgName } = req.body;
+
+        const org = req.query.orgName
+        const orgStatus = req.query.orgStatus
+        const expired = req.query.expired
+
+        const userName = req.query.userName || ""
+        const userStatus = req.query.userStatus || "all"
+        const userRole = req.query.userRole || "allRoles"
+        
         axios.put(`${process.env.API_URL}/users/${userId}`, { name, orgName, email, phone, role, status, orgId }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/update/' + orgId +  '/' + userId + '?success=true&type=update&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage + '&status=' + queryStatus + '&role=' + queryRole )
+            res.redirect('/superadmin/organizations/update/' + orgId +  '/' + userId + '?success=true&type=update&activeUsers=true&orgPage=' + orgPage + '&orgName' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
         }).catch(error => {
             if (error.status === 409){
-                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=dup-email&orgPage=' + orgPage + '&userPage=' + userPage + '&name=' + name + '&email=' + email +  '&phone=' + phone + '&status=' + queryStatus + '&role=' + queryRole );
+                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=dup-email&orgPage=' + orgPage + '&orgName' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole + '&name=' + name + '&email=' + email +  '&phone=' + phone );
             } else {
-                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&userPage=' + userPage + '&name=' + name + '&email=' + email +  '&phone=' + phone + '&status=' + queryStatus + '&role=' + queryRole );
+                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&orgName' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole + '&name=' + name + '&email=' + email +  '&phone=' + phone );
             }
         })
     }

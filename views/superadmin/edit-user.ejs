@@ -63,18 +63,71 @@
                                 <% }); %>
                         </select>
                     </div>
-                    <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update</button>
-                    <a href="/superadmin/organizations/detail/<%= user.orgId %>?orgPage=<%= orgPage %>&userPage=<%= userPage %>&activeUsers=true&status=<%= status %>&role<%= role %>s" id="resetBtn"	class="btn  w-100"></a>
-					<div class="mt-3">
-                        <p>Registered Date: <span id="currentRegisteredDate"
-                                class="fw-bold">
-                            <%= new Date(user.registered).toDateString() %>
-                        </span>
-                        </p>
-                    </div>
-                </form>
+                    <button onclick="clickBtn('update', '<%= user.id %>')" type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update</button>
+                    <a onclick="clickBtn('back', '<%= user.orgId %>')" href="#" id="resetBtn" class="btn  w-100"></a>
+				</form>
             </div>
 			<script>
+                // Click Btns
+                let url = new URL(window.location.href);
+                let orgId = req.query.orgId
+                let orgName = url.searchParams.get( 'orgName' )
+                let orgStatus = url.searchParams.get( 'orgStatus' )
+                let orgPage = url.searchParams.get( 'orgPage' )
+                let expired = url.searchParams.get( 'expired' )
+                let query = "?"
+                
+                if (orgPage) {
+                    query += "orgPage=" + orgPage
+                } else {
+                    query += "orgPage=1"
+                }
+
+                if (orgName) {
+                    query += "&orgName=" + orgName
+                }
+
+                if (orgStatus) {
+                    query += "&orgStatus=" + orgStatus
+                }
+
+                if (expired) {
+                    query += "&expired=" + expired
+                }
+
+                let userName = url.searchParams.get( 'userName' )
+                let userStatus = url.searchParams.get( 'userStatus' )
+                let userPage = url.searchParams.get( 'userPage' )
+                let userRole = url.searchParams.get( 'userRole' )
+                let userQuery = "&"
+                
+                if (userPage) {
+                    userQuery += "userPage=" + userPage
+                } else {
+                    userQuery += "userPage=1"
+                }
+
+                if (userName) {
+                    userQuery += "&userName=" + userName
+                }
+
+                if (userStatus) {
+                    userQuery += "&userStatus=" + userStatus
+                }
+
+                if (userRole) {
+                    userQuery += "&userRole=" + userRole
+                }
+
+                function clickBtn( type, num ) {
+                    if (type == 'back') {
+                        window.location.href = '/superadmin/organizations/detail/' + num + query + userQuery + '&activeUsers=true'
+                    } else {
+                        window.location.href = '/superadmin/organizations/' + type + '/' + orgId + '/' + num + query + userQuery + '&activeUsers=true'
+                    }
+                }
+
+                // xxx
 				function buttonType() {
 	                const searchParams = new URLSearchParams(window.location.search);
 	                const type = searchParams.get('type')
@@ -87,7 +140,6 @@
 						resetBtn.innerText = "Cancel"
 						resetBtn.classList.add("btn-danger")
 					}
-
 	            }
 
 	            buttonType();

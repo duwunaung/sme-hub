@@ -60,9 +60,9 @@
                                                 <% }); %>
                                         </select>
                                     </div>
-                                    <a href="/superadmin/organizations?page=<%= orgPage %>" class="btn btn-primary w-100 mb-2">Back to
+                                    <a onclick="clickBtn('back', 0)" href="#" class="btn btn-primary w-100 mb-2">Back to
                                         Organizations</a>
-                                    <a href="/superadmin/organizations/update/<%= org.id %>?page=<%= orgPage %>"
+                                    <a onclick="clickBtn('updateOrg', '<%= org.id %>')"  href="#"
                                         class="btn btn-warning w-100">Edit
                                         Organization</a>
                                     <div class="mt-3">
@@ -171,15 +171,15 @@
                                                                     <% } %>
                                                                 </td>
                                                                 <td style="padding-left: 3%;">
-                                                                    <a href="/superadmin/organizations/detail/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
+                                                                    <a onclick="clickBtn('detail', '<%= users[i].id %>')" href="#"
                                                                         class="btn btn-primary btn-sm">View</a>
-                                                                    <a href="/superadmin/organizations/update/<%= org.id %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
+                                                                    <a onclick="clickBtn('update', '<%= users[i].id %>')" href="#"
                                                                         class="btn btn-warning btn-sm">Edit</a>
                                                                     <% if (users[i].status=='deleted' ) { %>
-                                                                        <a href="/superadmin/organizations/restoreuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
+                                                                        <a onclick="clickBtn('restoreuser', '<%= users[i].id %>')" href="#"
                                                                             class="btn btn-danger btn-sm">Restore</a>
                                                                         <% } else { %>
-                                                                            <a href="/superadmin/organizations/deleteuser/<%= users[i].orgId %>/<%= users[i].id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&status=<%= status %>&role=<%= role %>"
+                                                                            <a onclick="clickBtn('deleteuser', '<%= users[i].id %>')" href="#"
                                                                                 class="btn btn-danger btn-sm">Delete</a>
                                                                             <% } %>
                                                                 </td>
@@ -221,6 +221,71 @@
         </main>
 
         <script>
+            // Click Btns
+            let url = new URL(window.location.href);
+            const orgId = "<%= org.id %>"
+            let orgName = url.searchParams.get( 'orgName' )
+            let orgStatus = url.searchParams.get( 'orgStatus' )
+            let orgPage = url.searchParams.get( 'orgPage' )
+            let expired = url.searchParams.get( 'expired' )
+            let query = "?"
+            
+            if (orgPage) {
+                query += "orgPage=" + orgPage
+            } else {
+                query += "orgPage=1"
+            }
+
+            if (orgName) {
+                query += "&orgName=" + orgName
+            }
+
+            if (orgStatus) {
+                query += "&orgStatus=" + orgStatus
+            }
+
+            if (expired) {
+                query += "&expired=" + expired
+            }
+
+            let userName = url.searchParams.get( 'userName' )
+            let userStatus = url.searchParams.get( 'userStatus' )
+            let userPage = url.searchParams.get( 'userPage' )
+            let userRole = url.searchParams.get( 'userRole' )
+            let userQuery = "&"
+            
+            if (userPage) {
+                userQuery += "userPage=" + userPage
+            } else {
+                userQuery += "userPage=1"
+            }
+
+            if (userName) {
+                userQuery += "&userName=" + userName
+            }
+
+            if (userStatus) {
+                userQuery += "&userStatus=" + userStatus
+            }
+
+            if (userRole) {
+                userQuery += "&userRole=" + userRole
+            }
+
+            function clickBtn(type, num) {
+                if ( type == 'back' ) {
+                    window.location.href = "/superadmin/organizations" + query
+                } else if ( type == 'updateOrg' ) {
+                    window.location.href = "/superadmin/organizations/update/" + num + query
+                } else {
+                    window.location.href = "/superadmin/organizations/" + type + "/" + orgId + "/" + num + query + userQuery
+                }
+            }
+
+            // Refresh
+            function refresh() {
+                window.location.href = "http://localhost:3000/superadmin/organizations/detail/" + orgId + query + "&userPage=1&activeUsers=true"
+            }
             
             // Ensure users section 'active' in detail-organization ( While get query = 'activeUsers' )
             const searchParams = new URLSearchParams(window.location.search);
@@ -239,7 +304,7 @@
                 document.getElementById(`users-view`).classList.remove('d-none');
             }
 
-            const status = searchParams.get('status')
+            const status = searchParams.get('userStatus')
             if (status) {
                 const statuses = document.querySelectorAll('.status');
                 statuses.forEach(status => {
@@ -248,7 +313,7 @@
                 document.getElementById(`${status}`).classList.add('dropdown-active');
             }
 
-            const role = searchParams.get('role')
+            const role = searchParams.get('userRole')
             if (role) {
                 const roles = document.querySelectorAll('.role');
                 roles.forEach(role => {
@@ -272,8 +337,6 @@
             const prevNum = document.getElementById('prevNum');
             const nextNum = document.getElementById('nextNum');
             const lastNum = document.getElementById('lastNum');
-            const orgId = "<%= org.id %>"
-            const orgPage = "<%= orgPage %>"
 
             if ( totalPage == 1 || Number.isNaN(page) || page > totalPage ) {
                 paginationNav.classList.add('d-none');
@@ -290,7 +353,6 @@
                 prevDots.classList.add('d-none');
             } else if (page === 4) {
                 prevDots.innerText = "2"
-                prevDots.href = "/superadmin/organizations/detail/" + orgId + "?orgPage=" + orgPage + "&userPage=2"
             }
 
             if (page == totalPage) {
@@ -308,7 +370,6 @@
                 nextDots.classList.add('d-none');
             } else if (page === totalPage - 3) {
                 nextDots.innerText = totalPage -1
-                nextDots.href = "/superadmin/organizations/detail/" + orgId + "?orgPage=" + orgPage + "&userPage=<%= +pagination.page +2 %>&activeUsers=true"
             }
             // xxx
 
@@ -355,22 +416,17 @@
                 })
             }
 
-            // Refresh
-            function refresh() {
-                window.location.href = "http://localhost:3000/superadmin/organizations/detail/" + orgId + "?orgPage=" + orgPage + "&userPage=1&activeUsers=true"
-            }
-
             // Search
             function search() {
                 let url = new URL(window.location.href);
                 let searchValue = document.getElementById("searchValue").value.trim()
                 
                 if (searchValue) {
-                    url.searchParams.set("name", searchValue)
+                    url.searchParams.set("userName", searchValue)
                     url.searchParams.set("activeUsers", true)
                     url.searchParams.set('userPage', 1);
                 } else {
-                    url.searchParams.delete("name")
+                    url.searchParams.delete("userName")
                     url.searchParams.set("activeUsers", true)
                 }
                 window.location.href = url.toString();
@@ -383,15 +439,14 @@
             }
 
             // Change status in filter
-            let url = new URL(window.location.href);
             function changeStatus(status) {
                 
                 if ( status != 'all' ) {
-                    url.searchParams.set('status', status);
+                    url.searchParams.set('userStatus', status);
                     url.searchParams.set('activeUsers', 'true');
                     url.searchParams.set('userPage', 1);
                 } else {
-                    url.searchParams.set('status', 'all');
+                    url.searchParams.set('userStatus', 'all');
                     url.searchParams.set('activeUsers', 'true');
                     url.searchParams.set('userPage', 1);
                 }
@@ -400,16 +455,16 @@
             function changeRole(role) {
                 
                 if ( role != 'allRoles' ) {
-                    url.searchParams.set('role', role);
+                    url.searchParams.set('userRole', role);
                     url.searchParams.set('activeUsers', 'true');
                 } else {
-                    url.searchParams.set('role', 'allRoles');
+                    url.searchParams.set('userRole', 'allRoles');
                     url.searchParams.set('activeUsers', 'true');
                 }
                 window.location.href = url.toString();
             }
 
-            const statusQuery = searchParams.get('status')
+            const statusQuery = searchParams.get('userStatus')
             if (statusQuery) {
                 const statuses = document.querySelectorAll('.status');
                 statuses.forEach(status => {
@@ -418,7 +473,7 @@
                 document.getElementById(`${statusQuery}`).classList.add('dropdown-active');
             }
 
-            const roleQuery = searchParams.get('role')
+            const roleQuery = searchParams.get('userRole')
             if (roleQuery) {
                 const roles = document.querySelectorAll('.roles');
                 roles.forEach(role => {
@@ -524,6 +579,7 @@
                 let url = new URL(window.location.href);
                 url.searchParams.set( type, num)
                 url.searchParams.set( orgPage, '<%= orgPage %>')
+                url.searchParams.set( 'activeUsers', true)
                 window.location.href = url.toString();
             }
 

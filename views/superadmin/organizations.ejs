@@ -97,10 +97,6 @@
                                                     class="btn btn-primary btn-sm">View</a>
                                                 <a onclick="clickBtn('update', '<%= orgs[i].id %>')" href="#"
                                                     class="btn btn-warning btn-sm">Edit</a>
-                                                <!-- <a onclick="" href="/superadmin/organizations/detail/<%= orgs[i].id %>?orgPage=<%= pagination.page %>&userPage=1"
-                                                    class="btn btn-primary btn-sm">View</a>
-                                                <a href="/superadmin/organizations/update/<%= orgs[i].id %>?page=<%= pagination.page %>"
-                                                    class="btn btn-warning btn-sm">Edit</a> -->
                                                 <% if (orgs[i].status=='deleted' ) { %>
                                                     <a onclick="clickBtn('restore', '<%= orgs[i].id %>')" href="#"
                                                         class="btn btn-danger btn-sm">Restore</a>
@@ -245,7 +241,6 @@
                 prevDots.classList.add('d-none');
             } else if (page === 4) {
                 prevDots.innerText = "2"
-                prevDots.href = "/superadmin/organizations?page=2"
             }
 
             if (page == totalPage) {
@@ -263,7 +258,6 @@
                 nextDots.classList.add('d-none');
             } else if (page === totalPage - 3) {
                 nextDots.innerText = totalPage -1
-                nextDots.href = "/superadmin/organizations?orgPage=<%= +pagination.page +2 %>"
             }
 
             // Tooltips
@@ -351,8 +345,8 @@
 
             // Click Btns
             let url = new URL(window.location.href);
-            let name = url.searchParams.get( 'orgName' )
-            let status = url.searchParams.get( 'orgStatus' )
+            let orgName = url.searchParams.get( 'orgName' )
+            let orgStatus = url.searchParams.get( 'orgStatus' )
             let orgPage = url.searchParams.get( 'orgPage' )
             let query = "?"
             
@@ -362,12 +356,12 @@
                 query += "orgPage=1"
             }
 
-            if (name) {
-                query += "&orgName=" + name
+            if (orgName) {
+                query += "&orgName=" + orgName
             }
 
-            if (status) {
-                query += "&orgStatus=" + status
+            if (orgStatus) {
+                query += "&orgStatus=" + orgStatus
             }
 
             if (expired) {

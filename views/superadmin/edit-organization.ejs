@@ -163,8 +163,8 @@
 
 				// Click Btns
 				let url = new URL(window.location.href);
-				let name = url.searchParams.get( 'orgName' )
-				let status = url.searchParams.get( 'orgStatus' )
+				let orgName = url.searchParams.get( 'orgName' )
+				let orgStatus = url.searchParams.get( 'orgStatus' )
 				let expired = url.searchParams.get( 'expired' )
 				let orgPage = url.searchParams.get( 'orgPage' )
 
@@ -177,12 +177,12 @@
 						query += "orgPage=1"
 				}
 
-				if (name) {
-						query += "&orgName=" + name
+				if (orgName) {
+						query += "&orgName=" + orgName
 				}
 
-				if (status) {
-						query += "&orgStatus=" + status
+				if (orgStatus) {
+						query += "&orgStatus=" + orgStatus
 				}
 
 				if (expired) {
