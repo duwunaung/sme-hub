@@ -39,7 +39,7 @@ exports.loginUser = (req, res) => {
         // Check if the account is expired
         const currentDate = new Date();
 
-        const expiredQuery = `SELECT expiredDate, name FROM orgs WHERE id = ${user.orgId}`;
+        const expiredQuery = `SELECT expiredDate, name, logo FROM orgs WHERE id = ${user.orgId}`;
 
         db_connection.query(expiredQuery, async (err, result) => {
             if (err) {
@@ -73,7 +73,8 @@ exports.loginUser = (req, res) => {
                 role: user.role,
                 orgId: user.orgId,
                 status: user.status,
-				orgName: result[0].name
+				orgName: result[0].name,
+				orgLogo: result[0].logo
             };
             const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
                 expiresIn: process.env.JWT_EXPIRES_IN
@@ -90,4 +91,129 @@ exports.loginUser = (req, res) => {
             });
         });        
     });
+}
+
+exports.getUserProfile = (req, res) => {
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "The Superadmin tried to access organization profile page"
+        })
+    }
+
+    const id = req.user.id
+    db_connection.query("SELECT id, name, email, phone FROM users WHERE id = ?", [id], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+        return res.status(200).send({
+            success: true,
+            message: 'Here is the user',
+            dev: "Good Job, Bro!",
+            data: results[0]
+        })
+    })
+};
+
+exports.checkPass = (req, res) => {
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "The Superadmin tried to access organization profile page"
+        })
+    }
+
+    const id = req.user.id
+    db_connection.query("SELECT password FROM users WHERE id = ?", [id], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+        return res.status(200).send({
+            success: true,
+            message: 'Here is the user',
+            dev: "Good Job, Bro!",
+            data: results[0]
+        })
+    })
+};
+
+exports.updateUserProfile = (req, res) => {
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "This user is from super organization"
+        })
+    }
+
+    const id = req.user.id
+    const { name, email, phone, password } = req.body
+	if (!name || !email || !phone ) {
+		return res.status(400).send(
+			{
+				success: false,
+                message: 'All fields are required',
+                dev: "Bro, give me correct ones"
+			}
+		)
+	}
+	
+	const parameters = []
+	parameters.push(name)
+	parameters.push(email)
+	parameters.push(phone)
+	
+	let sql = ''
+	if (password) {
+		sql = "UPDATE users SET name = ?, email = ?, phone = ?, password = ? WHERE id = ?"
+		parameters.push(password)
+		parameters.push(id)
+	} else {
+		sql = "UPDATE users SET name = ?, email = ?, phone = ? WHERE id = ?"
+		parameters.push(id)
+	}
+	
+
+    db_connection.query(sql, parameters, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        res.status(200).send({
+            success: true,
+            message: 'User updated successfully',
+            dev: "Good Job, Bro!",
+            data: {
+                name: name
+            }
+        })
+    })
 }

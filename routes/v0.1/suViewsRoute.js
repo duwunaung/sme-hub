@@ -1,5 +1,5 @@
 const express = require('express')
-const { login, logout, listExpenseCat, createExpenseCat, createIncomeCat, listIncomeCat , deleteIncomeCat, restoreIncomeCat , deleteExpenseCat, restoreExpenseCat , updateIncomeCat, updateExpenseCat, listIncomeTrans, listExpenseTrans , createIncomeTrans, createExpenseTrans , updateIncomeTrans, updateExpenseTrans , detailIncomeTrans, detailExpenseTrans, detailIncomeCat, detailExpenseCat, listAllTransactions} = require("../../controllers/v0.1/subscribersController")
+const { editUsrProfile, editOrgProfile, login, logout, listExpenseCat, createExpenseCat, createIncomeCat, listIncomeCat , deleteIncomeCat, restoreIncomeCat , deleteExpenseCat, restoreExpenseCat , updateIncomeCat, updateExpenseCat, listIncomeTrans, listExpenseTrans , createIncomeTrans, createExpenseTrans , updateIncomeTrans, updateExpenseTrans , detailIncomeTrans, detailExpenseTrans, detailIncomeCat, detailExpenseCat, listAllTransactions} = require("../../controllers/v0.1/subscribersController")
 
 const checkSubscriberSession = require('../../middlewares/viewSubscribers');
 const tmpSession = require('../../middlewares/tmp');
@@ -35,8 +35,12 @@ router.use('/category/expense/delete/:id', checkSubscriberSession, deleteExpense
 router.use('/category/expense/restore/:id', checkSubscriberSession, restoreExpenseCat )
 router.use('/category/expense', checkSubscriberSession, listExpenseCat )
 
+router.use('/user/profile', checkSubscriberSession, editUsrProfile)
+
+router.use('/organization/profile', checkSubscriberSession, upload.single("logo"), editOrgProfile)
+
 router.use('/home', checkSubscriberSession, (req, res) => {
-    res.render('subscriber/home', { token: req.session.token, user: req.session.user, organizationName: req.session.orgName })
+    res.render('subscriber/home', { token: req.session.token, user: req.session.user, organizationName: req.session.orgName, logo: req.session.orgLogo })
 })
 
 router.use('/', (req, res) => {

@@ -2,20 +2,38 @@
     <%- include('../partials/subscriber/navbar.ejs') %>
 	<style>
 		#receipt {
-			    max-height: 200px;
-			    border-radius: 10px;
-			    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-			    border: 1px solid #ddd;
-			    padding: 5px;
-			    background: #fff;
-			    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-			}
+		    max-height: 200px;
+		    border-radius: 10px;
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		    border: 1px solid #ddd;
+		    padding: 5px;
+		    background: #fff;
+		    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+		}
 
-			#receipt:hover {
-			    transform: scale(1.05);
-			    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
-				cursor: pointer;
-			}
+		#receipt:hover {
+		    transform: scale(1.05);
+		    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+			cursor: pointer;
+		}
+		#receiptPreview {
+		    max-height: 200px;
+		    border-radius: 10px;
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		    border: 1px solid #ddd;
+		    padding: 5px;
+		    background: #fff;
+		    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+		}
+		#receiptPreview:hover {
+			transform: scale(1.05);
+		    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+			cursor: pointer;
+		}
+
+		#previewContainer {
+		    margin-bottom: 1rem;
+		}
 	</style>
 		<main class="col-md-9 col-lg-10">
 			<div class="container my-5">
@@ -80,14 +98,28 @@
 					<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
 						<div class="mb-3">
 							<label for="transReceipt" class="form-label">Receipt</label><br>
-							<img src="/<%= transaction.receipt %>" data-bs-toggle="modal" data-bs-target="#receiptModal" id="receipt" alt="Receipt Image" class="img-fluid" />
+							<img src="/<%= transaction.receipt %>" data-bs-toggle="modal" 
+								 data-bs-target="#receiptModal" id="receiptPreview" 
+								 alt="Receipt Image" class="img-fluid" />
 							<br>
-							
+						</div>
+					<% } else { %>
+						<div class="mb-3" id="previewContainer" style="display: none;">
+							<label for="transReceipt" class="form-label">Receipt Preview</label><br>
+							<img id="receiptPreview" alt="Receipt Preview" class="img-fluid" />
+							<br>
 						</div>
 					<% } %>
 					<div class="mb-3">
-						<label for="transReceipt" class="form-label"><% if (transaction.receipt && transaction.receipt !== 'null' ) { %> Update Receipt <% } else { %> Upload Receipt <%} %></label><br>
-						<input type="file" class="form-control" name="receipt" id="transReceipt">
+						<label for="transReceipt" class="form-label">
+							<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
+								Update Receipt
+							<% } else { %>
+								Upload Receipt
+							<% } %>
+						</label><br>
+						<input type="file" class="form-control" name="receipt" 
+							   id="transReceipt" accept="image/*" onchange="previewReceipt(this)">
 					</div>
 					<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
 					<a href="" class="btn w-100" id="resetBtn"></a>
@@ -110,6 +142,34 @@
 				</div>
 			</div>
 			<script>
+
+				function previewReceipt(input) {
+				    const previewContainer = document.getElementById('previewContainer');
+				    const previewImage = document.getElementById('receiptPreview');
+				    
+				    if (input.files && input.files[0]) {
+				        const reader = new FileReader();
+				        
+				        reader.onload = function(e) {
+				            if (previewContainer) {
+				                previewContainer.style.display = 'block';
+				            }
+				            previewImage.src = e.target.result;
+				            previewImage.style.display = 'block';
+				            if (!previewImage.hasAttribute('data-bs-toggle')) {
+				                previewImage.setAttribute('data-bs-toggle', 'modal');
+				                previewImage.setAttribute('data-bs-target', '#receiptModal');
+				            }
+				        };
+				        
+				        reader.readAsDataURL(input.files[0]);
+				    } else {
+				        if (previewContainer) {
+				            previewContainer.style.display = 'none';
+				        }
+				        previewImage.style.display = 'none';
+				    }
+				}
 
 				function filterCategories() {
 			        let input = document.getElementById("categorySearch").value.toLowerCase();

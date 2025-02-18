@@ -4,6 +4,58 @@
 		text-decoration: none;
 		color: white;
 	}
+	.pro-pic{
+		width: 30px;
+		height: 30px;
+		object-fit: cover;
+		object-position: center;
+		border-radius: 50%;
+		margin-right: 8px;
+	}
+	.profile-placeholder {
+	    width: 30px;
+	    height: 30px;
+	    background: linear-gradient(135deg, #007bff, #0056b3);
+	    color: white;
+	    font-size: 20px;
+	    font-weight: bold;
+	    border-radius: 50%;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    text-transform: uppercase;
+	    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	    border: 2px solid rgba(255, 255, 255, 0.2); 
+	}
+	#sidebarLabel {
+		border: 2px solid rgba(255,255,255, 0.2);
+		box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.3);
+		transition: background-color 0.2s ease-in-out;
+	}
+
+	#sidebarLabel:hover {
+	    background-color: rgba(206, 206, 206, 0.05);
+	}
+	.circle-icon {
+	    width: 20px;
+	    height: 20px;
+	    color: white;
+	    font-size: 18px;
+	    display: flex;
+	    align-items: center;
+	    justify-content: center;
+	    border-radius: 50%;
+	    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+	}
+
+	.profile-logo-preview {
+		width: 30px;
+		height: 30px;
+        object-fit: cover;
+		object-position: center;
+		border-radius: 50%;
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
 </style>
 	        
 			<nav class="navbar navbar-dark bg-dark navbar-expand-lg justify-content-center"> 
@@ -17,19 +69,41 @@
 			<!-- Sidebar -->
 			<div class="offcanvas offcanvas-start bg-dark" tabindex="-1" id="sidebar" aria-labelledby="sidebarLabel" data-bs-backdrop="false">
 				<div class="offcanvas-header">
-				  <h5 class="offcanvas-title text-light" id="sidebarLabel"><%= organizationName.toUpperCase() %></h5>
-				  <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+					<button class="offcanvas-title text-light fs-5 d-flex align-items-center p-1 btn" id="sidebarLabel" onclick="goToProfilePage()">
+						<% if (logo) {%> 
+								<img src="/<%= logo %>" alt="Logo" class="profile-logo-preview">
+							<%} else {%> 
+								<div class="profile-placeholder me-2">
+									<%= organizationName.charAt(0).toUpperCase() %>
+								</div>
+							<%} 
+						%>
+						<span class="fw-bold me-4 ms-2">
+							<%= organizationName.toUpperCase() %>
+						</span>
+						<div class="circle-icon">
+							<i class="fas fa-caret-right"></i>
+						</div>
+					</button>									
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
 				</div>
+				
 				<div class="offcanvas-body">
 				  <ul class="list-unstyled">
 				    <li><a href="/subscriber/home" class="text-light d-block py-2">Dashboard</a></li>
 					<li><a href="/subscriber/transaction/transactions" class="text-light d-block py-2">Transactions</a></li>
 					<li><a href="/subscriber/category/income" class="text-light d-block py-2">Categories</a></li>
 				    <li><a href="#" class="text-light d-block py-2">Report</a></li>
+					<li><a href="/subscriber/user/profile" class="text-light d-block py-2">User Profile</a></li>
 				    <li class="border-top my-3"></li>
 				    <li><a href="/subscriber/logout" class="text-light d-block py-2">Logout</a></li>
 				  </ul>
 				</div>
 			</div>
+			<script>
+				function goToProfilePage() {
+					window.location.href = "/subscriber/organization/profile"
+				}
+			</script>
 			
 			
