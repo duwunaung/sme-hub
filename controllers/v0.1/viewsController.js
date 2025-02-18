@@ -384,13 +384,13 @@ exports.createUser = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&userPage=1&aciveUsers=true')
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired' + expired + '&userPage=1&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
         }).catch(error => {
             console.log(error)
             if (error.status === 409){
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&orgPage=' + orgPage + '&userPage=' + userPage + '&aciveUsers=true')
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&orgPage='  + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired' + expired + '&userPage=' + userPage + '&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
             } else {
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create&orgPage=' + orgPage + '&userPage=' + userPage + '&aciveUsers=true')
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create&orgPage='  + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired' + expired + '&userPage=' + userPage + '&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
             }
         })
     }
@@ -520,19 +520,20 @@ exports.updateUser = (req, res) => {
             const errorMsg = req.query.error;
             const type = req.query.type;
             if (success) {
-                res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
+                res.render('superadmin/edit-user', { user: response.data.data, orgId: orgId, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
             } else if (errorMsg) {
 				const name = req.query.name
 				const phone = req.query.phone
 				const email = req.query.email
 				const userData = {name, phone, email}
+                const orgId = req.params.id
                 if ( type == "dup-email") {
-                    res.render('superadmin/edit-user', { user: userData, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
+                    res.render('superadmin/edit-user', { user: userData, orgId: orgId, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
                 } else {
-                    res.render('superadmin/edit-user', { user: userData, options: options, roles: roles, errorMessage: "Something went wrong!", successMessage: null });
+                    res.render('superadmin/edit-user', { user: userData, orgId: orgId, options: options, roles: roles, errorMessage: "Something went wrong!", successMessage: null });
                 }
             } else {
-                res.render('superadmin/edit-user', { user: response.data.data, options: options, roles: roles, errorMessage: null, successMessage: null });
+                res.render('superadmin/edit-user', { user: response.data.data, orgId: orgId, options: options, roles: roles, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
 			if (error.status == 404)
@@ -559,10 +560,10 @@ exports.updateUser = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/organizations/update/' + orgId +  '/' + userId + '?success=true&type=update&activeUsers=true&orgPage=' + orgPage + '&orgName' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
+            res.redirect('/superadmin/organizations/update/' + orgId +  '/' + userId + '?success=true&type=update&activeUsers=true&orgPage=' + orgPage + '&orgName=' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
         }).catch(error => {
             if (error.status === 409){
-                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=dup-email&orgPage=' + orgPage + '&orgName' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole + '&name=' + name + '&email=' + email +  '&phone=' + phone );
+                res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=dup-email&activeUsers=true&orgPage=' + orgPage + '&orgName' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole + '&name=' + name + '&email=' + email +  '&phone=' + phone );
             } else {
                 res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&orgName' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole + '&name=' + name + '&email=' + email +  '&phone=' + phone );
             }
@@ -707,7 +708,7 @@ exports.updateSuperadmin = (req, res) => {
 				throw error
 			}
             if ( errorMsg ) {
-				const name = req.query.name
+				const name = req.query.uName
 				const phone = req.query.phone
 				const email = req.query.email
 				const userData = {name, phone, email}
@@ -745,9 +746,9 @@ exports.updateSuperadmin = (req, res) => {
             res.redirect('/superadmin/users/update/' + userId + '?success=true&type=update&page=' + page + '&name=' + urlName + '&status=' + urlStatus)
         }).catch(error => {
 			if (error.status === 409){
-           		res.redirect('/superadmin/users/update/' + userId + '?error=true&type=dup-email&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page + '&name=' + urlName + '&status=' + urlStatus);
+           		res.redirect('/superadmin/users/update/' + userId + '?error=true&type=dup-email&uName=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page + '&name=' + urlName + '&status=' + urlStatus);
 			} else {
-				res.redirect('/superadmin/users/update/' + userId + '?error=true&type=sysError&name=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page + '&name=' + urlName + '&status=' + urlStatus);
+				res.redirect('/superadmin/users/update/' + userId + '?error=true&type=sysError&uName=' + name + '&email=' + email +  '&phone=' + phone + '&page=' + page + '&name=' + urlName + '&status=' + urlStatus);
 			}
         })
     }

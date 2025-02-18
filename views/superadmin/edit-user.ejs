@@ -17,7 +17,7 @@
                     </div>
                     <% } %>
                 <!-- user Details Form -->
-                <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+                <form method="POST" id="myForm" onsubmit="submitForm(event)">
                     <div class="mb-3">
                         <label for="userName" class="form-label">Username</label>
                         <input type="text" class="form-control" maxlength="100" name="name" id="userName"
@@ -64,13 +64,14 @@
                         </select>
                     </div>
                     <button onclick="clickBtn('update', '<%= user.id %>')" type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update</button>
-                    <a onclick="clickBtn('back', '<%= user.orgId %>')" href="#" id="resetBtn" class="btn  w-100"></a>
 				</form>
+                <a onclick="clickBtn()" href="#" id="resetBtn" class="btn w-100"></a>
             </div>
 			<script>
                 // Click Btns
                 let url = new URL(window.location.href);
-                let orgId = req.query.orgId
+				const searchParams = new URLSearchParams(window.location.search);
+                
                 let orgName = url.searchParams.get( 'orgName' )
                 let orgStatus = url.searchParams.get( 'orgStatus' )
                 let orgPage = url.searchParams.get( 'orgPage' )
@@ -119,19 +120,15 @@
                     userQuery += "&userRole=" + userRole
                 }
 
-                function clickBtn( type, num ) {
-                    if (type == 'back') {
-                        window.location.href = '/superadmin/organizations/detail/' + num + query + userQuery + '&activeUsers=true'
-                    } else {
-                        window.location.href = '/superadmin/organizations/' + type + '/' + orgId + '/' + num + query + userQuery + '&activeUsers=true'
-                    }
-                }
+                let orgId = "<%= orgId %>"
 
+                function clickBtn( type, num ) {
+                    window.location.href = '/superadmin/organizations/detail/' + orgId + query + userQuery + '&activeUsers=true'
+                }
                 // xxx
-				function buttonType() {
-	                const searchParams = new URLSearchParams(window.location.search);
-	                const type = searchParams.get('type')
+                function buttonType() {
 					const resetBtn = document.getElementById("resetBtn")
+                    const type = searchParams.get('type')
 	                if (type == 'update') {
 						resetBtn.innerText = "Back"
 						resetBtn.classList.add("btn-primary")
@@ -140,10 +137,11 @@
 						resetBtn.innerText = "Cancel"
 						resetBtn.classList.add("btn-danger")
 					}
+
 	            }
 
 	            buttonType();
-                
+
                 const form = document.getElementById('myForm');
                 const addButton = document.getElementById('addBtn');
                 const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
@@ -178,8 +176,6 @@
 				    addButton.textContent = 'Submitting...';
 				}
 				
-
-				const searchParams = new URLSearchParams(window.location.search);
 				const error = searchParams.get('error')
 
 				if (error === 'true') {

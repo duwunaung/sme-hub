@@ -275,7 +275,7 @@
 
                 function clickBtn(type, num) {
                     if (type === 'add') {
-                        window.location.href = "/superadmin/add-superadmin" + query + "&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>"
+                        window.location.href = "/superadmin/add-superadmin" + query
                     } else {
                         window.location.href = "/superadmin/users/" + type + "/" + num + query
                     }

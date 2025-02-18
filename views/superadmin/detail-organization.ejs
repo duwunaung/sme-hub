@@ -30,7 +30,7 @@
                                             onclick="changeInfo('users')">Users</a>
                                     </li>
                                 </ul>
-                                <form id="detail-view" class="mb-4  view-containers">
+                                <form id="detail-view" action="/superadmin/organizations/<%= org.id %>" class="mb-4  view-containers">
                                     <h3 class="my-4">Organization Details</h3>
                                     <div class="mb-3">
                                         <label for="orgName" class="form-label">Organization Name</label>
@@ -144,13 +144,13 @@
                                                                     <%= i + (parseInt(pagination.page) - 1)*10 + 1 %>
                                                                 </td>
                                                                 <td>
-                                                                    <%= users[i].name.length > 25 
-											                        ? users[i].name.substring(0, 25) + "..." 
+                                                                    <%= users[i].name.length > 15 
+											                        ? users[i].name.substring(0, 15) + "..." 
 											                        : users[i].name %>
                                                                 </td>
 																<td>
-																	<%= users[i].email.length > 30 
-											                        ? users[i].email.substring(0, 30) + "..." 
+																	<%= users[i].email.length > 25
+											                        ? users[i].email.substring(0, 25) + "..." 
 											                        : users[i].email %>
                                                                 </td>
                                                                 <td>
@@ -277,6 +277,8 @@
                     window.location.href = "/superadmin/organizations" + query
                 } else if ( type == 'updateOrg' ) {
                     window.location.href = "/superadmin/organizations/update/" + num + query
+                } else if ( type == 'adduser' ) {
+                    window.location.href = "/superadmin/organizations/" + type + "/" + orgId + query + userQuery
                 } else {
                     window.location.href = "/superadmin/organizations/" + type + "/" + orgId + "/" + num + query + userQuery
                 }
@@ -492,7 +494,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                            <form id="addUserForm"  action="/superadmin/organizations/adduser/<%= org.id %>?orgPage=<%= orgPage %>&userPage=<%= pagination.page %>&totalPage=<%= pagination.totalPage %>&pageSize=<%= pagination.pageSize %>&total=<%= pagination.total %>&status=<%= status %>" method="POST" onsubmit="submitForm(event)">
+                            <form id="addUserForm"  action="" method="POST" onsubmit="submitForm(event)">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">User Name</label>
                                 <input type="text" class="form-control" maxlength="100" name="name" id="userName"
@@ -532,7 +534,7 @@
                                         <% }); %>
                                 </select>
                             </div>
-                            <button type="submit" id="addBtn" class="btn btn-primary w-100">Add New User</button>
+                            <button onclick="clickBtn('adduser', 1)" type="submit" id="addBtn" class="btn btn-primary w-100">Add New User</button>
                         </form>
                     </div>
                 </div>
@@ -578,7 +580,7 @@
             function pagination( type, num ) {
                 let url = new URL(window.location.href);
                 url.searchParams.set( type, num)
-                url.searchParams.set( orgPage, '<%= orgPage %>')
+                url.searchParams.set( 'orgPage', '<%= orgPage %>')
                 url.searchParams.set( 'activeUsers', true)
                 window.location.href = url.toString();
             }

@@ -223,10 +223,10 @@
 					confirmBtn.onclick = () => {
 						if (!type && !num) {
 							const expireDays = Math.ceil(orgExpiredDate/ (1000 * 60 * 60 * 24)) - Math.ceil(today/ (1000 * 60 * 60 * 24));
-							const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day` + query ;
+							const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day` + '&' + query.slice(1);
 		          window.location.href = newHref; 
 						} else {
-							const newURL = 'http://localhost:3000/superadmin/organizations/license/' + orgId + '?num=' + num + '&type=' + type + query;
+							const newURL = 'http://localhost:3000/superadmin/organizations/license/' + orgId + '?num=' + num + '&type=' + type + '&' + query.slice(1);
 							window.location.href = newURL; 
 						}
 					}
