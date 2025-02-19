@@ -253,8 +253,14 @@ exports.listExpenseCat = (req, res) => {
 exports.createExpenseCat = (req, res) => {
 	if (req.method == 'POST') {
 
-		const { name } = req.body;
-		axios.post(`${process.env.API_URL}/subscribers/categories/expense/create`, { name }, {
+		const { name ,categoryType, parentCategory } = req.body;
+		const parameters = {name}
+		let parentId;
+		if (categoryType === 'underParent' && parentCategory == 'purchase') {
+			parentId = 2;
+			parameters.parentId = parentId; 
+		}
+		axios.post(`${process.env.API_URL}/subscribers/categories/expense/create`, parameters, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -326,12 +332,12 @@ exports.updateExpenseCat = (req, res) => {
 		}).then(response => {
 			const {success, type} = req.query
 			if (success === 'true' && type === 'update') {
-				res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: "Updated Successfully!" });
+				res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: "Updated Successfully!", cat: 'expense' });
 			} else {
-				res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: null });
+				res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: null, cat: 'expense' });
 			}
 		}).catch(error => {
-			res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: {}, options: options, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: {}, options: options, errorMessage: "System Error!", successMessage: null, cat: 'expense' });
 		})
 	} else {
 		const id = req.params.id
@@ -452,8 +458,14 @@ exports.listIncomeCat = (req, res) => {
 exports.createIncomeCat = (req, res) => {
 	if (req.method == 'POST') {
 
-		const { name } = req.body;
-		axios.post(`${process.env.API_URL}/subscribers/categories/income/create`, { name }, {
+		const { name, categoryType, parentCategory } = req.body;
+		const parameters = {name}
+		let parentId;
+		if (categoryType === 'underParent' && parentCategory == 'sale') {
+			parentId = 1;
+			parameters.parentId = parentId; 
+		}
+		axios.post(`${process.env.API_URL}/subscribers/categories/income/create`, parameters, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -525,12 +537,12 @@ exports.updateIncomeCat = (req, res) => {
 		}).then(response => {
 			const {success, type} = req.query
 			if (success === 'true' && type === 'update') {
-				res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: "Updated Successfully!" });
+				res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: "Updated Successfully!", cat: 'income' });
 			} else {
-				res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: null });
+				res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: response.data.data, options: options, errorMessage: null, successMessage: null , cat: 'income' });
 			}
 		}).catch(error => {
-			res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: {}, options: options, errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/categories-edit', { logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, category: {}, options: options, errorMessage: "System Error!", successMessage: null, cat: 'income'  });
 		})
 	} else {
 		const id = req.params.id
@@ -929,6 +941,134 @@ exports.detailIncomeTrans = (req, res) => {
 			})
 		}).catch(error => {
 			res.render('subscriber/transaction-detail', { logo: req.session.orgLogo, pagination: {}, organizationName: req.session.orgName,category: [], transaction: {}, errorMessage: "System Error!", trans: "income", successMessage: null });         
+		})
+	}
+}
+
+exports.createSalesperson = (req, res) => {
+	if (req.method == 'POST') {
+
+		const { name } = req.body;
+		const parameters = {name}
+		axios.post(`${process.env.API_URL}/subscribers/salesperson/create`, parameters, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+				res.redirect('/subscriber/salesperson?success=true&type=create'  )
+		}).catch(error => {
+			if (error.status === 501 && error.response.data.message === "duplicate_name") {
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/list/${name}`, {
+					headers: {
+						'Authorization': `${req.session.token}`
+					}
+				}).then(responseSalesperson => {
+					const status = responseSalesperson.data.data.status
+					const id = responseSalesperson.data.data.id
+					res.redirect(`/subscriber/salesperson?error=true&type=duplicate-name&status=${status}&id=${id}&name=${name}`)
+				}).catch(err => {
+					res.redirect('/subscriber/salesperson?error=true&type=create')
+				})
+			} else {
+				res.redirect('/subscriber/salesperson?error=true&type=create')
+			}
+		})
+	}
+}
+
+exports.listSalesperson = (req, res) => {
+	if (req.method == 'GET') {
+		const { search } = req.query
+		const page = req.query.page || 1
+		const pageSize = req.query.pageSize || 10
+		let url_api = `${process.env.API_URL}/subscribers/salesperson/list`
+		const queryParams = [];
+		if (page) {
+			queryParams.push(`page=${page}`);
+		}
+		if (pageSize) {
+			queryParams.push(`pageSize=${pageSize}`);
+		}
+		if (search) {
+			queryParams.push(`search=${search}`);
+		}
+		if (queryParams.length > 0) {
+			url_api += `?${queryParams.join('&')}`;
+		}
+		axios.get(url_api, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			const options = [
+				{ id: 1, name: 'active' },
+				{ id: 2, name: 'deleted' }
+			];
+			const {success, type} = req.query
+			if (success === 'true') {
+				if (type === 'delete') {
+					res.render('subscriber/salesperson', { logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully Deleted!"});
+				} else if (type === 'create') {
+					res.render('subscriber/salesperson', { logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully Created!"});
+				} else if (type === 'restore') {
+					res.render('subscriber/salesperson', { logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully Restored!"});
+				} else {
+					res.render('subscriber/salesperson', { logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
+				}
+			} else {
+				res.render('subscriber/salesperson', { logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
+			}
+			
+		}).catch(error => {
+			res.render('subscriber/salesperson', { logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: [], options: [] ,  pagination: {}, errorMessage: "System Error!", successMessage: null });
+		})
+	}
+}
+
+exports.updateSalesperson = (req, res) => {
+	if (req.method === 'POST' ) {
+		const id = req.params.id
+		const { name } = req.body;
+		const page = req.query.page || 1
+		axios.put(`${process.env.API_URL}/subscribers/salesperson/update/${id}`, { name }, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			res.redirect('/subscriber/salesperson' + `?success=true&type=update&page=${page}`)
+		}).catch(error => {
+			res.redirect('/subscriber/salesperson' + `?error=true&type=sysError&page=${page}`);
+		})
+	}
+}
+
+exports.restoreSalesperson = (req, res) => {
+	if (req.method == 'GET') {
+		const id = req.params.id
+		axios.put(`${process.env.API_URL}/subscribers/salesperson/restore/${id}`, {},  {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			res.redirect('/subscriber/salesperson'+ '?success=true&type=restore')
+		}).catch(error => {
+			res.redirect('/subscriber/salesperson' + '?error=true&type=sysError')
+		})
+	}
+}
+
+exports.deleteSalesperson = (req, res) => {
+	if (req.method == 'GET') {
+		const id = req.params.id
+
+		axios.delete(`${process.env.API_URL}/subscribers/salesperson/delete/${id}`, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			res.redirect('/subscriber/salesperson'+ '?success=true&type=delete')
+		}).catch(error => {
+			res.redirect('/subscriber/salesperson' + '?error=true&type=sysError')
 		})
 	}
 }
