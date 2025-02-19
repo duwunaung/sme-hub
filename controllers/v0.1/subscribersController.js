@@ -181,6 +181,7 @@ exports.listAllTransactions = (req, res) => {
                 organizationName: req.session.orgName,
                 trans: "all",
                 category: [],
+				salesperson: [],
                 transaction: transactionsRes.data.data,
                 pagination: transactionsRes.data.pagination,
                 errorMessage: null,
@@ -192,6 +193,7 @@ exports.listAllTransactions = (req, res) => {
                 organizationName: req.session.orgName,
                 trans: "all",
                 category: [],
+				salesperson: [],
                 transaction: [],
                 pagination: {},
                 errorMessage: "System Error!",
@@ -649,17 +651,25 @@ exports.listExpenseTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				const success = req.query.success
-				const type = req.query.type
-				if (success === 'true'){
-					if (type === 'create') {
-						res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data, transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: "Successfully Created!"});
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+					headers: {
+						'Authorization': `${req.session.token}`
 					}
-				} else {
-					res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data, transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
-				}
+				}).then(responseSalesperson => {
+					const success = req.query.success
+					const type = req.query.type
+					if (success === 'true'){
+						if (type === 'create') {
+							res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: "Successfully Created!"});
+						}
+					} else {
+						res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+					}
+				}).catch(err => {
+					res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: [], transaction: [], salesperson: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+				})
 			}).catch(error => {
-				res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: [], transaction: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: [], transaction: [],salesperson: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
 			axios.get(`${process.env.API_URL}/subscribers/categories/expense`, {
@@ -667,13 +677,21 @@ exports.listExpenseTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				if (error.status === 404) {
-					res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data, transaction: [],  pagination: {}, errorMessage: null, successMessage: null });
-				} else {
-					res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data, transaction: [],  pagination: {}, errorMessage: "System Error!", successMessage: null });
-				}
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+					headers: {
+						'Authorization': `${req.session.token}`
+					}
+				}).then(responseSalesperson => {
+					if (error.status === 404) {
+						res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data, transaction: [], salesperson: responseSalesperson.data.data, pagination: {}, errorMessage: null, successMessage: null });
+					} else {
+						res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data, transaction: [], salesperson: responseSalesperson.data.data, pagination: {}, errorMessage: "System Error!", successMessage: null });
+					}
+				}).catch(err => {
+					res.render('subscriber/transaction', {  logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: [], transaction: [],  pagination: {},salesperson: [], errorMessage: "System Error!", successMessage: null });
+				})
 			}).catch(error => {
-				res.render('subscriber/transaction', {  logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: [], transaction: [],  pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction', {  logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: [], transaction: [],  pagination: {},salesperson: [], errorMessage: "System Error!", successMessage: null });
 			})
 		})
 	}
@@ -816,17 +834,25 @@ exports.listIncomeTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				const success = req.query.success
-				const type = req.query.type
-				if (success === 'true') {
-					if (type === 'create') {
-						res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: "Successfully Created!"});
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+					headers: {
+						'Authorization': `${req.session.token}`
 					}
-				} else {
-					res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
-				}
+				}).then(responseSalesperson => {
+					const success = req.query.success
+					const type = req.query.type
+					if (success === 'true') {
+						if (type === 'create') {
+							res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, salesperson: responseSalesperson.data.data ,transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: "Successfully Created!"});
+						}
+					} else {
+						res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+					}
+				}).catch(err => {
+					res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: [], pagination: {},salesperson: [] , errorMessage: "System Error!", successMessage: null });
+				})
 			}).catch(error => {
-				res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction', { logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: [], pagination: {}, salesperson: [] ,errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
 			axios.get(`${process.env.API_URL}/subscribers/categories/income`, {
@@ -834,13 +860,21 @@ exports.listIncomeTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				if (error.status === 404) {
-					res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [],  pagination: {}, errorMessage: null, successMessage: null });
-				} else {
-					res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [],  pagination: {}, errorMessage: "System Error!", successMessage: null });
-				}
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+					headers: {
+						'Authorization': `${req.session.token}`
+					}
+				}).then(responseSalesperson => {
+					if (error.status === 404) {
+						res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [], salesperson: responseSalesperson.data.data , pagination: {}, errorMessage: null, successMessage: null });
+					} else {
+						res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [], salesperson: responseSalesperson.data.data , pagination: {}, errorMessage: "System Error!", successMessage: null });
+					}
+				}).catch(err => {
+					res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: [], transaction: [], salesperson: [] , pagination: {}, errorMessage: "System Error!", successMessage: null });
+				})
 			}).catch(error => {
-				res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: [], transaction: [],  pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction', { logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: [], transaction: [], salesperson: [] , pagination: {}, errorMessage: "System Error!", successMessage: null });
 			})
 			
 		})
