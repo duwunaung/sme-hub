@@ -1,5 +1,5 @@
 const express = require('express')
-const { editUsrProfile, editOrgProfile, login, logout, listExpenseCat, createExpenseCat, createIncomeCat, listIncomeCat , deleteIncomeCat, restoreIncomeCat , deleteExpenseCat, restoreExpenseCat , updateIncomeCat, updateExpenseCat, listIncomeTrans, listExpenseTrans , createIncomeTrans, createExpenseTrans , updateIncomeTrans, updateExpenseTrans , detailIncomeTrans, detailExpenseTrans, detailIncomeCat, detailExpenseCat, listAllTransactions} = require("../../controllers/v0.1/subscribersController")
+const { deleteSalesperson, restoreSalesperson, updateSalesperson, createSalesperson, listSalesperson, editUsrProfile, editOrgProfile, login, logout, listExpenseCat, createExpenseCat, createIncomeCat, listIncomeCat , deleteIncomeCat, restoreIncomeCat , deleteExpenseCat, restoreExpenseCat , updateIncomeCat, updateExpenseCat, listIncomeTrans, listExpenseTrans , createIncomeTrans, createExpenseTrans , updateIncomeTrans, updateExpenseTrans , detailIncomeTrans, detailExpenseTrans, detailIncomeCat, detailExpenseCat, listAllTransactions} = require("../../controllers/v0.1/subscribersController")
 
 const checkSubscriberSession = require('../../middlewares/viewSubscribers');
 const tmpSession = require('../../middlewares/tmp');
@@ -34,6 +34,12 @@ router.use('/category/expense/update/:id', checkSubscriberSession, updateExpense
 router.use('/category/expense/delete/:id', checkSubscriberSession, deleteExpenseCat )
 router.use('/category/expense/restore/:id', checkSubscriberSession, restoreExpenseCat )
 router.use('/category/expense', checkSubscriberSession, listExpenseCat )
+
+router.use('/salesperson/delete/:id', checkSubscriberSession, deleteSalesperson )
+router.use('/salesperson/restore/:id', checkSubscriberSession, restoreSalesperson )
+router.use('/salesperson/update/:id', checkSubscriberSession, updateSalesperson )
+router.use('/salesperson/create', checkSubscriberSession, createSalesperson )
+router.use('/salesperson', checkSubscriberSession, listSalesperson )
 
 router.use('/user/profile', checkSubscriberSession, editUsrProfile)
 
