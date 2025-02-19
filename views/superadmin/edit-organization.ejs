@@ -71,9 +71,18 @@
 										<a href="" class="btn btn-outline-secondary" onclick="extLicense('month',1)" id="expireNowBtn" data-bs-toggle="modal"
 										data-bs-target="#confirmationModal" data-type="month" data-num="1">+1 Months</a>
 									</div>
-									<p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold">
-											<%= new Date(org.expiredDate).toDateString() %>
-									</span></p>
+									<div class="mt-3">
+										<p>The last updated by <strong id="updatedBy"><%= org.userName %></strong> at <span id="updatedAt"
+												class="fw-bold">
+												<%= new Date(org.updatedAt).toString().split('GMT')[0]; %>
+												</span>
+										</p>
+										<p>Current Expiration Date : <span id="currentExpirationDate"
+														class="fw-bold mx-2">
+												<%= new Date(org.expiredDate).toDateString() %>
+														</span>
+										</p>
+								</div>
                 </div>
 				<!-- Modal HTML -->
 				<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">

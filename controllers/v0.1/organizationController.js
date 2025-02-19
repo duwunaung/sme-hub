@@ -116,7 +116,9 @@ exports.createOrg = (req, res) => {
                 address: address,
                 phone: phone,
                 status: 'active',
-                expiredDate: expiry
+                expiredDate: expiry,
+                updatedBy: updatedBy,
+                updatedAt: updatedAt
             }
         })
     })
@@ -131,10 +133,12 @@ exports.updateOrg = (req, res) => {
         })
     }
 
+    const userId = req.user.userId
+    const now = new Date()
     const orgId = req.params.id
     const { name, address, phone, status } = req.body
 
-    db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, status = ? WHERE id = ?", [name, address, phone, status, orgId], (err, results) => {
+    db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, status = ?, updatedBy = ?, updatedAt = ? WHERE id = ?", [name, address, phone, status, userId, now, orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -168,7 +172,7 @@ exports.licenseOrg = (req, res) => {
 
     const orgId = req.params.id
     const { num, type } = req.body
-	
+	const userId = req.user.userId
     const today = new Date()
 	const year = today.getFullYear();
 	const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -211,7 +215,7 @@ exports.licenseOrg = (req, res) => {
 				message: 'not acceptable'
 			})
 		} else {
-			db_connection.query("UPDATE orgs SET expiredDate = ? WHERE id = ?", [expiry, orgId], (error, results) => {
+			db_connection.query("UPDATE orgs SET expiredDate = ?, updatedBy = ?, updatedAt = ? WHERE id = ?", [expiry, userId, today, orgId], (error, results) => {
 				if (error) {
 					return res.status(500).send({
 						success: false,
@@ -241,9 +245,10 @@ exports.deleteOrg = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-
+    const userId = req.user.userId
+    const now = new Date()
     const orgId = req.params.id
-    db_connection.query("UPDATE orgs SET status = 'deleted' WHERE id = ?", [orgId], (err, results) => {
+    db_connection.query("UPDATE orgs SET status = 'deleted', updatedBy = ?, updatedAt = ? WHERE id = ?", [userId, now, orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -310,7 +315,7 @@ exports.getOrg = (req, res) => {
             }
 
             results[0].userName = userName
-            
+
             return res.status(200).send({
                 success: true,
                 message: 'Here is the organization',
@@ -329,9 +334,10 @@ exports.restoreOrg = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-
+    const userId = req.user.userId
+    const now = new Date()
     const orgId = req.params.id
-    db_connection.query("UPDATE orgs SET status = 'active' WHERE id = ?", [orgId], (err, results) => {
+    db_connection.query("UPDATE orgs SET status = 'active', updatedBy = ?, updatedAt = ? WHERE id = ?", [userId, now, orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
