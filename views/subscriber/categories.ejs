@@ -145,34 +145,60 @@
 					</div>
 					<div class="modal-footer">
 						<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-						<button type="button" class="btn btn-primary" id="confirmBtn">Confirm</button>
+						<button type="button" class="btn btn-primary" id="confirmBtn" onclick="deleteConfirm()">Confirm</button>
 					</div>
 				</div>
 			</div>
 		</div>
-		<!-- Modal for adding new category -->
-		<div class="modal fade" id="addNewCategory" tabindex="-1" aria-labelledby="addNewCategoryModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addNewCategoryModalLabel">Add New Category</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="addNewCategoryForm" action="/subscriber/category/<%= cat %>/create" method="POST" onsubmit="submitForm(event)">
-                            <div class="mb-3">
-                                <label for="catName" class="form-label">Category Name</label>
-                                <input type="text" class="form-control" maxlength="100" name="name" id="catName"
-                                    placeholder="Enter category name" value="" oninput="checkInputs('catNameError', 'catName')" required>
-								<p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
-                            </div>
-                            <button type="submit" id="addBtn" class="btn btn-primary w-100">Add Category</button>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
+		<!-- Modal for Adding New Category -->
+		<div class="modal fade" id="addNewCategory" tabindex="-1" aria-labelledby="addNewCategoryModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <h5 class="modal-title" id="addNewCategoryModalLabel">Add New Category</h5>
+		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		            </div>
+		            <div class="modal-body">
+		                <form id="addNewCategoryForm" action="/subscriber/category/<%= cat %>/create" method="POST" onsubmit="submitForm(event)">
+		                    
+		                    <!-- Category Name -->
+		                    <div class="mb-3">
+		                        <label for="catName" class="form-label">Category Name</label>
+		                        <input type="text" class="form-control" maxlength="100" name="name" id="catName"
+		                            placeholder="Enter category name" value="" oninput="checkInputs('catNameError', 'catName')" required>
+		                        <p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
+		                    </div>
+
+		                    <!-- Category Type Selection -->
+		                    <div class="mb-3">
+		                        <label class="form-label">Category Type</label>
+		                        <div class="form-check">
+		                            <input class="form-check-input" type="radio" name="categoryType" id="standalone" value="standalone" checked onclick="toggleParentCategory()">
+		                            <label class="form-check-label" for="standalone">Standalone Category</label>
+		                        </div>
+		                        <div class="form-check">
+		                            <input class="form-check-input" type="radio" name="categoryType" id="underParent" value="underParent" onclick="toggleParentCategory()">
+		                            <label class="form-check-label" for="underParent">Under Parent <%= cat === 'income' ? 'Sale' : 'Purchase' %></label>
+		                        </div>
+		                    </div>
+
+		                    <!-- Parent Category Dropdown (Hidden by Default) -->
+		                    <div class="mb-3" id="parentCategoryGroup" style="display: none;">
+		                        <label for="parentCategory" class="form-label">
+									Select Parent <%= cat === 'income' ? 'Sale' : 'Purchase' %>
+								</label>								
+		                        <select class="form-select" id="parentCategory" name="parentCategory">
+		                            <option value="">Choose...</option>
+		                            <option value="<%= cat === 'income' ? 'sale' : 'purchase' %>" selected><%= cat === 'income' ? 'Sale' : 'Purchase' %></option>
+		                        </select>
+		                    </div>
+
+		                    <button type="submit" id="addBtn" class="btn btn-primary w-100" disabled>Add Category</button>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		</div>
 		<!-- PageSize -->
 		<div class="btn-group my-2" style="max-width: 100px;">
 			<button type="button" 
@@ -300,11 +326,12 @@
 		        deleteCategoryCat = element.getAttribute("data-category-cat");
 		    }
 
-		    document.getElementById("confirmBtn").addEventListener("click", function () {
+		    function deleteConfirm() {
 		        if (deleteCategoryId && deleteCategoryCat) {
 		            window.location.href = `/subscriber/category/${deleteCategoryCat}/delete/${deleteCategoryId}`;
 		        }
-		    });
+		    }
+			
 			function goToPage(pageNumber) {
 			    const baseUrl = new URL(window.location.href);
 			    baseUrl.searchParams.set("page", pageNumber);
@@ -370,6 +397,11 @@
 			    addButton.textContent = 'Submitting...';
 			}
 
+			function toggleParentCategory() {
+		        document.getElementById('parentCategoryGroup').style.display = 
+		            document.getElementById('underParent').checked ? 'block' : 'none';
+		    }
+			
 			function goToDirection(id, type) {
 			    const pathname = window.location.pathname;
 			    let newUrl;
