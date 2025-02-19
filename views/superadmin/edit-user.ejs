@@ -64,8 +64,14 @@
                         </select>
                     </div>
                     <button onclick="clickBtn('update', '<%= user.id %>')" type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update</button>
+                    <a onclick="clickBtn()" href="#" id="resetBtn" class="btn w-100"></a>
 				</form>
-                <a onclick="clickBtn()" href="#" id="resetBtn" class="btn w-100"></a>
+                <br>
+                <p>The last updated by <strong id="updatedBy"><%= user.superadminName %></strong> at <span id="updatedAt"
+                    class="fw-bold">
+                    <%= new Date(user.updatedAt).toString().split('GMT')[0]; %>
+                    </span>
+                </p>
             </div>
 			<script>
                 // Click Btns

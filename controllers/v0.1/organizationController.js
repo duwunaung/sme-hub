@@ -116,9 +116,7 @@ exports.createOrg = (req, res) => {
                 address: address,
                 phone: phone,
                 status: 'active',
-                expiredDate: expiry,
-                updatedBy: updatedBy,
-                updatedAt: updatedAt
+                expiredDate: expiry
             }
         })
     })
@@ -299,7 +297,7 @@ exports.getOrg = (req, res) => {
 
         const userId = results[0].updatedBy
 
-        db_connection.query("SELECT name FROM users WHERE id = ?", [userId], (err, userResult) => {
+        db_connection.query("SELECT name FROM users WHERE id = ? AND orgId = 0", [userId], (err, userResult) => {
             if (err) {
                 return res.status(500).send({
                     success: false,
@@ -457,7 +455,9 @@ exports.deleteUser = (req, res) => {
     }
 
     const userId = req.params.id
-    db_connection.query("UPDATE users SET status = 'deleted' WHERE id = ?", [userId], (err, results) => {
+    const superadminId = req.user.userId
+    const now = new Date()
+    db_connection.query("UPDATE users SET status = 'deleted', updatedBy = ?, updatedAt = ? WHERE id = ?", [superadminId, now, userId], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,

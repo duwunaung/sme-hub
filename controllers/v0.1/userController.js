@@ -24,9 +24,10 @@ exports.createUser = async (req, res) => {
                 dev: "Superadmin user creation is restricted from this api"
             });
         }
-
-        db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered, expired) VALUES (?,?,?,?,?,?,?,?,?)',
-            [name, hashedPassword, phone, role, email, orgId, status, new Date(), expiredDate],
+        const userId = req.user.userId
+        const now = new Date()
+        db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered, expired, updatedBy, updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+            [name, hashedPassword, phone, role, email, orgId, status, new Date(), expiredDate, userId, now],
             (err, result) => {
                 if (err) {
                     if (err.code ==  "ER_DUP_ENTRY") {
@@ -178,7 +179,7 @@ exports.getUser = (req, res) => {
     }
     const userId = req.params.id
     
-    let query = `SELECT name, email, role, phone, orgId, status, registered, remark, expired FROM users WHERE users.id = ${userId}`;
+    let query = `SELECT name, email, role, phone, orgId, status, registered, remark, expired, updatedBy, updatedAt FROM users WHERE users.id = ${userId}`;
 
     db_connection.query(query, (err, results) => {
         if (err) {
@@ -213,12 +214,34 @@ exports.getUser = (req, res) => {
             } else {
                 orgName = orgResult[0].name
             }
+
             results[0].orgName = orgName
-            return res.status(200).send({
-                success: true,
-                message: "We found this user!",
-                dev: "Thanks bro, you`re awesome",
-                data: results[0]
+            const updatedBy = results[0].updatedBy
+
+            superadminQuery = `SELECT name FROM users WHERE id = ? AND orgId = 0`;
+            db_connection.query(superadminQuery, [updatedBy], (err, superadminResult) => {
+                if (err) {
+                    return res.status(500).send({
+                        success: false,
+                        message: 'internal server error',
+                        dev: err
+                    })
+                }
+                
+                if (superadminResult.length === 0) {
+                    superadminName = ""
+                } else {
+                    superadminName = superadminResult[0].name
+                }
+    
+                results[0].superadminName = superadminName
+
+                return res.status(200).send({
+                    success: true,
+                    message: "We found this user!",
+                    dev: "Thanks bro, you`re awesome",
+                    data: results[0]
+                })
             })
         })
     });
@@ -236,10 +259,11 @@ exports.updateUser = (req, res) => {
             dev: 'Outside organization cannot update user' 
         });
     }
-
+    const superadminId = req.user.userId
+    const now = new Date()
     db_connection.query(
-        'UPDATE users SET name = ?, email = ?, phone = ?, role = ?, status = ?, orgId = ? WHERE id = ?',
-        [name, email, phone, role, status, orgId, userId],
+        'UPDATE users SET name = ?, email = ?, phone = ?, role = ?, status = ?, orgId = ?, updatedBy = ?, updatedAt = ? WHERE id = ?',
+        [name, email, phone, role, status, orgId, superadminId, now, userId],
         (err, result) => {
             if (err) {
                 if (err.code ==  "ER_DUP_ENTRY") {
@@ -285,6 +309,8 @@ exports.updateUser = (req, res) => {
 
 exports.deleteUser = (req, res) => {
     const userId = req.params.id;
+    const superadminId = req.user.userId
+    const now = new Date()
 
     // Ensure superadmin is deleting the user (validate org_id = 0 for superadmins)
     if (req.user.orgId !== 0) {
@@ -296,7 +322,7 @@ exports.deleteUser = (req, res) => {
     }
 
     // Soft delete: change status to 'deleted'
-    db_connection.query('UPDATE users SET status = "deleted" WHERE id = ?', [userId], (err, result) => {
+    db_connection.query('UPDATE users SET status = "deleted", updatedBy = ?, updatedAt = ? WHERE id = ? AND orgId = 0', [superadminId, now, userId], (err, result) => {
         if (err) {
             return res.status(500).send({ 
                 success: false,
@@ -322,6 +348,8 @@ exports.deleteUser = (req, res) => {
 
 exports.restoreUser = ( req, res ) => {
     const userId = req.params.id
+    const superadminId = req.user.userId
+    const now = new Date()
     // Ensure superadmin is deleting the user (validate org_id = 0 for superadmins)
     if (req.user.orgId !== 0) {
         return res.status(403).send({
@@ -332,8 +360,8 @@ exports.restoreUser = ( req, res ) => {
     }
     
     // Soft delete: change status to 'active'
-    const query = `UPDATE users SET status = 'active' WHERE users.id = ${userId}`
-    db_connection.query(query, (err,results) => {
+    const query = `UPDATE users SET status = 'active', updatedBy = ?, updatedAt = ? WHERE users.id = ?`
+    db_connection.query(query, [superadminId, now, userId], (err,results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
