@@ -71,6 +71,11 @@
                                             <%= new Date(org.expiredDate).toDateString() %>
                                                 </span>
                                         </p>
+                                        <p>Created by : <strong id="updatedBy"><%= org.userName %></strong> on <span id="updatedAt"
+                                            class="fw-bold">
+                                            <%= new Date(org.updatedAt).toDateString() %>
+                                            </span>
+                                        </p>
                                     </div>
 
                                 </form>

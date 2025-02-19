@@ -94,10 +94,11 @@ exports.createOrg = (req, res) => {
             dev: "This user is from other organization not from us"
         })
     }
-
+    const userId = req.user.userId
+    const now = new Date()
     const expiry = calculatedExpiryDate()
     const { name, address, phone, status = 'active' } = req.body
-    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status) VALUES (?,?,?,?,?)", [name, address, phone, expiry, status], (err, results) => {
+    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status, updatedBy, updatedAt) VALUES (?,?,?,?,?,?,?)", [name, address, phone, expiry, status, userId, now], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -290,11 +291,32 @@ exports.getOrg = (req, res) => {
                 dev: "Organization not found"
             })
         }
-        return res.status(200).send({
-            success: true,
-            message: 'Here is the organization',
-            dev: "Good Job, Bro!",
-            data: results[0]
+
+        const userId = results[0].updatedBy
+
+        db_connection.query("SELECT name FROM users WHERE id = ?", [userId], (err, userResult) => {
+            if (err) {
+                return res.status(500).send({
+                    success: false,
+                    message: 'internal server error',
+                    dev: err
+                })
+            }
+            
+            if (userResult.length === 0) {
+                userName = ""
+            } else {
+                userName = userResult[0].name
+            }
+
+            results[0].userName = userName
+            
+            return res.status(200).send({
+                success: true,
+                message: 'Here is the organization',
+                dev: "Good Job, Bro!",
+                data: results[0]
+            })
         })
     })
 }
