@@ -17,26 +17,56 @@
 				<% } %>
 				<!-- Category Details Form -->
 				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
-					<div class="mb-3">
-						<label for="catName" class="form-label">Category Name</label>
-						<input type="text" class="form-control" maxlength="100" name="name" id="catName"
-							placeholder="Enter category name" value="<%= category.name %>" oninput="checkInputs('catNameError', 'catName')" required>
-						<p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
-					</div>
-					<div class="mb-3">
-						<label for="catStatus" class="form-label">Status</label>
-						<select id="catStatus" name="status" class="form-select" required>
-		
-							<% options.forEach(option=> { %>
-								<option value="<%= option.name %>" <%=option.name===category.status ? 'selected' : '' %> >
-									<%= option.name.toUpperCase() %>
-								</option>
-								<% }); %>
-						</select>
-					</div>
-					<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
-					<a href="" class="btn w-100" id="resetBtn"></a>
-		
+				    <!-- Category Name -->
+				    <div class="mb-3">
+				        <label for="catName" class="form-label">Category Name</label>
+				        <input type="text" class="form-control" maxlength="100" name="name" id="catName"
+				            placeholder="Enter category name" value="<%= category.name %>" 
+				            oninput="checkInputs('catNameError', 'catName')" required>
+				        <p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
+				    </div>
+
+				    <!-- Status -->
+				    <div class="mb-3">
+				        <label for="catStatus" class="form-label">Status</label>
+				        <select id="catStatus" name="status" class="form-select" required>
+				            <% options.forEach(option => { %>
+				                <option value="<%= option.name %>" <%= option.name === category.status ? 'selected' : '' %> >
+				                    <%= option.name.toUpperCase() %>
+				                </option>
+				            <% }); %>
+				        </select>
+				    </div>
+
+				    <!-- Category Type Selection -->
+				    <div class="mb-3">
+				        <label class="form-label">Category Type</label>
+				        <div class="form-check">
+				            <input class="form-check-input" type="radio" name="categoryType" id="standalone" value="standalone" 
+				                <%= !category.parentId ? 'checked' : '' %> onclick="toggleParentCategory()">
+				            <label class="form-check-label" for="standalone">Standalone Category</label>
+				        </div>
+				        <div class="form-check">
+				            <input class="form-check-input" type="radio" name="categoryType" id="underParent" value="underParent" 
+				                <%= category.parentId ? 'checked' : '' %> onclick="toggleParentCategory()">
+				            <label class="form-check-label" for="underParent">Under Parent Sale</label>
+				        </div>
+				    </div>
+
+				    <!-- Parent Category Dropdown (Hidden if "Standalone" is selected) -->
+				    <div class="mb-3" id="parentCategoryGroup" <%= category.parentId ? '' : style="display: none;" %>>
+				        <label for="parentCategory" class="form-label">Select Parent 
+				            <%= cat === 'income' ? 'Sale' : 'Purchase' %>
+				        </label>
+				        <select class="form-select" id="parentCategory" name="parent">
+				            <option value="">Choose...</option>
+				            <option value="<%= cat === 'income' ? 'sale' : 'purchase' %>" selected><%= cat === 'income' ? 'Sale' : 'Purchase' %></option>
+				        </select>
+				    </div>
+
+				    <!-- Buttons -->
+				    <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
+				    <a href="" class="btn w-100" id="resetBtn"></a>
 				</form>
 		
 			</div>
@@ -89,7 +119,10 @@
 					addButton.disabled = true;
 					addButton.textContent = 'Submitting...';
 				}
-				
+				function toggleParentCategory() {
+			        document.getElementById('parentCategoryGroup').style.display = 
+			            document.getElementById('underParent').checked ? 'block' : 'none';
+			    }
 			</script>
 		</main>
         <%- include('../partials/subscriber/footer.ejs') %>
