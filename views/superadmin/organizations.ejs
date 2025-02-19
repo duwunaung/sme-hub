@@ -148,7 +148,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="addOrganizationForm" action="/superadmin/organization/register?page=<%= pagination.page %>" method="POST" onsubmit="submitForm(event)">
+                        <form id="addOrganizationForm" action="/superadmin/organization/register" method="POST" onsubmit="submitForm(event)">
                             <div class="mb-3">
                                 <label for="orgName" class="form-label">Organization Name</label>
                                 <input type="text" class="form-control" maxlength="145" name="name" id="orgName"
@@ -207,8 +207,13 @@
             }
 
             function submitForm(event) {
+                form = document.getElementById('addOrganizationForm')
+
+                
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
+
+                form.action = "/superadmin/add-superadmin" + query
 			}
             // xxx
 
@@ -370,7 +375,7 @@
 
             function clickBtn(type, num) {
                 if (type === 'add') {
-                    window.location.href = "/superadmin/add-superadmin" + query
+                    
                 } else {
                     window.location.href = "/superadmin/organizations/" + type + "/" + num + query
                 }

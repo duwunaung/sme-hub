@@ -373,7 +373,14 @@ exports.superadmins = (req, res) => {
 exports.createUser = (req, res) => {
     if (req.method == 'POST') {
         const orgPage = req.query.orgPage
-        const userPage = req.query.userPage
+        const orgName = req.query.orgName || ""
+        const orgStatus = req.query.orgStatus || "all"
+        const expired = req.query.expired || false
+
+        const userPage = req.query.userPage || 1
+        const userName = req.query.userName || ""
+        const userStatus = req.query.userStatus || 'all'
+        const userRole = req.query.userRole || 'allRoles'
 
         const { name, email, password, role, phone } = req.body;
         const orgId = req.params.id
@@ -384,13 +391,12 @@ exports.createUser = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired' + expired + '&userPage=1&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?success=true&type=user-create&orgPage=' + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=1&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
         }).catch(error => {
-            console.log(error)
             if (error.status === 409){
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&orgPage='  + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired' + expired + '&userPage=' + userPage + '&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=dup-email&orgPage='  + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
             } else {
-                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create&orgPage='  + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired' + expired + '&userPage=' + userPage + '&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
+                res.redirect('/superadmin/organizations/detail/' + orgId + '?error=true&type=user-create&orgPage='  + orgPage + '&orgName=' + orgName + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userStatus=' + userStatus + '&userRole=' + userRole + '&userName=' + userName + '&aciveUsers=true')
             }
         })
     }
@@ -406,7 +412,7 @@ exports.detailUser = (req , res) => {
         const options = [
             { id: 1, name: 'active' },
             { id: 2, name: 'deleted' },
-            { id: 3, name: 'pending'}
+            { id: 3, name: 'pending' }
         ];
         axios.get (`${process.env.API_URL}/users/${userId}`, {
             headers: {
@@ -600,10 +606,6 @@ exports.createSuperAdmins = (req, res) => {
             const urlStatus = req.query.status || ""
             
             const page = req.query.page
-            // const totalPage = req.query.totalPage
-            // const successPage = +totalPage +1
-            // const pageSize = req.query.pageSize
-            // const total = req.query.total
 
             axios.post(`${process.env.API_URL}/utils/register`, { name, email, phone, password, role, orgId, status }, {
                 headers: {

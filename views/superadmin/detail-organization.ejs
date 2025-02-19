@@ -30,7 +30,7 @@
                                             onclick="changeInfo('users')">Users</a>
                                     </li>
                                 </ul>
-                                <form id="detail-view" action="/superadmin/organizations/<%= org.id %>" class="mb-4  view-containers">
+                                <form id="detail-view" class="mb-4  view-containers">
                                     <h3 class="my-4">Organization Details</h3>
                                     <div class="mb-3">
                                         <label for="orgName" class="form-label">Organization Name</label>
@@ -494,7 +494,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                            <form id="addUserForm"  action="" method="POST" onsubmit="submitForm(event)">
+                            <form id="addUserForm" action="/superadmin/organizations/adduser/<%= org.id %>" method="POST" onsubmit="submitForm(event)">
                             <div class="mb-3">
                                 <label for="userName" class="form-label">User Name</label>
                                 <input type="text" class="form-control" maxlength="100" name="name" id="userName"
@@ -572,8 +572,12 @@
             }
 
             function submitForm(event) {
+                const form = document.getElementById('addUserForm')
+
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
+
+                form.action = "/superadmin/organizations/adduser/<%= org.id %>" + query + userQuery
 			}
 
             // Pagination
