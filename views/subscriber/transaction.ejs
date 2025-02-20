@@ -327,51 +327,59 @@
 								<div class="mb-3">
 									<label for="transDescription" class="form-label">Description</label>
 									<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
-										placeholder="Enter description" required>
+										placeholder="Enter description" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
+									<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
 								</div>
 						
 								<div class="mb-3">
 									<label for="transAmount" class="form-label">Amount</label>
-									<input type="number" class="form-control inputRequired" name="amount" id="transAmount"
-										placeholder="Enter amount" required>
+									<input type="number" class="form-control inputRequired" maxlength="30" name="amount" id="transAmount"
+										placeholder="Enter amount" oninput="checkInputs('transAmountError', 'transAmount')" required>
+									<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 30 characters!</p>
 								</div>
 							</div>
 						
 							<!-- Parent Sale Fields -->
-							<div id="parentSaleFields" style="display: none;">
+							<div id="parentSaleFields">
 								<div class="mb-3">
 									<label for="itemName" class="form-label">Item Name</label>
-									<input type="text" class="form-control" name="itemName" id="itemName" placeholder="Enter item name">
+									<input type="text" class="form-control inputRequired" maxlength="100" oninput="checkInputs('itemNameError', 'itemName')" name="itemName" id="itemName" placeholder="Enter item name" required>
+									<p id="itemNameError" class="mt-2 d-none text-danger">*Item Name can't exceed 100 characters!</p>
 								</div>
 						
 								<div class="mb-3">
 									<label for="pricePerUnit" class="form-label">Price per Unit</label>
-									<input type="number" class="form-control" name="price" id="pricePerUnit" placeholder="Enter price per unit">
+									<input type="number" class="form-control inputRequired" maxlength="30" oninput="checkInputs('pricePerUnitError', 'pricePerUnit')" name="price" id="pricePerUnit" placeholder="Enter price per unit"  required>
+									<p id="pricePerUnitError" class="mt-2 d-none text-danger">*Price per Unit can't exceed 30 characters!</p>
 								</div>
 						
 								<div class="mb-3">
 									<label for="quantity" class="form-label">Quantity</label>
-									<input type="number" class="form-control" name="quantity" id="quantity" placeholder="Enter quantity">
+									<input type="number" class="form-control inputRequired" maxlength="30" oninput="checkInputs('quantityError', 'quantity')" name="quantity" id="quantity" placeholder="Enter quantity" required>
+									<p id="quantityError" class="mt-2 d-none text-danger">*Quantity can't exceed 30 characters!</p>
 								</div>
+								<% if( trans === 'income') {%>
+									<div class="mb-3">
+										<label for="salesperson" class="form-label">Salesperson</label>
+										<select id="salesperson" name="salesperson" class="form-select inputRequired" required onchange="updateSalespersonName()">
+											<% salesperson.forEach(option => { %>
+												<option value="<%= option.id %>" data-salespersonName="<%= option.name %>"><%= option.name %></option>
+											<% }); %>
+										</select>
+										<input type="text" value="<%= salesperson.length > 0 ? salesperson[0].name : '' %>" style="display: none;" id="salespersonName" name="salespersonName">
+									</div>
+								<%}%>
 						
 								<div class="mb-3">
-									<label for="salesperson" class="form-label">Salesperson</label>
-									<select id="salesperson" name="salesperson" class="form-select inputRequired" required>
-										<% salesperson.forEach(option => { %>
-											<option value="<%= option.id %>" ><%= option.name %></option>
-										<% }); %>
-									</select>
-								</div>
-						
-								<div class="mb-3">
-									<label for="customerName" class="form-label">Customer Name</label>
-									<input type="text" class="form-control" name="customer" id="customerName" placeholder="Enter customer name">
+									<label for="customerName" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
+									<input type="text" class="form-control inputRequired" maxlength="100" oninput="checkInputs('customerNameError', 'customerName')" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="customerName" placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name" required>
+									<p id="customerNameError" class="mt-2 d-none text-danger">*Customer Name can't exceed 100 characters!</p>
 								</div>
 							</div>
 						
 							<!-- Common Receipt Field -->
 							<input type="hidden" name=<% if (trans === 'income' ) { %> incomeDate <% } else {%> expenseDate <% } %> id="transDate">
-							<div class="mb-3">
+							<div class="mb-3" id="receiptDiv">
 								<label for="transReceipt" class="form-label">Receipt</label>
 								<input type="file" class="form-control" name="receipt" id="transReceipt">
 							</div>
@@ -561,10 +569,11 @@
 			    }
 			}
 
-			const form = document.getElementById('addNewTransactionForm');
-            const addButton = document.getElementById('addBtn');
-            const inputs = form.querySelectorAll('.inputRequired');
+			
             function checkInputs(messageBox, inputField) {
+				const form = document.getElementById('addNewTransactionForm');
+	            const addButton = document.getElementById('addBtn');
+	            const inputs = form.querySelectorAll('.inputRequired');
                 let allFilled = true;
                 inputs.forEach(index => {
                 if (!index.value.trim()) {
@@ -725,21 +734,35 @@
 				document.getElementById('summaryDate').innerText = "ALL"
 			}
 
-			function toggleFormFields() {
-		        const selectedCategory = document.getElementById("transCategory");
-		        const selectedOption = selectedCategory.options[selectedCategory.selectedIndex];
-		        const parentSaleFields = document.getElementById("parentSaleFields");
-		        const standaloneFields = document.getElementById("standaloneFields");
-		        const parentId = selectedOption.getAttribute("data-parent");
-		        if (parentId === "1" || parentId === "2") {
-		            parentSaleFields.style.display = "block";
-		            standaloneFields.style.display = "none";
-		        } else {
-		            parentSaleFields.style.display = "none";
-		            standaloneFields.style.display = "block";
-		        }
-		    }
-		    toggleFormFields();
+			const parentSaleFields = document.getElementById("parentSaleFields");
+			const standaloneFields = document.getElementById("standaloneFields");
+			const parentSaleHTML = parentSaleFields;
+			const standaloneHTML = standaloneFields;
 
+			function toggleFormFields() {
+			    const selectedCategory = document.getElementById("transCategory");
+			    const selectedOption = selectedCategory.options[selectedCategory.selectedIndex];
+			    const parentId = selectedOption.getAttribute("data-parent");
+
+			    parentSaleFields.remove();
+			    standaloneFields.remove();
+
+				
+			    const form = document.getElementById("addNewTransactionForm");
+			    const receipt = document.getElementById("receiptDiv");
+
+			    if (parentId === "1" || parentId === "2") {
+			        form.insertBefore(parentSaleHTML, receipt);
+			    } else {
+			        form.insertBefore(standaloneHTML, receipt);
+			    }
+			}
+			toggleFormFields();
+
+			function updateSalespersonName() {
+			    const selectedOption = document.getElementById("salesperson").options[document.getElementById("salesperson").selectedIndex];
+			    const salespersonName = selectedOption.getAttribute("data-salespersonName");
+			    document.getElementById("salespersonName").value = salespersonName;
+			}
 		</script>
         <%- include('../partials/subscriber/footer.ejs') %>
