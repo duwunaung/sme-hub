@@ -343,9 +343,15 @@ exports.updateExpenseCat = (req, res) => {
 		})
 	} else {
 		const id = req.params.id
-		const { name } = req.body;
+		const { name, parent } = req.body;
+		const parameters = { name }
+		let parentId;
+		if (parent && parent === 'purchase'){
+			parentId = 2;
+			parameters.parentId = parentId;
+		}
 		const page = req.query.page || 1
-		axios.put(`${process.env.API_URL}/subscribers/categories/expense/${id}`, { name }, {
+		axios.put(`${process.env.API_URL}/subscribers/categories/expense/${id}`, parameters, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
@@ -548,9 +554,15 @@ exports.updateIncomeCat = (req, res) => {
 		})
 	} else {
 		const id = req.params.id
-		const { name } = req.body;
+		const { name , parent } = req.body;
+		const parameters = { name }
+		let parentId;
+		if (parent && parent === 'sale'){
+			parentId = 1;
+			parameters.parentId = parentId;
+		}
 		const page = req.query.page || 1
-		axios.put(`${process.env.API_URL}/subscribers/categories/income/${id}`, { name }, {
+		axios.put(`${process.env.API_URL}/subscribers/categories/income/${id}`, parameters, {
 			headers: {
 				'Authorization': `${req.session.token}`
 			}
