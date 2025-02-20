@@ -375,7 +375,7 @@ exports.createUser = (req, res) => {
         const orgPage = req.query.orgPage
         const orgName = req.query.orgName || ""
         const orgStatus = req.query.orgStatus || "all"
-        const expired = req.query.expired || fasle
+        const expired = req.query.expired || false
 
         const userPage = req.query.userPage || 1
         const userName = req.query.userName || ""

@@ -76,8 +76,8 @@
                                                 <%= i + (parseInt(pagination.page) - 1)*10 + 1 %>
                                             </td>
                                             <td>
-												<%= orgs[i].name.length > 50 
-						                        ? orgs[i].name.substring(0, 50) + "..." 
+												<%= orgs[i].name.length > 30 
+						                        ? orgs[i].name.substring(0, 30) + "..." 
 						                        : orgs[i].name %>
                                             </td>
                                             <td>
