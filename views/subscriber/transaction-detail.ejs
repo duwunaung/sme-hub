@@ -48,8 +48,47 @@
 				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
 					<div class="mb-3">
 						<label for="transDescription" class="form-label">Description</label>
-						<div id="transAmount" class="form-control"><%= transaction.description %></div>
+						<div id="transDescription" class="form-control"><%= transaction.description %></div>
 					</div>
+					<div class="mb-3">
+						<label for="transDate" class="form-label">Date</label>
+						<div id="transDate" class="form-control"></div>
+					</div>
+					<% if (transaction.parentId === 1 || transaction.parentId === 2) {%> 
+						<% if(trans === 'income') {%> 
+							<div class="mb-3">
+								<label for="transSalesperson" class="form-label">Salesperson Name</label>
+								<div id="transSalesperson" class="form-control"><%= transaction.salesperson %></div>
+							</div>
+						<%}%>
+						<div class="mb-3">
+							<label for="transCustomer" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
+							<div id="transCustomer" class="form-control"><%= trans === 'income' ? transaction.customerName : transaction.vendorName %></div>
+						</div>
+						<div class="mb-3">
+							<label for="transItem" class="form-label">Item Name</label>
+							<div id="transItem" class="form-control"><%= transaction.itemName %></div>
+						</div>
+						<div class="mb-3">
+							<label for="transPrice" class="form-label">Price Per Unit</label>
+							<div id="transPrice" class="form-control">
+								<% let formattedPrice = transaction.price.toLocaleString(); %>
+						
+								<% if (transaction.baseCurrency === 'MMK') { %>
+									<%= formattedPrice %> ks
+								<% } else if (transaction.baseCurrency === 'USD') { %>
+									$ <%= formattedPrice %>
+								<% } else { %>
+									<%= formattedPrice %> <%= transaction.baseCurrency %>
+								<% } %>
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="transQuantity" class="form-label">Quantity</label>
+							<div id="transQuantity" class="form-control"><%= transaction.quantity %></div>
+						</div>
+					<%} %>
+					
 					<div class="mb-3">
 						<label for="transAmount" class="form-label">Amount</label>
 						<div id="transAmount" class="form-control">
@@ -67,19 +106,8 @@
 					<div class="mb-3">
 						<label for="transCategory" class="form-label">Category</label>
 						<div id="transCategory" class="form-control bg-light text-dark">
-							<% 
-								const Category = category.find(option => option.id === transaction.catId);
-								if (Category) { 
-							%>
-								<%= Category.name %>
-							<% } else { %>
-								No Category
-							<% } %>
+							<%= transaction.category %>
 						</div>
-					</div>
-					<div class="mb-3">
-						<label for="transDate" class="form-label">Date</label>
-						<div id="transDate" class="form-control"></div>
 					</div>
 					<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
 						<div class="mb-3">
