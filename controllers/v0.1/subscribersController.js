@@ -752,7 +752,8 @@ exports.updateExpenseTrans = (req, res) => {
 				'Authorization': `${req.session.token}`
 			}
 		}).then(response => {
-			axios.get(`${process.env.API_URL}/subscribers/categories/expense`, {
+			const parentId = response.data.data.parentId || 0
+			axios.get(`${process.env.API_URL}/subscribers/categories/expense/update/${parentId}`, {
 				headers: {
 					'Authorization': `${req.session.token}`
 				}
@@ -951,7 +952,8 @@ exports.updateIncomeTrans = (req, res) => {
 				'Authorization': `${req.session.token}`
 			}
 		}).then(response => {
-			axios.get(`${process.env.API_URL}/subscribers/categories/income`, {
+			const parentId = response.data.data.parentId || 0
+			axios.get(`${process.env.API_URL}/subscribers/categories/income/update/${parentId}`, {
 				headers: {
 					'Authorization': `${req.session.token}`
 				}
