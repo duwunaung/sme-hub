@@ -110,6 +110,44 @@ exports.listAllCategories = (req, res) => {
     });
 };
 
+exports.listExpCatUpdate = (req, res) => {
+    const orgId = req.user.orgId
+    const { status = 'active' } = req.query;
+	const { parentId } = req.params
+	let query = '';
+	if (parentId === '2') {
+	    query = `
+	        SELECT ec.id, ec.name, u.name AS createdBy, ec.parentId
+	        FROM expcats ec
+	        JOIN users u ON ec.createdBy = u.id
+	        WHERE ec.orgId = ? AND ec.status = ? AND ec.parentId = ${parentId}
+	    `;
+	} else if (parentId === '0') {
+		query = `
+	        SELECT ec.id, ec.name, u.name AS createdBy, ec.parentId
+	        FROM expcats ec
+	        JOIN users u ON ec.createdBy = u.id
+	        WHERE ec.orgId = ? AND ec.status = ? AND ec.parentId IS NULL
+	    `;
+	}
+
+    db_connection.query(query, [orgId, status], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        res.status(200).send({
+            success: true,
+            message: 'Expense Category list',
+            dev: "Good Job, Bro!",
+            data: results
+        })
+    })
+}
 
 exports.listExpCat = (req, res) => {
     const orgId = req.user.orgId
@@ -121,6 +159,44 @@ exports.listExpCat = (req, res) => {
         WHERE ec.orgId = ? AND ec.status = ?
     `;
 
+    db_connection.query(query, [orgId, status], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        res.status(200).send({
+            success: true,
+            message: 'Expense Category list',
+            dev: "Good Job, Bro!",
+            data: results
+        })
+    })
+}
+
+exports.listIncCatUpdate = (req, res) => {
+    const orgId = req.user.orgId
+    const { status = 'active' } = req.query;
+	const { parentId } = req.params
+	let query = '';
+	if (parentId === '1') {
+		query = `
+	        SELECT ic.id, ic.name, u.name AS createdBy, ic.parentId
+	        FROM inccats ic
+	        JOIN users u ON ic.createdBy = u.id
+	        WHERE ic.orgId = ? AND ic.status = ? AND ic.parentId = ${parentId}
+	    `;
+	} else if (parentId === '0') {
+		query = `
+	        SELECT ic.id, ic.name, u.name AS createdBy, ic.parentId
+	        FROM inccats ic
+	        JOIN users u ON ic.createdBy = u.id
+	        WHERE ic.orgId = ? AND ic.status = ? AND ic.parentId IS NULL
+	    `;
+	}
     db_connection.query(query, [orgId, status], (err, results) => {
         if (err) {
             return res.status(500).send({
