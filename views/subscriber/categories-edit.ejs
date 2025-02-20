@@ -54,7 +54,11 @@
 				    </div>
 
 				    <!-- Parent Category Dropdown (Hidden if "Standalone" is selected) -->
-				    <div class="mb-3" id="parentCategoryGroup" <%= category.parentId ? '' : style="display: none;" %>>
+					<% if (category.parentId !== 1 && category.parentId !== 2) {%> 
+						<div class="mb-3" id="parentCategoryGroup" style="display: none;">
+					<%} else {%> 
+						<div class="mb-3" id="parentCategoryGroup" >
+					<%}%>
 				        <label for="parentCategory" class="form-label">Select Parent 
 				            <%= cat === 'income' ? 'Sale' : 'Purchase' %>
 				        </label>
