@@ -450,14 +450,27 @@ exports.getExpenseCategory = (req, res) => {
 
 exports.updateExpenseCategory = (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name , parentId } = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
-    const query = `UPDATE expcats SET name = ? WHERE id = ? AND orgId = ?`;
-    db_connection.query(query, [name, id, orgId], (err, results) => {
+	let query;
+	const queryParams = []
+	if (parentId){
+		query = `UPDATE expcats SET name = ? , parentId = ? WHERE id = ? AND orgId = ?`
+		queryParams.push(name)
+		queryParams.push(parentId)
+		queryParams.push(id)
+		queryParams.push(orgId)
+	} else {
+		query = `UPDATE expcats SET name = ? WHERE id = ? AND orgId = ?`
+		queryParams.push(name)
+		queryParams.push(id)
+		queryParams.push(orgId)
+	}
+    db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -873,14 +886,27 @@ exports.getIncomeCategory = (req, res) => {
 
 exports.updateIncomeCategory = (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name , parentId} = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
-    const query = `UPDATE inccats SET name = ? WHERE id = ? AND orgId = ?`;
-    db_connection.query(query, [name, id, orgId], (err, results) => {
+	let query;
+	const queryParams = []
+	if (parentId){
+		query = `UPDATE inccats SET name = ? , parentId = ? WHERE id = ? AND orgId = ?`
+		queryParams.push(name)
+		queryParams.push(parentId)
+		queryParams.push(id)
+		queryParams.push(orgId)
+	} else {
+		query = `UPDATE inccats SET name = ? WHERE id = ? AND orgId = ?`
+		queryParams.push(name)
+		queryParams.push(id)
+		queryParams.push(orgId)
+	}
+    db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
