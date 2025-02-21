@@ -46,7 +46,7 @@ router.use('/user/profile', checkSubscriberSession, editUsrProfile)
 router.use('/organization/profile', checkSubscriberSession, upload.single("logo"), editOrgProfile)
 
 router.use('/home', checkSubscriberSession, (req, res) => {
-    res.render('subscriber/home', { token: req.session.token, user: req.session.user, organizationName: req.session.orgName, logo: req.session.orgLogo })
+    res.render('subscriber/home', { token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo })
 })
 
 router.use('/', (req, res) => {
