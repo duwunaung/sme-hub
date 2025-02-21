@@ -206,8 +206,8 @@
 	<div class="top-bar">
 		<div id="userProfile" class="d-flex justify-content-center align-items-center">
 			<div class="me-3 d-none d-sm-flex flex-column align-items-end" id="userNamePosition">
-				<span id="userName" class="d-block fw-bold" style="font-size: large;">HTIN LIN AUNG</span>
-				<span id="userPosition">admin</span>
+				<span id="userName" class="d-block fw-bold" style="font-size: large;"><%= userName %></span>
+				<span id="userPosition"><%= userRole%></span>
 			</div>
 			<div id="profileBtn" onclick="goToUserProfilePage()">
 				<% if (logo) {%> 
