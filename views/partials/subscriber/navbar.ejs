@@ -16,8 +16,8 @@
     }
     
     .profile-placeholder {
-        width: 30px;
-        height: 30px;
+        width: 60px;
+        height: 60px;
         background: linear-gradient(135deg, #007bff, #0056b3);
         color: white;
         font-size: 20px;
@@ -50,8 +50,8 @@
     }
     
     .profile-logo-preview {
-        width: 30px;
-        height: 30px;
+        width: 60px;
+        height: 60px;
         object-fit: cover;
         object-position: center;
         border-radius: 50%;
@@ -117,7 +117,7 @@
     }
 	#sidebarBody {
 		position: fixed;
-		top: 155px;
+		top: 125px;
 	}
 	.iconColor{
 		filter: grayscale(1) brightness(1000%);
@@ -185,11 +185,18 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 1000;
     }
-    .content {
-        margin-top: 100px;
-        padding: 20px;
-        height: 200vh;
-    }
+	#userProfile {
+		position: fixed;
+		right: 30px;
+	}
+	#profileBtn {
+		background-color: transparent;
+		border: none;
+		width: 60px;
+		height: 60px;
+		border-radius: 50%;
+		cursor: pointer;
+	}
 </style>
 
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg justify-content-center">
@@ -197,6 +204,21 @@
         <img src="/dummy.svg" alt="menu logo" id="menulogo">
     </button>
 	<div class="top-bar">
+		<div id="userProfile" class="d-flex justify-content-center align-items-center">
+			<div class="me-3 d-none d-sm-flex flex-column align-items-end" id="userNamePosition">
+				<span id="userName" class="d-block fw-bold" style="font-size: large;">HTIN LIN AUNG</span>
+				<span id="userPosition">admin</span>
+			</div>
+			<div id="profileBtn" onclick="goToUserProfilePage()">
+				<% if (logo) {%> 
+					<img src="/<%= logo %>" alt="Logo" class="profile-logo-preview">
+				<%} else {%> 
+					<div class="profile-placeholder me-2">
+						<%= organizationName.charAt(0).toUpperCase() %>
+					</div>
+				<%} %>
+			</div>
+		</div>
 	</div>
 </nav>
 
@@ -295,10 +317,23 @@
     function goToProfilePage() {
         window.location.href = "/subscriber/organization/profile";
     }
+	function goToUserProfilePage() {
+        window.location.href = "/subscriber/user/profile";
+    }
+	function formatName(name) {
+        return name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+    let userNameElement = document.getElementById("userName");
+	let userPositionElement = document.getElementById("userPosition");
+    if (userNameElement) {
+        userNameElement.textContent = formatName(userNameElement.textContent);
+    }
+	if (userPositionElement) {
+		userPositionElement.textContent = formatName(userPositionElement.textContent);
+	}
 
     document.onclick = handleOutsideClick;
 
-    // Set initial active button when page loads
     window.onload = setInitialActiveButton;
 </script>
 			
