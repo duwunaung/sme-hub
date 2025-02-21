@@ -110,7 +110,7 @@ exports.createOrg = (req, res) => {
 
         const orgId = results.insertId
 
-        db_connection.query(`INSERT INTO incats (name, orgId, createdBy, status, parentId) VALUES  
+        db_connection.query(`INSERT INTO inccats (name, orgId, createdBy, status, parentId) VALUES  
                         ("Product sales", ${orgId}, 0, 'active', 1),
                         ("Service sales", ${orgId}, 0, 'active', 1),
                         ("Product sales(external)", ${orgId}, 0, 'active', 0),
