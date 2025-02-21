@@ -54,9 +54,12 @@
 			.profile-placeholder-img:hover {
 				cursor: pointer;
 			}
+			#mainContainer {
+				margin-top: 80px;
+			}
 	    </style>
         <!-- Main Content -->
-        <main>
+        <main id="mainContainer">
 			<% if (errorMessage) { %>
 				<div id="errorBox" class="alert alert-danger mt-3" role="alert">
 					<%= errorMessage %>
