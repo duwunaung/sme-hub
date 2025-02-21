@@ -132,8 +132,8 @@
                                                 <table class="table table-striped table-hover">
                                                     <thead class="table-dark">
                                                         <tr>
-                                                            <th>Id</th>
-                                                            <th>Name</th>
+                                                            <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">Id<span></span></th>
+                                                            <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name<span></span></th>
 															<th>Email</th>
                                                             <th>Phone</th>
                                                             <th>Role</th>
@@ -141,7 +141,7 @@
                                                             <th class="text-center">Actions</th>
                                                         </tr>
                                                     </thead>
-                                                    <tbody id="userTable">
+                                                    <tbody id="usersTable">
                                                         <!-- Dynamic rows go here -->
                                                         <% for (let i=0; i < users.length; i++) { %>
                                                             <tr>
@@ -226,6 +226,33 @@
         </main>
 
         <script>
+            // Sort
+            let sortDirections = {};
+
+            function sortTable(columnIndex, type, headerElement) {
+                let table = document.getElementById("usersTable");
+                let rows = Array.from(table.getElementsByTagName("tr"));
+                let ascending = !sortDirections[columnIndex];
+                sortDirections[columnIndex] = ascending;
+
+                rows.sort((rowA, rowB) => {
+                    let cellA = rowA.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+                    let cellB = rowB.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+
+                    if (type === "number") {
+                        cellA = parseFloat(cellA.replace(/[^0-9.-]/g, "")) || 0;
+                        cellB = parseFloat(cellB.replace(/[^0-9.-]/g, "")) || 0;
+                        return ascending ? cellA - cellB : cellB - cellA;
+                    } else {
+                        return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+                    }
+                });
+                rows.forEach(row => table.appendChild(row));
+                document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
+                headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
+            }
+            // xxx
+
             // Click Btns
             let url = new URL(window.location.href);
             const orgId = "<%= org.id %>"
