@@ -35,7 +35,7 @@
                                     <span style="font-weight: 500;" class="mx-2">Show expired</span>
                                 </div>
                                 <div class="btn-group">
-                                    <button type="button" class="btn dropdown-toggle sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button type="button" class="btn dropdown-toggle sortBtn" id="filterBtn" data-bs-toggle="dropdown" aria-expanded="false">
                                         Filter
                                     </button>
                                     <ul class="dropdown-menu dropdown-menu-end">
@@ -215,7 +215,7 @@
                 headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
             }
             // xxx
-            
+
             const form = document.getElementById('addOrganizationForm');
             const addButton = document.getElementById('addBtn');
             const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
@@ -240,7 +240,6 @@
             function submitForm(event) {
                 form = document.getElementById('addOrganizationForm')
 
-                
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
 
@@ -396,8 +395,14 @@
                 query += "&orgName=" + orgName
             }
 
+            const filterBtn = document.getElementById('filterBtn')
             if (orgStatus) {
                 query += "&orgStatus=" + orgStatus
+                if (orgStatus == "all") {
+                    filterBtn.classList.remove('useFilter')
+                } else {
+                    filterBtn.classList.add('useFilter')
+                }
             }
 
             if (expired) {

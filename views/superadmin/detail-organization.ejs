@@ -97,7 +97,7 @@
                                         </div>
                                         <div>
                                             <div class="btn-group">
-                                                <button type="button" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <button type="button" id="roleBtn" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Role
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
@@ -108,7 +108,7 @@
                                                 </ul>
                                             </div>
                                             <div class="btn-group">
-                                                <button type="button" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <button type="button" id="filterBtn" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
                                                     Filter
                                                 </button>
                                                 <ul class="dropdown-menu dropdown-menu-end">
@@ -296,12 +296,24 @@
                 userQuery += "&userName=" + userName
             }
 
+            const filterBtn = document.getElementById('filterBtn')
             if (userStatus) {
                 userQuery += "&userStatus=" + userStatus
+                if (userStatus == "all") {
+                    filterBtn.classList.remove('useFilter')
+                } else {
+                    filterBtn.classList.add('useFilter')
+                }
             }
 
+            const roleBtn = document.getElementById('roleBtn')
             if (userRole) {
                 userQuery += "&userRole=" + userRole
+                if (userRole == "allRoles") {
+                    roleBtn.classList.remove('useFilter')
+                } else {
+                    roleBtn.classList.add('useFilter')
+                }
             }
 
             function clickBtn(type, num) {
