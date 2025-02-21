@@ -38,7 +38,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="orgStatus" class="form-label">Status</label>
-                        <select id="orgStatus" name="status" class="form-select" required>
+                        <select id="orgStatus" name="status" class="form-select" oninput="checkInputs()" required>
 
                             <% options.forEach(option=> { %>
                                 <option value="<%= option.name %>" <%=option.name===org.status ? 'selected' : '' %> >
@@ -47,7 +47,7 @@
                                 <% }); %>
                         </select>
                     </div>
-                    <button onclick="clickBtn()" type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Organization</button>
+                    <button onclick="clickBtn()" type="submit" id="updateBtn" class="btn btn-success w-100 mb-2">Update Organization</button>
 										<a onclick="Back()" id="resetBtn" class="btn btn-primary w-100 mb-2">Back to organizations</a>
                 </form>
 
@@ -144,18 +144,36 @@
 				}
 	      buttonType();
 
-        const addButton = document.getElementById('addBtn');
+				const orgOldName = "<%= org.name %>"
+				const orgOldAddress = "<%= org.address %>"
+				const orgOldPhone = "<%= org.phone %>"
+				const orgOldStatus = "<%= org.status %>"
+
+        const updateBtn = document.getElementById('updateBtn');
 				const form = document.getElementById('myForm');
 				const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
 
 				function checkInputs(messageBox, inputField) {
+
+					const orgNameValue = document.getElementById('orgName').value
+					const orgAddressValue = document.getElementById('orgAddress').value
+					const orgPhoneValue = document.getElementById('orgPhone').value
+					const orgStatusValue = document.getElementById('orgStatus').value
+					
+					if ( (orgOldName === orgNameValue) && (orgOldAddress === orgAddressValue) && (orgOldPhone === orgPhoneValue) && (orgOldStatus === orgStatusValue) ) {
+						updateBtn.classList.add('disabled')
+					} else {
+						updateBtn.classList.remove('disabled')
+					}
+
+					// xxx
 					let allFilled = true;
 					inputs.forEach(index => {
 						if (!index.value.trim()) {
 								allFilled = false;
 						}
 					});
-          addButton.disabled = !allFilled;
+          updateBtn.disabled = !allFilled;
 					const message = document.getElementById(messageBox)
 					const input = document.getElementById(inputField)
 					if (input.value.length === parseInt(input.maxLength)) {
@@ -165,9 +183,11 @@
 					}
 				}
 
+				checkInputs();
+
 				function submitForm(event) {
-					addButton.disabled = true;
-					addButton.textContent = 'Submitting...';
+					updateBtn.disabled = true;
+					updateBtn.textContent = 'Submitting...';
 				}
 
 				// Click Btns

@@ -31,7 +31,7 @@
                     </div>
 					          <div class="mb-3">
                         <label for="userRole" class="form-label">Role</label>
-                        <select id="userRole" name="role" class="form-select" required>
+                        <select id="userRole" name="role" class="form-select" oninput="checkInputs()" required>
 
                             <% roles.forEach(role=> { %>
                                 <option value="<%= role.name %>" <%=role.name===user.role ? 'selected' : '' %> >
@@ -54,7 +54,7 @@
                     </div>
                     <div class="mb-3">
                         <label for="userStatus" class="form-label">Status</label>
-                        <select id="userStatus" name="status" class="form-select" required>
+                        <select id="userStatus" name="status" class="form-select" oninput="checkInputs()" required>
 
                             <% options.forEach(option=> { %>
                                 <option value="<%= option.name %>" <%=option.name===user.status ? 'selected' : '' %> >
@@ -63,7 +63,7 @@
                                 <% }); %>
                         </select>
                     </div>
-                    <button onclick="clickBtn('update', '<%= user.id %>')" type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update</button>
+                    <button onclick="clickBtn('update', '<%= user.id %>')" type="submit" id="updateBtn" class="btn btn-success w-100 mb-2">Update</button>
                     <a onclick="clickBtn()" href="#" id="resetBtn" class="btn w-100"></a>
 				</form>
                 <br>
@@ -149,19 +149,38 @@
 	            buttonType();
 
                 const form = document.getElementById('myForm');
-                const addButton = document.getElementById('addBtn');
+                const updateBtn = document.getElementById('updateBtn');
                 const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
 				const userEmail = document.getElementById('userEmail')
 				const labelEmail = document.getElementById('labelEmail')
 
+				const userOldName = "<%= user.name %>"
+                const userOldRole = "<%= user.role %>"
+				const userOldEmail = "<%= user.email %>"
+				const userOldPhone = "<%= user.phone %>"
+				const userOldStatus = "<%= user.status %>"
+
                 function checkInputs(messageBox, inputField) {
+
+									const userNameValue = document.getElementById('userName').value
+                                    const userRoleValue = document.getElementById('userRole').value
+									const userEmailValue = document.getElementById('userEmail').value
+									const userPhoneValue = document.getElementById('userPhone').value
+									const userStatusValue = document.getElementById('userStatus').value
+
+									if ( (userOldName == userNameValue) && (userOldRole == userRoleValue) && (userOldEmail == userEmailValue) && (userOldPhone == userPhoneValue) && (userOldStatus == userStatusValue) ) {
+										updateBtn.classList.add('disabled')
+									} else {
+										updateBtn.classList.remove('disabled')
+									}
+
 	                let allFilled = true;
 	                inputs.forEach(index => {
 	                if (!index.value.trim()) {
 	                    allFilled = false;
 	                }
 	                });
-	                addButton.disabled = !allFilled;
+	                updateBtn.disabled = !allFilled;
 					const message = document.getElementById(messageBox)
 					const input = document.getElementById(inputField)
 					if (input.value.length === parseInt(input.maxLength)) {
@@ -177,9 +196,12 @@
 					}
 	            }
 
-				function submitForm(event) {
-				    addButton.disabled = true;
-				    addButton.textContent = 'Submitting...';
+							checkInputs();
+
+
+                function submitForm(event) {
+				    updateBtn.disabled = true;
+				    updateBtn.textContent = 'Submitting...';
 				}
 				
 				const error = searchParams.get('error')
