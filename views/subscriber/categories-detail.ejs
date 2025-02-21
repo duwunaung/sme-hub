@@ -56,8 +56,11 @@
 				cursor: pointer;
 				color: black;
 			}
+			#mainContainer {
+				margin-top: 100px;
+			}
 		</style>
-		
+		<div id="mainContainer"></div>
 		<div class="my-2">
 			<h2 class="mb-4"><a href="/subscriber/category/<%= cat %>" class="categoryName"><strong><%= category.name.toUpperCase() %></strong></a> Category (<%= cat %>)</h2>
 	
@@ -100,7 +103,7 @@
 				</div>
 			</div>
 			<!-- Summary Card -->
-			<div class="card mb-2 w-auto" style="max-width: 350px;">
+			<div class="card mb-2 mt-4 w-auto" style="max-width: 350px;">
 				<div class="card-body">
 					<div class="d-flex justify-content-between align-items-center">
 						<p class="small mb-1">Date: <span id="summaryDate"></span></p>
