@@ -89,6 +89,49 @@
             left: 18px;
         }
 
+        /* Navbar */
+        #sidebar {
+            border: 1px solid rgb(120, 111, 111);
+            box-shadow: 0px 4px 25px rgb(112, 106, 106);
+        }
+
+        .nav-link, .nav-link:hover {
+            color: black;
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .nav-link-active, .nav-link-active:hover {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .nav-link-active:hover {
+            cursor: default;
+        }
+
+        .nav-item-active {
+            background-color: #D62828;
+            border: 1px solid #D62828;
+            border-radius: 10px;
+        }
+
+        /* LOGO */
+        #menuBtn {
+            width: 51px;
+            height: 56px;
+            border-radius: 8px;
+            background-color: #D62828;
+            top: 25px;
+            left: 39.42px;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: none;
+            cursor: pointer;
+            z-index: 1031;
+        }
     </style>
 </head>
 
@@ -96,4 +139,4 @@
     <div class="container-fluid">
         <div class="row">
             <!-- Sidebar -->
-            <nav id="sidebar" class="col-md-3 col-lg-2 bg-dark text-white p-3">
+            <nav id="sidebar" class="col-md-3 col-lg-2 p-3">

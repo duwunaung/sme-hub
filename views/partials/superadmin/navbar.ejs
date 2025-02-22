@@ -1,17 +1,24 @@
 
-        <h4 class="text-center">Dashboard</h4>
-        <ul class="nav flex-column mt-4">
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/superadmin/dashboard">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/superadmin/organizations">Organizations</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/superadmin/users">Users</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link text-white" href="/superadmin/logout">Logout</a>
-            </li>
-        </ul>
+        <div class="d-flex">
+            <button id="menuBtn" class="btn menu-icon me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+                <img src="/dummy.svg" alt="menu logo" id="menulogo">
+            </button>
+            <h5 class="fw-bolder mt-3">SME-HUB</h5>
+        </div>
+        <div class="offcanvas-body">
+            <ul class="nav flex-column mt-4 list-unstyled">
+                <li class="nav-item mx-2 my-2 nav-item-dashboard">
+                    <a class="nav-link d-flex py-2 fs-6 nav-link-dashboard" href="/superadmin/dashboard"><img src="/dashboard.svg" class="me-2" id="dashboard"><span class="mt-1">Dashboard</span></a>
+                </li>
+                <li class="nav-item mx-2 my-2 nav-item-organizations">
+                    <a class="nav-link d-flex py-2 fs-6 nav-link-organizations" href="/superadmin/organizations"><img src="/organizations.svg" width="20%" class="me-2 mt-1" id="organizations"><span>Organizations</span></a>
+                </li>
+                <li class="nav-item mx-2 my-2 nav-item-users">
+                    <a class="nav-link d-flex py-2 fs-6 nav-link-users" href="/superadmin/users"><img src="/users.svg" width="25%" class="me-2" id="users"><span class="mt-1">Users</span></a>
+                </li>
+                <li class="nav-item mx-2 my-2">
+                    <a class="nav-link d-flex py-2 fs-6" href="/superadmin/logout"><img src="/Logout.svg" class="me-2 mt-1"><span>Logout</span></a>
+                </li>
+            </ul>
+        </div>
     </nav>
