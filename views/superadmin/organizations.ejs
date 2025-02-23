@@ -18,7 +18,7 @@
                         <% } %>
                         <div class="d-flex justify-content-between align-items-center mb-4">
                             <h2>Organizations</h2>
-                            <button class="btn btn-primary" data-bs-toggle="modal"
+                            <button class="btn btnColor" data-bs-toggle="modal"
                                 data-bs-target="#addOrganizationModal">
                                 Add New Organization
                             </button>
@@ -27,11 +27,11 @@
                         <nav class="mb-4 d-flex w-100 justify-content-between">
                             <div class="d-flex searchBar" role="search">
                                 <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter organization name" aria-label="Search" value="<%= name %>" required>
-                                <button class="btn btn-primary" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
+                                <button class="btn btnColor" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
                             </div>
                             <div class="d-flex">
                                 <div style="margin-top: 7px;">
-                                    <input style="transform: scale(1.2)" type="checkbox" id="expiredCheckbox" onclick="showExpired()">
+                                    <input style="transform: scale(1.2); accent-color: #D62828;" type="checkbox" id="expiredCheckbox" onclick="showExpired()">
                                     <span style="font-weight: 500;" class="mx-2">Show expired</span>
                                 </div>
                                 <div class="btn-group">
@@ -112,7 +112,7 @@
                         </div>
                         <nav aria-label="..." id="paginationNav">
                             <div class="d-flex justify-content-center">
-                                <p> <%= (parseInt(pagination.page) - 1)*10 + 1 %><span id="lastNum">-<%= parseInt(pagination.page) *10 %></span> / <%= pagination.total %></p>
+                                <p class="pagContent"> <%= (parseInt(pagination.page) - 1)*10 + 1 %><span id="lastNum">-<%= parseInt(pagination.page) *10 %></span> / <%= pagination.total %></p>
                             </div>
                             <ul class="pagination d-flex justify-content-center">
                                 <li class="page-item">
@@ -124,7 +124,7 @@
                                     <a class="page-link" href="#" onclick="pagination('orgPage','<%= pagination.page -1 %>')"><%= pagination.page -1 %><span class="sr-only"></span></a>
                                 </li>
                                 <li class="page-item active" id="currentPage">
-                                    <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
+                                    <a class="page-link page" href="#"><%= pagination.page %><span class="sr-only"></span></a>
                                 </li>
                                 <li class="page-item next" id="nextNum">
                                     <a class="page-link" href="#" onclick="pagination('orgPage','<%= +pagination.page +1 %>')"><%= +pagination.page +1 %><span class="sr-only"></span></a>
@@ -178,7 +178,7 @@
                                         <% }); %>
                                 </select>
                             </div>
-                            <button type="submit" id="addBtn" class="btn btn-primary w-100">Add Organization</button>
+                            <button type="submit" id="addBtn" class="btn btnColor w-100">Add Organization</button>
                         </form>
                     </div>
                 </div>

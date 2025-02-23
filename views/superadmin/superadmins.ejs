@@ -17,14 +17,14 @@
                             <% } %>
                                 <div class="d-flex justify-content-between align-items-center mb-4">
                                     <h2>System Admins</h2>
-                                    <a class="btn btn-primary" onclick="clickBtn('add', 1)" href="#">
+                                    <a class="btn btnColor" onclick="clickBtn('add', 1)" href="#">
                                         Add New System Admin
                                     </a>
                                 </div>
                                 <nav class="mb-4 d-flex w-100 justify-content-between">
                                     <div class="d-flex searchBar" role="search">
                                         <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter username (or) email address" value="<%= name %>" aria-label="Search" required>
-                                        <button class="btn btn-primary" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
+                                        <button class="btn btnColor" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
                                     </div>
                                     <div>
                                         <div class="btn-group">
@@ -112,7 +112,7 @@
                                 </div>
                                 <nav aria-label="..." id="paginationNav">
                                     <div class="d-flex justify-content-center">
-                                        <p> <%= (parseInt(pagination.page) - 1)*10 + 1 %><span id="lastNum">-<%= parseInt(pagination.page) *10 %></span> / <%= pagination.total %></p>
+                                        <p class="pagContent"> <%= (parseInt(pagination.page) - 1)*10 + 1 %><span id="lastNum">-<%= parseInt(pagination.page) *10 %></span> / <%= pagination.total %></p>
                                     </div>
                                     <ul class="pagination d-flex justify-content-center">
                                         <li class="page-item">
@@ -124,7 +124,7 @@
                                             <a class="page-link" href="#" onclick="pagination('page','<%= pagination.page -1 %>')"><%= pagination.page -1 %><span class="sr-only"></span></a>
                                         </li>
                                         <li class="page-item active" id="currentPage">
-                                            <a class="page-link" href="#"><%= pagination.page %><span class="sr-only"></span></a>
+                                            <a class="page-link page" href="#"><%= pagination.page %><span class="sr-only"></span></a>
                                         </li>
                                         <li class="page-item next" id="nextNum">
                                             <a class="page-link" href="#" onclick="pagination('page','<%= +pagination.page +1 %>')"><%= +pagination.page +1 %><span class="sr-only"></span></a>
