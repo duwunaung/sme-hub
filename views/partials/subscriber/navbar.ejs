@@ -96,9 +96,26 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
-    .sidebar-body {
-        padding: 1rem;
-    }
+    .sidebar-body a {
+	    transition: all 0.2s ease-in-out;
+	    display: flex;
+	    align-items: center;
+	    padding: 12px;
+	    border-radius: 8px;
+	}
+
+	.sidebar-body a:hover {
+	    background-color: #D62828;
+	    color: white !important;
+	    transform: translateX(10px);
+	    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+		
+	}
+
+	.sidebar-body a:hover img {
+	    filter: grayscale(1) brightness(800%);
+	}
+
 
     /* Overlay styles */
     .sidebar-overlay {
@@ -274,26 +291,29 @@
     }
 
     function setActiveButton(buttonId) {
-        const allButtons = document.querySelectorAll('.sidebar-body a');
-        allButtons.forEach(button => {
-            button.classList.remove('text-light', 'btnColor');
-            button.classList.add('text-dark');
-            const img = button.querySelector('img');
-            if (img) {
-                img.classList.remove('iconColor');
-            }
-        });
+	    const allButtons = document.querySelectorAll('.sidebar-body a');
 
-        const activeButton = document.getElementById(buttonId);
-        if (activeButton) {
-            activeButton.classList.remove('text-dark');
-            activeButton.classList.add('text-light', 'btnColor');
-            const img = activeButton.querySelector('img');
-            if (img) {
-                img.classList.add('iconColor');
-            }
-        }
-    }
+	    allButtons.forEach(button => {
+	        button.classList.remove('text-light', 'btnColor');
+	        button.classList.add('text-dark');
+	        button.style.transform = "translateX(0px)";
+	        button.style.transition = "all 0.3s ease-in-out";
+	        
+	        const img = button.querySelector('img');
+	        if (img) img.classList.remove('iconColor');
+	    });
+
+	    const activeButton = document.getElementById(buttonId);
+	    if (activeButton) {
+	        activeButton.classList.remove('text-dark');
+	        activeButton.classList.add('text-light', 'btnColor');
+	        activeButton.style.transform = "translateX(10px)";
+
+	        const img = activeButton.querySelector('img');
+	        if (img) img.classList.add('iconColor');
+	    }
+	}
+
 
     function toggleSidebar() {
         const sidebar = document.getElementById('sidebar');

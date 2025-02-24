@@ -226,7 +226,7 @@ exports.getSalespersonList = (req, res) => {
     const orgId = req.user.orgId
 	const queryParams = []
     let query = `
-        SELECT * FROM Salesperson WHERE orgId = ?
+        SELECT * FROM salesperson WHERE orgId = ?
     `;
 	queryParams.push(orgId)
 	if (search) {
@@ -239,6 +239,7 @@ exports.getSalespersonList = (req, res) => {
 	queryParams.push(offset)
     db_connection.query(query, queryParams, (err, results) => {
         if (err) {
+			console.log(err)
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',

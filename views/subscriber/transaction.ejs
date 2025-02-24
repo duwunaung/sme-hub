@@ -70,9 +70,12 @@
 		        -webkit-overflow-scrolling: touch;
 		    }
 		    
-		    .text-success {
-		        color: green !important;
-		    }
+			.text-income {
+				color: #00C382 !important;
+			}
+			.text-expense {
+				color: #D62828 !important;
+			}
 		    @media (max-width: 768px) {
 		        .table th, .table td {
 		            padding: 0.5rem;
@@ -242,13 +245,13 @@
 							<% if (transaction.length > 0) { %>
 								<% for (let i = 0; i < transaction.length; i++) { %>
 									<tr>
-										<td class="text-nowrap <%= trans === 'all' && transaction[i].transactionType === 'income' ? 'text-success' : '' %>">
+										<td class="text-nowrap ">
 											<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>
 										</td>
-										<td class="text-nowrap <%= trans === 'all' && transaction[i].transactionType === 'income' ? 'text-success' : '' %>" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+										<td class="text-nowrap " style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
 											<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
 										</td>
-										<td class="text-nowrap <%= trans === 'all' && transaction[i].transactionType === 'income' ? 'text-success' : '' %>">
+										<td class="text-nowrap <%= transaction[i].transactionType === 'income' || trans === 'income' ? 'text-income' : 'text-expense' %>">
 											<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
 											<% if (transaction[i].baseCurrency === 'MMK') { %>
 												<%= formattedAmount %> ks
@@ -258,7 +261,7 @@
 												<%= formattedAmount %> <%= transaction[i].baseCurrency %>
 											<% } %>
 										</td>
-										<td class="text-nowrap <%= trans === 'all' && transaction[i].transactionType === 'income' ? 'text-success' : '' %>">
+										<td class="text-nowrap ">
 											<%= new Date(
 												trans === 'income' ? transaction[i].incomeDate :
 												trans === 'expense' ? transaction[i].expenseDate :
@@ -273,10 +276,10 @@
 												hour12: true 
 											}) %>
 										</td>
-										<td class="text-nowrap <%= trans === 'all' && transaction[i].transactionType === 'income' ? 'text-success' : '' %>">
+										<td class="text-nowrap ">
 											<%= transaction[i].category %>
 										</td>
-										<td class="text-nowrap <%= trans === 'all' && transaction[i].transactionType === 'income' ? 'text-success' : '' %>">
+										<td class="text-nowrap ">
 											<%= transaction[i].createdBy %>
 										</td>
 										<% if (trans !== 'all') { %>
