@@ -111,7 +111,6 @@
 							Reset
 						</button>
 					</div>
-					<p class="small mb-1">Category: <span id="summaryCategory"></span></p>
 					<p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
 					<p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
 				</div>
@@ -373,8 +372,6 @@
 			const searchParams = new URLSearchParams(window.location.search);
 			const type = searchParams.get('type')
 			const num = searchParams.get('num')
-			const catId = searchParams.get('catId')
-			let categoryBtns = document.querySelectorAll('#categoryBtns')
 			
 			const totalTrans = "<%= transaction.length %>"
 			if (totalTrans) {
@@ -397,18 +394,6 @@
 			    }
 			} else {
 			    document.getElementById('summaryTotalSum').innerText = "0";
-			}
-
-			if (catId) {
-				categoryBtns.forEach(categoryBtn => {
-					let categoryBtnId = categoryBtn.dataset.num
-					if (catId === categoryBtnId) {
-						const categoryName = categoryBtn.value.toUpperCase()
-						document.getElementById('summaryCategory').innerText = categoryName
-					}
-				})
-			} else if (!catId) {
-				document.getElementById('summaryCategory').innerText = "ALL"
 			}
 			
 			if (type === 'month') {
