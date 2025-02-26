@@ -879,15 +879,12 @@ exports.listIncomeTrans = (req, res) => {
 						res.render('subscriber/transaction', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
 					}
 				}).catch(err => {
-					console.log("salesperson", err.status)
 					res.render('subscriber/transaction', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: [], pagination: {},salesperson: [] , errorMessage: "System Error!", successMessage: null });
 				})
 			}).catch(error => {
-				console.log("category", error.status)
 				res.render('subscriber/transaction', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: [], pagination: {}, salesperson: [] ,errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
-			console.log("transaction", error.status)
 			axios.get(`${process.env.API_URL}/subscribers/categories/income`, {
 				headers: {
 					'Authorization': `${req.session.token}`
