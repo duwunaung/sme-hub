@@ -147,6 +147,47 @@
 
         #menuBtn {
             background-color: var(--btnBgColor);
+            cursor: default;
+        }
+
+        #mobile {
+            display: none;
+        }
+
+        #pcProfile {
+            display: flex;
+        }
+
+        /* Tablet responsive */
+        @media screen and (max-width: 1024px) {
+            #sidebar {
+                display: none;
+            }
+            #pcProfile {
+                display: none;
+            }
+            #mobile {
+                display: block;
+            }
+            .offcanvas {
+                --bs-offcanvas-width: 250px;
+            }
+        }
+
+        /* Phone responsive */
+        @media screen and (max-width: 767px) {
+            #sidebar {
+                display: none;
+            }
+            #pcProfile {
+                display: none;
+            }
+            #mobile {
+                display: block;
+            }
+            .offcanvas {
+                --bs-offcanvas-width: 250px;
+            }
         }
 
     </style>
@@ -155,5 +196,3 @@
 <body class="bg-light">
     <div class="container-fluid">
         <div class="row">
-            <!-- Sidebar -->
-            <nav id="sidebar" class="col-md-3 col-lg-2 p-3">
