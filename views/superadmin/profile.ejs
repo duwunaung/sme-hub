@@ -1,0 +1,178 @@
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
+
+            <div class="container my-3 mx-3">
+                <h2 class="mb-4">Admin Profile</h2>
+
+                <% if (successMessage) { %>
+                <div id="successBox" class="alert alert-success" role="alert">
+                    <%= successMessage %>
+                </div>
+                <% } if (errorMessage) { %>
+                  <div id="errorBox" class="alert alert-danger" role="alert">
+                    <%= errorMessage %>
+                  </div>
+                <% } %>
+                <!-- user Details Form -->
+                <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Username</label>
+                        <input type="text" class="form-control" maxlength="100" name="name" id="userName"
+                            placeholder="Enter username" value="<%= user.name %>" oninput="checkInputs('nameUserError', 'userName')" disabled>
+						              <p id="nameUserError" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
+                    </div>
+										<div class="mb-3">
+											<label for="userRole" class="form-label">Role</label>
+											<input type="text" class="form-control" name="role" id="userRole"
+													placeholder="Enter user role" value="<%= user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase() %>" disabled>
+										</div>
+					          <div class="mb-3">
+                        <label for="userEmail" class="form-label" id="labelEmail">Email Address</label>
+                        <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
+                            placeholder="Enter email address" value="<%= user.email %>" oninput="checkInputs('emailUserError', 'userEmail')" disabled>
+						                <p id="emailUserError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" maxlength="45" id="userPhone" name="phone"
+                            placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" disabled>
+						              <p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+										</div>
+										<a class="btn btn-warning w-100" data-bs-toggle="modal" data-bs-target="#confirmationModal">Edit Profile</a>
+										<div class="mt-3">
+                      <p>Registered Date: <span id="currentRegisteredDate"
+                              class="fw-bold">
+                          <%= new Date(user.registered).toDateString() %>
+                        </span>
+                      </p>
+                    </div>
+                </form>
+								<!-- Type Password modal -->
+								<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+									<div class="modal-dialog">
+										<div class="modal-content">
+											<div class="modal-header">
+                        <input type="password" class="form-control" maxlength="200" id="enterPassword"
+                            placeholder="Enter your password..." required>
+				
+											</div>
+											<div class="modal-footer">
+												<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+												<button type="button" class="btn btn-primary" id="confirmBtn" onclick="enterPassword()">Confirm</button>
+											</div>
+										</div>
+									</div>
+								</div>
+            </div>
+			<script>
+
+				function enterPassword() {
+					const enterPassword = document.getElementById('enterPassword')
+				}
+
+        function showPassword(checkbox) {
+          if (checkbox.checked) {
+                userPassword.type = 'text';
+            } else {
+                userPassword.type = 'password';
+            }
+        }
+
+        document.getElementById('pcProfile').classList.add('d-none')
+
+
+// xxx
+				function buttonType() {
+	                const searchParams = new URLSearchParams(window.location.search);
+	                const type = searchParams.get('type')
+					const resetBtn = document.getElementById("resetBtn")
+	                if (type == 'update') {
+						resetBtn.innerText = "Back"
+						resetBtn.classList.add("btn-primary")
+	                }
+					else {
+						resetBtn.innerText = "Cancel"
+						resetBtn.classList.add("btn-danger")
+					}
+
+	            }
+
+	            buttonType();
+							// xxx
+
+				const form = document.getElementById('myForm');
+				const updateBtn = document.getElementById('updateBtn');
+				const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+				const userEmail = document.getElementById('userEmail')
+				const labelEmail = document.getElementById('labelEmail')
+
+				const userOldName = "<%= user.name %>"
+				const userOldEmail = "<%= user.email %>"
+				const userOldPhone = "<%= user.phone %>"
+				const userOldStatus = "<%= user.status %>"
+
+                function checkInputs(messageBox, inputField) {
+
+									const userNameValue = document.getElementById('userName').value
+									const userEmailValue = document.getElementById('userEmail').value
+									const userPhoneValue = document.getElementById('userPhone').value
+									const userStatusValue = document.getElementById('userStatus').value
+
+									if ( (userOldName == userNameValue) && (userOldEmail == userEmailValue) && (userOldPhone == userPhoneValue) && (userOldStatus == userStatusValue) ) {
+										updateBtn.classList.add('disabled')
+									} else {
+										updateBtn.classList.remove('disabled')
+									}
+
+	                let allFilled = true;
+	                inputs.forEach(index => {
+	                if (!index.value.trim()) {
+	                    allFilled = false;
+	                }
+	                });
+	                updateBtn.disabled = !allFilled;
+					const message = document.getElementById(messageBox)
+					const input = document.getElementById(inputField)
+					if (input.value.length === parseInt(input.maxLength)) {
+				        message.classList.remove('d-none');
+				    } else {
+				        message.classList.add('d-none');
+				    }
+					if (inputField === 'userEmail')
+					{
+						userEmail.classList.remove('border-danger')
+						labelEmail.style.color = 'black'
+						userEmail.classList.remove('input-error')
+					}
+	            }
+
+							checkInputs();
+
+
+                function submitForm(event) {
+				    updateBtn.disabled = true;
+				    updateBtn.textContent = 'Submitting...';
+				}
+
+				const searchParams = new URLSearchParams(window.location.search);
+				const error = searchParams.get('error')
+
+				if (error === 'true') {
+					const type = searchParams.get('type')
+					if (type === 'dup-email') {
+						userEmail.classList.add('border-danger')
+						labelEmail.style.color = '#bb2124'
+						userEmail.onfocus = function() {
+				            userEmail.classList.add('input-error');
+				        };
+				        
+				        userEmail.onblur = function() {
+				            userEmail.classList.remove('input-error');
+				        };
+					}
+				}
+
+			</script>
+        </main>
+
+        <%- include('../partials/superadmin/footer.ejs') %>

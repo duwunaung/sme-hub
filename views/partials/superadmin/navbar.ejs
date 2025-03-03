@@ -1,7 +1,7 @@
 
     <div id="sidebar" class="col-md-3 col-lg-2 p-3">
         <div class="d-flex">
-            <button id="menuBtn" class="btn menu-icon me-3">
+            <button id="menuBtn" class="btn menu-icon me-2">
                 <img src="/dummy.svg" alt="menu logo" id="menulogo">
             </button>
             <h5 class="fw-bolder mt-3">FLOWSIGHT</h5>
@@ -9,16 +9,19 @@
         <div class="offcanvas-body">
             <ul class="nav flex-column mt-4 list-unstyled">
                 <li class="nav-item my-2 nav-item-dashboard">
-                    <a class="nav-link d-flex py-2 fs-6 nav-link-dashboard" href="/superadmin/dashboard"><img src="/dashboard.svg" class="me-2" id="dashboard"><span class="mt-1">Dashboard</span></a>
+                    <a class="nav-link d-flex py-2 fs-6 nav-link-dashboard" href="/superadmin/dashboard"><img src="/dashboard.svg" class="" id="dashboard"><span class="mt-1 mx-3">Dashboard</span></a>
                 </li>
                 <li class="nav-item my-2 py-1 nav-item-organizations">
-                    <a class="nav-link d-flex py-2 fs-6 nav-link-organizations" href="/superadmin/organizations"><img src="/organizations.svg" width="20%" class="me-2" id="organizations"><span class="mx-1">Organizations</span></a>
+                    <a class="nav-link d-flex py-2 fs-6 nav-link-organizations" href="/superadmin/organizations"><img src="/organizations.svg" width="20%" class="" id="organizations"><span class="mx-3">Organizations</span></a>
                 </li>
                 <li class="nav-item my-2 nav-item-users">
-                    <a class="nav-link d-flex py-2 fs-6 nav-link-users" href="/superadmin/users"><img src="/users.svg" width="25%" class="me-2" id="users"><span class="mt-1">Users</span></a>
+                    <a class="nav-link d-flex py-2 fs-6 nav-link-users" href="/superadmin/users"><img src="/users.svg" width="25%" class="" id="users"><span class="mt-1 mx-2">Users</span></a>
+                </li>
+                <li class="nav-item my-2 nav-item-profile">
+                    <a class="nav-link d-flex mx-1 py-2 fs-6 nav-link-profile" href="/superadmin/profile"><img src="/profile.svg" width="22%" class="" id="profile"><span class="mx-2 px-1">Profile</span></a>
                 </li>
                 <li class="nav-item my-2">
-                    <a class="nav-link d-flex py-2 fs-6" href="/superadmin/logout"><img src="/Logout.svg" class="me-2"><span>Logout</span></a>
+                    <a class="nav-link d-flex mx-2 py-2 fs-6" href="/superadmin/logout"><img src="/Logout.svg"><span class="mx-2">Logout</span></a>
                 </li>
             </ul>
         </div>
@@ -32,7 +35,7 @@
                 </button>
                 <div class="d-flex">
                     <button onclick="goToProfile()" id="profileBtn" class="btn profile-icon" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-                        <img src="/profile.svg" width="500%" alt="menu logo" id="profilelogo">
+                        <img src="/profileIcon.svg" width="500%" alt="menu logo" id="profilelogo">
                     </button>
                 </div>
             </div>
@@ -49,13 +52,16 @@
                         <a class="nav-link d-flex py-2 fs-6 nav-link-dashboard" href="/superadmin/dashboard"><img src="/dashboard.svg" class="mx-3" id="mobiledashboard"><span class="mt-1">Dashboard</span></a>
                     </li>
                     <li class="nav-item my-2 py-1 nav-item-organizations">
-                        <a class="nav-link d-flex py-2 fs-6 nav-link-organizations" href="/superadmin/organizations"><img src="/organizations.svg" width="9%" class="mx-3" id="mobileorganizations"><span class="mx-1">Organizations</span></a>
+                        <a class="nav-link d-flex py-2 fs-6 nav-link-organizations" href="/superadmin/organizations"><img src="/organizations.svg" width="13%" class="mx-3" id="mobileorganizations"><span class="mx-1">Organizations</span></a>
                     </li>
                     <li class="nav-item my-2 nav-item-users">
-                        <a class="nav-link d-flex py-2 fs-6 nav-link-users" href="/superadmin/users"><img src="/users.svg" width="10%" class="mx-3" id="mobileusers"><span class="mt-1">Users</span></a>
+                        <a class="nav-link d-flex py-2 fs-6 nav-link-users" href="/superadmin/users"><img src="/users.svg" width="15%" class="mx-3" id="mobileusers"><span class="mt-1">Users</span></a>
+                    </li>
+                    <li class="nav-item my-2 nav-item-profile">
+                        <a class="nav-link d-flex py-2 fs-6 nav-link-profile mx-1" href="/superadmin/profile"><img src="/profile.svg" width="11%" class="mx-3" id="mobileprofile"><span class="mt-1 mx-1">Profile</span></a>
                     </li>
                     <li class="nav-item my-2">
-                        <a class="nav-link d-flex py-2 fs-6" href="/superadmin/logout"><img src="/Logout.svg" class="mx-3"><span>Logout</span></a>
+                        <a class="nav-link d-flex py-2 mx-1 fs-6" href="/superadmin/logout"><img src="/Logout.svg" class="mx-3"><span>Logout</span></a>
                     </li>
                 </ul>
             </div>
@@ -67,7 +73,7 @@
         <div class="mt-3 mx-4" id="pcProfile" style="justify-content: space-between;">
             <div class="d-flex">
                 <button onclick="goToProfile()" id="profileBtn" class="btn profile-icon me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
-                    <img src="/profile.svg" width="500%" alt="menu logo" id="profilelogo">
+                    <img src="/profileIcon.svg" width="500%" alt="menu logo" id="profilelogo">
                 </button>
                 <div class="mt-1">
                     <h6 class="fw-bolder">HanZar NiOo</h6>
@@ -85,7 +91,7 @@
         document.getElementById("currentDate").innerText = currentDate;
     
         function goToProfile () {
-            window.location.href = '#'
+            window.location.href = '/superadmin/profile'
         }
         
         function navbarActive() {

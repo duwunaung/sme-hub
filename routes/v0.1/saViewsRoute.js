@@ -1,5 +1,5 @@
 const express = require('express')
-const { login, logout, orgs, restoreOrg, deleteOrg, updateOrg, createUser, detailUser, updateUser, extendLicense, registerOrg, detailOrg, superadmins, deleteUser, restoreUser, createSuperAdmins, detailSuperadmin, restoreSuperadmin, deleteSuperadmin, updateSuperadmin } = require("../../controllers/v0.1/viewsController")
+const { login, logout, orgs, restoreOrg, deleteOrg, updateOrg, createUser, detailUser, updateUser, extendLicense, registerOrg, detailOrg, superadmins, deleteUser, restoreUser, createSuperAdmins, detailSuperadmin, restoreSuperadmin, deleteSuperadmin, updateSuperadmin, adminProfile } = require("../../controllers/v0.1/viewsController")
 
 const checkSuperAdminSession = require('../../middlewares/viewSuperAdmin');
 const tmpSession = require('../../middlewares/tmp');
@@ -8,6 +8,7 @@ const router = express.Router();
 router.use('/login', login)
 router.use('/logout', logout)
 
+router.use('/profile', checkSuperAdminSession, adminProfile)
 router.use('/organizations/restore/:id', checkSuperAdminSession, restoreOrg)
 router.use('/organizations/delete/:id', checkSuperAdminSession, deleteOrg)
 router.use('/organizations/update/:id/:userId', checkSuperAdminSession, updateUser)
