@@ -755,3 +755,28 @@ exports.updateSuperadmin = (req, res) => {
         })
     }
 }
+
+exports.adminProfile = (req, res) => {
+	if (req.method == 'GET') {
+		
+        axios.get(`${process.env.API_URL}/utils/profile`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.render('superadmin/profile', { user: response.data.data, successMessage: null, errorMessage: null });
+        }).catch(error => {
+		    res.redirect('/superadmin/profile?error=true');
+        })
+    } else {
+        axios.put(`${process.env.API_URL}/users/profile`, { name, email, phone, password }, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            res.redirect('/superadmin/organizations/update/' + orgId +  '/' + userId + '?success=true&type=update&activeUsers=true&orgPage=' + orgPage + '&orgName=' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole )
+        }).catch(error => {
+            res.redirect('/superadmin/organizations/update/' + orgId + '/' + userId + '?error=true&type=404Error&activeUsers=true&orgPage=' + orgPage + '&orgName' + org + '&orgStatus=' + orgStatus + '&expired=' + expired + '&userPage=' + userPage + '&userName=' + userName + '&userStatus=' + userStatus + '&userRole=' + userRole + '&name=' + name + '&email=' + email +  '&phone=' + phone );
+        })
+    }
+}
