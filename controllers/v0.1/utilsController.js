@@ -246,3 +246,31 @@ exports.adminProfile = ( req,res ) => {
         })
     })
 }
+
+exports.editAdminProfile = ( req,res ) => {
+    const adminId = req.user.userId
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment.',
+            dev: "This user is from other organization not from us"
+        })
+    }
+    let query = 'UPDATE users SET name = ?, email = ?, phone = ?, updatedBy = ?, updatedAt = ? WHERE id = ?'
+    db_connection.query(query, [ adminId ], (err, results ) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        return res.status(200).send({
+            success: true,
+            message: 'Updated successfully.',
+            dev: "Good Job, Bro!",
+            data: results[0]
+        })
+    })
+}
