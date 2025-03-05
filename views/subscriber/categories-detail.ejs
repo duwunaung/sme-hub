@@ -59,6 +59,66 @@
 			#mainContainer {
 				margin-top: 100px;
 			}
+			.search-container {
+	            display: flex;
+	            align-items: center;
+	            position: relative;
+	            transition: all 0.3s ease-in-out;
+	        }
+
+	        #searchInput {
+	            width: 200px;
+				height: 35px;
+				top: 58px;
+				left: 936px;
+				border-radius: 15px;
+	            padding: 10px;
+	            font-size: 16px;
+	            border: 1px solid #4D4D4D;
+	            outline: none;
+	            transition: all 0.3s ease-in-out;
+	            background-color: white;
+	            color: #333;
+	        }
+
+	        #searchInput:focus {
+	            width: 250px;
+	            box-shadow: 0px 4px 10px #4d4d4d5c;
+	            border-color: #4D4D4D;
+	        }
+
+	        #searchBarButton {
+	            background-color: white;
+	            border: 1px solid #4D4D4D;
+	            border-radius: 50%;
+	            width: 33px;
+	            height: 33px;
+	            display: flex;
+	            justify-content: center;
+	            align-items: center;
+	            margin-left: 8px;
+	            transition: all 0.3s ease-in-out;
+	        }
+
+	        #searchBarButton:hover {
+	            background-color: #4D4D4D;
+	            border-color: #505050;
+	        }
+
+	        #searchBarButton:hover #searchIcon {
+	            filter: invert(1);
+	        }
+
+	        #searchIcon {
+	            width: 15px;
+	            height: 15px;
+	            transition: all 0.3s ease-in-out;
+	        }
+			@media (max-width: 576px ) {
+				#searchInput:focus {
+					width: 200px !important;
+				}
+			}
 		</style>
 		<div id="mainContainer"></div>
 		<div class="my-2">
@@ -77,20 +137,24 @@
 			<!-- Search Bar and Filter -->
 			<div class="container-div">
 	
-				<div class="d-flex me-3">
-					<input type="text" class="form-control me-2" placeholder="Search..." id="searchInput" onkeydown="searchKey(event)">
-					<button class="btn btn-primary d-flex align-items-center" onclick="performSearch()">
-						<i class="fas fa-search"></i>
+				<div class="d-flex search-container me-2">
+					<input type="text" 
+						   class="form-control" 
+						   placeholder="Search..." 
+						   id="searchInput" 
+						   onkeydown="searchKey(event)">
+					<button class="btn" id="searchBarButton" onclick="performSearch()">
+						<img src="/search_icon.svg" alt="search icon" id="searchIcon">
 					</button>
 				</div>
 				<div class="btn-group">
 					<button type="button" 
-							class="btn btn-primary dropdown-toggle" 
+							class="btn btn-light dropdown-toggle" 
 							data-bs-toggle="dropdown" 
-							aria-expanded="false">
+							aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
 						<i class="fas fa-calendar me-1"></i>Date
 					</button>
-					<ul class="dropdown-menu dropdown-menu-end">
+					<ul class="dropdown-menu dropdown-menu-end mt-2" >
 						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
 						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
 						<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
@@ -107,7 +171,7 @@
 				<div class="card-body">
 					<div class="d-flex justify-content-between align-items-center">
 						<p class="small mb-1">Date: <span id="summaryDate"></span></p>
-						<button class="btn btn-sm btn-outline-dark" id="refreshButton" onclick="refreshAction()">
+						<button class="btn btn-sm btn-light" id="refreshButton" onclick="refreshAction()" style="color: #4D4D4D; border: 1px solid #4D4D4D; border-radius: 8px;">
 							Reset
 						</button>
 					</div>
@@ -171,9 +235,9 @@
 									<td>
 										<div class="d-flex gap-2">
 											<a href="/subscriber/transaction/<%= cat %>/detail/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>&page=<%= pagination.page %>"
-												class="btn btn-primary btn-sm w-100 button-fixed-width">View</a>
+												class="btn btn-primary btn-sm w-100 button-fixed-width" style="border-radius: 8px;">View</a>
 											<a href="/subscriber/transaction/<%= cat %>/update/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>&page=<%= pagination.page %>"
-												class="btn btn-warning btn-sm w-100 button-fixed-width">Edit</a>
+												class="btn btn-warning btn-sm w-100 button-fixed-width" style="border-radius: 8px;">Edit</a>
 										</div>
 									</td>
 								</tr>
