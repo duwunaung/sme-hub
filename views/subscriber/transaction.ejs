@@ -77,6 +77,33 @@
 				color: #D62828 !important;
 			}
 		    @media (max-width: 768px) {
+				.container-div {
+			        display: flex;
+			        justify-content: flex-end;
+			        flex-direction: column;
+			        align-items: flex-end;
+			    }
+
+			    .row.align-items-center {
+			        flex-direction: column;
+			        align-items: flex-end !important;
+			        width: 100%;
+			    }
+
+			    .search-container {
+			        margin-bottom: 10px;
+			        align-self: flex-end;
+			    }
+
+			    .col-auto.me-auto.mb-2 {
+			        align-self: flex-end;
+			        margin-right: 0 !important;
+			    }
+
+			    .container-div .row .col-auto {
+			        width: auto;
+			        max-width: none;
+			    }
 				.table th, .table td {
 					padding: 0.5rem;
 					font-size: 0.875rem;
@@ -285,6 +312,61 @@
 			.btnAddNewLeft {
 				left: 51%;
 			}
+			.search-container {
+	            display: flex;
+	            align-items: center;
+	            position: relative;
+	            transition: all 0.3s ease-in-out;
+	        }
+
+	        #searchInput {
+	            width: 200px;
+				height: 35px;
+				top: 58px;
+				left: 936px;
+				border-radius: 15px;
+	            padding: 10px;
+	            font-size: 16px;
+	            border: 1px solid #4D4D4D;
+	            outline: none;
+	            transition: all 0.3s ease-in-out;
+	            background-color: white;
+	            color: #333;
+	        }
+
+	        #searchInput:focus {
+	            width: 250px;
+	            box-shadow: 0px 4px 10px #4d4d4d5c;
+	            border-color: #4D4D4D;
+	        }
+
+	        #searchBarButton {
+	            background-color: white;
+	            border: 1px solid #4D4D4D;
+	            border-radius: 50%;
+	            width: 33px;
+	            height: 33px;
+	            display: flex;
+	            justify-content: center;
+	            align-items: center;
+	            margin-left: 8px;
+	            transition: all 0.3s ease-in-out;
+	        }
+
+	        #searchBarButton:hover {
+	            background-color: #4D4D4D;
+	            border-color: #505050;
+	        }
+
+	        #searchBarButton:hover #searchIcon {
+	            filter: invert(1);
+	        }
+
+	        #searchIcon {
+	            width: 15px;
+	            height: 15px;
+	            transition: all 0.3s ease-in-out;
+	        }
 		</style>
 		<!-- Main Content -->
 		<div id="mainContainer" style="margin-top: 100px;"></div>
@@ -353,6 +435,13 @@
 							</button>
 						<% } %>
 					</div>
+					<div class="d-flex justify-content-between align-items-center mb-4 <%= trans === 'income' ? 'btnAddNewLeft'  : 'btnAddNewRight' %>" id="addBtnNewTranGrp">
+						<% if (trans !== 'all') { %>
+							<div id="addNewTranBtn" style="border: 1px solid #4D4D4D;">
+								<%= trans === 'income' ? 'INCOME'  : 'EXPENSE' %>
+							</div>
+						<% } %>
+					</div>
 				</div>
 				<!-- Nav Buttons -->
 				<div class="container my-2">
@@ -367,15 +456,14 @@
 
 						<!-- Search Bar -->
 						<div class="col-auto mb-2">
-							<div class="d-flex">
+							<div class="d-flex search-container">
 								<input type="text" 
-									   class="form-control me-2" 
+									   class="form-control" 
 									   placeholder="Search..." 
 									   id="searchInput" 
-									   onkeydown="searchKey(event)"
-									   style="width: 250px;">
-								<button class="btn btn-primary d-flex align-items-center px-3" onclick="performSearch()">
-									<i class="fas fa-search"></i>
+									   onkeydown="searchKey(event)">
+								<button class="btn" id="searchBarButton" onclick="performSearch()">
+									<img src="/search_icon.svg" alt="search icon" id="searchIcon">
 								</button>
 							</div>
 						</div>
@@ -387,14 +475,14 @@
 								<div class="btn-group">
 									<% if (trans !== 'all') { %>
 										<button type="button" 
-												class="btn btn-primary dropdown-toggle" 
+												class="btn btn-light dropdown-toggle" 
 												data-bs-toggle="dropdown" 
-												aria-expanded="false">
-											<i class="fas fa-filter me-1"></i>Category
+												aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px; ">
+											<i class="fas fa-filter me-1" style="color: #4D4D4D;"></i>Category
 										</button>
 									<% } %>
-									<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-category" style="max-height: 280px; overflow-y: auto;">
-										<!-- Search Bar For Category -->
+									<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2" id="dropdown-menu-category" style="max-height: 280px; overflow-y: auto;">
+										<!-- Filter Bar For Category -->
 										<% if (category.length > 8 ) { %>
 											<li class="p-2">
 												<input type="text" class="form-control" id="categorySearch" placeholder="Search category..." onkeyup="filterCategories()">
@@ -417,12 +505,12 @@
 								</div>
 								<div class="btn-group">
 									<button type="button" 
-											class="btn btn-primary dropdown-toggle" 
+											class="btn btn-light dropdown-toggle" 
 											data-bs-toggle="dropdown" 
-											aria-expanded="false">
-										<i class="fas fa-calendar me-1"></i>Date
+											aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+										<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i>Date
 									</button>
-									<ul class="dropdown-menu dropdown-menu-end shadow-sm">
+									<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
 										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
 										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
 										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
@@ -444,7 +532,7 @@
 					<div class="card-body">
 						<div class="d-flex justify-content-between align-items-center">
 							<p class="small mb-1">Date: <span id="summaryDate"></span></p>
-							<button class="btn btn-sm btn-outline-dark" id="refreshButton" onclick="refreshAction()">
+							<button class="btn btn-sm btn-light" id="refreshButton" onclick="refreshAction()" style="color: #4D4D4D; border: 1px solid #4D4D4D; border-radius: 8px;">
 								Reset
 							</button>
 						</div>
@@ -522,9 +610,9 @@
 											<td>
 												<div class="d-flex flex-nowrap">
 													<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
-														class="btn btn-primary btn-sm btn-fixed-width me-1">View</a>
+														class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">View</a>
 													<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
-														class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
+														class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">Edit</a>
 												</div>
 											</td>
 										<% } %>
