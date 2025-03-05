@@ -10,210 +10,8 @@
 			.page-item a:hover {
 		    	cursor: pointer;
 			}
-			@media (max-width: 768px) {
-				.table th, .table td {
-					padding: 0.5rem;
-					font-size: 0.875rem;
-				}
-				
-				.btn-sm {
-					padding: 0.25rem 0.5rem;
-					font-size: 0.75rem;
-				}
-				
-				#btnIncome, #btnExpense, #addNewCatBtn {
-					height: 60px !important;
-					width: 180px !important;
-					font-size: 0.9rem;
-				}
-				#expenseIcon {
-					top: 33px !important;
-					left: 20px !important;
-				}
-				#incomeIcon {
-					top: 30px !important;
-					left: 20px !important;
-				}
-				#btnGroupCard {
-					width: 460px !important;
-					height: 200px !important;
-				}
-				#menuNameFirst, #dayDay, #monthMonth {
-					font-size: 16px !important;
-				}
-				#menuNameSec {
-					font-size: 14px !important;
-				}
-				#dateDay {
-					height: 40px !important;
-					width: 40px !important;
-					font-size: 14px;
-				}
-				#menuName{
-					margin-left: 31px !important;
-				}
-				#dateSection{
-					margin-right: 31px !important;
-				}
-				#addBtnNewCatGrp {
-					top: 220px !important;
-				}
-				#headCard{
-					margin-bottom: 100px !important;
-				}
-			}
-			@media (max-width: 576px) {
-				#btnIncome, #btnExpense, #addNewCatBtn {
-					height: 50px !important;
-					width: 130px !important;
-					font-size: 0.85rem;
-				}
-				#expenseIcon {
-					top: 30px !important;
-					left: 15px !important;
-				}
-				#incomeIcon {
-					top: 27px !important;
-					left: 15px !important;
-				}
-				#btnGroupCard {
-					width: 320px !important;
-					height: 150px !important;
-				}
-				#menuNameFirst, #dayDay, #monthMonth {
-					font-size: 14px !important;
-				}
-				#menuNameSec {
-					font-size: 12px !important;
-				}
-				#dateDay {
-					height: 32px !important;
-					width: 32px !important;
-					font-size: 13px;
-				}
-				#menuName {
-					margin-left: 15px !important;
-				}
-				#dateSection {
-					margin-right: 12px !important;
-				}
-				#addBtnNewCatGrp {
-					top: 170px !important;
-				}
-				#headCard{
-					margin-bottom: 90px !important;
-				}
-			}
-			#btnIncome, #btnExpense , #addNewCatBtn {
-			    height: 70px;
-			    width: 250px;
-			    top: 139px;
-			    left: 55px;
-			    border-radius: 16px;
-			    border-width: 3px;
-			    display: flex;
-			    align-items: center;
-			    justify-content: center;
-				transition: all 0.3s;
-				box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-			}
-			.incomeBtnColor {
-				background-color: #00C382;
-			}
-			.expenseBtnColor {
-				background-color:#D62828;
-			}
-			.incomeBtnColor:hover {
-			    background-color: #00A872 !important;
-			    color: white !important;
-			}
-
-			.expenseBtnColor:hover {
-			    background-color: #C42323 !important;
-			    color: white !important;
-			}
-			#expenseIcon {
-				height: 25px; width: 25px; position: absolute; top: 40px; left: 45px; transform: translateY(-50%);
-			}
-			#incomeIcon {
-				height: 25px; width: 25px; position: absolute; top: 38px; left: 45px; transform: translateY(-50%);
-			}
-			#btnGroupCard {
-				width: 600px;
-				height: 220px;
-				top: 155px;
-				left: 374px;
-				border-radius: 20px;
-				border-width: 1px;
-				box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-				display: flex; 
-				flex-direction: column;
-				justify-content: center;
-			}
-			#headOfCard {
-			    display: flex;
-			    justify-content: space-between;
-			    align-items: center;
-			    width: 100%;
-				margin-bottom: 20px;
-			}
-
-			#menuName {
-			    display: flex;
-			    flex-direction: column;
-				margin-left: 30px;
-			}
-
-			#dateSection {
-			    display: flex;
-			    align-items: center;
-				margin-right: 30px;
-			}
-
-			#dateDay {
-			    width: 50px;
-			    height: 50px;
-			    background-color: #4D4D4D;
-			    color: white;
-			    display: flex;
-			    justify-content: center;
-			    align-items: center;
-			    border-radius: 50%;
-			    font-weight: bold;
-			    margin-right: 10px;
-			}
-
-			#dayMonth {
-			    display: flex;
-			    flex-direction: column;
-			}
-			#menuNameFirst {
-				color: #05004E; 
-				font-weight: 600; 
-				font-size: 20px; 
-				line-height: 32px; 
-				letter-spacing: 0px;
-			}
-			#menuNameSec {
-				font-weight: 400;
-				font-size: 16px;
-				line-height: 30px;
-				letter-spacing: 0px;
-			}
-			#addBtnNewCatGrp {
-				position: absolute;
-				top: 250px;
-				
-			}
-			#headCard{
-				position: relative;
-				margin-bottom: 120px;
-			}
-			.btnAddNewRight {
-				right: 51%;
-			}
-			.btnAddNewLeft {
-				left: 51%;
+			#mainContainer {
+				margin-top: 100px;
 			}
 			.search-container {
 	            display: flex;
@@ -270,13 +68,29 @@
 	            height: 15px;
 	            transition: all 0.3s ease-in-out;
 	        }
-			
+			#addNewSalespersonBtn {
+				height: 50px;
+				width: 130px;
+			    top: 139px;
+			    left: 55px;
+			    border-radius: 16px;
+			    border-width: 3px;
+				border: 1px solid #4D4D4D;
+			    display: flex;
+			    align-items: center;
+			    justify-content: center;
+				transition: all 0.3s;
+			}
+			#addNewSalespersonBtn:hover {
+				background-color: #4D4D4D;
+				color: white;
+			}
 		</style>
-		<div id="mainContainer" style="margin-top: 100px;"></div>
 		<!-- Main Content -->
+		<div id="mainContainer"></div>
         <main >
 			
-            <div class="content">
+            <div class="content mt-3">
 				<% if (errorMessage) { %>
 					<div id="errorBox" class="alert alert-danger" role="alert">
 						<%= errorMessage %>
@@ -287,66 +101,17 @@
 						<%= successMessage %>
 					</div>
 					<% } %>
-				<div id="headCard">
-					<div class="container my-2" id="btnGroupCard">
-						<div id="headOfCard" class="d-flex">
-							<div id="menuName">
-								<div id="menuNameFirst">Categories</div>
-								<div id="menuNameSec" class="text-secondary"><% if (cat === 'income' ) { %> Income <% } else {%> Expense <% } %> Categories</div>
-							</div>
-							<div id="dateSection">
-								<div id="dateDay"></div>
-								<div id="dayMonth">
-									<div id="dayDay"></div>
-									<div id="monthMonth"></div>
-								</div>
-							</div>
-						</div>					
-						<div id="btnGroup">
-							<div class="d-flex justify-content-center  gap-3">
-								<div class="d-flex  gap-2">
-									<div style="position: relative;">
-										<img src="/income_icon.svg" id="incomeIcon" style="cursor: pointer;" onclick="document.getElementById('btnIncome').click();">
-										<a type="button" href="/subscriber/category/income" 
-										   class="text-decoration-none btn <% if (cat === 'income') { %> incomeBtnColor <% } else { %> btn-secondary <% } %> flex-grow-1 ps-4" 
-										   id="btnIncome">
-										  <div class="btn-content">
-											<span class="text-light">INCOME</span>
-										  </div>
-										</a>
-									</div>
-								</div>
-						
-								<div class="d-flex align-items-center gap-2">
-									<div style="position: relative;">
-										<img src="/expense_icon.svg" id="expenseIcon" style="cursor: pointer;" onclick="document.getElementById('btnExpense').click();">
-										<a type="button" href="/subscriber/category/expense" 
-										   class="text-decoration-none btn <% if (cat === 'expense') { %> expenseBtnColor <% } else { %> btn-secondary <% } %> flex-grow-1 ps-4" 
-										   id="btnExpense">
-										  <div class="btn-content">
-											<span class="text-light">EXPENSE</span>
-										  </div>
-										</a>
-									</div>
-								</div>
-							</div>
-						</div>
-					</div>
-					<div class="d-flex justify-content-between align-items-center mb-4 <%= cat === 'income' ? 'btnAddNewRight'  : 'btnAddNewLeft' %>" id="addBtnNewCatGrp" >
-						<button class="btn <%= cat === 'income' ? 'incomeBtnColor'  : 'expenseBtnColor' %> text-light" data-bs-toggle="modal" id="addNewCatBtn"
-						data-bs-target="#addNewCategory">
-							Add Category
-						</button>
-					</div>
-					<div class="d-flex justify-content-between align-items-center mb-4 <%= cat === 'income' ? 'btnAddNewLeft'  : 'btnAddNewRight' %>" id="addBtnNewCatGrp">
-						<div id="addNewCatBtn" style="border: 1px solid #4D4D4D;">
-							<%= cat === 'income' ? 'INCOME'  : 'EXPENSE' %>
-						</div>
-					</div>
+				<div class="mb-4">
+					<h2>Salespersons</h2>
 				</div>
-				
+				<div class="my-3" style="display: flex; justify-content: flex-end;">
+					<button class="btn" data-bs-toggle="modal"
+					data-bs-target="#addNewsalesperson" id="addNewSalespersonBtn">
+						Add New
+					</button>
+				</div>
 				<!-- Search Bar -->
-				<div class="container-div my-2" >
+				<div class="container-div my-2">
 					<div class="row justify-content-end">
 				
 						<!-- Search Bar -->
@@ -361,48 +126,44 @@
 									<img src="/search_icon.svg" alt="search icon" id="searchIcon">
 								</button>
 							</div>
-						</div>	
+						</div>
+				
 					</div>
 				</div>
 				
-				<!-- Category Table -->
-				<div class="table-responsive" >
-					
+				<!-- salesperson Table -->
+				<div class="table-responsive">
 					<table class="table table-striped table-hover">
-						
 						<thead class="table-dark">
-						  <tr >
-							<th style="width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">ID <span></span></th>
-							<th style="width: 180px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
-							<th style="width: 100px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
-							<th style="width: 100px;">Actions</th>
+						  <tr>
+							<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">ID <span></span></th>
+							<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
+							<th style="min-width: 130px">Actions</th>
 						</tr>
 						</thead>
 						<tbody>
-							<tbody id="categoryTable">
-								<% if (category.length > 0) { %>
-									<% for (let i = 0; i < category.length; i++) { %>
+							<tbody id="salespersonTable">
+								<% if (salesperson.length > 0) { %>
+									<% for (let i = 0; i < salesperson.length; i++) { %>
 										<tr>
 											<td class="text-nowrap"><%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %></td>
-											<td class="text-nowrap"><%= category[i].name.length > 30 ? category[i].name.substring(0, 30) + '...' : category[i].name %></td>
-											<td class="text-nowrap" style="min-width: 100px;"><%= category[i].createdBy %></td>
+											<td class="text-nowrap"><%= salesperson[i].name.length > 30 ? salesperson[i].name.substring(0, 30) + '...' : salesperson[i].name %></td>
 											<td>
 												<div class="d-flex flex-nowrap">
-													<a href="/subscriber/category/<%= cat %>/detail/<%= category[i].id %>"
-														class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">View</a>
-													<a href="/subscriber/category/<%= cat %>/update/<%= category[i].id %>?cat=<%= cat %>&page=<%= pagination.page %>"
-														class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">Edit</a>
+													<button onclick="openUpdateModal('<%= salesperson[i].id %>', '<%= salesperson[i].name %>')"
+														class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
+														Edit
+													</button>
 													
-													<% if (category[i].status === 'deleted') { %>
-														<a href="/subscriber/category/<%= cat %>/restore/<%= category[i].id %>"
-															class="btn btn-danger btn-sm btn-fixed-width" style="border-radius: 8px;">Restore</a>
-													<% } else if (category[i].status === 'active') { %>
+													<% if (salesperson[i].status === 'deleted') { %>
+														<a href="/subscriber/salesperson/restore/<%= salesperson[i].id %>"
+															class="btn btn-danger btn-sm btn-fixed-width">Restore</a>
+													<% } else if (salesperson[i].status === 'active') { %>
 														<a href="#" class="btn btn-danger btn-sm btn-fixed-width" 
 														   data-bs-toggle="modal" 
 														   data-bs-target="#confirmationModal" 
-														   data-category-id="<%= category[i].id %>" 
-														   data-category-cat="<%= cat %>"
-														   onclick="setDeleteCategory(this)" style="border-radius: 8px;">Delete</a>
+														   data-salesperson-id="<%= salesperson[i].id %>"
+														   onclick="setDeleteSalesperson(this)" style="border-radius: 8px;">Delete</a>
 													<% } %>
 												</div>
 											</td>
@@ -410,7 +171,7 @@
 									<% } %>
 								<% } else { %>
 									<tr>
-										<td colspan="4" class="text-center text-muted">No categories found.</td>
+										<td colspan="4" class="text-center text-muted">No salespersons found.</td>
 									</tr>
 								<% } %>
 							</tbody>
@@ -425,7 +186,7 @@
 			<div class="modal-dialog">
 				<div class="modal-content">
 					<div class="modal-header">
-						<h5 class="modal-title" id="duplicateNameLabel">Duplicate Category Name</h5>
+						<h5 class="modal-title" id="duplicateNameLabel">duplicate Salesperson Name</h5>
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
@@ -446,7 +207,7 @@
 						<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 					</div>
 					<div class="modal-body">
-						<p>You are <strong>deleting</strong> a category. Do you want to proceed?</p>
+						<p>You are <strong>deleting</strong> a salesperson record. Do you want to proceed?</p>
 					
 
 					</div>
@@ -457,50 +218,58 @@
 				</div>
 			</div>
 		</div>
-		<!-- Modal for Adding New Category -->
-		<div class="modal fade" id="addNewCategory" tabindex="-1" aria-labelledby="addNewCategoryModalLabel" aria-hidden="true">
+		<!-- Modal for Adding New salesperson -->
+		<div class="modal fade" id="addNewsalesperson" tabindex="-1" aria-labelledby="addNewsalespersonModalLabel" aria-hidden="true">
 		    <div class="modal-dialog">
 		        <div class="modal-content">
 		            <div class="modal-header">
-		                <h5 class="modal-title" id="addNewCategoryModalLabel">Add New Category</h5>
+		                <h5 class="modal-title" id="addNewsalespersonModalLabel">Add New salesperson</h5>
 		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 		            </div>
 		            <div class="modal-body">
-		                <form id="addNewCategoryForm" action="/subscriber/category/<%= cat %>/create" method="POST" onsubmit="submitForm(event)">
+		                <form id="addNewsalespersonForm" action="/subscriber/salesperson/create" method="POST" onsubmit="submitForm(event)">
 		                    
-		                    <!-- Category Name -->
+		                    <!-- salesperson Name -->
 		                    <div class="mb-3">
-		                        <label for="catName" class="form-label">Category Name</label>
-		                        <input type="text" class="form-control" maxlength="100" name="name" id="catName"
-		                            placeholder="Enter category name" value="" oninput="checkInputs('catNameError', 'catName')" required>
-		                        <p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
+		                        <label for="salespersonName" class="form-label">Salesperson Name</label>
+		                        <input type="text" class="form-control" maxlength="100" name="name" id="salespersonName"
+		                            placeholder="Enter salesperson name" value="" oninput="checkInputs('salespersonNameError', 'salespersonName')" required>
+		                        <p id="salespersonNameError" class="mt-2 d-none text-danger">*Salesperson Name can't exceed 100 characters!</p>
 		                    </div>
 
-		                    <!-- Category Type Selection -->
+		                    <button type="submit" id="addBtn" class="btn btn-primary w-100" disabled>Add Salesperson</button>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		</div>
+		<!-- Modal for Updating Salesperson -->
+		<div class="modal fade" id="updateSalesperson" tabindex="-1" aria-labelledby="updateSalespersonModalLabel" aria-hidden="true">
+		    <div class="modal-dialog">
+		        <div class="modal-content">
+		            <div class="modal-header">
+		                <h5 class="modal-title" id="updateSalespersonModalLabel">Update Salesperson</h5>
+		                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+		            </div>
+		            <div class="modal-body">
+		                <form id="updateSalespersonForm" onsubmit="submitUpdateForm(event)" method="POST">
+		                    <input type="hidden" id="salespersonId" name="id">
+		                    
+		                    <!-- Salesperson Name -->
 		                    <div class="mb-3">
-		                        <label class="form-label">Category Type</label>
-		                        <div class="form-check">
-		                            <input class="form-check-input" type="radio" name="categoryType" id="standalone" value="standalone" checked onclick="toggleParentCategory()">
-		                            <label class="form-check-label" for="standalone">Standalone Category</label>
-		                        </div>
-		                        <div class="form-check">
-		                            <input class="form-check-input" type="radio" name="categoryType" id="underParent" value="underParent" onclick="toggleParentCategory()">
-		                            <label class="form-check-label" for="underParent">Under Parent <%= cat === 'income' ? 'Sale' : 'Purchase' %></label>
-		                        </div>
+		                        <label for="updateSalespersonName" class="form-label">Salesperson Name</label>
+		                        <input type="text" 
+		                               class="form-control" 
+		                               maxlength="100" 
+		                               name="name" 
+		                               id="updateSalespersonName"
+		                               placeholder="Enter salesperson name" 
+		                               oninput="checkUpdateInputs('updateSalespersonNameError', 'updateSalespersonName')" 
+		                               required>
+		                        <p id="updateSalespersonNameError" class="mt-2 d-none text-danger">*Salesperson Name can't exceed 100 characters!</p>
 		                    </div>
 
-		                    <!-- Parent Category Dropdown (Hidden by Default) -->
-		                    <div class="mb-3" id="parentCategoryGroup" style="display: none;">
-		                        <label for="parentCategory" class="form-label">
-									Select Parent <%= cat === 'income' ? 'Sale' : 'Purchase' %>
-								</label>								
-		                        <select class="form-select" id="parentCategory" name="parentCategory">
-		                            <option value="">Choose...</option>
-		                            <option value="<%= cat === 'income' ? 'sale' : 'purchase' %>" selected><%= cat === 'income' ? 'Sale' : 'Purchase' %></option>
-		                        </select>
-		                    </div>
-
-		                    <button type="submit" id="addBtn" class="btn btn-primary w-100" disabled>Add Category</button>
+		                    <button type="submit" id="updateBtn" class="btn btn-primary w-100">Update Salesperson</button>
 		                </form>
 		            </div>
 		        </div>
@@ -599,7 +368,7 @@
 			let sortDirections = {};
 
 			function sortTable(columnIndex, type, headerElement) {
-				let table = document.getElementById("categoryTable");
+				let table = document.getElementById("salespersonTable");
 				let rows = Array.from(table.getElementsByTagName("tr"));
 				let ascending = !sortDirections[columnIndex];
 				sortDirections[columnIndex] = ascending;
@@ -625,20 +394,6 @@
 				headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
 			}
 
-			let deleteCategoryId = null;
-		    let deleteCategoryCat = null;
-
-		    function setDeleteCategory(element) {
-		        deleteCategoryId = element.getAttribute("data-category-id");
-		        deleteCategoryCat = element.getAttribute("data-category-cat");
-		    }
-
-		    function deleteConfirm() {
-		        if (deleteCategoryId && deleteCategoryCat) {
-		            window.location.href = `/subscriber/category/${deleteCategoryCat}/delete/${deleteCategoryId}`;
-		        }
-		    }
-			
 			function goToPage(pageNumber) {
 			    const baseUrl = new URL(window.location.href);
 			    baseUrl.searchParams.set("page", pageNumber);
@@ -677,7 +432,7 @@
 			    window.location.href = url.toString();
 			}
 			
-			const form = document.getElementById('addNewCategoryForm');
+			const form = document.getElementById('addNewsalespersonForm');
             const addButton = document.getElementById('addBtn');
             const inputs = form.querySelectorAll('.form-control[required]');
 
@@ -703,21 +458,24 @@
 			    addButton.disabled = true;
 			    addButton.textContent = 'Submitting...';
 			}
-
-			function toggleParentCategory() {
-		        document.getElementById('parentCategoryGroup').style.display = 
-		            document.getElementById('underParent').checked ? 'block' : 'none';
-		    }
 			
+			let deleteSalespersonId = null;
+
+		    function setDeleteSalesperson(element) {
+		        deleteSalespersonId = element.getAttribute("data-salesperson-id");
+		    }
+
+			function deleteConfirm() {
+		        if (deleteSalespersonId ) {
+		            window.location.href = `/subscriber/salesperson/delete/${deleteSalespersonId}`;
+		        }
+		    }
+
 			function goToDirection(id, type) {
 			    const pathname = window.location.pathname;
 			    let newUrl;
 
-			    if (type === 'view') {
-			        newUrl = `${pathname}/detail/${id}`;
-			    } else if (type === 'edit') {
-			        newUrl = `${pathname}/update/${id}`;
-			    } else if (type === 'restore') {
+			    if (type === 'restore') {
 			        newUrl = `${pathname}/restore/${id}`;
 			    }
 			    if (newUrl) {
@@ -725,6 +483,26 @@
 			    } else {
 			        console.error('Invalid type provided');
 			    }
+			}
+
+			function openUpdateModal(id, name) {
+			    document.getElementById('salespersonId').value = id;
+			    document.getElementById('updateSalespersonName').value = name;
+			    new bootstrap.Modal(document.getElementById('updateSalesperson')).show();
+			}
+
+			function openEditModal(id, name) {
+			    document.getElementById('salespersonId').value = id;
+			    document.getElementById('updateSalespersonName').value = name;
+			    new bootstrap.Modal(document.getElementById('updateSalesperson')).show();
+			}
+
+			function showUpdateModal(id, name) {
+				document.getElementById("duplicateNameModal").remove();
+			    
+			    setTimeout(() => {
+			        openEditModal(id, name);
+			    }, 500);
 			}
 
 			const params = new URLSearchParams(window.location.search);
@@ -740,13 +518,12 @@
 			            modalFooter.innerHTML = '';
 
 			            if (status === 'active') {
-			                modalBody.innerHTML = `The category name <strong>${name}</strong> already exists.`;
+			                modalBody.innerHTML = `The salesperson name <strong>${name}</strong> already exists.`;
 			                modalFooter.innerHTML = `
-			                    <button type="button" class="btn btn-primary" onclick="goToDirection(${id}, 'view')">View</button>
-			                    <button type="button" class="btn btn-warning" onclick="goToDirection(${id}, 'edit')">Edit</button>
+			                    <button type="button" class="btn btn-warning" onclick="showUpdateModal(${id}, '${name}')">Edit</button>
 			                `;
 			            } else if (status === 'deleted') {
-			                modalBody.innerHTML = `The category name <strong>${name}</strong> already exists. Do you want to restore?`;
+			                modalBody.innerHTML = `The salesperson name <strong>${name}</strong> already exists. Do you want to restore?`;
 			                modalFooter.innerHTML = `
 			                    <button type="button" class="btn btn-danger" onclick="goToDirection(${id}, 'restore')">Restore</button>
 			                `;
@@ -757,14 +534,62 @@
 			        }
 			    }
 			}
-			const today = new Date();
-			const day = today.getDate();
-			const weekday = today.toLocaleDateString("en-US", { weekday: "long" });
-			const month = today.toLocaleDateString("en-US", { month: "long" });
 
-			document.getElementById("dateDay").textContent = day;
-			document.getElementById("dayDay").textContent = weekday + ",";
-			document.getElementById("monthMonth").textContent = month;
-						
+			function checkUpdateInputs(messageBox, inputField) {
+			    const updateForm = document.getElementById('updateSalespersonForm');
+			    const updateButton = document.getElementById('updateBtn');
+			    const inputs = updateForm.querySelectorAll('.form-control[required]');
+			    
+			    let allFilled = true;
+			    inputs.forEach(input => {
+			        if (!input.value.trim()) {
+			            allFilled = false;
+			        }
+			    });
+			    
+			    updateButton.disabled = !allFilled;
+			    const message = document.getElementById(messageBox);
+			    const input = document.getElementById(inputField);
+			    
+			    if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			    } else {
+			        message.classList.add('d-none');
+			    }
+			}
+
+			function submitUpdateForm(event) {
+			    event.preventDefault();
+			    const updateButton = document.getElementById('updateBtn');
+			    const salespersonId = document.getElementById('salespersonId').value;
+			    const name = document.getElementById('updateSalespersonName').value;
+			    const form = document.getElementById('updateSalespersonForm');
+			    
+			    if (name && name.trim()) {
+			        updateButton.disabled = true;
+			        updateButton.textContent = 'Updating...';
+			        const submitForm = document.createElement('form');
+			        submitForm.method = 'POST';
+			        submitForm.action = `/subscriber/salesperson/update/${salespersonId}`;
+
+			        const nameInput = document.createElement('input');
+			        nameInput.type = 'hidden';
+			        nameInput.name = 'name';
+			        nameInput.value = name;
+			        submitForm.appendChild(nameInput);
+
+			        const urlParams = new URLSearchParams(window.location.search);
+			        const currentPage = urlParams.get('page') || 1;
+			        const pageInput = document.createElement('input');
+			        pageInput.type = 'hidden';
+			        pageInput.name = 'page';
+			        pageInput.value = currentPage;
+			        submitForm.appendChild(pageInput);
+
+			        document.body.appendChild(submitForm);
+			        submitForm.submit();
+			    }
+			}
+
 		</script>
         <%- include('../partials/subscriber/footer.ejs') %>

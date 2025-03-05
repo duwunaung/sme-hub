@@ -133,7 +133,7 @@ exports.listAllTransactions = (req, res) => {
 };
 
 exports.createExpense = (req, res) => {
-    const { description, amount, expenseDate, catId } = req.body
+    const { description, amount, expenseDate, catId, itemName, price, quantity, vendorName } = req.body
     const orgId = req.user.orgId
     const createdBy = req.user.id
 
@@ -147,9 +147,18 @@ exports.createExpense = (req, res) => {
         )
     }
 
-	const receiptFilename = req.body.receipt || null
-    const query = `INSERT INTO exps (description, amount, expenseDate, catId, orgId, createdBy, receipt) VALUES ('${description}', '${amount}', '${expenseDate}', '${catId}', '${orgId}', '${createdBy}', '${receiptFilename}')`
-    db_connection.query(query, (err, result) => {
+	const receipt = req.body.receipt
+    let query = `INSERT INTO exps (description, amount, expenseDate, catId, orgId, createdBy`
+	let values = [description, amount, expenseDate, catId, orgId, createdBy];
+	const optionalFields = { receipt, itemName, price, quantity, vendorName };
+	Object.entries(optionalFields).forEach(([key, value]) => {
+		if (value !== null && value !== undefined) {
+			query += `, ${key}`;
+			values.push(value);
+		}
+	});
+	query += ') VALUES (' + values.map(() => '?').join(', ') + ')';
+    db_connection.query(query, values, (err, result) => {
         if (err) {
             return res.status(500).send(
                 {
@@ -172,7 +181,7 @@ exports.createExpense = (req, res) => {
 
 exports.updateExpense = (req, res) => {
     const { id } = req.params
-    const { description, amount, expenseDate, catId } = req.body
+    const { description, amount, expenseDate, catId,  itemName, price, quantity, vendorName } = req.body
     const orgId = req.user.orgId
 
     if (!description || !amount || !expenseDate || !catId) {
@@ -184,14 +193,21 @@ exports.updateExpense = (req, res) => {
             }
         )
     }
-	const receiptFilename = req.body.receipt
-	let query = ''
-	if (receiptFilename) {
-		query = `UPDATE exps SET description = '${description}', amount = '${amount}', expenseDate = '${expenseDate}', catId = '${catId}', receipt = '${receiptFilename}' WHERE id = '${id}' AND orgId = '${orgId}'`
-	} else {
-		query = `UPDATE exps SET description = '${description}', amount = '${amount}', expenseDate = '${expenseDate}', catId = '${catId}' WHERE id = '${id}' AND orgId = '${orgId}'`
-	}
-    db_connection.query(query, (err, result) => {
+	let sql = 'UPDATE exps SET description = ?, amount = ?, expenseDate = ? , catId = ?'
+	let values = [description, amount, expenseDate, catId];
+	const receipt = req.body.receipt;
+	const optionalFields = { receipt, itemName, price, quantity, vendorName };
+	Object.entries(optionalFields).forEach(([key, value]) => {
+		if (value !== null && value !== undefined) {
+			sql += `, ${key} = ?`;
+			values.push(value);
+		}
+	});
+	sql += 'WHERE id = ? AND orgId = ?'
+	values.push(id)
+	values.push(orgId)
+	
+    db_connection.query(sql, values, (err, result) => {
         if (err) {
             return res.status(500).send(
                 {
@@ -255,7 +271,7 @@ exports.getExpense = (req, res) => {
         })
     }
     const id = req.params.id
-    let query = `SELECT e.id, e.description, e.amount, e.expenseDate, e.catId, e.orgId, e.createdBy, e.receipt, o.baseCurrency AS baseCurrency , u.name AS username, ec.name AS category
+    let query = `SELECT e.id, e.description, e.amount, e.expenseDate, e.itemName, e.vendorName, e.price, e.quantity, e.catId, e.orgId, e.createdBy, e.receipt, o.baseCurrency AS baseCurrency , u.name AS username, ec.name AS category, ec.parentId AS parentId
 	FROM exps e 
 	JOIN orgs o ON e.orgId = o.id
 	JOIN users u ON e.createdBy = u.id
@@ -498,7 +514,7 @@ exports.getMonthlyExpenses = (req, res) => {
 }
 
 exports.createIncome = (req, res) => {
-	const { description, amount, incomeDate, catId } = req.body
+	const { description, amount, incomeDate, catId, itemName, price, quantity, salespersonId } = req.body
 	const orgId = req.user.orgId
 	const createdBy = req.user.id
 
@@ -511,9 +527,21 @@ exports.createIncome = (req, res) => {
 			}
 		)
 	}
-	const receiptFilename = req.body.receipt || null
-	const sql = 'INSERT into incs (description, amount, incomeDate, catId, orgId, createdBy, receipt) VALUES (?,?,?,?,?,?,?)'
-	const values = [description, amount, incomeDate, catId, orgId, createdBy, receiptFilename]
+	let sql = 'INSERT INTO incs (description, amount, incomeDate, catId, orgId, createdBy';
+	let values = [description, amount, incomeDate, catId, orgId, createdBy];
+	const customerName = req.body.customer;
+	const receipt = req.body.receipt;
+	
+	const optionalFields = { receipt, itemName, price, quantity, salespersonId, customerName };
+	
+	Object.entries(optionalFields).forEach(([key, value]) => {
+		if (value !== null && value !== undefined) {
+			sql += `, ${key}`;
+			values.push(value);
+		}
+	});
+	
+	sql += ') VALUES (' + values.map(() => '?').join(', ') + ')';
 	db_connection.query(sql, values, (err, results) => {
 		if (err) {
 			return res.status(500).send(
@@ -536,7 +564,7 @@ exports.createIncome = (req, res) => {
 }
 
 exports.updateIncome = (req, res) => {
-	const { description, amount, incomeDate, catId } = req.body
+	const { description, amount, incomeDate, catId, itemName, price, quantity, salespersonId } = req.body
 	const orgId = req.user.orgId
 	const createdBy = req.user.userId
 	const { id } = req.params
@@ -549,15 +577,22 @@ exports.updateIncome = (req, res) => {
 			}
 		)
 	}
-	const receiptFilename = req.body.receipt
-	let sql = ''
-	if (receiptFilename) {
-		sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}', receipt = '${receiptFilename}' WHERE id = '${id}' AND orgId = '${orgId}'`
-	} else {
-		sql = `UPDATE incs SET description = '${description}', amount = '${amount}', incomeDate = '${incomeDate}', catId = '${catId}' WHERE id = '${id}' AND orgId = '${orgId}'`
-	}
+	let sql = 'UPDATE incs SET description = ?, amount = ?, incomeDate = ? , catId = ?'
+	let values = [description, amount, incomeDate, catId];
+	const customerName = req.body.customer;
+	const receipt = req.body.receipt;
+	const optionalFields = { receipt, itemName, price, quantity, salespersonId, customerName };
+	Object.entries(optionalFields).forEach(([key, value]) => {
+		if (value !== null && value !== undefined) {
+			sql += `, ${key} = ?`;
+			values.push(value);
+		}
+	});
+	sql += 'WHERE id = ? AND orgId = ?'
+	values.push(id)
+	values.push(orgId)
 	
-	db_connection.query(sql, (err, results) => {
+	db_connection.query(sql, values, (err, results) => {
 		if (err) {
 			return res.status(500).send(
                 {
@@ -613,7 +648,7 @@ exports.getIncome = (req, res) => {
         })
     }
     const id = req.params.id
-    let query = `SELECT i.id, i.description, i.amount, i.incomeDate, i.catId, i.orgId, i.createdBy, i.receipt, o.baseCurrency AS baseCurrency , u.name AS username, ic.name as category
+    let query = `SELECT i.id, i.description, i.amount, i.incomeDate,i.itemName, i.customerName, i.price, i.quantity, i.salespersonId, i.catId, i.orgId, i.createdBy, i.receipt, o.baseCurrency AS baseCurrency , u.name AS username, ic.name AS category, ic.parentId AS parentId
 	FROM incs i 
 	JOIN orgs o ON i.orgId = o.id
 	JOIN users u ON i.createdBy = u.id
@@ -635,12 +670,35 @@ exports.getIncome = (req, res) => {
                 dev: "Data not found"
             })
         }
-		return res.status(200).send({
-			success: true,
-			message: "We found the data!",
-			dev: "Thanks bro, you`re awesome",
-			data: results[0]
-		})
+		
+		if (results[0].parentId === 1) {
+			const salespersonId = results[0].salespersonId
+			let querySalesperson = `SELECT name FROM salesperson WHERE id = ${salespersonId}`
+			db_connection.query(querySalesperson, (error, result) => {
+				if (error) {
+					return res.status(500).send({
+						success: false,
+						message: 'internal server error',
+						dev: err
+					})
+				}
+				const salesperson = result[0].name
+				results[0].salesperson = salesperson
+				return res.status(200).send({
+					success: true,
+					message: "We found the data!",
+					dev: "Thanks bro, you`re awesome",
+					data: results[0]
+				})
+			})
+		} else {
+			return res.status(200).send({
+				success: true,
+				message: "We found the data!",
+				dev: "Thanks bro, you`re awesome",
+				data: results[0]
+			})
+		}
     });
 }
 

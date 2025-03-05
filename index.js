@@ -17,6 +17,7 @@ const user_v01 = require('./routes/v0.1/userRoute')
 const extCats_v01 = require('./routes/v0.1/extCatsRoute')
 const extTrans_v01 = require('./routes/v0.1/extTransRoute')
 const extOrg_v01 = require('./routes/v0.1/extOrgRoute')
+const extSalesperson_v01 = require('./routes/v0.1/extSalespersonRoute.js')
 
 const saViews_v01 = require('./routes/v0.1/saViewsRoute')
 const suViews_v01 = require('./routes/v0.1/suViewsRoute')
@@ -63,6 +64,7 @@ app.use("/api/v0.1/subscribers/expenses", authenticateToken, authorizeRole(subsc
 app.use("/api/v0.1/subscribers/transactions", authenticateToken, authorizeRole(subscribers), extTrans_v01);
 app.use("/api/v0.1/subscribers/organization", authenticateToken, authorizeRole(subscribers), extOrg_v01);
 app.use("/api/v0.1/subscribers/user", authenticateToken, authorizeRole(subscribers), extUser_v01);
+app.use("/api/v0.1/subscribers/salesperson", authenticateToken, authorizeRole(subscribers), extSalesperson_v01);
 
 // view engine setup
 app.set('view engine', 'ejs');

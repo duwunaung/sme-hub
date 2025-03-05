@@ -34,7 +34,11 @@
 		#previewContainer {
 		    margin-bottom: 1rem;
 		}
+		#mainContainer {
+			margin-top: 80px;
+		}
 	</style>
+		<div id="mainContainer"></div>
 		<main class="col-md-9 col-lg-10">
 			<div class="container my-5">
 				<h2 class="mb-4">Update Transaction</h2>
@@ -58,11 +62,75 @@
 						<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
 					</div>
 					<div class="mb-3">
-						<label for="transAmount" class="form-label">Amount</label>
-						<input type="number" class="form-control inputRequired" maxlength="11" name="amount" id="transAmount"
-							placeholder="Enter amount" value="<%= transaction.amount %>" oninput="checkInputs('transAmountError', 'transAmount')" required>
-						<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 11 characters!</p>
+						<label for="transDate" class="form-label">Date</label>
+						<input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
+							placeholder="Select date" value="" required>
 					</div>
+					<% if (transaction.parentId === 1 || transaction.parentId === 2) {%> 
+						<% if(salesperson.length > 0 && trans === 'income') {%> 
+							<div class="mb-3">
+								<label for="transSalesperson" class="form-label">Salesperson Name</label>
+								<div class="mb-3">
+									<div class="dropdown">
+										<button type="button" class="form-control dropdown-toggle" type="button" id="dropdownSalesperson" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 100px;">
+											<%= transaction.salesperson.length > 25 ? transaction.salesperson.substring(0, 25) + '...' : transaction.salesperson %>
+										</button>
+										<ul class="dropdown-menu w-100 mt-2" id="salespersonDropdownMenu" style="min-width: 250px; max-height: 300px; overflow-y: auto;">
+											<!-- Search bar -->
+											 <% if (salesperson.length > 8) { %>
+												<li class="p-2">
+													<input type="text" class="form-control" id="salespersonSearch" placeholder="Search salesperson..." oninput="filterSalespersons()" >
+												</li>
+												<li><hr class="dropdown-divider"></li>
+											<% } %>
+											<% salesperson.forEach(option => { %>
+												<li>
+													<button class="dropdown-item salesperson-item" onclick="selectSalesperson('<%= option.id %>', '<%= option.name %>')">
+														<%= option.name.length > 20 ? option.name.substring(0, 20) + '...' : option.name %>
+													</button>
+												</li>
+											<% }); %>
+										</ul>
+									</div>
+									<input type="hidden" name="salespersonId" id="selectedSalesperson" value="<%= transaction.salespersonId %>">
+								</div>
+							</div>
+						<%} %>
+						
+						<div class="mb-3">
+							<label for="transCustomer" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
+							<input type="text" class="form-control inputRequired" maxlength="100" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="transCustomer"
+								placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name" value="<%= trans === 'income' ? transaction.customerName: transaction.vendorName %>" oninput="checkInputs('transCustomerError', 'transCustomer')" required>
+							<p id="transCustomerError" class="mt-2 d-none text-danger">*Customer Name can't exceed 100 characters!</p>
+						</div>
+						<div class="mb-3">
+							<label for="transItem" class="form-label">Item Name</label>
+							<input type="text" class="form-control inputRequired" maxlength="100" name="itemName" id="transItem"
+								placeholder="Enter item name" value="<%= transaction.itemName %>" oninput="checkInputs('transItemError', 'transItem')" required>
+							<p id="transItemError" class="mt-2 d-none text-danger">*Item Name can't exceed 100 characters!</p>
+						</div>
+						<div class="mb-3">
+							<label for="transPrice" class="form-label">Price Per Unit</label>
+							<input type="number" class="form-control inputRequired" maxlength="30" name="price" id="transPrice"
+								placeholder="Enter price per unit" value="<%= transaction.price %>" oninput="checkInputs('transPriceError', 'transPrice')" required>
+							<p id="transPriceError" class="mt-2 d-none text-danger">*Price Per Unit can't exceed 30 characters!</p>
+						</div>
+						<div class="mb-3">
+							<label for="transQuantity" class="form-label">Quantity</label>
+							<input type="number" class="form-control inputRequired" maxlength="30" name="quantity" id="transQuantity"
+								placeholder="Enter quantity" value="<%= transaction.quantity %>" oninput="checkInputs('transQuantityError', 'transQuantity')" required>
+							<p id="transQuantityError" class="mt-2 d-none text-danger">*Quantity can't exceed 30 characters!</p>
+						</div>
+					<%} %>
+					<% if (!(transaction.parentId === 1 || transaction.parentId === 2)) {%>
+						<div class="mb-3">
+							<label for="transAmount" class="form-label">Amount</label>
+							<input type="number" class="form-control inputRequired" maxlength="30" name="amount" id="transAmount"
+								placeholder="Enter amount" value="<%= transaction.amount %>" oninput="checkInputs('transAmountError', 'transAmount')" required>
+							<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 30 characters!</p>
+						</div>
+					<%} %>
+					
 					<div class="mb-3">
 						<label for="transCategory" class="form-label">Category</label>
 						<div class="mb-3">
@@ -90,11 +158,7 @@
 							<input type="hidden" name="catId" id="selectedCategory" value="<%= transaction.catId %>">
 						</div>
 					</div>
-					<div class="mb-3">
-						<label for="transDate" class="form-label">Date</label>
-						<input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
-							placeholder="Select date" value="" required>
-					</div>
+					
 					<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
 						<div class="mb-3">
 							<label for="transReceipt" class="form-label">Receipt</label><br>
@@ -181,10 +245,27 @@
 			        }
 			    }
 
+				
+				function filterSalespersons() {
+			        let input = document.getElementById("salespersonSearch").value.toLowerCase();
+			        let items = document.getElementsByClassName("salesperson-item");
+			        
+			        for (let i = 0; i < items.length; i++) {
+			            let text = items[i].textContent.toLowerCase();
+			            items[i].style.display = text.includes(input) ? "" : "none";
+			        }
+			    }
+
 			    function selectCategory(id, name) {
 					event.preventDefault(); 
 			        document.getElementById("dropdownCategory").textContent = name;
 			        document.getElementById("selectedCategory").value = id;
+			    }
+				
+				function selectSalesperson(id, name) {
+					event.preventDefault(); 
+			        document.getElementById("dropdownSalesperson").textContent = name;
+			        document.getElementById("selectedSalesperson").value = id;
 			    }
 
 				let searchParams = new URLSearchParams(window.location.search);

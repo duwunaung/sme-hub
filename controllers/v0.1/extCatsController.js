@@ -2,7 +2,7 @@ const { query } = require('express')
 const db_connection = require('../../utils/connection')
 
 exports.createExpenseCategory = (req, res) => {
-    const { name } = req.body
+    const { name, parentId } = req.body
     const orgId = req.user.orgId
     const createdBy = req.user.id
 
@@ -13,9 +13,24 @@ exports.createExpenseCategory = (req, res) => {
             dev: "name is required"
         })
     }
-    const query = `INSERT INTO expcats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`;
+	let query = ''
+	const parameters = []
+	if (parentId) {
+		query = `INSERT INTO expcats (name, orgId, createdBy, status, parentId) VALUES (?, ?, ?, ?, ?)`;
+		parameters.push(name)
+		parameters.push(orgId)
+		parameters.push(createdBy)
+		parameters.push('active')
+		parameters.push(parentId)
+	} else {
+		query = `INSERT INTO expcats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`;
+		parameters.push(name)
+		parameters.push(orgId)
+		parameters.push(createdBy)
+		parameters.push('active')
+	}
 
-    db_connection.query(query, [name, orgId, createdBy, 'active'], (err, results) => {
+    db_connection.query(query, parameters, (err, results) => {
         if (err) {
 			if (err.code === "ER_DUP_ENTRY") {
 				return res.status(501).send({
@@ -95,12 +110,50 @@ exports.listAllCategories = (req, res) => {
     });
 };
 
+exports.listExpCatUpdate = (req, res) => {
+    const orgId = req.user.orgId
+    const { status = 'active' } = req.query;
+	const { parentId } = req.params
+	let query = '';
+	if (parentId === '2') {
+	    query = `
+	        SELECT ec.id, ec.name, u.name AS createdBy, ec.parentId
+	        FROM expcats ec
+	        JOIN users u ON ec.createdBy = u.id
+	        WHERE ec.orgId = ? AND ec.status = ? AND ec.parentId = ${parentId}
+	    `;
+	} else if (parentId === '0') {
+		query = `
+	        SELECT ec.id, ec.name, u.name AS createdBy, ec.parentId
+	        FROM expcats ec
+	        JOIN users u ON ec.createdBy = u.id
+	        WHERE ec.orgId = ? AND ec.status = ? AND ec.parentId IS NULL
+	    `;
+	}
+
+    db_connection.query(query, [orgId, status], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        res.status(200).send({
+            success: true,
+            message: 'Expense Category list',
+            dev: "Good Job, Bro!",
+            data: results
+        })
+    })
+}
 
 exports.listExpCat = (req, res) => {
     const orgId = req.user.orgId
     const { status = 'active' } = req.query;
     const query = `
-        SELECT ec.id, ec.name, u.name AS createdBy
+        SELECT ec.id, ec.name, u.name AS createdBy, ec.parentId
         FROM expcats ec
         JOIN users u ON ec.createdBy = u.id
         WHERE ec.orgId = ? AND ec.status = ?
@@ -124,11 +177,49 @@ exports.listExpCat = (req, res) => {
     })
 }
 
+exports.listIncCatUpdate = (req, res) => {
+    const orgId = req.user.orgId
+    const { status = 'active' } = req.query;
+	const { parentId } = req.params
+	let query = '';
+	if (parentId === '1') {
+		query = `
+	        SELECT ic.id, ic.name, u.name AS createdBy, ic.parentId
+	        FROM inccats ic
+	        JOIN users u ON ic.createdBy = u.id
+	        WHERE ic.orgId = ? AND ic.status = ? AND ic.parentId = ${parentId}
+	    `;
+	} else if (parentId === '0') {
+		query = `
+	        SELECT ic.id, ic.name, u.name AS createdBy, ic.parentId
+	        FROM inccats ic
+	        JOIN users u ON ic.createdBy = u.id
+	        WHERE ic.orgId = ? AND ic.status = ? AND ic.parentId IS NULL
+	    `;
+	}
+    db_connection.query(query, [orgId, status], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        res.status(200).send({
+            success: true,
+            message: 'Expense Category list',
+            dev: "Good Job, Bro!",
+            data: results
+        })
+    })
+}
+
 exports.listIncCat = (req, res) => {
     const orgId = req.user.orgId
     const { status = 'active' } = req.query;
     const query = `
-        SELECT ic.id, ic.name, u.name AS createdBy
+        SELECT ic.id, ic.name, u.name AS createdBy, ic.parentId
         FROM inccats ic
         JOIN users u ON ic.createdBy = u.id
         WHERE ic.orgId = ? AND ic.status = ?
@@ -435,14 +526,27 @@ exports.getExpenseCategory = (req, res) => {
 
 exports.updateExpenseCategory = (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name , parentId } = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
-    const query = `UPDATE expcats SET name = ? WHERE id = ? AND orgId = ?`;
-    db_connection.query(query, [name, id, orgId], (err, results) => {
+	let query;
+	const queryParams = []
+	if (parentId){
+		query = `UPDATE expcats SET name = ? , parentId = ? WHERE id = ? AND orgId = ?`
+		queryParams.push(name)
+		queryParams.push(parentId)
+		queryParams.push(id)
+		queryParams.push(orgId)
+	} else {
+		query = `UPDATE expcats SET name = ? WHERE id = ? AND orgId = ?`
+		queryParams.push(name)
+		queryParams.push(id)
+		queryParams.push(orgId)
+	}
+    db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -527,7 +631,7 @@ exports.restoreExpenseCategory = (req, res) => {
 }
 
 exports.createIncomeCategory = (req, res) => {
-    const { name } = req.body
+    const { name, parentId } = req.body
     const orgId = req.user.orgId
     const createdBy = req.user.id
     if (!name) {
@@ -537,8 +641,23 @@ exports.createIncomeCategory = (req, res) => {
             dev: "name is required"
         })
     }
-    const query = `INSERT INTO inccats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`;
-    db_connection.query(query, [name, orgId, createdBy, 'active'], (err, results) => {
+	let query = ''
+	const parameters = []
+	if (parentId) {
+		query = `INSERT INTO inccats (name, orgId, createdBy, status, parentId) VALUES (?, ?, ?, ?, ?)`
+		parameters.push(name)
+		parameters.push(orgId)
+		parameters.push(createdBy)
+		parameters.push('active')
+		parameters.push(parentId)
+	} else {
+		query = `INSERT INTO inccats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`
+		parameters.push(name)
+		parameters.push(orgId)
+		parameters.push(createdBy)
+		parameters.push('active')
+	}
+    db_connection.query(query, parameters, (err, results) => {
         if (err) {
 			if (err.code === "ER_DUP_ENTRY") {
 				return res.status(501).send({
@@ -724,7 +843,8 @@ exports.getIncCat = (req, res) => {
         })
     }
     const {name} = req.params
-    let query = `SELECT * FROM inccats WHERE inccats.name = '${name}'`;
+	const orgId = req.user.orgId
+    let query = `SELECT * FROM inccats WHERE inccats.name = '${name}' and inccats.orgId = ${orgId}`;
 
     db_connection.query(query, (err, results) => {
         if (err) {
@@ -759,7 +879,8 @@ exports.getExpCat = (req, res) => {
         })
     }
     const {name} = req.params
-    let query = `SELECT * FROM expcats WHERE expcats.name = '${name}'`;
+	const orgId = req.user.orgId
+    let query = `SELECT * FROM expcats WHERE expcats.name = '${name}' and orgId = ${orgId}`;
 
     db_connection.query(query, (err, results) => {
         if (err) {
@@ -841,14 +962,27 @@ exports.getIncomeCategory = (req, res) => {
 
 exports.updateIncomeCategory = (req, res) => {
     const { id } = req.params;
-    const { name } = req.body;
+    const { name , parentId} = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
-    const query = `UPDATE inccats SET name = ? WHERE id = ? AND orgId = ?`;
-    db_connection.query(query, [name, id, orgId], (err, results) => {
+	let query;
+	const queryParams = []
+	if (parentId){
+		query = `UPDATE inccats SET name = ? , parentId = ? WHERE id = ? AND orgId = ?`
+		queryParams.push(name)
+		queryParams.push(parentId)
+		queryParams.push(id)
+		queryParams.push(orgId)
+	} else {
+		query = `UPDATE inccats SET name = ? WHERE id = ? AND orgId = ?`
+		queryParams.push(name)
+		queryParams.push(id)
+		queryParams.push(orgId)
+	}
+    db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,

@@ -2,9 +2,12 @@
     <%- include('../partials/subscriber/navbar.ejs') %>
 
 		<style>
-	        
+	        #mainContainer {
+				margin-top: 100px;
+			}
 	    </style>
         <!-- Main Content -->
+		<div id="mainContainer"></div>
         <main>
 			<% if (errorMessage) { %>
 				<div id="errorBox" class="alert alert-danger mt-3" role="alert">

@@ -1,6 +1,6 @@
 const express = require('express')
 
-const { getIncCat, getExpCat, createExpenseCategory, listExpenseCategory, updateExpenseCategory, deleteExpenseCategory, createIncomeCategory, updateIncomeCategory, deleteIncomeCategory, listIncomeCategory, restoreIncomeCategory , restoreExpenseCategory , getIncomeCategory , getExpenseCategory , detailExpenseCategory, detailIncomeCategory, listIncCat, listExpCat, listAllCategories} = require('../../controllers/v0.1/extCatsController')
+const { listIncCatUpdate,listExpCatUpdate, getIncCat, getExpCat, createExpenseCategory, listExpenseCategory, updateExpenseCategory, deleteExpenseCategory, createIncomeCategory, updateIncomeCategory, deleteIncomeCategory, listIncomeCategory, restoreIncomeCategory , restoreExpenseCategory , getIncomeCategory , getExpenseCategory , detailExpenseCategory, detailIncomeCategory, listIncCat, listExpCat, listAllCategories} = require('../../controllers/v0.1/extCatsController')
 
 const router = express.Router();
 
@@ -12,6 +12,7 @@ router.get('/expense/:id', getExpenseCategory);
 router.put('/expense/:id', updateExpenseCategory);
 router.delete('/expense/:id', deleteExpenseCategory);
 router.put('/expense/restore/:id', restoreExpenseCategory);
+router.get('/expense/update/:parentId', listExpCatUpdate);
 router.get('/expense', listExpCat);
 
 
@@ -23,6 +24,7 @@ router.get('/income/category/:name', getIncCat);
 router.get('/income/:id', getIncomeCategory);
 router.put('/income/:id', updateIncomeCategory);
 router.delete('/income/:id', deleteIncomeCategory);
+router.get('/income/update/:parentId', listIncCatUpdate);
 router.get('/income', listIncCat);
 
 router.get('/', listAllCategories);
