@@ -13,6 +13,78 @@
 			#mainContainer {
 				margin-top: 100px;
 			}
+			.search-container {
+	            display: flex;
+	            align-items: center;
+	            position: relative;
+	            transition: all 0.3s ease-in-out;
+	        }
+
+	        #searchInput {
+	            width: 200px;
+				height: 35px;
+				top: 58px;
+				left: 936px;
+				border-radius: 15px;
+	            padding: 10px;
+	            font-size: 16px;
+	            border: 1px solid #4D4D4D;
+	            outline: none;
+	            transition: all 0.3s ease-in-out;
+	            background-color: white;
+	            color: #333;
+	        }
+
+	        #searchInput:focus {
+	            width: 250px;
+	            box-shadow: 0px 4px 10px #4d4d4d5c;
+	            border-color: #4D4D4D;
+	        }
+
+	        #searchBarButton {
+	            background-color: white;
+	            border: 1px solid #4D4D4D;
+	            border-radius: 50%;
+	            width: 33px;
+	            height: 33px;
+	            display: flex;
+	            justify-content: center;
+	            align-items: center;
+	            margin-left: 8px;
+	            transition: all 0.3s ease-in-out;
+	        }
+
+	        #searchBarButton:hover {
+	            background-color: #4D4D4D;
+	            border-color: #505050;
+	        }
+
+	        #searchBarButton:hover #searchIcon {
+	            filter: invert(1);
+	        }
+
+	        #searchIcon {
+	            width: 15px;
+	            height: 15px;
+	            transition: all 0.3s ease-in-out;
+	        }
+			#addNewSalespersonBtn {
+				height: 50px;
+				width: 130px;
+			    top: 139px;
+			    left: 55px;
+			    border-radius: 16px;
+			    border-width: 3px;
+				border: 1px solid #4D4D4D;
+			    display: flex;
+			    align-items: center;
+			    justify-content: center;
+				transition: all 0.3s;
+			}
+			#addNewSalespersonBtn:hover {
+				background-color: #4D4D4D;
+				color: white;
+			}
 		</style>
 		<!-- Main Content -->
 		<div id="mainContainer"></div>
@@ -29,10 +101,12 @@
 						<%= successMessage %>
 					</div>
 					<% } %>
-				<div class="d-flex justify-content-between align-items-center mb-4">
+				<div class="mb-4">
 					<h2>Salespersons</h2>
-					<button class="btn btn-primary" data-bs-toggle="modal"
-					data-bs-target="#addNewsalesperson">
+				</div>
+				<div class="my-3" style="display: flex; justify-content: flex-end;">
+					<button class="btn" data-bs-toggle="modal"
+					data-bs-target="#addNewsalesperson" id="addNewSalespersonBtn">
 						Add New
 					</button>
 				</div>
@@ -42,15 +116,14 @@
 				
 						<!-- Search Bar -->
 						<div class="col-auto mb-2">
-							<div class="d-flex justify-content-end">
+							<div class="d-flex search-container">
 								<input type="text" 
-									   class="form-control me-2" 
+									   class="form-control" 
 									   placeholder="Search..." 
 									   id="searchInput" 
-									   onkeydown="searchKey(event)"
-									   style="width: 250px;">
-								<button class="btn btn-primary d-flex align-items-center px-3" onclick="performSearch()">
-									<i class="fas fa-search"></i>
+									   onkeydown="searchKey(event)">
+								<button class="btn" id="searchBarButton" onclick="performSearch()">
+									<img src="/search_icon.svg" alt="search icon" id="searchIcon">
 								</button>
 							</div>
 						</div>
@@ -78,7 +151,7 @@
 											<td>
 												<div class="d-flex flex-nowrap">
 													<button onclick="openUpdateModal('<%= salesperson[i].id %>', '<%= salesperson[i].name %>')"
-														class="btn btn-warning btn-sm btn-fixed-width me-1">
+														class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
 														Edit
 													</button>
 													
@@ -90,7 +163,7 @@
 														   data-bs-toggle="modal" 
 														   data-bs-target="#confirmationModal" 
 														   data-salesperson-id="<%= salesperson[i].id %>"
-														   onclick="setDeleteSalesperson(this)">Delete</a>
+														   onclick="setDeleteSalesperson(this)" style="border-radius: 8px;">Delete</a>
 													<% } %>
 												</div>
 											</td>
