@@ -429,10 +429,11 @@ exports.updateProfile = (req, res) => {
     const userId = req.user.userId
     const { name, email, phone } = req.body;
     const now = new Date()
+    const role = 'superadmin'
 
     db_connection.query(
         'UPDATE users SET name = ?, email = ?, phone = ?, role = ?, status = ?, orgId = ?, updatedBy = ?, updatedAt = ? WHERE id = ?',
-        [name, email, phone, 'superadmin', 'active', 0, userId, now, userId],
+        [name, email, phone, role, 'active', 0, userId, now, userId],
         (err, result) => {
             if (err) {
                 if (err.code ==  "ER_DUP_ENTRY") {
@@ -468,7 +469,7 @@ exports.updateProfile = (req, res) => {
                 success: true,
                 message: 'User updated successfully',
                 dev: 'User details updated successfully',
-                data: { name, email, phone, role, status, orgId }
+                data: { name, email, phone, role }
             });
         }
     );

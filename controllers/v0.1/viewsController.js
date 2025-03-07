@@ -763,9 +763,32 @@ exports.adminProfile = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.render('superadmin/profile', { user: response.data.data, errorMessage: null, successMessage: null });
+            const success = req.query.success
+            const error = req.query.error
+            const type = req.query.type
+
+            if (success) {
+                if (type == 'updateProfile') {
+                    res.render('superadmin/profile', { user: response.data.data, errorMessage: null, successMessage: "Successfully Updated" });
+                }
+            } else if (error) {
+
+                const name = req.query.name
+                const email = req.query.email
+                const phone = req.query.phone
+                const role = 'superadmin'
+                const userData = { name, email, phone, role }
+
+                if (type == 'dup-email') {
+                    res.render('superadmin/profile', { user: userData, errorMessage: "Duplicate Email!", successMessage: null });
+                } else {
+                    res.render('superadmin/profile', { user: userData, errorMessage: "Internal Server Error!", successMessage: null });
+                }
+            } else {
+                res.render('superadmin/profile', { user: response.data.data, errorMessage: null, successMessage: null });
+            }
         }).catch(error => {
-			res.redirect('/superadmin/profile?error=true');
+			res.render('superadmin/login', { errorMessage: error.response.data.message });
         })
     } else {
 
@@ -776,9 +799,13 @@ exports.adminProfile = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.redirect('/superadmin/utils/profile?success=true&type=updateProfile')
+            res.redirect('/superadmin/profile?success=true&type=updateProfile')
         }).catch(error => {
-            res.redirect('/superadmin/utils/profile?success=false&type=updateProfile')
+            if (error.status === 409){
+                res.redirect('/superadmin/profile?error=true&type=dup-email&name=' + name + '&email=' + email + '&phone=' + phone )
+            } else {
+                res.redirect('/superadmin/profile?error=true&type=sysError&name=' + name + '&email=' + email + '&phone=' + phone )
+            }
         })
     }
 }
