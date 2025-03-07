@@ -248,7 +248,7 @@ exports.getUser = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-    const userId = req.params.id;
+    const userId = req.params.id
     const { name, email, phone, role, status, orgId } = req.body;
 
     // Ensure superadmin is updating the user (validate org_id = 0 for superadmins)
@@ -383,3 +383,93 @@ exports.restoreUser = ( req, res ) => {
         })
     })
 }
+
+exports.getProfile = (req, res) => {
+
+    const superadminId = req.user.userId
+    
+    let query = `SELECT name, email, role, phone, orgId, status, registered, remark, expired, updatedBy, updatedAt FROM users WHERE users.id = ${superadminId}`;
+
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+
+        return res.status(200).send({
+            success: true,
+            message: "We found this user!",
+            dev: "Thanks bro, you`re awesome",
+            data: results[0]
+        })
+    });
+};
+
+exports.updateProfile = (req, res) => {
+
+    // Ensure superadmin is updating the user (validate org_id = 0 for superadmins)
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'Access denied',
+            dev: 'Outside organization cannot update user' 
+        });
+    }
+    
+    const userId = req.user.userId
+    const { name, email, phone } = req.body;
+    const now = new Date()
+
+    db_connection.query(
+        'UPDATE users SET name = ?, email = ?, phone = ?, role = ?, status = ?, orgId = ?, updatedBy = ?, updatedAt = ? WHERE id = ?',
+        [name, email, phone, 'superadmin', 'active', 0, userId, now, userId],
+        (err, result) => {
+            if (err) {
+                if (err.code ==  "ER_DUP_ENTRY") {
+                    return res.status(409).send(
+                        {
+                            success: false,
+                            message: 'Email duplicate error',
+                            dev: err.message
+                        }
+                    );
+                } else {
+                    return res.status(500).send(
+                        {
+                            success: false,
+                            message: 'Failed to update user',
+                            dev: err.message,
+                        }
+                    );
+                }
+            }
+
+            if (result.affectedRows === 0) {
+                return res.status(404).send(
+                    {
+                        success: false,
+                        message: 'User not found',
+                        dev: 'User with the provided ID was not found'
+                    }
+                );
+            }
+
+            res.send ({
+                success: true,
+                message: 'User updated successfully',
+                dev: 'User details updated successfully',
+                data: { name, email, phone, role, status, orgId }
+            });
+        }
+    );
+};

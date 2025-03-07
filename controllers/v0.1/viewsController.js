@@ -757,42 +757,28 @@ exports.updateSuperadmin = (req, res) => {
 }
 
 exports.adminProfile = (req, res) => {
-    axios.get(`${process.env.API_URL}/utils/profile`, {
-        headers: {
-            'Authorization': `${req.session.token}`
-        }
-    }).then(response => {
-        res.render('superadmin/profile', { user: response.data.data, successMessage: null, errorMessage: null });
-    }).catch(error => {
-        res.redirect('/superadmin/profile?error=true');
-    })
-}
-
-exports.editAdminProfile = (req, res) => {
 	if (req.method == 'GET') {
-		
-        axios.get(`${process.env.API_URL}/utils/profile`, {
+        axios.get(`${process.env.API_URL}/users/profile/get`, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.render('superadmin/edit-profile', { user: response.data.data, successMessage: null, errorMessage: null });
+            res.render('superadmin/profile', { user: response.data.data, errorMessage: null, successMessage: null });
         }).catch(error => {
-		    res.redirect('/superadmin/profile/edit?error=true');
+			res.redirect('/superadmin/profile?error=true');
         })
-
     } else {
 
-        const { name, email, phone, password } = req.body;
+        const { name, email, phone } = req.body;
 
-        axios.put(`${process.env.API_URL}/utils/profile`, { name, email, phone, password }, {
+        axios.put(`${process.env.API_URL}/users/profile/update`, { name, email, phone }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-            res.render('superadmin/edit-profile', { user: response.data.data, successMessage: "Successfully updated", errorMessage: null });
+            res.redirect('/superadmin/utils/profile?success=true&type=updateProfile')
         }).catch(error => {
-		    res.redirect('/superadmin/profile/edit?error=true');
+            res.redirect('/superadmin/utils/profile?success=false&type=updateProfile')
         })
     }
 }
