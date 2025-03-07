@@ -88,7 +88,8 @@ exports.updateOrgProfile = (req, res) => {
             dev: "Good Job, Bro!",
             data: {
                 name: name,
-                logo: logo
+                logo: logo,
+				baseCurrency: baseCurrency
             }
         })
     })
@@ -214,7 +215,14 @@ exports.getSalesperson = (req, res) => {
 };
 
 exports.getSalespersonList = (req, res) => {
-	const { page = 1, pageSize = 10 , search} = req.query;
+    const { 
+        page = 1, 
+        pageSize = 10, 
+        search,
+        num,
+        type
+    } = req.query;
+
     if (req.user.orgId === 0) {
         return res.status(403).send({
             success: false,
@@ -222,21 +230,76 @@ exports.getSalespersonList = (req, res) => {
             dev: "The Superadmin tried to access Salespersons list"
         })
     }
-	const offset = (page - 1) * pageSize;
-    const orgId = req.user.orgId
-	const queryParams = []
+
+    const offset = (page - 1) * pageSize;
+    const orgId = req.user.orgId;
+    const queryParams = [];
+
     let query = `
-        SELECT * FROM salesperson WHERE orgId = ?
+    SELECT
+        s.id,
+        s.name,
+        s.status,
+        COALESCE(SUM(t.amount), 0) AS totalSales,
+        COUNT(t.id) AS totalTransactions
+    FROM
+        salesperson s
+    LEFT JOIN
+        incs t ON s.id = t.salespersonId
+    WHERE
+        s.orgId = ?
     `;
-	queryParams.push(orgId)
-	if (search) {
-		query += ` AND (name LIKE ? )`;
+
+    queryParams.push(orgId);
+
+
+    if (search) {
+        query += ` AND (s.name LIKE ? )`;
         const searchPattern = `%${search}%`;
         queryParams.push(searchPattern);
-	}
-	query += ` ORDER BY id DESC LIMIT ? OFFSET ?`
-	queryParams.push(parseInt(pageSize))
-	queryParams.push(offset)
+    }
+
+    // Date filtering logic for num and type
+    if (num && type && ["day", "week", "month"].includes(type)) {
+        if (type === "week") {
+            if (parseInt(num) === 1) {
+                query += ` AND t.incomeDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                        AND t.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+            } else {
+                query += ` AND t.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+                queryParams.push(num);
+            }
+        } else if (type === "month") {
+            if (parseInt(num) === 1) {
+                query += ` AND t.incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else if (parseInt(num) === -1) {
+                query += ` AND t.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                query += ` AND t.incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else {
+                query += ` AND t.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                queryParams.push(num - 1);
+            }
+        } else {
+            if (type === "day") {
+                if (parseInt(num) === 1) {
+                    query += ` AND t.incomeDate >= CURDATE() AND t.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                } else {
+                    query += ` AND t.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND t.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                    queryParams.push(num);
+                }
+            }
+        }
+    }
+
+    query += `
+    GROUP BY s.id, s.name, s.status
+    ORDER BY totalSales DESC
+    LIMIT ? OFFSET ?
+    `;
+
+    queryParams.push(parseInt(pageSize));
+    queryParams.push(offset);
+
     db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -245,6 +308,7 @@ exports.getSalespersonList = (req, res) => {
                 dev: err
             })
         }
+
         if (results.length === 0) {
             return res.status(404).send({
                 success: false,
@@ -252,16 +316,59 @@ exports.getSalespersonList = (req, res) => {
                 dev: "Salespersons not found"
             })
         }
-		const totalNum = results.length;
-		let countQuery = `SELECT COUNT(*) AS total FROM salesperson WHERE orgId = ?`;
-		const countParams = []
-		countParams.push(orgId)
-		if (search) {
-			countQuery += ` AND (name LIKE ? )`;
-			const searchPattern = `%${search}%`;
-			countParams.push(searchPattern);
-		}
-		db_connection.query(countQuery, countParams, (err, countResults) => {
+
+        const totalNum = results.length;
+        const totalSales = results.reduce((total, item) => total + item.totalSales, 0);
+
+        // Construct count query
+        let countQuery = `
+        SELECT COUNT(DISTINCT s.id) AS total
+        FROM salesperson s
+        LEFT JOIN incs t ON s.id = t.salespersonId
+        WHERE s.orgId = ?
+        `;
+
+        const countParams = [orgId];
+
+        if (search) {
+            countQuery += ` AND (s.name LIKE ? )`;
+            const searchPattern = `%${search}%`;
+            countParams.push(searchPattern);
+        }
+
+        // Add date filter to the count query
+        if (num && type && ["day", "week", "month"].includes(type)) {
+            if (type === "week") {
+                if (parseInt(num) === 1) {
+                    countQuery += ` AND t.incomeDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                            AND t.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                } else {
+                    countQuery += ` AND t.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+                    countParams.push(num);
+                }
+            } else if (type === "month") {
+                if (parseInt(num) === 1) {
+                    countQuery += ` AND t.incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else if (parseInt(num) === -1) {
+                    countQuery += ` AND t.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                    countQuery += ` AND t.incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else {
+                    countQuery += ` AND t.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                    countParams.push(num - 1);
+                }
+            } else {
+                if (type === "day") {
+                    if (parseInt(num) === 1) {
+                        countQuery += ` AND t.incomeDate >= CURDATE() AND t.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                    } else {
+                        countQuery += ` AND t.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND t.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                        countParams.push(num);
+                    }
+                }
+            }
+        }
+
+        db_connection.query(countQuery, countParams, (err, countResults) => {
             if (err) {
                 return res.status(500).send({
                     success: false,
@@ -270,24 +377,24 @@ exports.getSalespersonList = (req, res) => {
                 });
             }
 
-			const total = countResults[0].total;
+            const total = countResults[0].total;
             const totalPages = Math.ceil(total / pageSize);
-			res.status(200).send({
-				success: true,
-				message: 'Here is the Salesperson list',
-				dev: "Good Job, Bro!",
-				data: results,
-				totalNum: totalNum,
+
+            res.status(200).send({
+                success: true,
+                message: 'Here is the Salesperson list with total sales',
+                dev: "Good Job, Bro!",
+                data: results,
+                totalNum: totalNum,
+                totalSales: totalSales,
                 pagination: {
                     total: total,
                     page: parseInt(page),
                     pageSize: parseInt(pageSize),
                     totalPages: totalPages
-				}
-			})
-
-		})
-        
+                }
+            })
+        })
     })
 };
 
