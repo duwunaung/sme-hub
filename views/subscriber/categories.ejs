@@ -374,7 +374,8 @@
 						  <tr >
 							<th style="width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">ID <span></span></th>
 							<th style="width: 180px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
-							<th style="width: 100px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
+							<th style="width: 180px; cursor: pointer;" onclick="sortTable(2, 'number', this)"><%= cat === 'income' ? 'Sale': 'Purchase' %> <span></span></th>
+							<th style="width: 100px; cursor: pointer;" onclick="sortTable(3, 'string', this)">Created By <span></span></th>
 							<th style="width: 100px;">Actions</th>
 						</tr>
 						</thead>
@@ -385,6 +386,17 @@
 										<tr>
 											<td class="text-nowrap"><%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %></td>
 											<td class="text-nowrap"><%= category[i].name.length > 30 ? category[i].name.substring(0, 30) + '...' : category[i].name %></td>
+											<td class="text-nowrap">
+												<% let totalSales = parseInt(category[i].totalAmount) %>
+												<% let formattedAmount = totalSales.toLocaleString(); %>
+												<% if (baseCurrency === 'MMK') { %>
+													<%= formattedAmount %> ks
+												<% } else if (baseCurrency === 'USD') { %>
+													$ <%= formattedAmount %>
+												<% } else { %>
+													<%= formattedAmount %> <%= baseCurrency %>
+												<% } %>
+											</td>
 											<td class="text-nowrap" style="min-width: 100px;"><%= category[i].createdBy %></td>
 											<td>
 												<div class="d-flex flex-nowrap">
