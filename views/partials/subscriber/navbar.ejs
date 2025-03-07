@@ -162,14 +162,20 @@
 		width: 26px;
 		height: 26px;
 	}
-	#salespersonIcon {
+	
+	#salespersonIcon, #usrProfileIcon, #orgProfileIcon {
 		font-size: 20px;
+	}
+	#usrProfileIcon, #orgProfileIcon {
+		width: 26px;
+		display: flex;
+		justify-content: center;
 	}
 	#settingsIcon {
 		width: 26px;
 		height: 26px;
 	}
-	#dashboardBtn, #transactionBtn, #reportBtn, #categoryBtn, #signoutBtn, #salespersonBtn, #settingsBtn {
+	#dashboardBtn, #transactionBtn, #reportBtn, #categoryBtn, #signoutBtn, #salespersonBtn, #settingsBtn, #usrProfileBtn, #orgProfileBtn {
 		width: 231.0292510986328;
 		height: 64;
 		top: 155px;
@@ -258,9 +264,13 @@
             <li><a href="/subscriber/category/income" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="categoryBtn" onclick="setActiveButton('categoryBtn')">
                 <img src="/category_icon.svg" alt="Category icon" id="categoryIcon"> <span id="dashboardText">Categories</span></a></li>
             <li><a href="/subscriber/salesperson" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="salespersonBtn" onclick="setActiveButton('salespersonBtn')">
-                <i class="fa-solid fa-user" id="salespersonIcon"></i> <span id="dashboardText">Salespersons</span></a></li>
+                <i class="fa-solid fa-users" id="salespersonIcon"></i> <span id="dashboardText">Salespersons</span></a></li>
             <li><a href="#" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="reportBtn" onclick="setActiveButton('reportBtn')">
                 <img src="/report_icon.svg" alt="Report icon" id="reportIcon"> <span id="dashboardText">Report</span></a></li>
+			<li><a href="/subscriber/user/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="usrProfileBtn" onclick="setActiveButton('usrProfileBtn')">
+				<i class="fa-regular fa-user"  id="usrProfileIcon"></i> <span id="dashboardText">User Profile</span></a></li>
+			<li><a href="/subscriber/organization/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="orgProfileBtn" onclick="setActiveButton('orgProfileBtn')">
+				<i class="fa-regular fa-building" id="orgProfileIcon"></i> <span id="dashboardText">Organization</span></a></li>
             <li><a href="#" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="settingsBtn" onclick="setActiveButton('settingsBtn')">
                 <img src="/settings_icon.svg" alt="Settings icon" id="settingsIcon"> <span id="dashboardText">Settings</span></a></li>
             <li><a href="/subscriber/logout" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="signoutBtn" onclick="setActiveButton('signoutBtn')">
