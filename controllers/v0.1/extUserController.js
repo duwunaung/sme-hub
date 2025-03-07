@@ -39,7 +39,7 @@ exports.loginUser = (req, res) => {
         // Check if the account is expired
         const currentDate = new Date();
 
-        const expiredQuery = `SELECT expiredDate, name, logo FROM orgs WHERE id = ${user.orgId}`;
+        const expiredQuery = `SELECT expiredDate, name, logo, baseCurrency FROM orgs WHERE id = ${user.orgId}`;
 
         db_connection.query(expiredQuery, async (err, result) => {
             if (err) {
@@ -74,7 +74,8 @@ exports.loginUser = (req, res) => {
                 orgId: user.orgId,
                 status: user.status,
 				orgName: result[0].name,
-				orgLogo: result[0].logo
+				orgLogo: result[0].logo,
+				baseCurrency: result[0].baseCurrency
             };
             const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
                 expiresIn: process.env.JWT_EXPIRES_IN
