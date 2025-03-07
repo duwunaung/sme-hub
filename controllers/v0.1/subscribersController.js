@@ -211,7 +211,7 @@ exports.listAllTransactions = (req, res) => {
 
 exports.listExpenseCat = (req, res) => {
 	if (req.method == 'GET') {
-		const { search } = req.query
+		const { search , num, type} = req.query
 		const page = req.query.page || 1
 		const pageSize = req.query.pageSize || 10
 		let url_api = `${process.env.API_URL}/subscribers/categories/expense/list`
@@ -224,6 +224,12 @@ exports.listExpenseCat = (req, res) => {
 		}
 		if (search) {
 			queryParams.push(`search=${search}`);
+		}
+		if (num) {
+			queryParams.push(`num=${num}`);
+		}
+		if (type) {
+			queryParams.push(`type=${type}`);
 		}
 		if (queryParams.length > 0) {
 			url_api += `?${queryParams.join('&')}`;
@@ -253,7 +259,11 @@ exports.listExpenseCat = (req, res) => {
 			}
 			
 		}).catch(error => {
-			res.render('subscriber/categories', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], options: [] , cat: "expense", pagination: {}, errorMessage: "System Error!", successMessage: null });
+			if (error.status === 404) {
+				res.render('subscriber/categories', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], options: [] , cat: "expense", pagination: {}, errorMessage: null, successMessage: null });
+			} else {
+				res.render('subscriber/categories', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], options: [] , cat: "expense", pagination: {}, errorMessage: "System Error!", successMessage: null });
+			}
 		})
 	}
 }
@@ -422,7 +432,7 @@ exports.detailExpenseCat = (req, res) => {
 
 exports.listIncomeCat = (req, res) => {
 	if (req.method == 'GET') {
-		const { search } = req.query
+		const { search, num, type } = req.query
 		const page = req.query.page || 1
 		const pageSize = req.query.pageSize || 10
 		let url_api = `${process.env.API_URL}/subscribers/categories/income/list`
@@ -435,6 +445,12 @@ exports.listIncomeCat = (req, res) => {
 		}
 		if (search) {
 			queryParams.push(`search=${search}`);
+		}
+		if (num) {
+			queryParams.push(`num=${num}`);
+		}
+		if (type) {
+			queryParams.push(`type=${type}`);
 		}
 		if (queryParams.length > 0) {
 			url_api += `?${queryParams.join('&')}`;
@@ -464,7 +480,11 @@ exports.listIncomeCat = (req, res) => {
 			}
 			
 		}).catch(error => {
-			res.render('subscriber/categories', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], options: [] , cat: "income", pagination: {}, errorMessage: "System Error!", successMessage: null });
+			if (error.status === 404) {
+				res.render('subscriber/categories', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], options: [] , cat: "income", pagination: {}, errorMessage: null, successMessage: null });
+			} else {
+				res.render('subscriber/categories', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], options: [] , cat: "income", pagination: {}, errorMessage: "System Error!", successMessage: null });
+			}
 		})
 	}
 }
