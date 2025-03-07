@@ -474,3 +474,43 @@ exports.updateProfile = (req, res) => {
         }
     );
 };
+
+exports.deleteAccount = (req, res) => {
+
+    // Ensure superadmin is deleting the user (validate org_id = 0 for superadmins)
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'Access denied',
+            dev: 'Outside organization cannot delete user',
+        });
+    }
+
+    const userId = req.user.userId
+    const now = new Date()
+
+    // Soft delete: change status to 'deleted'
+    db_connection.query('UPDATE users SET status = "deleted", updatedBy = ?, updatedAt = ? WHERE id = ? AND orgId = 0', [userId, now, userId], (err, result) => {
+        if (err) {
+            return res.status(500).send({ 
+                success: false,
+                message: 'Failed to delete user',
+                dev: err.message
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send ({
+                success: false,
+                message: 'User not found', 
+                dev: 'User with the provided ID was not found' 
+            });
+        }
+
+        res.send({ 
+            success: true,
+            message: 'User deleted successfully',
+            dev: 'User deleted successfully' 
+        });
+    });
+};

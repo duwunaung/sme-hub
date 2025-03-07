@@ -1,5 +1,5 @@
 const express = require('express')
-const { login, logout, orgs, restoreOrg, deleteOrg, updateOrg, createUser, detailUser, updateUser, extendLicense, registerOrg, detailOrg, superadmins, deleteUser, restoreUser, createSuperAdmins, detailSuperadmin, restoreSuperadmin, deleteSuperadmin, updateSuperadmin, adminProfile } = require("../../controllers/v0.1/viewsController")
+const { login, logout, orgs, restoreOrg, deleteOrg, updateOrg, createUser, detailUser, updateUser, extendLicense, registerOrg, detailOrg, superadmins, deleteUser, restoreUser, createSuperAdmins, detailSuperadmin, restoreSuperadmin, deleteSuperadmin, updateSuperadmin, adminProfile, deleteAccount } = require("../../controllers/v0.1/viewsController")
 
 const checkSuperAdminSession = require('../../middlewares/viewSuperAdmin');
 const tmpSession = require('../../middlewares/tmp');
@@ -25,9 +25,11 @@ router.use('/users/update/:id', checkSuperAdminSession, updateSuperadmin)
 router.use('/users/restore/:id', checkSuperAdminSession, restoreSuperadmin)
 router.use('/users/delete/:id', checkSuperAdminSession, deleteSuperadmin)
 router.use('/add-superadmin', checkSuperAdminSession, createSuperAdmins)
+router.use('/profile/delete', checkSuperAdminSession, deleteAccount)
 router.use('/users/detail/:id', checkSuperAdminSession, detailSuperadmin)
 router.use('/profile', checkSuperAdminSession, adminProfile)
 router.use('/users', checkSuperAdminSession, superadmins)
+router.use('/profile/delete', checkSuperAdminSession, deleteAccount)
 
 router.use('/dashboard', checkSuperAdminSession, (req, res) => {
     res.render('superadmin/dashboard', { token: req.session.token, user: req.session.user })

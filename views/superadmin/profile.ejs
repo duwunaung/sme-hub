@@ -9,11 +9,6 @@
 										<%= errorMessage %>
 									</div>
 								<% } %>
-								<% if (successMessage) { %>
-									<div id="successBox" class="alert alert-success" role="alert">
-										<%= successMessage %>
-									</div>
-								<% } %>
                 <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
                     <div class="mb-3">
                         <label for="userName" class="form-label">Username</label>
@@ -54,27 +49,9 @@
 				document.getElementById('pcProfile').classList.add('d-none')
         
         function clickBtn () {
-          window.location.href = "/superadmin/profile"
+          window.location.href = "/superadmin/profile/delete"
         }
         // xxx
-        function buttonType() {
-	                const searchParams = new URLSearchParams(window.location.search);
-	                const type = searchParams.get('type')
-					const resetBtn = document.getElementById("resetBtn")
-	                if (type == 'update') {
-						resetBtn.innerText = "Back"
-						resetBtn.classList.add("btn-primary")
-	                }
-					else {
-						resetBtn.innerText = "Cancel"
-						resetBtn.classList.add("btn-danger")
-					}
-
-	            }
-
-	            buttonType();
-							// xxx
-
 				const form = document.getElementById('myForm');
 				const updateBtn = document.getElementById('updateBtn');
 				const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
@@ -84,16 +61,14 @@
 				const userOldName = "<%= user.name %>"
 				const userOldEmail = "<%= user.email %>"
 				const userOldPhone = "<%= user.phone %>"
-				const userOldStatus = "<%= user.status %>"
 
                 function checkInputs(messageBox, inputField) {
 
 									const userNameValue = document.getElementById('userName').value
 									const userEmailValue = document.getElementById('userEmail').value
 									const userPhoneValue = document.getElementById('userPhone').value
-									const userStatusValue = document.getElementById('userStatus').value
 
-									if ( (userOldName == userNameValue) && (userOldEmail == userEmailValue) && (userOldPhone == userPhoneValue) && (userOldStatus == userStatusValue) ) {
+									if ( (userOldName == userNameValue) && (userOldEmail == userEmailValue) && (userOldPhone == userPhoneValue) ) {
 										updateBtn.classList.add('disabled')
 									} else {
 										updateBtn.classList.remove('disabled')

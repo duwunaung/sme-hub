@@ -781,6 +781,10 @@ exports.adminProfile = (req, res) => {
 
                 if (type == 'dup-email') {
                     res.render('superadmin/profile', { user: userData, errorMessage: "Duplicate Email!", successMessage: null });
+                } else if (type == '404Error') {
+                    res.render('superadmin/profile', { user: userData, errorMessage: "User not found!", successMessage: null });
+                } else if (type == 'deleteAccount') {
+                    res.render('superadmin/profile', { user: userData, errorMessage: "Cannot delete your account at the moment!", successMessage: null });
                 } else {
                     res.render('superadmin/profile', { user: userData, errorMessage: "Internal Server Error!", successMessage: null });
                 }
@@ -803,9 +807,34 @@ exports.adminProfile = (req, res) => {
         }).catch(error => {
             if (error.status === 409){
                 res.redirect('/superadmin/profile?error=true&type=dup-email&name=' + name + '&email=' + email + '&phone=' + phone )
+            } else if (error.status === 404) {
+                res.redirect('/superadmin/profile?error=true&type=404Error&name=' + name + '&email=' + email + '&phone=' + phone )
             } else {
                 res.redirect('/superadmin/profile?error=true&type=sysError&name=' + name + '&email=' + email + '&phone=' + phone )
             }
+        })
+    }
+}
+
+exports.deleteAccount = (req,res) => {
+    if (req.method == 'GET') {
+        axios.delete(`${process.env.API_URL}/users/profile/delete`, {
+            headers: {
+                'Authorization': `${req.session.token}`
+            }
+        }).then(response => {
+            if (req.session) {
+                req.session.destroy(err => {
+                    if (err) {
+                        return res.redirect('/'); // Redirect to home on error
+                    }
+                    res.redirect('login'); // Redirect to login after successful logout
+                });
+            } else {
+                res.redirect('login'); // If no session, redirect to login
+            }
+        }).catch(error => {
+            res.redirect('/superadmin/profile?error=true&type=deleteAccount')
         })
     }
 }
