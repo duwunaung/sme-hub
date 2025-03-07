@@ -90,8 +90,11 @@
 			    justify-content: flex-end;
 			}
 			@media (max-width: 576px ) {
+				#searchInput {
+					width: 180px !important;
+				}
 				#searchInput:focus {
-					width: 200px !important;
+					width: 180px !important;
 				}
 			}
 		</style>
@@ -314,7 +317,7 @@
 					onclick="displayMenu('dropdown-menu-pageSize')">
 				Page Size
 			</button>
-			<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-pageSize" style="max-height: 280px; overflow-y: auto; position: absolute; top: 42px;">
+			<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-pageSize" style="max-height: 280px; overflow-y: auto; position: absolute; bottom: 42px;">
 				
 				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(5)">
 					5
