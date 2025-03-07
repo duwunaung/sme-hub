@@ -244,31 +244,85 @@ exports.listIncCat = (req, res) => {
 }
 
 exports.listExpenseCategory = (req, res) => {
-	const { page = 1, pageSize = 10, search } = req.query;
+    const { 
+        page = 1, 
+        pageSize = 10, 
+        search,
+        status,
+        num,
+        type
+    } = req.query;
+    
     const orgId = req.user.orgId;
-    const { status } = req.query;
     const offset = (page - 1) * pageSize;
-	const queryParams = []
+    const queryParams = [];
+
     let query = `
-        SELECT ec.id, ec.name, u.name AS createdBy, ec.status
+        SELECT 
+            ec.id, 
+            ec.name, 
+            u.name AS createdBy, 
+            ec.status,
+            COALESCE(SUM(e.amount * e.price), 0) AS totalAmount,
+            COUNT(e.id) AS totalTransactions
         FROM expcats ec
         JOIN users u ON ec.createdBy = u.id
+        LEFT JOIN exps e ON ec.id = e.catId
         WHERE ec.orgId = ?
     `;
+    queryParams.push(orgId);
 
-	queryParams.push(orgId)
-	if (search) {
-		query += ` AND (ec.name LIKE ? )`;
+    if (search) {
+        query += ` AND (ec.name LIKE ? )`;
         const searchPattern = `%${search}%`;
         queryParams.push(searchPattern);
-	}
-	if (status) {
-		query += ` AND ec.status = ?`;
-		queryParams.push(status);
-	}
-	query += ` ORDER BY ec.id DESC LIMIT ? OFFSET ?`
-	queryParams.push(parseInt(pageSize))
-	queryParams.push(offset)
+    }
+
+    if (status) {
+        query += ` AND ec.status = ?`;
+        queryParams.push(status);
+    }
+
+    // Date filtering logic for num and type
+    if (num && type && ["day", "week", "month"].includes(type)) {
+        if (type === "week") {
+            if (parseInt(num) === 1) {
+                query += ` AND e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                        AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+            } else {
+                query += ` AND e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+                queryParams.push(num);
+            }
+        } else if (type === "month") {
+            if (parseInt(num) === 1) {
+                query += ` AND e.expenseDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else if (parseInt(num) === -1) {
+                query += ` AND e.expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                query += ` AND e.expenseDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else {
+                query += ` AND e.expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                queryParams.push(num - 1);
+            }
+        } else {
+            if (type === "day") {
+                if (parseInt(num) === 1) {
+                    query += ` AND e.expenseDate >= CURDATE() AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                } else {
+                    query += ` AND e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                    queryParams.push(num);
+                }
+            }
+        }
+    }
+
+    query += `
+        GROUP BY ec.id, ec.name, u.name, ec.status
+        ORDER BY ec.id DESC
+        LIMIT ? OFFSET ?
+    `;
+    queryParams.push(parseInt(pageSize));
+    queryParams.push(offset);
+
     db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -279,18 +333,60 @@ exports.listExpenseCategory = (req, res) => {
         }
 
         const totalNum = results.length;
-        let countQuery = `SELECT COUNT(*) AS total FROM expcats WHERE orgId = ?`;
-		const countParams = []
-		countParams.push(orgId)
-		if (search) {
-			countQuery += ` AND (expcats.name LIKE ? )`;
-			const searchPattern = `%${search}%`;
-			countParams.push(searchPattern);
-		}
-		if (status) {
-			countQuery += ` AND expcats.status = ?`;
-			countParams.push(status);
-		}
+        const totalAmount = results.reduce((total, item) => total + item.totalAmount, 0);
+
+        // Construct count query
+        let countQuery = `
+            SELECT COUNT(DISTINCT ec.id) AS total
+            FROM expcats ec
+            LEFT JOIN exps e ON ec.id = e.catId
+            WHERE ec.orgId = ?
+        `;
+        const countParams = [orgId];
+
+        if (search) {
+            countQuery += ` AND (ec.name LIKE ? )`;
+            const searchPattern = `%${search}%`;
+            countParams.push(searchPattern);
+        }
+
+        if (status) {
+            countQuery += ` AND ec.status = ?`;
+            countParams.push(status);
+        }
+
+        // Add date filter to the count query
+        if (num && type && ["day", "week", "month"].includes(type)) {
+            if (type === "week") {
+                if (parseInt(num) === 1) {
+                    countQuery += ` AND e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                            AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                } else {
+                    countQuery += ` AND e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+                    countParams.push(num);
+                }
+            } else if (type === "month") {
+                if (parseInt(num) === 1) {
+                    countQuery += ` AND e.expenseDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else if (parseInt(num) === -1) {
+                    countQuery += ` AND e.expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                    countQuery += ` AND e.expenseDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else {
+                    countQuery += ` AND e.expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                    countParams.push(num - 1);
+                }
+            } else {
+                if (type === "day") {
+                    if (parseInt(num) === 1) {
+                        countQuery += ` AND e.expenseDate >= CURDATE() AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                    } else {
+                        countQuery += ` AND e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                        countParams.push(num);
+                    }
+                }
+            }
+        }
+
         db_connection.query(countQuery, countParams, (err, countResults) => {
             if (err) {
                 return res.status(500).send({
@@ -305,10 +401,11 @@ exports.listExpenseCategory = (req, res) => {
 
             res.status(200).send({
                 success: true,
-                message: 'Expense Category list',
+                message: 'Expense Category list with transaction data',
                 dev: "Good Job, Bro!",
                 data: results,
                 totalNum: totalNum,
+                totalAmount: totalAmount,
                 pagination: {
                     total: total,
                     page: parseInt(page),
@@ -318,7 +415,7 @@ exports.listExpenseCategory = (req, res) => {
             });
         });
     });
-}
+};
 
 exports.detailExpenseCategory = (req, res) => {
     if (req.user.orgId === 0) {
@@ -1068,30 +1165,85 @@ exports.restoreIncomeCategory = (req, res) => {
 }
 
 exports.listIncomeCategory = (req, res) => {
-    const { page = 1, pageSize = 10 , search} = req.query;
+    const { 
+        page = 1, 
+        pageSize = 10, 
+        search,
+        status,
+        num,
+        type
+    } = req.query;
+    
     const orgId = req.user.orgId;
-    const { status } = req.query;
     const offset = (page - 1) * pageSize;
-	const queryParams = []
+    const queryParams = [];
+
     let query = `
-        SELECT ic.id, ic.name, u.name AS createdBy, ic.status
+        SELECT 
+            ic.id, 
+            ic.name, 
+            u.name AS createdBy, 
+            ic.status,
+            COALESCE(SUM(i.amount), 0) AS totalAmount,
+            COUNT(i.id) AS totalTransactions
         FROM inccats ic
         JOIN users u ON ic.createdBy = u.id
+        LEFT JOIN incs i ON ic.id = i.catId
         WHERE ic.orgId = ?
     `;
-	queryParams.push(orgId)
-	if (search) {
-		query += ` AND (ic.name LIKE ? )`;
+    queryParams.push(orgId);
+
+    if (search) {
+        query += ` AND (ic.name LIKE ? )`;
         const searchPattern = `%${search}%`;
         queryParams.push(searchPattern);
-	}
-	if (status) {
-		query += ` AND ic.status = ?`;
-		queryParams.push(status);
-	}
-	query += ` ORDER BY ic.id DESC LIMIT ? OFFSET ?`
-	queryParams.push(parseInt(pageSize))
-	queryParams.push(offset)
+    }
+
+    if (status) {
+        query += ` AND ic.status = ?`;
+        queryParams.push(status);
+    }
+
+    // Date filtering logic for num and type
+    if (num && type && ["day", "week", "month"].includes(type)) {
+        if (type === "week") {
+            if (parseInt(num) === 1) {
+                query += ` AND i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                        AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+            } else {
+                query += ` AND i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+                queryParams.push(num);
+            }
+        } else if (type === "month") {
+            if (parseInt(num) === 1) {
+                query += ` AND i.incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else if (parseInt(num) === -1) {
+                query += ` AND i.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                query += ` AND i.incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else {
+                query += ` AND i.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                queryParams.push(num - 1);
+            }
+        } else {
+            if (type === "day") {
+                if (parseInt(num) === 1) {
+                    query += ` AND i.incomeDate >= CURDATE() AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                } else {
+                    query += ` AND i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                    queryParams.push(num);
+                }
+            }
+        }
+    }
+
+    query += `
+        GROUP BY ic.id, ic.name, u.name, ic.status
+        ORDER BY ic.id DESC
+        LIMIT ? OFFSET ?
+    `;
+    queryParams.push(parseInt(pageSize));
+    queryParams.push(offset);
+
     db_connection.query(query, queryParams, (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -1102,19 +1254,60 @@ exports.listIncomeCategory = (req, res) => {
         }
 
         const totalNum = results.length;
+        const totalAmount = results.reduce((total, item) => total + item.totalAmount, 0);
 
-        let countQuery = `SELECT COUNT(*) AS total FROM inccats WHERE orgId = ?`;
-		const countParams = []
-		countParams.push(orgId)
-		if (search) {
-			countQuery += ` AND (inccats.name LIKE ? )`;
-			const searchPattern = `%${search}%`;
-			countParams.push(searchPattern);
-		}
-		if (status) {
-			countQuery += ` AND inccats.status = ?`;
-			countParams.push(status);
-		}
+        // Construct count query
+        let countQuery = `
+            SELECT COUNT(DISTINCT ic.id) AS total
+            FROM inccats ic
+            LEFT JOIN incs i ON ic.id = i.catId
+            WHERE ic.orgId = ?
+        `;
+        const countParams = [orgId];
+
+        if (search) {
+            countQuery += ` AND (ic.name LIKE ? )`;
+            const searchPattern = `%${search}%`;
+            countParams.push(searchPattern);
+        }
+
+        if (status) {
+            countQuery += ` AND ic.status = ?`;
+            countParams.push(status);
+        }
+
+        // Add date filter to the count query
+        if (num && type && ["day", "week", "month"].includes(type)) {
+            if (type === "week") {
+                if (parseInt(num) === 1) {
+                    countQuery += ` AND i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) 
+                            AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                } else {
+                    countQuery += ` AND i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+                    countParams.push(num);
+                }
+            } else if (type === "month") {
+                if (parseInt(num) === 1) {
+                    countQuery += ` AND i.incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else if (parseInt(num) === -1) {
+                    countQuery += ` AND i.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')`;
+                    countQuery += ` AND i.incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+                } else {
+                    countQuery += ` AND i.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                    countParams.push(num - 1);
+                }
+            } else {
+                if (type === "day") {
+                    if (parseInt(num) === 1) {
+                        countQuery += ` AND i.incomeDate >= CURDATE() AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                    } else {
+                        countQuery += ` AND i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                        countParams.push(num);
+                    }
+                }
+            }
+        }
+
         db_connection.query(countQuery, countParams, (err, countResults) => {
             if (err) {
                 return res.status(500).send({
@@ -1129,10 +1322,11 @@ exports.listIncomeCategory = (req, res) => {
 
             res.status(200).send({
                 success: true,
-                message: 'Income Category list',
+                message: 'Income Category list with transaction data',
                 dev: "Good Job, Bro!",
                 data: results,
                 totalNum: totalNum,
+                totalAmount: totalAmount,
                 pagination: {
                     total: total,
                     page: parseInt(page),
