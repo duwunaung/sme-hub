@@ -331,6 +331,13 @@ exports.listExpenseCategory = (req, res) => {
                 dev: err
             });
         }
+		if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'categories not found',
+                dev: "categories not found"
+            })
+        }
 
         const totalNum = results.length;
         const totalAmount = results.reduce((total, item) => total + item.totalAmount, 0);
@@ -1251,6 +1258,13 @@ exports.listIncomeCategory = (req, res) => {
                 message: 'internal server error',
                 dev: err
             });
+        }
+		if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'categories not found',
+                dev: "categories not found"
+            })
         }
 
         const totalNum = results.length;
