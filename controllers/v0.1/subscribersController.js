@@ -786,15 +786,15 @@ exports.updateExpenseTrans = (req, res) => {
 			}).then(responseCategory => {
 				const {success, type} = req.query
 				if (success === 'true' && type === 'update') {
-					res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, salesperson: [], organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data, errorMessage: null , successMessage: "Updated Successfully!"});
+					res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, salesperson: [], organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data, errorMessage: null , successMessage: "Updated Successfully!"});
 				} else {
-					res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
+					res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
 				}
 			}).catch(error => {
-				res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, salesperson: [],organizationName: req.session.orgName,trans: "expense",  transaction: {}, category: [],  errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, salesperson: [],organizationName: req.session.orgName,trans: "expense",  transaction: {}, category: [],  errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
-			res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName, trans: "expense", transaction: {}, category: [],  errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName, trans: "expense", transaction: {}, category: [],  errorMessage: "System Error!", successMessage: null });
 			
 		})
 	} else {
@@ -991,18 +991,18 @@ exports.updateIncomeTrans = (req, res) => {
 				}).then(responseSalesperson => {
 					const {success, type} = req.query
 					if (success === 'true' && type === 'update') {
-						res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data, errorMessage: null , successMessage: "Updated Successfully!"});
+						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data, errorMessage: null , successMessage: "Updated Successfully!"});
 					} else {
-						res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
+						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
 					}
 				}).catch(err => {
-					res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income",  transaction: {}, category: [], salesperson: [],   errorMessage: "System Error!", successMessage: null });
+					res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income",  transaction: {}, category: [], salesperson: [],   errorMessage: "System Error!", successMessage: null });
 				})
 			}).catch(error => {
-				res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income",  transaction: {}, category: [],salesperson: [],   errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income",  transaction: {}, category: [],salesperson: [],   errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
-			res.render('subscriber/transaction-edit', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, trans: "income", transaction: {}, category: [], salesperson: [],  errorMessage: "System Error!", successMessage: null });
+			res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, trans: "income", transaction: {}, category: [], salesperson: [],  errorMessage: "System Error!", successMessage: null });
 			
 		})
 	} else {
