@@ -398,7 +398,7 @@
 							<th style="width: 180px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
 							<th style="width: 180px; cursor: pointer;" onclick="sortTable(2, 'number', this)"><%= cat === 'income' ? 'Sale': 'Purchase' %> <span></span></th>
 							<th style="width: 100px; cursor: pointer;" onclick="sortTable(3, 'string', this)">Created By <span></span></th>
-							<th style="width: 100px;">Actions</th>
+							<th style="width: 100px; text-align: center;">Actions</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -408,7 +408,7 @@
 										<tr>
 											<td class="text-nowrap"><%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %></td>
 											<td class="text-nowrap"><%= category[i].name.length > 30 ? category[i].name.substring(0, 30) + '...' : category[i].name %></td>
-											<td class="text-nowrap">
+											<td class="text-nowrap <%= cat === 'income' ? 'text-income' : 'text-expense' %>">
 												<% let totalSales = parseInt(category[i].totalAmount) %>
 												<% let formattedAmount = totalSales.toLocaleString(); %>
 												<% if (baseCurrency === 'MMK') { %>
@@ -421,7 +421,7 @@
 											</td>
 											<td class="text-nowrap" style="min-width: 100px;"><%= category[i].createdBy %></td>
 											<td>
-												<div class="d-flex flex-nowrap">
+												<div class="d-flex flex-nowrap justify-content-center" >
 													<a href="/subscriber/category/<%= cat %>/detail/<%= category[i].id %>"
 														class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">View</a>
 													<a href="/subscriber/category/<%= cat %>/update/<%= category[i].id %>?cat=<%= cat %>&page=<%= pagination.page %>"
