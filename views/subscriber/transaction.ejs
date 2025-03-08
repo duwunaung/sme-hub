@@ -363,447 +363,450 @@
 	            transition: all 0.3s ease-in-out;
 	        }
 		</style>
-		<!-- Main Content -->
-		<div id="mainContainer" style="margin-top: 100px;"></div>
-        <main >
-            <div class="content">
-				<!-- Message -->
-				<% if (errorMessage) { %>
-					<div id="errorBox" class="alert alert-danger" role="alert">
-						<%= errorMessage %>
-					</div>
-					<% } %>
-					<% if (successMessage) { %>
-					<div id="successBox" class="alert alert-success" role="alert">
-						<%= successMessage %>
-					</div>
-					<% } %>
-				<div id="headCard">
-					<div class="container my-2" id="btnGroupCard">
-						<div id="headOfCard" class="d-flex">
-							<div id="menuName">
-								<div id="menuNameFirst">Transactions</div>
-								<div id="menuNameSec" class="text-secondary"><% if (trans === 'income' ) { %> Income <% } else if (trans === 'expense') {%> Expense <% } else if (trans === 'all') {%> All <% } %> Transactions</div>
-							</div>
-							<div id="dateSection">
-								<div id="dateDay"></div>
-								<div id="dayMonth">
-									<div id="dayDay"></div>
-									<div id="monthMonth"></div>
+		<div class="main-content">
+			<!-- Main Content -->
+			<div id="mainContainer" style="margin-top: 100px;"></div>
+	        <main >
+	            <div class="content">
+					<!-- Message -->
+					<% if (errorMessage) { %>
+						<div id="errorBox" class="alert alert-danger" role="alert">
+							<%= errorMessage %>
+						</div>
+						<% } %>
+						<% if (successMessage) { %>
+						<div id="successBox" class="alert alert-success" role="alert">
+							<%= successMessage %>
+						</div>
+						<% } %>
+					<div id="headCard">
+						<div class="container my-2" id="btnGroupCard">
+							<div id="headOfCard" class="d-flex">
+								<div id="menuName">
+									<div id="menuNameFirst">Transactions</div>
+									<div id="menuNameSec" class="text-secondary"><% if (trans === 'income' ) { %> Income <% } else if (trans === 'expense') {%> Expense <% } else if (trans === 'all') {%> All <% } %> Transactions</div>
 								</div>
-							</div>
-						</div>					
-						<div id="btnGroup">
-							<div class="d-flex justify-content-center align-items-center gap-3">
-								<div class="d-flex align-items-center gap-2">
-									<div style="position: relative;">
-										<img src="/income_icon.svg" id="incomeIcon" style="cursor: pointer;" onclick="document.getElementById('btnIncome').click();">
-										<a type="button" href="/subscriber/transaction/income" 
-										   class="text-decoration-none btn <% if (trans === 'income') { %> incomeBtnColor <% } else { %> btn-secondary <% } %> flex-grow-1 ps-4" 
-										   id="btnIncome" onclick="handleClick('income', event)">
-										  <div class="btn-content">
-											<span class="text-light">INCOME</span>
-										  </div>
-										</a>
+								<div id="dateSection">
+									<div id="dateDay"></div>
+									<div id="dayMonth">
+										<div id="dayDay"></div>
+										<div id="monthMonth"></div>
 									</div>
 								</div>
-						
-								<div class="d-flex align-items-center gap-2">
-									<div style="position: relative;">
-										<img src="/expense_icon.svg" id="expenseIcon" style="cursor: pointer;" onclick="document.getElementById('btnExpense').click();">
-										<a type="button" href="/subscriber/transaction/expense" 
-										   class="text-decoration-none btn <% if (trans === 'expense') { %> expenseBtnColor <% } else { %> btn-secondary <% } %> flex-grow-1 ps-4" 
-										   id="btnExpense" onclick="handleClick('expense', event)">
-										  <div class="btn-content">
-											<span class="text-light">EXPENSE</span>
-										  </div>
-										</a>
+							</div>					
+							<div id="btnGroup">
+								<div class="d-flex justify-content-center align-items-center gap-3">
+									<div class="d-flex align-items-center gap-2">
+										<div style="position: relative;">
+											<img src="/income_icon.svg" id="incomeIcon" style="cursor: pointer;" onclick="document.getElementById('btnIncome').click();">
+											<a type="button" href="/subscriber/transaction/income" 
+											   class="text-decoration-none btn <% if (trans === 'income') { %> incomeBtnColor <% } else { %> btn-secondary <% } %> flex-grow-1 ps-4" 
+											   id="btnIncome" onclick="handleClick('income', event)">
+											  <div class="btn-content">
+												<span class="text-light">INCOME</span>
+											  </div>
+											</a>
+										</div>
+									</div>
+							
+									<div class="d-flex align-items-center gap-2">
+										<div style="position: relative;">
+											<img src="/expense_icon.svg" id="expenseIcon" style="cursor: pointer;" onclick="document.getElementById('btnExpense').click();">
+											<a type="button" href="/subscriber/transaction/expense" 
+											   class="text-decoration-none btn <% if (trans === 'expense') { %> expenseBtnColor <% } else { %> btn-secondary <% } %> flex-grow-1 ps-4" 
+											   id="btnExpense" onclick="handleClick('expense', event)">
+											  <div class="btn-content">
+												<span class="text-light">EXPENSE</span>
+											  </div>
+											</a>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
-					</div>
-					<div class="d-flex justify-content-between align-items-center mb-4 <%= trans === 'income' ? 'btnAddNewRight'  : 'btnAddNewLeft' %>" id="addBtnNewTranGrp">
-						<% if (trans !== 'all') { %>
-							<button class="btn <%= trans === 'income' ? 'incomeBtnColor'  : 'expenseBtnColor' %> text-light" data-bs-toggle="modal" data-bs-target="#addNewTransaction" id="addNewTranBtn">
-								Add Transaction
-							</button>
-						<% } %>
-					</div>
-					<div class="d-flex justify-content-between align-items-center mb-4 <%= trans === 'income' ? 'btnAddNewLeft'  : 'btnAddNewRight' %>" id="addBtnNewTranGrp">
-						<% if (trans !== 'all') { %>
-							<div id="addNewTranBtn" style="border: 1px solid #4D4D4D;">
-								<%= trans === 'income' ? 'INCOME'  : 'EXPENSE' %>
-							</div>
-						<% } %>
-					</div>
-				</div>
-				<!-- Nav Buttons -->
-				<div class="container my-2">
-					
-				</div>
-				
-				
-				
-				<!-- Filters and Search Bar -->
-				<div class="container-div my-2">
-					<div class="row align-items-center">
-
-						<!-- Search Bar -->
-						<div class="col-auto mb-2">
-							<div class="d-flex search-container">
-								<input type="text" 
-									   class="form-control" 
-									   placeholder="Search..." 
-									   id="searchInput" 
-									   onkeydown="searchKey(event)">
-								<button class="btn" id="searchBarButton" onclick="performSearch()">
-									<img src="/search_icon.svg" alt="search icon" id="searchIcon">
+						<div class="d-flex justify-content-between align-items-center mb-4 <%= trans === 'income' ? 'btnAddNewRight'  : 'btnAddNewLeft' %>" id="addBtnNewTranGrp">
+							<% if (trans !== 'all') { %>
+								<button class="btn <%= trans === 'income' ? 'incomeBtnColor'  : 'expenseBtnColor' %> text-light" data-bs-toggle="modal" data-bs-target="#addNewTransaction" id="addNewTranBtn">
+									Add Transaction
 								</button>
-							</div>
+							<% } %>
 						</div>
+						<div class="d-flex justify-content-between align-items-center mb-4 <%= trans === 'income' ? 'btnAddNewLeft'  : 'btnAddNewRight' %>" id="addBtnNewTranGrp">
+							<% if (trans !== 'all') { %>
+								<div id="addNewTranBtn" style="border: 1px solid #4D4D4D;">
+									<%= trans === 'income' ? 'INCOME'  : 'EXPENSE' %>
+								</div>
+							<% } %>
+						</div>
+					</div>
+					<!-- Nav Buttons -->
+					<div class="container my-2">
+						
+					</div>
+					
+					
+					
+					<!-- Filters and Search Bar -->
+					<div class="container-div my-2">
+						<div class="row align-items-center">
+
+							<!-- Search Bar -->
+							<div class="col-auto mb-2">
+								<div class="d-flex search-container">
+									<input type="text" 
+										   class="form-control" 
+										   placeholder="Search..." 
+										   id="searchInput" 
+										   onkeydown="searchKey(event)">
+									<button class="btn" id="searchBarButton" onclick="performSearch()">
+										<img src="/search_icon.svg" alt="search icon" id="searchIcon">
+									</button>
+								</div>
+							</div>
 
 
-						<!-- Filter Buttons -->
-						<div class="col-auto me-auto mb-2">
-							<div class="d-flex gap-2">
-								<div class="btn-group">
-									<% if (trans !== 'all') { %>
+							<!-- Filter Buttons -->
+							<div class="col-auto me-auto mb-2">
+								<div class="d-flex gap-2">
+									<div class="btn-group">
+										<% if (trans !== 'all') { %>
+											<button type="button" 
+													class="btn btn-light dropdown-toggle" 
+													data-bs-toggle="dropdown" 
+													aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px; ">
+												<i class="fas fa-filter me-1" style="color: #4D4D4D;"></i>Category
+											</button>
+										<% } %>
+										<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2" id="dropdown-menu-category" style="max-height: 280px; overflow-y: auto;">
+											<!-- Filter Bar For Category -->
+											<% if (category.length > 8 ) { %>
+												<li class="p-2">
+													<input type="text" class="form-control" id="categorySearch" placeholder="Search category..." onkeyup="filterCategories()">
+												</li>
+											<%} %>
+											
+											<!-- ALL Button -->
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterCategory('all')">
+												ALL
+											</button>
+											<% for (let i = 0; i < category.length; i++) { %>
+												<button class="dropdown-item btn btn-light w-100 mb-1 category-item" 
+														onclick="filterCategory('<%= category[i].id %>')" 
+														data-num="<%= category[i].id %>" 
+														value="<%= category[i].name %>" id="categoryBtns">
+													<%= category[i].name.length > 20 ? category[i].name.substring(0, 20).toUpperCase() + '...' : category[i].name.toUpperCase() %>
+												</button>
+											<% } %>
+										</ul>
+									</div>
+									<div class="btn-group">
 										<button type="button" 
 												class="btn btn-light dropdown-toggle" 
 												data-bs-toggle="dropdown" 
-												aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px; ">
-											<i class="fas fa-filter me-1" style="color: #4D4D4D;"></i>Category
+												aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+											<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i>Date
 										</button>
-									<% } %>
-									<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2" id="dropdown-menu-category" style="max-height: 280px; overflow-y: auto;">
-										<!-- Filter Bar For Category -->
-										<% if (category.length > 8 ) { %>
-											<li class="p-2">
-												<input type="text" class="form-control" id="categorySearch" placeholder="Search category..." onkeyup="filterCategories()">
-											</li>
-										<%} %>
-										
-										<!-- ALL Button -->
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterCategory('all')">
-											ALL
-										</button>
-										<% for (let i = 0; i < category.length; i++) { %>
-											<button class="dropdown-item btn btn-light w-100 mb-1 category-item" 
-													onclick="filterCategory('<%= category[i].id %>')" 
-													data-num="<%= category[i].id %>" 
-													value="<%= category[i].name %>" id="categoryBtns">
-												<%= category[i].name.length > 20 ? category[i].name.substring(0, 20).toUpperCase() + '...' : category[i].name.toUpperCase() %>
-											</button>
-										<% } %>
-									</ul>
-								</div>
-								<div class="btn-group">
-									<button type="button" 
-											class="btn btn-light dropdown-toggle" 
-											data-bs-toggle="dropdown" 
-											aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
-										<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i>Date
-									</button>
-									<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
-										<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
-									</ul>
+										<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+										</ul>
+									</div>
 								</div>
 							</div>
+					
+							
 						</div>
-				
-						
 					</div>
-				</div>
-				<!-- Summary Card -->
-				<div class="card mb-2 w-auto" style="max-width: 350px;">
-					<div class="card-body">
-						<div class="d-flex justify-content-between align-items-center">
-							<p class="small mb-1">Date: <span id="summaryDate"></span></p>
-							<button class="btn btn-sm btn-light" id="refreshButton" onclick="refreshAction()" style="color: #4D4D4D; border: 1px solid #4D4D4D; border-radius: 8px;">
-								Reset
-							</button>
+					<!-- Summary Card -->
+					<div class="card mb-2 w-auto" style="max-width: 350px;">
+						<div class="card-body">
+							<div class="d-flex justify-content-between align-items-center">
+								<p class="small mb-1">Date: <span id="summaryDate"></span></p>
+								<button class="btn btn-sm btn-light" id="refreshButton" onclick="refreshAction()" style="color: #4D4D4D; border: 1px solid #4D4D4D; border-radius: 8px;">
+									Reset
+								</button>
+							</div>
+							<p class="small mb-1">Category: <span id="summaryCategory"></span></p>
+							<p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
+							<p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
 						</div>
-						<p class="small mb-1">Category: <span id="summaryCategory"></span></p>
-						<p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
-						<p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
 					</div>
-				</div>
-				<!-- Transaction Table -->
-				<div class="table-responsive">
-					<table class="table table-striped table-hover">
-						<thead class="table-dark">
-							<tr>
-								<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">ID <span></span></th>
-								<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Description <span></span></th>
-								<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Amount <span></span></th>
-								<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(3, 'date', this)">Date <span></span></th>
-								<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(4, 'string', this)">Category <span></span></th>
-								<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
-								<% if (trans !== 'all') { %>
-									<th style="min-width: 130px; text-align: center;">Actions</th>
-								<% } %>
-							</tr>
-						</thead>
-						<tbody id="transactionTable">
-							<% 
-								let totalSum = 0; 
-								if (transaction.length > 0) { 
-									for (let i = 0; i < transaction.length; i++) { 
-										totalSum += transaction[i].amount;
+					<!-- Transaction Table -->
+					<div class="table-responsive">
+						<table class="table table-striped table-hover">
+							<thead class="table-dark">
+								<tr>
+									<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">ID <span></span></th>
+									<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Description <span></span></th>
+									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Amount <span></span></th>
+									<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(3, 'date', this)">Date <span></span></th>
+									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(4, 'string', this)">Category <span></span></th>
+									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
+									<% if (trans !== 'all') { %>
+										<th style="min-width: 130px; text-align: center;">Actions</th>
+									<% } %>
+								</tr>
+							</thead>
+							<tbody id="transactionTable">
+								<% 
+									let totalSum = 0; 
+									if (transaction.length > 0) { 
+										for (let i = 0; i < transaction.length; i++) { 
+											totalSum += transaction[i].amount;
+										} 
 									} 
-								} 
-							%>
-							<% if (transaction.length > 0) { %>
-								<% for (let i = 0; i < transaction.length; i++) { %>
-									<tr>
-										<td class="text-nowrap ">
-											<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>
-										</td>
-										<td class="text-nowrap " style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-											<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
-										</td>
-										<td class="text-nowrap <%= transaction[i].transactionType === 'income' || trans === 'income' ? 'text-income' : 'text-expense' %>">
-											<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
-											<% if (transaction[i].baseCurrency === 'MMK') { %>
-												<%= formattedAmount %> ks
-											<% } else if (transaction[i].baseCurrency === 'USD') { %>
-												$ <%= formattedAmount %>
-											<% } else { %>
-												<%= formattedAmount %> <%= transaction[i].baseCurrency %>
-											<% } %>
-										</td>
-										<td class="text-nowrap ">
-											<%= new Date(
-												trans === 'income' ? transaction[i].incomeDate :
-												trans === 'expense' ? transaction[i].expenseDate :
-												transaction[i].transactionDate
-											).toLocaleString('en-US', { 
-												day: '2-digit', 
-												month: 'short', 
-												year: 'numeric', 
-												hour: '2-digit', 
-												minute: '2-digit', 
-												second: '2-digit', 
-												hour12: true 
-											}) %>
-										</td>
-										<td class="text-nowrap ">
-											<%= transaction[i].category %>
-										</td>
-										<td class="text-nowrap ">
-											<%= transaction[i].createdBy %>
-										</td>
-										<% if (trans !== 'all') { %>
-											<td>
-												<div class="d-flex flex-nowrap justify-content-center">
-													<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
-														class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">View</a>
-													<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
-														class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">Edit</a>
-												</div>
+								%>
+								<% if (transaction.length > 0) { %>
+									<% for (let i = 0; i < transaction.length; i++) { %>
+										<tr>
+											<td class="text-nowrap ">
+												<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>
 											</td>
-										<% } %>
+											<td class="text-nowrap " style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+												<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
+											</td>
+											<td class="text-nowrap <%= transaction[i].transactionType === 'income' || trans === 'income' ? 'text-income' : 'text-expense' %>">
+												<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
+												<% if (transaction[i].baseCurrency === 'MMK') { %>
+													<%= formattedAmount %> ks
+												<% } else if (transaction[i].baseCurrency === 'USD') { %>
+													$ <%= formattedAmount %>
+												<% } else { %>
+													<%= formattedAmount %> <%= transaction[i].baseCurrency %>
+												<% } %>
+											</td>
+											<td class="text-nowrap ">
+												<%= new Date(
+													trans === 'income' ? transaction[i].incomeDate :
+													trans === 'expense' ? transaction[i].expenseDate :
+													transaction[i].transactionDate
+												).toLocaleString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric', 
+													hour: '2-digit', 
+													minute: '2-digit', 
+													second: '2-digit', 
+													hour12: true 
+												}) %>
+											</td>
+											<td class="text-nowrap ">
+												<%= transaction[i].category %>
+											</td>
+											<td class="text-nowrap ">
+												<%= transaction[i].createdBy %>
+											</td>
+											<% if (trans !== 'all') { %>
+												<td>
+													<div class="d-flex flex-nowrap justify-content-center">
+														<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
+															class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">View</a>
+														<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
+															class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">Edit</a>
+													</div>
+												</td>
+											<% } %>
+										</tr>
+									<% } %>
+								<% } else { %>
+									<tr>
+										<td colspan="<%= trans === 'all' ? 6 : 7 %>" class="text-center text-muted">No transactions found.</td>
 									</tr>
 								<% } %>
-							<% } else { %>
-								<tr>
-									<td colspan="<%= trans === 'all' ? 6 : 7 %>" class="text-center text-muted">No transactions found.</td>
-								</tr>
-							<% } %>
-						</tbody>
-					</table>
-				</div>
-				
-				
-            </div>
-        </main>
-		<!-- Modal for adding new transaction -->
-		<div class="modal fade" id="addNewTransaction" tabindex="-1" aria-labelledby="addNewTransactionModalLabel"
-            aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="addNewTransactionModalLabel">Add New Transaction</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <form id="addNewTransactionForm" action="/subscriber/transaction/<%= trans %>/create" method="post" enctype="multipart/form-data" onsubmit="setCurrentDateTime(event)">
-							<div class="mb-3">
-								<label for="transCategory" class="form-label">Category</label>
-								<select id="transCategory" name="catId" class="form-select inputRequired" required onchange="toggleFormFields()">
-									<% category.forEach(option => { %>
-										<option value="<%= option.id %>" data-parent="<%= option.parentId %>"><%= option.name %></option>
-									<% }); %>
-								</select>
-							</div>
-						
-							<!-- Standalone Fields -->
-							<div id="standaloneFields">
-								<div class="mb-3">
-									<label for="transDescription" class="form-label">Description</label>
-									<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
-										placeholder="Enter description" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
-									<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
-								</div>
-						
-								<div class="mb-3">
-									<label for="transAmount" class="form-label">Amount</label>
-									<input type="number" class="form-control inputRequired" maxlength="30" name="amount" id="transAmount"
-										placeholder="Enter amount" oninput="checkInputs('transAmountError', 'transAmount')" required>
-									<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 30 characters!</p>
-								</div>
-							</div>
-						
-							<!-- Parent Sale Fields -->
-							<div id="parentSaleFields">
-								<div class="mb-3">
-									<label for="itemName" class="form-label">Item Name</label>
-									<input type="text" class="form-control inputRequired" maxlength="100" oninput="checkInputs('itemNameError', 'itemName')" name="itemName" id="itemName" placeholder="Enter item name" required>
-									<p id="itemNameError" class="mt-2 d-none text-danger">*Item Name can't exceed 100 characters!</p>
-								</div>
-						
-								<div class="mb-3">
-									<label for="pricePerUnit" class="form-label">Price per Unit</label>
-									<input type="number" class="form-control inputRequired" maxlength="30" oninput="calculateTotalAmount('pricePerUnitError', 'pricePerUnit')" name="price" id="pricePerUnit" placeholder="Enter price per unit"  required>
-									<p id="pricePerUnitError" class="mt-2 d-none text-danger">*Price per Unit can't exceed 30 characters!</p>
-								</div>
-						
-								<div class="mb-3">
-									<label for="quantity" class="form-label">Quantity</label>
-									<input type="number" class="form-control inputRequired" maxlength="30" oninput="calculateTotalAmount('quantityError', 'quantity')" name="quantity" id="quantity" placeholder="Enter quantity" required>
-									<p id="quantityError" class="mt-2 d-none text-danger">*Quantity can't exceed 30 characters!</p>
-								</div>
-								<div class="mb-3">
-									<label class="form-label">Amount</label>
-									<div class="form-control text-secondary" id="totalAmount" placeholder="Total Amount" >Total Amount</div>
-								</div>
-								<% if( trans === 'income') {%>
-									<div class="mb-3">
-										<label for="salesperson" class="form-label">Salesperson</label>
-										<select id="salesperson" name="salesperson" class="form-select inputRequired" required onchange="updateSalespersonName()">
-											<% salesperson.forEach(option => { %>
-												<option value="<%= option.id %>" data-salespersonName="<%= option.name %>"><%= option.name %></option>
-											<% }); %>
-										</select>
-										<input type="text" value="<%= salesperson.length > 0 ? salesperson[0].name : '' %>" style="display: none;" id="salespersonName" name="salespersonName">
-									</div>
-								<%}%>
-						
-								<div class="mb-3">
-									<label for="customerName" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
-									<input type="text" class="form-control inputRequired" maxlength="100" oninput="checkInputs('customerNameError', 'customerName')" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="customerName" placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name" required>
-									<p id="customerNameError" class="mt-2 d-none text-danger">*Customer Name can't exceed 100 characters!</p>
-								</div>
-							</div>
-						
-							<!-- Common Receipt Field -->
-							<input type="hidden" name=<% if (trans === 'income' ) { %> incomeDate <% } else {%> expenseDate <% } %> id="transDate">
-							<div class="mb-3" id="receiptDiv">
-								<label for="transReceipt" class="form-label">Receipt</label>
-								<input type="file" class="form-control" name="receipt" id="transReceipt">
-							</div>
-						
-							<button type="submit" id="addBtn" class="btn btn-primary w-100">Add Transaction</button>
-						</form>
-                    </div>
-                </div>
-            </div>
-        </div>
-		<!-- PageSize -->
-		<div class="btn-group my-2" style="max-width: 100px;">
-			<button type="button" 
-					class="btn btn-outline-dark dropdown-toggle" 
-					data-bs-toggle="dropdown" 
-					aria-expanded="false">
-				Page Size
-			</button>
-			<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-pageSize" style="max-height: 280px; overflow-y: auto;">
-				
-				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(5)">
-					5
-				</button>
-				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(10)">
-					10
-				</button>
-				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(15)">
-					15
-				</button>
-				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(20)">
-					20
-				</button>
-				<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(30)">
-					30
-				</button>
-			</ul>
-		</div>
-		<!-- Pagination -->
-		<% if (pagination && pagination.totalPages > 1) { %>
-			<nav aria-label="Pagination" id="paginationNav">
-				<ul class="pagination justify-content-center">
-					<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
-						<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(1)' : '' %>><<</a>
-					</li>
-		   
-					<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
-						<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(' + (pagination.page - 1) + ')' : '' %>><</a>
-					</li>
-		   
-					<% if (pagination.page > 2) { %>
-						<li class="page-item"><a class="page-link" onclick="goToPage(1)">1</a></li>
-						<% if (pagination.page > 3) { %>
-							<li class="page-item disabled"><a class="page-link">...</a></li>
-						<% } %>
-					<% } %>
+							</tbody>
+						</table>
+					</div>
 					
-					<% if (pagination.page > 1) { %>
-						<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(parseInt(pagination.totalPages), parseInt(pagination.page) + 1); i++) { %>
-							<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
-								<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
-							</li>
-						<% } %>
-					<% } else { %>
-						<% for (let i = 1; i <= Math.min(2, pagination.totalPages); i++) { %>
-							<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
-								<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
-							</li>
-						<% } %>
-					<% } %>
-		   
-					<% if (pagination.page < pagination.totalPages - 1) { %>
-						<% if (pagination.page < pagination.totalPages - 2) { %>
-							<li class="page-item disabled"><a class="page-link">...</a></li>
-							<li class="page-item">
-								<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
-									<%= pagination.totalPages %>
-								</a>
-							</li>
-						<% } else if (pagination.page < pagination.totalPages) { %>
-							<li class="page-item">
-								<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
-									<%= pagination.totalPages %>
-								</a>
-							</li>
-						<% } %>
-					<% } %>
-		   
-					<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
-						<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + (parseInt(pagination.page) + 1) + ')' : '' %>>></a>
-					</li>
-		   
-					<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
-						<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + pagination.totalPages + ')' : '' %>>>></a>
-					</li>
+					
+	            </div>
+	        </main>
+			<!-- Modal for adding new transaction -->
+			<div class="modal fade" id="addNewTransaction" tabindex="-1" aria-labelledby="addNewTransactionModalLabel"
+	            aria-hidden="true">
+	            <div class="modal-dialog">
+	                <div class="modal-content">
+	                    <div class="modal-header">
+	                        <h5 class="modal-title" id="addNewTransactionModalLabel">Add New Transaction</h5>
+	                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	                    </div>
+	                    <div class="modal-body">
+	                        <form id="addNewTransactionForm" action="/subscriber/transaction/<%= trans %>/create" method="post" enctype="multipart/form-data" onsubmit="setCurrentDateTime(event)">
+								<div class="mb-3">
+									<label for="transCategory" class="form-label">Category</label>
+									<select id="transCategory" name="catId" class="form-select inputRequired" required onchange="toggleFormFields()">
+										<% category.forEach(option => { %>
+											<option value="<%= option.id %>" data-parent="<%= option.parentId %>"><%= option.name %></option>
+										<% }); %>
+									</select>
+								</div>
+							
+								<!-- Standalone Fields -->
+								<div id="standaloneFields">
+									<div class="mb-3">
+										<label for="transDescription" class="form-label">Description</label>
+										<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
+											placeholder="Enter description" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
+										<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
+									</div>
+							
+									<div class="mb-3">
+										<label for="transAmount" class="form-label">Amount</label>
+										<input type="number" class="form-control inputRequired" maxlength="30" name="amount" id="transAmount"
+											placeholder="Enter amount" oninput="checkInputs('transAmountError', 'transAmount')" required>
+										<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 30 characters!</p>
+									</div>
+								</div>
+							
+								<!-- Parent Sale Fields -->
+								<div id="parentSaleFields">
+									<div class="mb-3">
+										<label for="itemName" class="form-label">Item Name</label>
+										<input type="text" class="form-control inputRequired" maxlength="100" oninput="checkInputs('itemNameError', 'itemName')" name="itemName" id="itemName" placeholder="Enter item name" required>
+										<p id="itemNameError" class="mt-2 d-none text-danger">*Item Name can't exceed 100 characters!</p>
+									</div>
+							
+									<div class="mb-3">
+										<label for="pricePerUnit" class="form-label">Price per Unit</label>
+										<input type="number" class="form-control inputRequired" maxlength="30" oninput="calculateTotalAmount('pricePerUnitError', 'pricePerUnit')" name="price" id="pricePerUnit" placeholder="Enter price per unit"  required>
+										<p id="pricePerUnitError" class="mt-2 d-none text-danger">*Price per Unit can't exceed 30 characters!</p>
+									</div>
+							
+									<div class="mb-3">
+										<label for="quantity" class="form-label">Quantity</label>
+										<input type="number" class="form-control inputRequired" maxlength="30" oninput="calculateTotalAmount('quantityError', 'quantity')" name="quantity" id="quantity" placeholder="Enter quantity" required>
+										<p id="quantityError" class="mt-2 d-none text-danger">*Quantity can't exceed 30 characters!</p>
+									</div>
+									<div class="mb-3">
+										<label class="form-label">Amount</label>
+										<div class="form-control text-secondary" id="totalAmount" placeholder="Total Amount" >Total Amount</div>
+									</div>
+									<% if( trans === 'income') {%>
+										<div class="mb-3">
+											<label for="salesperson" class="form-label">Salesperson</label>
+											<select id="salesperson" name="salesperson" class="form-select inputRequired" required onchange="updateSalespersonName()">
+												<% salesperson.forEach(option => { %>
+													<option value="<%= option.id %>" data-salespersonName="<%= option.name %>"><%= option.name %></option>
+												<% }); %>
+											</select>
+											<input type="text" value="<%= salesperson.length > 0 ? salesperson[0].name : '' %>" style="display: none;" id="salespersonName" name="salespersonName">
+										</div>
+									<%}%>
+							
+									<div class="mb-3">
+										<label for="customerName" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
+										<input type="text" class="form-control inputRequired" maxlength="100" oninput="checkInputs('customerNameError', 'customerName')" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="customerName" placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name" required>
+										<p id="customerNameError" class="mt-2 d-none text-danger">*Customer Name can't exceed 100 characters!</p>
+									</div>
+								</div>
+							
+								<!-- Common Receipt Field -->
+								<input type="hidden" name=<% if (trans === 'income' ) { %> incomeDate <% } else {%> expenseDate <% } %> id="transDate">
+								<div class="mb-3" id="receiptDiv">
+									<label for="transReceipt" class="form-label">Receipt</label>
+									<input type="file" class="form-control" name="receipt" id="transReceipt">
+								</div>
+							
+								<button type="submit" id="addBtn" class="btn btn-primary w-100">Add Transaction</button>
+							</form>
+	                    </div>
+	                </div>
+	            </div>
+	        </div>
+			<!-- PageSize -->
+			<div class="btn-group my-2" style="max-width: 100px;">
+				<button type="button" 
+						class="btn btn-outline-dark dropdown-toggle" 
+						data-bs-toggle="dropdown" 
+						aria-expanded="false">
+					Page Size
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-pageSize" style="max-height: 280px; overflow-y: auto;">
+					
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(5)">
+						5
+					</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(10)">
+						10
+					</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(15)">
+						15
+					</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(20)">
+						20
+					</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(30)">
+						30
+					</button>
 				</ul>
-			</nav>
-		<% } %>
+			</div>
+			<!-- Pagination -->
+			<% if (pagination && pagination.totalPages > 1) { %>
+				<nav aria-label="Pagination" id="paginationNav">
+					<ul class="pagination justify-content-center">
+						<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+							<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(1)' : '' %>><<</a>
+						</li>
+			   
+						<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+							<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(' + (pagination.page - 1) + ')' : '' %>><</a>
+						</li>
+			   
+						<% if (pagination.page > 2) { %>
+							<li class="page-item"><a class="page-link" onclick="goToPage(1)">1</a></li>
+							<% if (pagination.page > 3) { %>
+								<li class="page-item disabled"><a class="page-link">...</a></li>
+							<% } %>
+						<% } %>
+						
+						<% if (pagination.page > 1) { %>
+							<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(parseInt(pagination.totalPages), parseInt(pagination.page) + 1); i++) { %>
+								<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
+									<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
+								</li>
+							<% } %>
+						<% } else { %>
+							<% for (let i = 1; i <= Math.min(2, pagination.totalPages); i++) { %>
+								<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
+									<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
+								</li>
+							<% } %>
+						<% } %>
+			   
+						<% if (pagination.page < pagination.totalPages - 1) { %>
+							<% if (pagination.page < pagination.totalPages - 2) { %>
+								<li class="page-item disabled"><a class="page-link">...</a></li>
+								<li class="page-item">
+									<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
+										<%= pagination.totalPages %>
+									</a>
+								</li>
+							<% } else if (pagination.page < pagination.totalPages) { %>
+								<li class="page-item">
+									<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
+										<%= pagination.totalPages %>
+									</a>
+								</li>
+							<% } %>
+						<% } %>
+			   
+						<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+							<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + (parseInt(pagination.page) + 1) + ')' : '' %>>></a>
+						</li>
+			   
+						<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+							<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + pagination.totalPages + ')' : '' %>>>></a>
+						</li>
+					</ul>
+				</nav>
+			<% } %>
+		</div>
+		
 		
 		<script>
 			function calculateTotal() {
