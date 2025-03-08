@@ -2,7 +2,7 @@
     #com-name {
         text-decoration: none;
         color: white;
-		position: fixed;
+        position: fixed;
         top: 25px;
     }
     
@@ -33,8 +33,8 @@
     
     #sidebarLabel {
         position: fixed;
-		top: 30px;
-		left: 95px;
+        top: 30px;
+        left: 95px;
     }
     
     .circle-icon {
@@ -84,7 +84,7 @@
         height: 100vh;
         transition: left 0.3s ease-in-out;
         z-index: 1030;
-        overflow-y: auto;
+        overflow-y: auto; /* Make the sidebar scrollable */
     }
 
     .sidebar.active {
@@ -96,26 +96,28 @@
         border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     }
 
+    .sidebar-body {
+        padding-bottom: 50px; /* Add padding to ensure scrollable content is visible */
+    }
+
     .sidebar-body a {
-	    transition: all 0.2s ease-in-out;
-	    display: flex;
-	    align-items: center;
-	    padding: 12px;
-	    border-radius: 8px;
-	}
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+    }
 
-	.sidebar-body a:hover {
-	    background-color: #D62828;
-	    color: white !important;
-	    transform: translateX(10px);
-	    box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
-		
-	}
+    .sidebar-body a:hover {
+        background-color: #D62828;
+        color: white !important;
+        transform: translateX(10px);
+        box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+    }
 
-	.sidebar-body a:hover img {
-	    filter: grayscale(1) brightness(800%);
-	}
-
+    .sidebar-body a:hover img {
+        filter: grayscale(1) brightness(800%);
+    }
 
     /* Overlay styles */
     .sidebar-overlay {
@@ -132,68 +134,82 @@
     .sidebar-overlay.active {
         display: block;
     }
-	#sidebarBody {
-		position: fixed;
-		top: 125px;
-	}
-	.iconColor{
-		filter: grayscale(1) brightness(1000%);
-	}
-	.btnColor{
-		background-color: #D62828;
-	}
-	#dashboardIcon {
-		width: 26px;
-		height: 26px;
-	}
-	#transactionIcon {
-		width: 26px;
-		height: 19.89px;
-	}
-	#categoryIcon {
-		width: 26px;
-		height: 20px;
-	}
-	#reportIcon {
-		width: 26px;
-		height: 26px;
-	}
-	#signoutIcon {
-		width: 26px;
-		height: 26px;
-	}
-	
-	#salespersonIcon, #usrProfileIcon, #orgProfileIcon {
-		font-size: 20px;
-	}
-	#usrProfileIcon, #orgProfileIcon {
-		width: 26px;
-		display: flex;
-		justify-content: center;
-	}
-	#settingsIcon {
-		width: 26px;
-		height: 26px;
-	}
-	#dashboardBtn, #transactionBtn, #reportBtn, #categoryBtn, #signoutBtn, #salespersonBtn, #settingsBtn, #usrProfileBtn, #orgProfileBtn {
-		width: 231.0292510986328;
-		height: 64;
-		top: 155px;
-		left: 42.17px;
-		border-radius: 16px;
-		padding-top: 16px;
-		padding-right: 24px;
-		padding-bottom: 16px;
-		padding-left: 24px;
-		gap: 24px;
-	}
-	a{
-		text-decoration: none;
-	}
-	#dashboardText {
-		margin-right: 10px;
-	}
-	.top-bar {
+    
+    #sidebarBody {
+        position: relative; /* Changed from fixed to relative for scrolling */
+        margin-top: 125px;
+    }
+    
+    .iconColor{
+        filter: grayscale(1) brightness(1000%);
+    }
+    
+    .btnColor{
+        background-color: #D62828;
+    }
+    
+    #dashboardIcon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    #transactionIcon {
+        width: 26px;
+        height: 19.89px;
+    }
+    
+    #categoryIcon {
+        width: 26px;
+        height: 20px;
+    }
+    
+    #reportIcon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    #signoutIcon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    #salespersonIcon, #usrProfileIcon, #orgProfileIcon {
+        font-size: 20px;
+    }
+    
+    #usrProfileIcon, #orgProfileIcon {
+        width: 26px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    #settingsIcon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    #dashboardBtn, #transactionBtn, #reportBtn, #categoryBtn, #signoutBtn, #salespersonBtn, #settingsBtn, #usrProfileBtn, #orgProfileBtn {
+        width: 220px;
+        height: 45px;
+        top: 155px;
+        left: 42.17px;
+        border-radius: 16px;
+        padding-top: 16px;
+        padding-right: 24px;
+        padding-bottom: 16px;
+        padding-left: 24px;
+        gap: 24px;
+    }
+    
+    a{
+        text-decoration: none;
+    }
+    
+    #dashboardText {
+        margin-right: 10px;
+    }
+    
+    .top-bar {
         position: fixed;
         top: 0;
         left: 0;
@@ -207,53 +223,133 @@
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         z-index: 1000;
     }
-	#userProfile {
-		position: fixed;
-		right: 30px;
+    
+    #userProfile {
+        position: fixed;
+        right: 30px;
+    }
+    
+    #profileBtn {
+        background-color: transparent;
+        border: none;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+	.adjustImgSize {
+		width: 26px;
+		filter: invert(1);
 	}
-	#profileBtn {
-		background-color: transparent;
-		border: none;
-		width: 60px;
-		height: 60px;
-		border-radius: 50%;
-		cursor: pointer;
+    #menuBtnDiv {
+		width: 51px;
+        height: 56px;
+        border-radius: 8px;
+        background-color: #D62828;
+        position: fixed;
+        top: 25px;
+        left: 39.42px;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        cursor: pointer;
+        z-index: 1031;
+	}
+
+    @media (min-width: 992px) {
+        .sidebar {
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+			position: absolute;
+			top: 12px;
+			margin-left: 60px;
+		}
+        .top-bar {
+            width: calc(100% - 280px);
+            left: 280px;
+        }
+        
+        .main-content {
+		    margin-left: 280px;
+		    width: calc(100% - 280px);
+		    overflow-x: hidden;
+		    position: relative;
+		}
+		#menuBtn {
+			display: none;
+		}
+
+		.main-content .container {
+		    max-width: 100%;
+		    padding-left: 15px;
+		    padding-right: 15px;
+		}
+        
+        .sidebar-overlay {
+            display: none !important;
+        }
+        
+        #sidebarLabel {
+            position: relative;
+            left: 0;
+            top: 0;
+        }
+		#menuBtnDiv {
+			display: flex !important;
+		}
+    }
+	#sidebarHeader {
+		position: fixed;
+		width: 265px;
+		height: 100px;
+		background-color: rgb(248, 249, 250);
+		z-index: 1000;
 	}
 </style>
 
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg justify-content-center">
     <button id="menuBtn" class="btn btn-dark menu-icon me-3" onclick="toggleSidebar()">
-        <img src="/dummy.svg" alt="menu logo" id="menulogo">
+        <img src="/closed_menu.svg" class="adjustImgSize" alt="menu logo" id="menulogo">
     </button>
-	<div class="top-bar">
-		<div id="userProfile" class="d-flex justify-content-center align-items-center">
-			<div class="me-3 d-none d-sm-flex flex-column align-items-end" id="userNamePosition">
-				<span id="userName" class="d-block fw-bold" style="font-size: large;"><%= userName %></span>
-				<span id="userPosition"><%= userRole%></span>
-			</div>
-			<div id="profileBtn" onclick="goToUserProfilePage()">
-				<% if (logo) {%> 
-					<img src="/<%= logo %>" alt="Logo" class="profile-logo-preview">
-				<%} else {%> 
-					<div class="profile-placeholder me-2">
-						<%= organizationName.charAt(0).toUpperCase() %>
-					</div>
-				<%} %>
-			</div>
-		</div>
+	<div id="menuBtnDiv" class="btn btn-dark d-none me-3">
+		<img src="/dummy.svg" alt="menu logo" id="menulogoDiv">
 	</div>
+    <div class="top-bar">
+        <div id="userProfile" class="d-flex justify-content-center align-items-center">
+            <div class="me-3 d-none d-sm-flex flex-column align-items-end" id="userNamePosition">
+                <span id="userName" class="d-block fw-bold" style="font-size: large;"><%= userName %></span>
+                <span id="userPosition"><%= userRole%></span>
+            </div>
+            <div id="profileBtn" onclick="goToUserProfilePage()">
+                <% if (logo) {%> 
+                    <img src="/<%= logo %>" alt="Logo" class="profile-logo-preview">
+                <%} else {%> 
+                    <div class="profile-placeholder me-2">
+                        <%= organizationName.charAt(0).toUpperCase() %>
+                    </div>
+                <%} %>
+            </div>
+        </div>
+    </div>
 </nav>
-
 
 <!-- Sidebar -->
 <div class="sidebar bg-light" id="sidebar">
-    <div class="sidebar-header">
-        <button class="offcanvas-title text-dark fs-5 d-flex align-items-center p-1 btn" id="sidebarLabel" onclick="goToProfilePage()">
-            <span class="fw-bold me-4 ms-2" style="font-size: larger;">
-                <%= organizationName.toUpperCase() %>
-            </span>
-        </button>
-    </div>
+	<div id="sidebarHeader">
+		<div class="sidebar-header">
+			<div class="offcanvas-title text-dark fs-5 d-flex align-items-center p-1" id="sidebarLabel">
+				<span class="fw-bold me-4 ms-2" style="font-size: larger;">
+					<!-- <%= organizationName.toUpperCase() %> -->
+					 Flow Sight
+				</span>
+			</div>
+		</div>
+	</div>
     
     <div class="sidebar-body" id="sidebarBody">
         <ul class="list-unstyled">
@@ -267,10 +363,10 @@
                 <i class="fa-solid fa-users" id="salespersonIcon"></i> <span id="dashboardText">Salespersons</span></a></li>
             <li><a href="#" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="reportBtn" onclick="setActiveButton('reportBtn')">
                 <img src="/report_icon.svg" alt="Report icon" id="reportIcon"> <span id="dashboardText">Report</span></a></li>
-			<li><a href="/subscriber/user/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="usrProfileBtn" onclick="setActiveButton('usrProfileBtn')">
-				<i class="fa-regular fa-user"  id="usrProfileIcon"></i> <span id="dashboardText">User Profile</span></a></li>
-			<li><a href="/subscriber/organization/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="orgProfileBtn" onclick="setActiveButton('orgProfileBtn')">
-				<i class="fa-regular fa-building" id="orgProfileIcon"></i> <span id="dashboardText">Organization</span></a></li>
+            <li><a href="/subscriber/user/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="usrProfileBtn" onclick="setActiveButton('usrProfileBtn')">
+                <i class="fa-regular fa-user"  id="usrProfileIcon"></i> <span id="dashboardText">User Profile</span></a></li>
+            <li><a href="/subscriber/organization/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="orgProfileBtn" onclick="setActiveButton('orgProfileBtn')">
+                <i class="fa-regular fa-building" id="orgProfileIcon"></i> <span id="dashboardText">Organization</span></a></li>
             <li><a href="#" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="settingsBtn" onclick="setActiveButton('settingsBtn')">
                 <img src="/settings_icon.svg" alt="Settings icon" id="settingsIcon"> <span id="dashboardText">Settings</span></a></li>
             <li><a href="/subscriber/logout" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="signoutBtn" onclick="setActiveButton('signoutBtn')">
@@ -279,7 +375,6 @@
     </div>
 </div>
 
-<!-- Overlay -->
 <div id="overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <script>
@@ -300,70 +395,115 @@
     }
 
     function setActiveButton(buttonId) {
-	    const allButtons = document.querySelectorAll('.sidebar-body a');
+        const allButtons = document.querySelectorAll('.sidebar-body a');
 
-	    allButtons.forEach(button => {
-	        button.classList.remove('text-light', 'btnColor');
-	        button.classList.add('text-dark');
-	        button.style.transform = "translateX(0px)";
-	        button.style.transition = "all 0.3s ease-in-out";
+        allButtons.forEach(button => {
+            button.classList.remove('text-light', 'btnColor');
+            button.classList.add('text-dark');
+            button.style.transform = "translateX(0px)";
+            button.style.transition = "all 0.3s ease-in-out";
+            
+            const img = button.querySelector('img');
+            if (img) img.classList.remove('iconColor');
+        });
+
+        const activeButton = document.getElementById(buttonId);
+        if (activeButton) {
+            activeButton.classList.remove('text-dark');
+            activeButton.classList.add('text-light', 'btnColor');
+            activeButton.style.transform = "translateX(10px)";
+
+            const img = activeButton.querySelector('img');
+            if (img) img.classList.add('iconColor');
+        }
+    }
+
+	function toggleSidebar() {
+	    if (window.innerWidth < 992) {
+	        const sidebar = document.getElementById('sidebar');
+	        const overlay = document.getElementById('overlay');
+	        const menuLogo = document.getElementById('menulogo');
 	        
-	        const img = button.querySelector('img');
-	        if (img) img.classList.remove('iconColor');
-	    });
-
-	    const activeButton = document.getElementById(buttonId);
-	    if (activeButton) {
-	        activeButton.classList.remove('text-dark');
-	        activeButton.classList.add('text-light', 'btnColor');
-	        activeButton.style.transform = "translateX(10px)";
-
-	        const img = activeButton.querySelector('img');
-	        if (img) img.classList.add('iconColor');
+	        sidebar.classList.toggle('active');
+	        overlay.classList.toggle('active');
+	        
+	        if (sidebar.classList.contains('active')) {
+	            menuLogo.src = "/dummy.svg";
+				menuLogo.classList.remove('adjustImgSize')
+	        } else {
+	            menuLogo.src = "/closed_menu.svg";
+				menuLogo.classList.add('adjustImgSize')
+	        }
 	    }
 	}
 
-
-    function toggleSidebar() {
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        
-        sidebar.classList.toggle('active');
-        overlay.classList.toggle('active');
-    }
-
     function handleOutsideClick(event) {
-        const sidebar = document.getElementById('sidebar');
-        const menuBtn = document.getElementById('menuBtn');
-        
-        if (!sidebar.contains(event.target) && 
-            !menuBtn.contains(event.target) && 
-            sidebar.classList.contains('active')) {
-            toggleSidebar();
+        if (window.innerWidth < 992) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.getElementById('menuBtn');
+            
+            if (!sidebar.contains(event.target) && 
+                !menuBtn.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
         }
     }
 
     function goToProfilePage() {
         window.location.href = "/subscriber/organization/profile";
     }
-	function goToUserProfilePage() {
+    
+    function goToUserProfilePage() {
         window.location.href = "/subscriber/user/profile";
     }
-	function formatName(name) {
+    
+    function formatName(name) {
         return name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
     }
-    let userNameElement = document.getElementById("userName");
-	let userPositionElement = document.getElementById("userPosition");
-    if (userNameElement) {
-        userNameElement.textContent = formatName(userNameElement.textContent);
+    
+    // Format user name and position
+    document.onreadystatechange = function() {
+        if (document.readyState === "complete") {
+            let userNameElement = document.getElementById("userName");
+            let userPositionElement = document.getElementById("userPosition");
+            
+            if (userNameElement) {
+                userNameElement.textContent = formatName(userNameElement.textContent);
+            }
+            
+            if (userPositionElement) {
+                userPositionElement.textContent = formatName(userPositionElement.textContent);
+            }
+
+            setInitialActiveButton();
+            setSidebarState();
+            
+            // Set up click handler for document
+            document.onclick = handleOutsideClick;
+            
+            // Set up resize handler without addEventListener
+            window.onresize = setSidebarState;
+        }
+    };
+
+    function setSidebarState() {
+        const sidebar = document.getElementById('sidebar');
+        const menuLogo = document.getElementById('menulogo');
+        
+        if (window.innerWidth >= 992) {
+            sidebar.classList.add('active');
+        } else {
+            sidebar.classList.remove('active');
+            
+            // Update menu logo when resizing
+            if (sidebar.classList.contains('active')) {
+                menuLogo.src = "/dummy.svg";
+                menuLogo.classList.remove('adjustImgSize');
+            } else {
+                menuLogo.src = "/closed_menu.svg";
+                menuLogo.classList.add('adjustImgSize');
+            }
+        }
     }
-	if (userPositionElement) {
-		userPositionElement.textContent = formatName(userPositionElement.textContent);
-	}
-
-    document.onclick = handleOutsideClick;
-
-    window.onload = setInitialActiveButton;
 </script>
-			
-			
