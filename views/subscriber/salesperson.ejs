@@ -162,7 +162,7 @@
 							<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">ID <span></span></th>
 							<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
 							<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
-							<th style="min-width: 130px">Actions</th>
+							<th style="min-width: 130px; text-align: center;">Actions</th>
 						</tr>
 						</thead>
 						<tbody>
@@ -172,7 +172,7 @@
 										<tr>
 											<td class="text-nowrap"><%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %></td>
 											<td class="text-nowrap"><%= salesperson[i].name.length > 30 ? salesperson[i].name.substring(0, 30) + '...' : salesperson[i].name %></td>
-											<td class="text-nowrap">
+											<td class="text-nowrap text-income">
 												<% let totalSales = parseInt(salesperson[i].totalSales) %>
 												<% let formattedAmount = totalSales.toLocaleString(); %>
 												<% if (baseCurrency === 'MMK') { %>
@@ -184,7 +184,7 @@
 												<% } %>
 											</td>
 											<td>
-												<div class="d-flex flex-nowrap">
+												<div class="d-flex flex-nowrap justify-content-center">
 													<button onclick="openUpdateModal('<%= salesperson[i].id %>', '<%= salesperson[i].name %>')"
 														class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
 														Edit
