@@ -70,12 +70,7 @@
 		        -webkit-overflow-scrolling: touch;
 		    }
 		    
-			.text-income {
-				color: #00C382 !important;
-			}
-			.text-expense {
-				color: #D62828 !important;
-			}
+			
 		    @media (max-width: 768px) {
 				.container-div {
 			        display: flex;
@@ -553,7 +548,7 @@
 								<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(4, 'string', this)">Category <span></span></th>
 								<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
 								<% if (trans !== 'all') { %>
-									<th style="min-width: 130px">Actions</th>
+									<th style="min-width: 130px; text-align: center;">Actions</th>
 								<% } %>
 							</tr>
 						</thead>
@@ -608,7 +603,7 @@
 										</td>
 										<% if (trans !== 'all') { %>
 											<td>
-												<div class="d-flex flex-nowrap">
+												<div class="d-flex flex-nowrap justify-content-center">
 													<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
 														class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">View</a>
 													<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
