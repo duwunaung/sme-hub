@@ -84,7 +84,7 @@
         height: 100vh;
         transition: left 0.3s ease-in-out;
         z-index: 1030;
-        overflow-y: auto; /* Make the sidebar scrollable */
+        overflow-y: auto;
     }
 
     .sidebar.active {
@@ -97,7 +97,7 @@
     }
 
     .sidebar-body {
-        padding-bottom: 50px; /* Add padding to ensure scrollable content is visible */
+        padding-bottom: 50px;
     }
 
     .sidebar-body a {
@@ -136,7 +136,7 @@
     }
     
     #sidebarBody {
-        position: relative; /* Changed from fixed to relative for scrolling */
+        position: relative;
         margin-top: 125px;
     }
     
@@ -462,7 +462,6 @@
         return name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
     }
     
-    // Format user name and position
     document.onreadystatechange = function() {
         if (document.readyState === "complete") {
             let userNameElement = document.getElementById("userName");
@@ -479,10 +478,8 @@
             setInitialActiveButton();
             setSidebarState();
             
-            // Set up click handler for document
             document.onclick = handleOutsideClick;
             
-            // Set up resize handler without addEventListener
             window.onresize = setSidebarState;
         }
     };
@@ -496,7 +493,6 @@
         } else {
             sidebar.classList.remove('active');
             
-            // Update menu logo when resizing
             if (sidebar.classList.contains('active')) {
                 menuLogo.src = "/dummy.svg";
                 menuLogo.classList.remove('adjustImgSize');
