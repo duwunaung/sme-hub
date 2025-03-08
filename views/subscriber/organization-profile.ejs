@@ -55,120 +55,123 @@
 				cursor: pointer;
 			}
 			#mainContainer {
-				margin-top: 80px;
+				margin-top: 100px;
 			}
 	    </style>
-        <!-- Main Content -->
-        <main id="mainContainer">
-			<% if (errorMessage) { %>
-				<div id="errorBox" class="alert alert-danger mt-3" role="alert">
-					<%= errorMessage %>
+		<div class="main-content">
+			<!-- Main Content -->
+			<main id="mainContainer">
+				<% if (errorMessage) { %>
+					<div id="errorBox" class="alert alert-danger mt-3" role="alert">
+						<%= errorMessage %>
+					</div>
+					<% } %>
+				<% if (successMessage) { %>
+				<div id="successBox" class="alert alert-success mt-3" role="alert">
+					<%= successMessage %>
 				</div>
 				<% } %>
-			<% if (successMessage) { %>
-			<div id="successBox" class="alert alert-success mt-3" role="alert">
-				<%= successMessage %>
-			</div>
-			<% } %>
-            <form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)">
-				<div class="container mt-5">
-					<div class="row justify-content-center">
-						<div class="col-md-8">
-							<div class="card shadow-sm">
-								<div class="card-body" style=" justify-content: center; align-items: center;">
-									<div class="row mb-4" style="display: flex; justify-content: center; align-items: center;">
-										<div style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center;">
-											<div style="position: relative; width: 150px; height: 150px; border-radius: 50%;">
-												<% if(org.logo && org.logo !== 'null' ) { %>
-													<img src="/<%= org.logo %>" alt="Logo" class="profile-logo" id="imagePreview" data-bs-toggle="modal" 
-													data-bs-target="#profileModal">
-												<% } else { %>
-													<div class="profile-placeholder-img me-2" id="placeholderPreview">
-														<%= org.name.charAt(0).toUpperCase() %>
+				<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)">
+					<div class="container mt-5">
+						<div class="row justify-content-center">
+							<div class="col-md-8">
+								<div class="card shadow-sm">
+									<div class="card-body" style=" justify-content: center; align-items: center;">
+										<div class="row mb-4" style="display: flex; justify-content: center; align-items: center;">
+											<div style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center;">
+												<div style="position: relative; width: 150px; height: 150px; border-radius: 50%;">
+													<% if(org.logo && org.logo !== 'null' ) { %>
+														<img src="/<%= org.logo %>" alt="Logo" class="profile-logo" id="imagePreview" data-bs-toggle="modal" 
+														data-bs-target="#profileModal">
+													<% } else { %>
+														<div class="profile-placeholder-img me-2" id="placeholderPreview">
+															<%= org.name.charAt(0).toUpperCase() %>
+														</div>
+													<% } %>
+													<div class="edit-button">
+														<label for="orgLogo" style="cursor: pointer;">
+															<i class="fa-solid fa-pen-to-square fs-4"></i>
+														</label>
+														<input type="file" 
+															   class="form-control" 
+															   name="logo" 
+															   id="orgLogo" 
+															   style="display: none;" 
+															   accept="image/*"
+															   onchange="previewImage(this)">
 													</div>
-												<% } %>
-												<div class="edit-button">
-													<label for="orgLogo" style="cursor: pointer;">
-														<i class="fa-solid fa-pen-to-square fs-4"></i>
-													</label>
-													<input type="file" 
-														   class="form-control" 
-														   name="logo" 
-														   id="orgLogo" 
-														   style="display: none;" 
-														   accept="image/*"
-														   onchange="previewImage(this)">
 												</div>
+												
 											</div>
-											
 										</div>
-									</div>
-									<div class="row " style="display: flex; justify-content: center; align-items: center;">
-										<h3 class="mb-2">Business Details</h3>
-										<div class="mb-3">
-											<label for="orgName" class="form-label">Organization Name</label>
-											<input type="text" class="form-control inputRequired" maxlength="145" name="name" id="orgName"
-												placeholder="Enter description" value="<%= org.name %>" oninput="checkInputs('orgNameError', 'orgName')" required>
-											<p id="orgNameError" class="mt-2 d-none text-danger">*Organization Name can't exceed 145 characters!</p>
-										</div>
-										<div class="mb-3">
-											<label for="orgAddress" class="form-label">Address</label>
-											<textarea class="form-control" id="orgAddress" maxlength="145" name="address" rows="2"
-												placeholder="Enter organization address" oninput="checkInputs('addressOrgError', 'orgAddress')" required><%= org.address %></textarea>
-											<p id="addressOrgError" class="mt-2 d-none text-danger">*Address can't exceed 145 characters!</p>
-										</div>
-										<div class="mb-3">
-											<label for="orgPhone" class="form-label">Phone</label>
-											<input type="tel" class="form-control" maxlength="45" id="orgPhone" name="phone"
-												placeholder="Enter phone number" value="<%= org.phone %>" oninput="checkInputs('phoneOrgError', 'orgPhone')" required>
-											<p id="phoneOrgError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
-										</div>
-										<div class="mb-3">
-											<label for="orgBaseCurrency" class="form-label">Base Currency</label>
-											<select id="orgBaseCurrency" name="baseCurrency" class="form-select" required>
-					
-												<% options.forEach(option=> { %>
-													<option value="<%= option.name %>" <%=option.name===org.baseCurrency ? 'selected' : '' %> >
-														<%= option.name.toUpperCase() %>
-													</option>
-													<% }); %>
-											</select>
-										</div>
-										<div class="mb-3">
-											<p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold">
-												<%= new Date(org.expiredDate).toDateString() %>
-										</span></p>
-										</div>
-										<div class="mt-4 d-flex justify-content-end">
-											<button id="extendBtn" class="btn btn-primary mb-2 me-2" onclick="extendLicense()">Extend License</button>
-											<button type="submit" id="addBtn" class="btn btn-success mb-2">Save Changes</button>
+										<div class="row " style="display: flex; justify-content: center; align-items: center;">
+											<h3 class="mb-2">Business Details</h3>
+											<div class="mb-3">
+												<label for="orgName" class="form-label">Organization Name</label>
+												<input type="text" class="form-control inputRequired" maxlength="145" name="name" id="orgName"
+													placeholder="Enter description" value="<%= org.name %>" oninput="checkInputs('orgNameError', 'orgName')" required>
+												<p id="orgNameError" class="mt-2 d-none text-danger">*Organization Name can't exceed 145 characters!</p>
+											</div>
+											<div class="mb-3">
+												<label for="orgAddress" class="form-label">Address</label>
+												<textarea class="form-control" id="orgAddress" maxlength="145" name="address" rows="2"
+													placeholder="Enter organization address" oninput="checkInputs('addressOrgError', 'orgAddress')" required><%= org.address %></textarea>
+												<p id="addressOrgError" class="mt-2 d-none text-danger">*Address can't exceed 145 characters!</p>
+											</div>
+											<div class="mb-3">
+												<label for="orgPhone" class="form-label">Phone</label>
+												<input type="tel" class="form-control" maxlength="45" id="orgPhone" name="phone"
+													placeholder="Enter phone number" value="<%= org.phone %>" oninput="checkInputs('phoneOrgError', 'orgPhone')" required>
+												<p id="phoneOrgError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+											</div>
+											<div class="mb-3">
+												<label for="orgBaseCurrency" class="form-label">Base Currency</label>
+												<select id="orgBaseCurrency" name="baseCurrency" class="form-select" required>
+						
+													<% options.forEach(option=> { %>
+														<option value="<%= option.name %>" <%=option.name===org.baseCurrency ? 'selected' : '' %> >
+															<%= option.name.toUpperCase() %>
+														</option>
+														<% }); %>
+												</select>
+											</div>
+											<div class="mb-3">
+												<p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold">
+													<%= new Date(org.expiredDate).toDateString() %>
+											</span></p>
+											</div>
+											<div class="mt-4 d-flex justify-content-end">
+												<button id="extendBtn" class="btn btn-primary mb-2 me-2" onclick="extendLicense()">Extend License</button>
+												<button type="submit" id="addBtn" class="btn btn-success mb-2">Save Changes</button>
+											</div>
 										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			</form>
-			<% if (org.logo && org.logo !== 'null') {%> 
-				<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
-					<div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 700px; max-height: 700px;">
-						<div class="modal-content">
-							<div class="modal-header">
-								<h5 class="modal-title" id="profileModalLabel">Profile Preview</h5>
-								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-							</div>
-							<div class="modal-body text-center">
-								<img src="/<%= org.logo %>" class="img-fluid" id="modalReceiptImage" alt="Logo Image"
-									style="width: 100%; max-width: 500px; max-height: 500px; object-fit: contain; border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);" />
+				</form>
+				<% if (org.logo && org.logo !== 'null') {%> 
+					<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 700px; max-height: 700px;">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="profileModalLabel">Profile Preview</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body text-center">
+									<img src="/<%= org.logo %>" class="img-fluid" id="modalReceiptImage" alt="Logo Image"
+										style="width: 100%; max-width: 500px; max-height: 500px; object-fit: contain; border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);" />
+								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			<%} %>
+				<%} %>
+				
 			
+			</main>
+		</div>
         
-        </main>
 		<script>
 			function previewImage(input) {
 			    if (input.files && input.files[0]) {
