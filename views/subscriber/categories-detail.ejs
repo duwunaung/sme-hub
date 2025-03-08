@@ -159,7 +159,7 @@
 							<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Amount <span></span></th>
 							<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(3, 'date', this)">Date <span></span></th>
 							<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
-							<th style="min-width: 130px">Actions</th>
+							<th style="min-width: 130px; text-align: center;">Actions</th>
 						</tr>
 					</thead>
 					<tbody id="transactionTable">
@@ -178,7 +178,7 @@
 									<td class="text-nowrap" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
 										<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
 									</td>
-									<td class="text-nowrap">
+									<td class="text-nowrap <%= cat === 'income' ? 'text-income' : 'text-expense' %>">
 										<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
 										<% if (transaction[i].baseCurrency === 'MMK') { %>
 											<%= formattedAmount %> ks
@@ -203,7 +203,7 @@
 									</td>
 									<td class="text-nowrap"><%= transaction[i].createdBy %></td>
 									<td>
-										<div class="d-flex gap-2">
+										<div class="d-flex gap-2 justify-content-center">
 											<a href="/subscriber/transaction/<%= cat %>/detail/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>&page=<%= pagination.page %>"
 												class="btn btn-primary btn-sm w-100 button-fixed-width" style="border-radius: 8px;">View</a>
 											<a href="/subscriber/transaction/<%= cat %>/update/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>&page=<%= pagination.page %>"
