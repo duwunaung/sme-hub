@@ -689,12 +689,19 @@
 									<% if( trans === 'income') {%>
 										<div class="mb-3">
 											<label for="salesperson" class="form-label">Salesperson</label>
-											<select id="salesperson" name="salesperson" class="form-select inputRequired" required onchange="updateSalespersonName()">
-												<% salesperson.forEach(option => { %>
-													<option value="<%= option.id %>" data-salespersonName="<%= option.name %>"><%= option.name %></option>
-												<% }); %>
-											</select>
-											<input type="text" value="<%= salesperson.length > 0 ? salesperson[0].name : '' %>" style="display: none;" id="salespersonName" name="salespersonName">
+											<% if(salesperson.length > 0) {%>
+												<select id="salesperson" name="salesperson" class="form-select inputRequired" required onchange="updateSalespersonName()">
+													<% salesperson.forEach(option => { %>
+														<option value="<%= option.id %>" data-salespersonName="<%= option.name %>"><%= option.name %></option>
+													<% }); %>
+												</select>
+												<input type="text" value="<%= salesperson.length > 0 ? salesperson[0].name : '' %>" style="display: none;" id="salespersonName" name="salespersonName">
+												<%} 
+											else {%>
+												<input type="text" class="form-control inputRequired" id="salespersonNameNew" name="salespersonNameNew"  maxlength="100" oninput="calculateTotalAmount('salespersonNameNewError', 'salespersonNameNew')" required>
+												<p id="salespersonNameNewError" class="mt-2 d-none text-danger">*Salesperson Name can't exceed 100 characters!</p>
+												<%} %>
+											
 										</div>
 									<%}%>
 							
