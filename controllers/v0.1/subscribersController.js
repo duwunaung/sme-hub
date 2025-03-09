@@ -63,6 +63,8 @@ exports.editUsrProfile = (req, res) => {
 					res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "Invalid Password!" });
 				} else if (type === 'sysError') {
 					res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "System Error!" });
+				} else if (type === 'dupEmail') {
+					res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "Email Already Existed!" });
 				}
 			} else {
 				res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: null }); 
@@ -106,7 +108,11 @@ exports.editUsrProfile = (req, res) => {
 				req.session.user = response.data.data.name
                 res.redirect('/subscriber/user/profile?success=true&type=update');
             } catch (error) {
-                res.redirect('/subscriber/user/profile?error=true&type=sysError');
+				if (error.status === 500 && error.response.data.message === 'duplicate email') {
+					res.redirect('/subscriber/user/profile?error=true&type=dupEmail');
+				} else {
+                	res.redirect('/subscriber/user/profile?error=true&type=sysError');
+				}
             }
         };
         updateProfile();
