@@ -201,6 +201,13 @@ exports.updateUserProfile = (req, res) => {
 
     db_connection.query(sql, parameters, (err, results) => {
         if (err) {
+			if (err.code === 'ER_DUP_ENTRY') {
+				return res.status(500).send({
+					success: false,
+					message: 'duplicate email',
+					dev: err
+				})
+			}
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',
