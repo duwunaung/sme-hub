@@ -1,6 +1,6 @@
 const axios = require('axios');
 const e = require('express');
-const { use } = require('../../routes/v0.1/utilsRoute');
+const { use, param } = require('../../routes/v0.1/utilsRoute');
 const bcrypt = require('bcryptjs');
 
 exports.login = (req, res) => {
@@ -94,7 +94,7 @@ exports.editUsrProfile = (req, res) => {
                         parameters.password = await bcrypt.hash(newPassword, 10);
                     }
                 }
-                await axios.put(
+                const response = await axios.put(
                     `${process.env.API_URL}/subscribers/user/profile/update`, 
                     parameters, 
                     {
@@ -103,7 +103,7 @@ exports.editUsrProfile = (req, res) => {
                         }
                     }
                 );
-
+				req.session.user = response.data.data.name
                 res.redirect('/subscriber/user/profile?success=true&type=update');
             } catch (error) {
                 res.redirect('/subscriber/user/profile?error=true&type=sysError');
@@ -125,7 +125,6 @@ exports.editOrgProfile = (req, res) => {
 				'Authorization': `${req.session.token}`
 			}
 		}).then(response => {
-			req.session.baseCurrency = response.data.data.baseCurrency
 			const {success, error, type} = req.query
 			if (success === 'true') {
 				if (type === 'update') {
@@ -152,6 +151,7 @@ exports.editOrgProfile = (req, res) => {
 		}).then(response => {
 			req.session.orgName = response.data.data.name
 			req.session.orgLogo = response.data.data.logo
+			req.session.baseCurrency = response.data.data.baseCurrency
 			res.redirect('/subscriber/organization/profile'  + `?success=true&type=update`)
 		}).catch(error => {
 			res.redirect('/subscriber/organization/profile' + `?error=true&type=sysError`);
@@ -689,7 +689,7 @@ exports.listExpenseTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/all`, {
 					headers: {
 						'Authorization': `${req.session.token}`
 					}
@@ -715,7 +715,7 @@ exports.listExpenseTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/all`, {
 					headers: {
 						'Authorization': `${req.session.token}`
 					}
@@ -727,9 +727,9 @@ exports.listExpenseTrans = (req, res) => {
 					}
 				}).catch(err => {
 					if (err.status === 404) {
-						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role,  logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: [], transaction: [],  pagination: {},salesperson: [], errorMessage: null, successMessage: null });
+						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role,  logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data, transaction: [],  pagination: {},salesperson: [], errorMessage: null, successMessage: null });
 					} else {
-						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role,  logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: [], transaction: [],  pagination: {},salesperson: [], errorMessage: "System Error!", successMessage: null });
+						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role,  logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data, transaction: [],  pagination: {},salesperson: [], errorMessage: "System Error!", successMessage: null });
 					}
 				})
 			}).catch(error => {
@@ -896,7 +896,7 @@ exports.listIncomeTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/all`, {
 					headers: {
 						'Authorization': `${req.session.token}`
 					}
@@ -911,7 +911,11 @@ exports.listIncomeTrans = (req, res) => {
 						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
 					}
 				}).catch(err => {
-					res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: [], pagination: {},salesperson: [] , errorMessage: "System Error!", successMessage: null });
+					if (err.status === 404) {
+						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [], pagination: {},salesperson: [] , errorMessage: null, successMessage: null });
+					} else {
+						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [], pagination: {},salesperson: [] , errorMessage: "System Error!", successMessage: null });
+					}
 				})
 			}).catch(error => {
 				res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: [], pagination: {}, salesperson: [] ,errorMessage: "System Error!", successMessage: null });
@@ -922,7 +926,7 @@ exports.listIncomeTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/all`, {
 					headers: {
 						'Authorization': `${req.session.token}`
 					}
@@ -934,9 +938,9 @@ exports.listIncomeTrans = (req, res) => {
 					}
 				}).catch(err => {
 					if (err.status === 404) {
-						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: [], transaction: [], salesperson: [] , pagination: {}, errorMessage: null, successMessage: null });
+						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [], salesperson: [] , pagination: {}, errorMessage: null, successMessage: null });
 					} else {
-						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: [], transaction: [], salesperson: [] , pagination: {}, errorMessage: "System Error!", successMessage: null });
+						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [], salesperson: [] , pagination: {}, errorMessage: "System Error!", successMessage: null });
 					}
 				})
 			}).catch(error => {
@@ -953,37 +957,70 @@ exports.listIncomeTrans = (req, res) => {
 
 exports.createIncomeTrans = (req, res) => {
 	if (req.method == 'POST') {
-		const { description, amount, incomeDate, catId, itemName, price, quantity, salesperson, customer , salespersonName} = req.body;
-		const receipt = req.file ? req.file.filename : null
-		let parameters = { incomeDate, catId }
+	  const { description, amount, incomeDate, catId, itemName, price, quantity, salesperson, customer, salespersonName, salespersonNameNew } = req.body;
+	  const receipt = req.file ? req.file.filename : null;
+	  let parameters = { incomeDate, catId };
+	  
+	  const createIncome = (updatedSalesperson, updatedSalespersonName) => {
 		if (description) {
-			parameters.description = description;
-			parameters.amount = amount;
+		  parameters.description = description;
+		  parameters.amount = amount;
 		} else {
-			parameters.itemName = itemName;
-			parameters.price = price;
-			parameters.quantity = quantity;
-			parameters.salespersonId = salesperson;
-			parameters.customer = customer;
-			const amount = parseInt(price) * parseInt(quantity);
-			parameters.amount = `${amount}`;
-			const description = salespersonName + " has sold " + quantity + " " + itemName  + " to " + customer
-			parameters.description = description
+		  parameters.itemName = itemName;
+		  parameters.price = price;
+		  parameters.quantity = quantity;
+		  parameters.salespersonId = updatedSalesperson || salesperson;
+		  parameters.customer = customer;
+		  const amount = parseInt(price) * parseInt(quantity);
+		  parameters.amount = `${amount}`;
+		  const finalSalespersonName = updatedSalespersonName || salespersonName;
+		  const description = finalSalespersonName + " has sold " + quantity + " " + itemName + " to " + customer;
+		  parameters.description = description;
 		}
+		
 		if (receipt) {
-			parameters.receipt = receipt;
+		  parameters.receipt = receipt;
 		}
-		axios.post(`${process.env.API_URL}/subscribers/incomes/create`,parameters, {
-			headers: {
-				'Authorization': `${req.session.token}`
-			}
+		
+		axios.post(`${process.env.API_URL}/subscribers/incomes/create`, parameters, {
+		  headers: {
+			'Authorization': `${req.session.token}`
+		  }
 		}).then(response => {
-				res.redirect('/subscriber/transaction/income?success=true&type=create')
+		  res.redirect('/subscriber/transaction/income?success=true&type=create');
 		}).catch(error => {
-			res.redirect('/subscriber/transaction/income?error=true&type=sysError')
-		})
+		  res.redirect('/subscriber/transaction/income?error=true&type=sysError');
+		});
+	  };
+	  
+	  if (salespersonNameNew) {
+		axios.post(`${process.env.API_URL}/subscribers/salesperson/create`, { name: salespersonNameNew }, {
+		  headers: {
+			'Authorization': `${req.session.token}`
+		  }
+		}).then(responseAddNewSalesperson => {
+		  const name = responseAddNewSalesperson.data.data.name;
+		  
+		  axios.get(`${process.env.API_URL}/subscribers/salesperson/list/${name}`, {
+			headers: {
+			  'Authorization': `${req.session.token}`
+			}
+		  }).then(resSalepersonId => {
+			const newSalespersonId = resSalepersonId.data.data.id;
+			const newSalespersonName = resSalepersonId.data.data.name;
+			
+			createIncome(newSalespersonId, newSalespersonName);
+		  }).catch(errId => {
+			res.redirect('/subscriber/transaction/income?error=true&type=sysError');
+		  });
+		}).catch(err => {
+		  res.redirect('/subscriber/transaction/income?error=true&type=sysError');
+		});
+	  } else {
+		createIncome();
+	  }
 	}
-}
+};
 
 exports.updateIncomeTrans = (req, res) => {
 	if (req.method == 'GET') {
@@ -1000,7 +1037,7 @@ exports.updateIncomeTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				axios.get(`${process.env.API_URL}/subscribers/salesperson/list`, {
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/all`, {
 					headers: {
 						'Authorization': `${req.session.token}`
 					}
