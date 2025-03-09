@@ -153,9 +153,8 @@ exports.listExpCat = (req, res) => {
     const orgId = req.user.orgId
     const { status = 'active' } = req.query;
     const query = `
-        SELECT ec.id, ec.name, u.name AS createdBy, ec.parentId
+        SELECT ec.id, ec.name, ec.parentId
         FROM expcats ec
-        JOIN users u ON ec.createdBy = u.id
         WHERE ec.orgId = ? AND ec.status = ?
     `;
 
@@ -219,9 +218,8 @@ exports.listIncCat = (req, res) => {
     const orgId = req.user.orgId
     const { status = 'active' } = req.query;
     const query = `
-        SELECT ic.id, ic.name, u.name AS createdBy, ic.parentId
+        SELECT ic.id, ic.name, ic.parentId
         FROM inccats ic
-        JOIN users u ON ic.createdBy = u.id
         WHERE ic.orgId = ? AND ic.status = ?
     `;
 
@@ -260,13 +258,11 @@ exports.listExpenseCategory = (req, res) => {
     let query = `
         SELECT 
             ec.id, 
-            ec.name, 
-            u.name AS createdBy, 
+            ec.name,
             ec.status,
             COALESCE(SUM(e.amount * e.price), 0) AS totalAmount,
             COUNT(e.id) AS totalTransactions
         FROM expcats ec
-        JOIN users u ON ec.createdBy = u.id
         LEFT JOIN exps e ON ec.id = e.catId
         WHERE ec.orgId = ?
     `;
@@ -316,7 +312,7 @@ exports.listExpenseCategory = (req, res) => {
     }
 
     query += `
-        GROUP BY ec.id, ec.name, u.name, ec.status
+        GROUP BY ec.id, ec.name, ec.status
         ORDER BY ec.id DESC
         LIMIT ? OFFSET ?
     `;
@@ -1188,13 +1184,11 @@ exports.listIncomeCategory = (req, res) => {
     let query = `
         SELECT 
             ic.id, 
-            ic.name, 
-            u.name AS createdBy, 
+            ic.name,  
             ic.status,
             COALESCE(SUM(i.amount), 0) AS totalAmount,
             COUNT(i.id) AS totalTransactions
         FROM inccats ic
-        JOIN users u ON ic.createdBy = u.id
         LEFT JOIN incs i ON ic.id = i.catId
         WHERE ic.orgId = ?
     `;
@@ -1244,7 +1238,7 @@ exports.listIncomeCategory = (req, res) => {
     }
 
     query += `
-        GROUP BY ic.id, ic.name, u.name, ic.status
+        GROUP BY ic.id, ic.name, ic.status
         ORDER BY ic.id DESC
         LIMIT ? OFFSET ?
     `;
