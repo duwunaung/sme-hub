@@ -166,7 +166,7 @@ exports.getSalespersonName = (req, res) => {
         if (results.length === 0) {
             return res.status(404).send({
                 success: false,
-                message: 'Data not found',
+                message: 'Data not found salesperson',
                 dev: "Data not found"
             })
         }
@@ -214,6 +214,47 @@ exports.getSalesperson = (req, res) => {
     })
 };
 
+
+exports.getSalespersonListAll = (req, res) => {
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "The Superadmin tried to access Salespersons list"
+        })
+    }
+    const orgId = req.user.orgId;
+    const queryParams = [];
+    let query = ` SELECT * FROM salesperson WHERE orgId = ? AND status = ? `;
+
+    queryParams.push(orgId);
+	queryParams.push('active')
+    db_connection.query(query, queryParams, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'Salespersons not found',
+                dev: "Salespersons not found"
+            })
+        }
+
+        return res.status(200).send({
+            success: true,
+            message: 'Here is the Salesperson list',
+            dev: "Good Job, Bro!",
+            data: results
+        })
+    })
+};
+
 exports.getSalespersonList = (req, res) => {
     const { 
         page = 1, 
@@ -222,7 +263,6 @@ exports.getSalespersonList = (req, res) => {
         num,
         type
     } = req.query;
-
     if (req.user.orgId === 0) {
         return res.status(403).send({
             success: false,
@@ -230,7 +270,6 @@ exports.getSalespersonList = (req, res) => {
             dev: "The Superadmin tried to access Salespersons list"
         })
     }
-
     const offset = (page - 1) * pageSize;
     const orgId = req.user.orgId;
     const queryParams = [];
@@ -251,7 +290,6 @@ exports.getSalespersonList = (req, res) => {
     `;
 
     queryParams.push(orgId);
-
 
     if (search) {
         query += ` AND (s.name LIKE ? )`;
