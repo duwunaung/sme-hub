@@ -415,6 +415,41 @@ exports.getProfile = (req, res) => {
     });
 };
 
+exports.checkPass = (req, res) => {
+
+    if (req.user.orgId != 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "The Superadmin tried to access organization profile page"
+        })
+    }
+
+    const userId = req.user.userId
+    db_connection.query("SELECT password FROM users WHERE id = ?", [userId], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+        return res.status(200).send({
+            success: true,
+            message: 'Here is the user',
+            dev: "Good Job, Bro!",
+            data: results[0]
+        })
+    })
+};
+
 exports.updateProfile = (req, res) => {
 
     // Ensure superadmin is updating the user (validate org_id = 0 for superadmins)
@@ -427,52 +462,64 @@ exports.updateProfile = (req, res) => {
     }
     
     const userId = req.user.userId
-    const { name, email, phone } = req.body;
     const now = new Date()
-    const role = 'superadmin'
 
-    db_connection.query(
-        'UPDATE users SET name = ?, email = ?, phone = ?, role = ?, status = ?, orgId = ?, updatedBy = ?, updatedAt = ? WHERE id = ?',
-        [name, email, phone, role, 'active', 0, userId, now, userId],
-        (err, result) => {
-            if (err) {
-                if (err.code ==  "ER_DUP_ENTRY") {
-                    return res.status(409).send(
-                        {
-                            success: false,
-                            message: 'Email duplicate error',
-                            dev: err.message
-                        }
-                    );
-                } else {
-                    return res.status(500).send(
-                        {
-                            success: false,
-                            message: 'Failed to update user',
-                            dev: err.message,
-                        }
-                    );
-                }
-            }
+    const { name, email, phone, password } = req.body;
+    if (!name || !email || !phone ) {
+		return res.status(400).send(
+			{
+				success: false,
+                message: 'All fields are required',
+                dev: "Bro, give me correct ones"
+			}
+		)
+	}
 
-            if (result.affectedRows === 0) {
-                return res.status(404).send(
+    const parameters = []
+	parameters.push(name)
+	parameters.push(email)
+	parameters.push(phone)
+    parameters.push(userId)
+    parameters.push(now)
+
+    let query = ''
+	if (password) {
+		query = "UPDATE users SET name = ?, email = ?, phone = ?, updatedBy = ?, updatedAt = ?, password = ? WHERE id = ?"
+		parameters.push(password)
+		parameters.push(userId)
+	} else {
+		query = "UPDATE users SET name = ?, email = ?, phone = ?, updatedBy = ?, updatedAt = ? WHERE id = ?"
+		parameters.push(userId)
+	}
+
+    db_connection.query( query , parameters, (err, results) => {            
+        if (err) {
+            if (err.code ==  "ER_DUP_ENTRY") {
+                return res.status(409).send(
                     {
                         success: false,
-                        message: 'User not found',
-                        dev: 'User with the provided ID was not found'
+                        message: 'Email duplicate error',
+                        dev: err.message
+                    }
+                );
+            } else {
+                return res.status(500).send(
+                    {
+                        success: false,
+                        message: 'Failed to update user',
+                        dev: err.message,
                     }
                 );
             }
-
-            res.send ({
-                success: true,
-                message: 'User updated successfully',
-                dev: 'User details updated successfully',
-                data: { name, email, phone, role }
-            });
         }
-    );
+
+        res.send ({
+            success: true,
+            message: 'Profile updated successfully',
+            dev: 'Admin profile updated successfully',
+            data: { name }
+        });
+    });
 };
 
 exports.deleteAccount = (req, res) => {
