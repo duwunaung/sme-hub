@@ -66,10 +66,12 @@
 									<div id="transSalesperson" class="form-control"><%= transaction.salesperson %></div>
 								</div>
 							<%}%>
-							<div class="mb-3">
-								<label for="transCustomer" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
-								<div id="transCustomer" class="form-control"><%= trans === 'income' ? transaction.customerName : transaction.vendorName %></div>
-							</div>
+							<% if((trans === 'income' && transaction.customerName) || (trans === 'expense' && transaction.vendorName)) {%> 
+								<div class="mb-3">
+									<label for="transCustomer" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
+									<div id="transCustomer" class="form-control"><%= trans === 'income' ? transaction.customerName : transaction.vendorName %></div>
+								</div>
+							<%} %>
 							<div class="mb-3">
 								<label for="transItem" class="form-label">Item Name</label>
 								<div id="transItem" class="form-control"><%= transaction.itemName %></div>
