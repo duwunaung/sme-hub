@@ -57,20 +57,20 @@
 					<!-- Category Details Form -->
 					<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)">
 						<div class="mb-3">
-							<label for="transDescription" class="form-label">Description</label>
+							<label for="transDescription" class="form-label">Description *</label>
 							<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
 								placeholder="Enter description" value="<%= transaction.description %>" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
 							<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
 						</div>
 						<div class="mb-3">
-							<label for="transDate" class="form-label">Date</label>
+							<label for="transDate" class="form-label">Date *</label>
 							<input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
 								placeholder="Select date" value="" required>
 						</div>
 						<% if (transaction.parentId === 1 || transaction.parentId === 2) {%> 
 							<% if(salesperson.length > 0 && trans === 'income') {%> 
 								<div class="mb-3">
-									<label for="transSalesperson" class="form-label">Salesperson Name</label>
+									<label for="transSalesperson" class="form-label">Salesperson *</label>
 									<div class="mb-3">
 										<div class="dropdown">
 											<button type="button" class="form-control dropdown-toggle" type="button" id="dropdownSalesperson" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 100px;">
@@ -105,31 +105,31 @@
 								<p id="transCustomerError" class="mt-2 d-none text-danger">*Customer Name can't exceed 100 characters!</p>
 							</div>
 							<div class="mb-3">
-								<label for="transItem" class="form-label">Item Name</label>
+								<label for="transItem" class="form-label">Item Name *</label>
 								<input type="text" class="form-control inputRequired" maxlength="100" name="itemName" id="transItem"
 									placeholder="Enter item name" value="<%= transaction.itemName %>" oninput="checkInputs('transItemError', 'transItem')" required>
 								<p id="transItemError" class="mt-2 d-none text-danger">*Item Name can't exceed 100 characters!</p>
 							</div>
 							<div class="mb-3">
-								<label for="transPrice" class="form-label">Price Per Unit</label>
+								<label for="transPrice" class="form-label">Price Per Unit *</label>
 								<input type="number" class="form-control inputRequired" maxlength="30" name="price" id="transPrice"
 									placeholder="Enter price per unit" value="<%= transaction.price %>" oninput="calculateTotalAmount('transPriceError', 'transPrice')" required>
 								<p id="transPriceError" class="mt-2 d-none text-danger">*Price Per Unit can't exceed 30 characters!</p>
 							</div>
 							<div class="mb-3">
-								<label for="transQuantity" class="form-label">Quantity</label>
+								<label for="transQuantity" class="form-label">Quantity *</label>
 								<input type="number" class="form-control inputRequired" maxlength="30" name="quantity" id="transQuantity"
 									placeholder="Enter quantity" value="<%= transaction.quantity %>" oninput="calculateTotalAmount('transQuantityError', 'transQuantity')" required>
 								<p id="transQuantityError" class="mt-2 d-none text-danger">*Quantity can't exceed 30 characters!</p>
 							</div>
 							<div class="mb-3">
-								<label class="form-label">Amount</label>
+								<label class="form-label">Amount *</label>
 								<div class="form-control text-secondary" id="totalAmount" placeholder="Total Amount" >Total Amount</div>
 							</div>
 						<%} %>
 						<% if (!(transaction.parentId === 1 || transaction.parentId === 2)) {%>
 							<div class="mb-3">
-								<label for="transAmount" class="form-label">Amount</label>
+								<label for="transAmount" class="form-label">Amount *</label>
 								<input type="number" class="form-control inputRequired" maxlength="30" name="amount" id="transAmount"
 									placeholder="Enter amount" value="<%= transaction.amount %>" oninput="checkInputs('transAmountError', 'transAmount')" required>
 								<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 30 characters!</p>
@@ -137,7 +137,7 @@
 						<%} %>
 						
 						<div class="mb-3">
-							<label for="transCategory" class="form-label">Category</label>
+							<label for="transCategory" class="form-label">Category *</label>
 							<div class="mb-3">
 								<div class="dropdown">
 									<button type="button" class="form-control dropdown-toggle" type="button" id="dropdownCategory" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 100px;">
@@ -211,36 +211,6 @@
 					</div>
 				</div>
 				<script>
-
-					function calculateTotal() {
-						const quantity = document.getElementById('transQuantity').value;
-						const price = document.getElementById('transPrice').value;
-						const total = document.getElementById('totalAmount');
-						const baseCurrency = "<%= baseCurrency %>"
-						let totalAmount;
-						if (!quantity || parseInt(quantity) <= 0 || !price || parseInt(price) <= 0) {
-							total.innerText = "Total Amount"
-							total.classList.add('text-secondary')
-						} else {
-							let amount;
-							totalAmount = parseInt(quantity) * parseInt(price)
-							totalAmount = totalAmount.toLocaleString()
-							if (baseCurrency === 'MMK') {
-								amount = `${totalAmount}  ks`
-							} else if (baseCurrency === 'USD') {
-								amount = `$ ${totalAmount}`
-							} else { 
-								amount = `${totalAmount} baseCurrency`
-							}
-							total.classList.remove('text-secondary')
-							total.innerText = amount
-						}
-					}
-					calculateTotal();
-					function calculateTotalAmount(errorMsg, field) {
-						checkInputs(errorMsg, field);
-						calculateTotal();
-					}
 					
 					function previewReceipt(input) {
 					    const previewContainer = document.getElementById('previewContainer');
@@ -373,6 +343,36 @@
 					function submitForm(event) {
 						addButton.disabled = true;
 						addButton.textContent = 'Submitting...';
+					}
+
+					function calculateTotal() {
+						const quantity = document.getElementById('transQuantity').value;
+						const price = document.getElementById('transPrice').value;
+						const total = document.getElementById('totalAmount');
+						const baseCurrency = "<%= baseCurrency %>"
+						let totalAmount;
+						if (!quantity || parseInt(quantity) <= 0 || !price || parseInt(price) <= 0) {
+							total.innerText = "Total Amount"
+							total.classList.add('text-secondary')
+						} else {
+							let amount;
+							totalAmount = parseInt(quantity) * parseInt(price)
+							totalAmount = totalAmount.toLocaleString()
+							if (baseCurrency === 'MMK') {
+								amount = `${totalAmount}  ks`
+							} else if (baseCurrency === 'USD') {
+								amount = `$ ${totalAmount}`
+							} else { 
+								amount = `${totalAmount} baseCurrency`
+							}
+							total.classList.remove('text-secondary')
+							total.innerText = amount
+						}
+					}
+					calculateTotal();
+					function calculateTotalAmount(errorMsg, field) {
+						checkInputs(errorMsg, field);
+						calculateTotal();
 					}
 					
 				</script>
