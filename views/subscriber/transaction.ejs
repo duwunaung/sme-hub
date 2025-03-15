@@ -638,7 +638,7 @@
 	                    <div class="modal-body">
 	                        <form id="addNewTransactionForm" action="/subscriber/transaction/<%= trans %>/create" method="post" enctype="multipart/form-data" onsubmit="setCurrentDateTime(event)">
 								<div class="mb-3">
-									<label for="transCategory" class="form-label">Category</label>
+									<label for="transCategory" class="form-label">Category *</label>
 									<select id="transCategory" name="catId" class="form-select inputRequired" required onchange="toggleFormFields()">
 										<% category.forEach(option => { %>
 											<option value="<%= option.id %>" data-parent="<%= option.parentId %>"><%= option.name %></option>
@@ -649,14 +649,14 @@
 								<!-- Standalone Fields -->
 								<div id="standaloneFields">
 									<div class="mb-3">
-										<label for="transDescription" class="form-label">Description</label>
+										<label for="transDescription" class="form-label">Description *</label>
 										<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
 											placeholder="Enter description" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
 										<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
 									</div>
 							
 									<div class="mb-3">
-										<label for="transAmount" class="form-label">Amount</label>
+										<label for="transAmount" class="form-label">Amount *</label>
 										<input type="number" class="form-control inputRequired" maxlength="30" name="amount" id="transAmount"
 											placeholder="Enter amount" oninput="checkInputs('transAmountError', 'transAmount')" required>
 										<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 30 characters!</p>
@@ -666,35 +666,36 @@
 								<!-- Parent Sale Fields -->
 								<div id="parentSaleFields">
 									<div class="mb-3">
-										<label for="itemName" class="form-label">Item Name</label>
+										<label for="itemName" class="form-label">Item Name *</label>
 										<input type="text" class="form-control inputRequired" maxlength="100" oninput="checkInputs('itemNameError', 'itemName')" name="itemName" id="itemName" placeholder="Enter item name" required>
 										<p id="itemNameError" class="mt-2 d-none text-danger">*Item Name can't exceed 100 characters!</p>
 									</div>
 							
 									<div class="mb-3">
-										<label for="pricePerUnit" class="form-label">Price per Unit</label>
+										<label for="pricePerUnit" class="form-label">Price per Unit *</label>
 										<input type="number" class="form-control inputRequired" maxlength="30" oninput="calculateTotalAmount('pricePerUnitError', 'pricePerUnit')" name="price" id="pricePerUnit" placeholder="Enter price per unit"  required>
 										<p id="pricePerUnitError" class="mt-2 d-none text-danger">*Price per Unit can't exceed 30 characters!</p>
 									</div>
 							
 									<div class="mb-3">
-										<label for="quantity" class="form-label">Quantity</label>
+										<label for="quantity" class="form-label">Quantity *</label>
 										<input type="number" class="form-control inputRequired" maxlength="30" oninput="calculateTotalAmount('quantityError', 'quantity')" name="quantity" id="quantity" placeholder="Enter quantity" required>
 										<p id="quantityError" class="mt-2 d-none text-danger">*Quantity can't exceed 30 characters!</p>
 									</div>
 									<div class="mb-3">
-										<label class="form-label">Amount</label>
+										<label class="form-label">Amount *</label>
 										<div class="form-control text-secondary" id="totalAmount" placeholder="Total Amount" >Total Amount</div>
 									</div>
 									<% if( trans === 'income') {%>
 										<div class="mb-3">
-											<label for="salesperson" class="form-label">Salesperson</label>
+											<label for="salesperson" class="form-label">Salesperson *</label>
 											<% if(salesperson.length > 0) {%>
 												<select id="salesperson" name="salesperson" class="form-select inputRequired" required onchange="updateSalespersonName()">
 													<% salesperson.forEach(option => { %>
 														<option value="<%= option.id %>" data-salespersonName="<%= option.name %>"><%= option.name %></option>
 													<% }); %>
 												</select>
+												<p style="font-size: small;" class="text-secondary mt-1">Add a new salesperson in "<strong><a href="/subscriber/salesperson" style="text-decoration: none;">Salesperson</a></strong>" menu</p>
 												<input type="text" value="<%= salesperson.length > 0 ? salesperson[0].name : '' %>" style="display: none;" id="salespersonName" name="salespersonName">
 												<%} 
 											else {%>
@@ -707,7 +708,7 @@
 							
 									<div class="mb-3">
 										<label for="customerName" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
-										<input type="text" class="form-control inputRequired" maxlength="100" oninput="checkInputs('customerNameError', 'customerName')" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="customerName" placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name" required>
+										<input type="text" class="form-control" maxlength="100" oninput="checkInputs('customerNameError', 'customerName')" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="customerName" placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name">
 										<p id="customerNameError" class="mt-2 d-none text-danger">*Customer Name can't exceed 100 characters!</p>
 									</div>
 								</div>
