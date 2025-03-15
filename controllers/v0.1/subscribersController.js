@@ -283,6 +283,8 @@ exports.createExpenseCat = (req, res) => {
 		if (categoryType === 'underParent' && parentCategory == 'purchase') {
 			parentId = 2;
 			parameters.parentId = parentId; 
+		} else {
+			parameters.paraentId = 0;
 		}
 		axios.post(`${process.env.API_URL}/subscribers/categories/expense/create`, parameters, {
 			headers: {
@@ -504,6 +506,8 @@ exports.createIncomeCat = (req, res) => {
 		if (categoryType === 'underParent' && parentCategory == 'sale') {
 			parentId = 1;
 			parameters.parentId = parentId; 
+		} else {
+			parameters.parentId = 0
 		}
 		axios.post(`${process.env.API_URL}/subscribers/categories/income/create`, parameters, {
 			headers: {
@@ -765,7 +769,9 @@ exports.createExpenseTrans = (req, res) => {
 			parameters.vendorName = vendorName;
 			const amount = parseInt(price) * parseInt(quantity);
 			parameters.amount = `${amount}`;
-			const description = `Purchased ${quantity} ${itemName} from ${vendorName}`
+			let description = `Purchased ${quantity} ${itemName}`
+			if (vendorName)
+				description = description + `from ${vendorName}`
 			parameters.description = description
 		}
 		if (receipt) {
@@ -980,7 +986,9 @@ exports.createIncomeTrans = (req, res) => {
 		  const amount = parseInt(price) * parseInt(quantity);
 		  parameters.amount = `${amount}`;
 		  const finalSalespersonName = updatedSalespersonName || salespersonName;
-		  const description = finalSalespersonName + " has sold " + quantity + " " + itemName + " to " + customer;
+		  let description = finalSalespersonName + " has sold " + quantity + " " + itemName;
+		  if (customer)
+		  	description = description + " to " + customer;
 		  parameters.description = description;
 		}
 		
