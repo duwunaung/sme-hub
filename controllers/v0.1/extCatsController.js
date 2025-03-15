@@ -15,20 +15,12 @@ exports.createExpenseCategory = (req, res) => {
     }
 	let query = ''
 	const parameters = []
-	if (parentId) {
-		query = `INSERT INTO expcats (name, orgId, createdBy, status, parentId) VALUES (?, ?, ?, ?, ?)`;
-		parameters.push(name)
-		parameters.push(orgId)
-		parameters.push(createdBy)
-		parameters.push('active')
-		parameters.push(parentId)
-	} else {
-		query = `INSERT INTO expcats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`;
-		parameters.push(name)
-		parameters.push(orgId)
-		parameters.push(createdBy)
-		parameters.push('active')
-	}
+	query = `INSERT INTO expcats (name, orgId, createdBy, status, parentId) VALUES (?, ?, ?, ?, ?)`;
+	parameters.push(name)
+	parameters.push(orgId)
+	parameters.push(createdBy)
+	parameters.push('active')
+	parameters.push(parentId)
 
     db_connection.query(query, parameters, (err, results) => {
         if (err) {
@@ -115,21 +107,11 @@ exports.listExpCatUpdate = (req, res) => {
     const { status = 'active' } = req.query;
 	const { parentId } = req.params
 	let query = '';
-	if (parentId === '2') {
-	    query = `
-	        SELECT ec.id, ec.name, u.name AS createdBy, ec.parentId
-	        FROM expcats ec
-	        JOIN users u ON ec.createdBy = u.id
-	        WHERE ec.orgId = ? AND ec.status = ? AND ec.parentId = ${parentId}
-	    `;
-	} else if (parentId === '0') {
-		query = `
-	        SELECT ec.id, ec.name, u.name AS createdBy, ec.parentId
-	        FROM expcats ec
-	        JOIN users u ON ec.createdBy = u.id
-	        WHERE ec.orgId = ? AND ec.status = ? AND ec.parentId IS NULL
-	    `;
-	}
+    query = `
+        SELECT ec.id, ec.name, ec.parentId
+        FROM expcats ec
+        WHERE ec.orgId = ? AND ec.status = ? AND ec.parentId = ${parentId}
+    `;
 
     db_connection.query(query, [orgId, status], (err, results) => {
         if (err) {
@@ -181,21 +163,11 @@ exports.listIncCatUpdate = (req, res) => {
     const { status = 'active' } = req.query;
 	const { parentId } = req.params
 	let query = '';
-	if (parentId === '1') {
-		query = `
-	        SELECT ic.id, ic.name, u.name AS createdBy, ic.parentId
-	        FROM inccats ic
-	        JOIN users u ON ic.createdBy = u.id
-	        WHERE ic.orgId = ? AND ic.status = ? AND ic.parentId = ${parentId}
-	    `;
-	} else if (parentId === '0') {
-		query = `
-	        SELECT ic.id, ic.name, u.name AS createdBy, ic.parentId
-	        FROM inccats ic
-	        JOIN users u ON ic.createdBy = u.id
-	        WHERE ic.orgId = ? AND ic.status = ? AND ic.parentId IS NULL
-	    `;
-	}
+	query = `
+        SELECT ic.id, ic.name,  ic.parentId
+        FROM inccats ic
+        WHERE ic.orgId = ? AND ic.status = ? AND ic.parentId = ${parentId}
+    `;
     db_connection.query(query, [orgId, status], (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -743,20 +715,12 @@ exports.createIncomeCategory = (req, res) => {
     }
 	let query = ''
 	const parameters = []
-	if (parentId) {
-		query = `INSERT INTO inccats (name, orgId, createdBy, status, parentId) VALUES (?, ?, ?, ?, ?)`
-		parameters.push(name)
-		parameters.push(orgId)
-		parameters.push(createdBy)
-		parameters.push('active')
-		parameters.push(parentId)
-	} else {
-		query = `INSERT INTO inccats (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`
-		parameters.push(name)
-		parameters.push(orgId)
-		parameters.push(createdBy)
-		parameters.push('active')
-	}
+	query = `INSERT INTO inccats (name, orgId, createdBy, status, parentId) VALUES (?, ?, ?, ?, ?)`
+	parameters.push(name)
+	parameters.push(orgId)
+	parameters.push(createdBy)
+	parameters.push('active')
+	parameters.push(parentId)
     db_connection.query(query, parameters, (err, results) => {
         if (err) {
 			if (err.code === "ER_DUP_ENTRY") {
