@@ -127,7 +127,6 @@ exports.listUsers = (req, res) => {
     // Execute the query to fetch paginated users
     db_connection.query(query, params, (err, results) => {
         if (err) {
-            console.error(err);
             return res.status(500).send({ error: 'Failed to retrieve users' });
         }
 
@@ -513,7 +512,7 @@ exports.updateProfile = (req, res) => {
             }
         }
 
-        res.send ({
+        return res.status(200).send ({
             success: true,
             message: 'Profile updated successfully',
             dev: 'Admin profile updated successfully',

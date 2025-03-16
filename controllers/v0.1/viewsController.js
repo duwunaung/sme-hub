@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { query } = require('express');
+const bcrypt = require('bcryptjs');
 
 exports.login = (req, res) => {
     if (req.method === 'POST') {
@@ -772,7 +773,6 @@ exports.adminProfile = (req, res) => {
                     res.render('superadmin/profile', { user: response.data.data, errorMessage: null, successMessage: "Successfully Updated" });
                 }
             } else if (error) {
-
                 const name = req.query.name
                 const email = req.query.email
                 const phone = req.query.phone
@@ -795,24 +795,41 @@ exports.adminProfile = (req, res) => {
 			res.render('superadmin/login', { errorMessage: error.response.data.message });
         })
     } else {
-
-        const { name, email, phone } = req.body;
-
-        axios.put(`${process.env.API_URL}/users/profile/update`, { name, email, phone }, {
-            headers: {
-                'Authorization': `${req.session.token}`
+        const updateProfile = async () => {
+            const { name, email, phone } = req.body
+            const { currentPassword, newPassword, confirmPassword } = req.body
+            let parameters = { name, email, phone }
+            try {
+                if (currentPassword) {
+                    const resPass = await axios.get(`${process.env.API_URL}/users/profile/check`, {
+                        headers: {
+                            'Authorization': `${req.session.token}`
+                        }
+                    });
+                    
+                    const hashedPassword = resPass.data.data.password;
+                    const isPasswordValid = await bcrypt.compare(currentPassword, hashedPassword);
+                    if (!isPasswordValid) {
+                        return res.redirect('/superadmin/profile?error=true&type=invalidPassword');
+                    }
+                    if ((newPassword) && (newPassword === confirmPassword)) {
+                        parameters.password = await bcrypt.hash(newPassword, 10);
+                    }
+                }
+                // xxx
+                await axios.put(
+                    `${process.env.API_URL}/users/profile/update`, parameters, {
+                        headers: {
+                            'Authorization': `${req.session.token}`
+                        }
+                    }
+                );
+                res.redirect('/superadmin/profile?success=true&type=updateProfile');
+            } catch (error) {
+                res.redirect('/superadmin/profile?error=true&type=sysError');
             }
-        }).then(response => {
-            res.redirect('/superadmin/profile?success=true&type=updateProfile')
-        }).catch(error => {
-            if (error.status === 409){
-                res.redirect('/superadmin/profile?error=true&type=dup-email&name=' + name + '&email=' + email + '&phone=' + phone )
-            } else if (error.status === 404) {
-                res.redirect('/superadmin/profile?error=true&type=404Error&name=' + name + '&email=' + email + '&phone=' + phone )
-            } else {
-                res.redirect('/superadmin/profile?error=true&type=sysError&name=' + name + '&email=' + email + '&phone=' + phone )
-            }
-        })
+        };
+        updateProfile();
     }
 }
 
