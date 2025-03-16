@@ -783,6 +783,8 @@ exports.adminProfile = (req, res) => {
                     res.render('superadmin/profile', { user: userData, errorMessage: "Duplicate Email!", successMessage: null });
                 } else if (type == '404Error') {
                     res.render('superadmin/profile', { user: userData, errorMessage: "User not found!", successMessage: null });
+                } else if (type == 'empty-value') {
+                    res.render('superadmin/profile', { user: userData, errorMessage: "Input field shouldn't be empty!", successMessage: null });
                 } else if (type == 'deleteAccount') {
                     res.render('superadmin/profile', { user: userData, errorMessage: "Cannot delete your account at the moment!", successMessage: null });
                 } else {
@@ -826,7 +828,13 @@ exports.adminProfile = (req, res) => {
                 );
                 res.redirect('/superadmin/profile?success=true&type=updateProfile');
             } catch (error) {
-                res.redirect('/superadmin/profile?error=true&type=sysError');
+                if (error.status == 409) {
+                    res.redirect('/superadmin/profile?error=true&type=dup-email');
+                } else if (error.status == 400) {
+                    res.redirect('/superadmin/profile?error=true&type=empty-value');
+                } else {
+                    res.redirect('/superadmin/profile?error=true&type=sysError');
+                }
             }
         };
         updateProfile();
