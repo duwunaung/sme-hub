@@ -812,7 +812,7 @@ exports.adminProfile = (req, res) => {
                     const hashedPassword = resPass.data.data.password;
                     const isPasswordValid = await bcrypt.compare(currentPassword, hashedPassword);
                     if (!isPasswordValid) {
-                        return res.redirect('/superadmin/profile?error=true&type=invalidPassword');
+                        return res.redirect('/superadmin/profile?error=true&type=invalidPassword&name=' + name + '&email=' + email + '&phone=' + phone );
                     }
                     if ((newPassword) && (newPassword === confirmPassword)) {
                         parameters.password = await bcrypt.hash(newPassword, 10);
@@ -829,11 +829,11 @@ exports.adminProfile = (req, res) => {
                 res.redirect('/superadmin/profile?success=true&type=updateProfile');
             } catch (error) {
                 if (error.status == 409) {
-                    res.redirect('/superadmin/profile?error=true&type=dup-email');
+                    res.redirect('/superadmin/profile?error=true&type=dup-email&name=' + name + '&email=' + email + '&phone=' + phone );
                 } else if (error.status == 400) {
-                    res.redirect('/superadmin/profile?error=true&type=empty-value');
+                    res.redirect('/superadmin/profile?error=true&type=empty-value&name=' + name + '&email=' + email + '&phone=' + phone );
                 } else {
-                    res.redirect('/superadmin/profile?error=true&type=sysError');
+                    res.redirect('/superadmin/profile?error=true&type=sysError&name=' + name + '&email=' + email + '&phone=' + phone );
                 }
             }
         };
