@@ -129,6 +129,7 @@ exports.login = (req, res) => {
                 dev: "In future, kindly include Token in header['authorization'].",
                 data: {
                     name: user.name,
+                    role: user.role,
                     token: token
                 }
             })
