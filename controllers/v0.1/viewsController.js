@@ -12,7 +12,7 @@ exports.login = (req, res) => {
                         req.session.token = response.data.data.token;
                         req.session.user = response.data.data.name;
                         req.session.role = response.data.data.role;
-                        res.render('superadmin/dashboard', { userName: req.session.user, userRole: req.session.role });
+                        res.redirect('/superadmin/dashboard');
                     } else {
                         res.render('superadmin/login', { errorMessage: response.data.message });
                     }

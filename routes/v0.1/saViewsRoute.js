@@ -32,7 +32,7 @@ router.use('/users', checkSuperAdminSession, superadmins)
 router.use('/profile/delete', checkSuperAdminSession, deleteAccount)
 
 router.use('/dashboard', checkSuperAdminSession, (req, res) => {
-    res.render('superadmin/dashboard', { token: req.session.token, user: req.session.user })
+    res.render('superadmin/dashboard', { userName: req.session.user, userRole: req.session.role, token: req.session.token, user: req.session.user })
 })
 
 router.use('/', (req, res) => {
