@@ -13,8 +13,9 @@
             overflow-x: hidden;
             --btnColor: #fff;
             --btnBgColor:  #D62828;
-
-            /* primaryColorCode - #007bff */
+            --pagniColor:  black;
+            
+            /* <= primaryColorCode - #007bff */
         }
 
         #sidebar {
@@ -95,11 +96,14 @@
         .dropdown-item:hover {
             background-color: gainsboro;
         }
-        .dropdown-active, .page-link, .page-link:hover {
+        .dropdown-active {
+            color: var(--btnBgColor);
+        }
+        .page-link, .page-link:hover {
             color: var(--btnBgColor);
         }
         .pagContent {
-            color: var(--btnBgColor);
+            color: var(--pagniColor);
         }
 
         /* Navbar */
