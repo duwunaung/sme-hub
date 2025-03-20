@@ -1,7 +1,7 @@
 <%- include('../partials/superadmin/header.ejs') %>
     <%- include('../partials/superadmin/navbar.ejs') %>
 
-            <div class="container my-5">
+            <div class="container my-3">
 
                 <% if (errorMessage) { %>
                     <div id="errorBox" class="alert alert-danger" role="alert">
@@ -13,7 +13,7 @@
                                 <%= successMessage %>
                             </div>
                             <% } %>
-                                <h2 class="mb-4">
+                                <h2 class="mb-3">
                                     <%= org.name %>
                                 </h2>
                                 <!-- Organization Details Form -->
@@ -78,17 +78,17 @@
 
                                 </form>
 
-                                <div id="users-view" class="view-containers d-none mb-4">
-                                    <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div id="users-view" class="view-containers d-none mb-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
 
-                                        <h3 class="my-4">Users</h3>
+                                        <h3 class="my-3">Users</h3>
                                         <button class="btn btnColor" data-bs-toggle="modal"
                                             data-bs-target="#addUserModal" onclick="generatePassowrd()">
                                             Add new user
                                         </button>
                                     </div>
                                     <!-- xxx -->
-                                    <nav class="mb-4 d-flex w-100 justify-content-between">
+                                    <nav class="mb-3 d-flex w-100 justify-content-between">
                                         <div class="d-flex searchBar" role="search">
                                             <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter username (or) email address" value="<%= name %>" aria-label="Search" required>
                                             <button class="btn btnColor" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>

@@ -1,8 +1,8 @@
 <%- include('../partials/superadmin/header.ejs') %>
     <%- include('../partials/superadmin/navbar.ejs') %>
 
-            <div class="container my-5">
-                <h2 class="mb-4">Update Superadmin's Details</h2>
+            <div class="container my-3">
+                <h2 class="mb-3">Update Superadmin's Details</h2>
 
                 <% if (successMessage) { %>
                 <div id="successBox" class="alert alert-success" role="alert">
@@ -15,7 +15,7 @@
 					</div>
 					<% } %>
                 <!-- user Details Form -->
-                <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+                <form class="mb-3" method="POST" id="myForm" onsubmit="submitForm(event)">
                     <div class="mb-3">
                         <label for="userName" class="form-label">Username</label>
                         <input type="text" class="form-control" maxlength="100" name="name" id="userName"

@@ -1,7 +1,7 @@
 <%- include('../partials/superadmin/header.ejs') %>
     <%- include('../partials/superadmin/navbar.ejs') %>
 
-            <div class="container my-5">
+            <div class="container my-3">
 
                 <!-- Error type စစ်ရန် -->
                 <% if (errorMessage) { %>
@@ -12,8 +12,8 @@
                 <!-- xxx -->
 
                 <!-- Superadmin Details Form -->
-                <form id="detail-view" class="mb-4  view-containers">
-                    <h3 class="my-4">User Details</h3>
+                <form id="detail-view" class="mb-3 view-containers">
+                    <h3 class="my-3">User Details</h3>
                     <div class="mb-3">
                         <label for="userName" class="form-label">User Name</label>
                         <input type="text" class="form-control" name="name" id="userName"
@@ -51,7 +51,7 @@
                         </select>
                     </div>
                     <a onclick="Back()" href="#" class="btn btn-primary w-100 mt-1">Back to
-                        Organization detail</a>
+                        users table</a>
                 </form>
                 <p>The last updated by <strong id="updatedBy"><%= user.superadminName %></strong> at <span id="updatedAt"
                     class="fw-bold">

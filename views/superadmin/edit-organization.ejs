@@ -3,7 +3,7 @@
 		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 		<div class="container my-3">
-			<h2 class="mb-4">Update Organization</h2>
+			<h2 class="mb-3">Update Organization</h2>
 
 			<% if (errorMessage) { %>
 				<div id="errorBox" class="alert alert-danger" role="alert">
@@ -16,7 +16,7 @@
 						</div>
 						<% } %>
 							<!-- Organization Details Form -->
-							<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+							<form class="mb-2" method="POST" id="myForm" onsubmit="submitForm(event)">
 								<div class="mb-3">
 									<label for="orgName" class="form-label">Organization Name</label>
 									<input type="text" class="form-control" maxlength="145" name="name" id="orgName"
@@ -120,39 +120,8 @@
 							</div>
 		</div>
 		<script>
-
+			// Variables declaration
 			const orgExpiredDate = new Date("<%= org.expiredDate %>");
-			document.querySelectorAll('.reduceLicense').forEach(button => {
-				const num = parseInt(button.dataset.num);
-				const type = button.dataset.type;
-				let newExpiry = new Date(orgExpiredDate);
-
-				if (type === 'month') {
-					newExpiry.setMonth(newExpiry.getMonth() + num);
-				} else if (type === 'day') {
-					newExpiry.setDate(newExpiry.getDate() + num);
-				}
-
-				if (newExpiry <= today) {
-					button.classList.add('d-none');
-					button.setAttribute('d-none', true);
-				}
-			});
-			// xxx
-
-			function buttonType() {
-				const searchParams = new URLSearchParams(window.location.search);
-				const type = searchParams.get('type')
-				const resetBtn = document.getElementById("resetBtn")
-				if (type == 'update' || type == "extendLicense" || type == "reduceLicense") {
-					resetBtn.innerText = "Back"
-					resetBtn.classList.add("btn-primary")
-				} else {
-					resetBtn.innerText = "Cancel"
-					resetBtn.classList.add("btn-danger")
-				}
-			}
-			buttonType();
 
 			const orgOldName = "<%= org.name %>"
 			const orgOldAddress = "<%= org.address %>"
@@ -163,44 +132,6 @@
 			const form = document.getElementById('myForm');
 			const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
 
-			function checkInputs(messageBox, inputField) {
-
-				const orgNameValue = document.getElementById('orgName').value
-				const orgAddressValue = document.getElementById('orgAddress').value
-				const orgPhoneValue = document.getElementById('orgPhone').value
-				const orgStatusValue = document.getElementById('orgStatus').value
-
-				if ((orgOldName === orgNameValue) && (orgOldAddress === orgAddressValue) && (orgOldPhone === orgPhoneValue) && (orgOldStatus === orgStatusValue)) {
-					updateBtn.classList.add('disabled')
-				} else {
-					updateBtn.classList.remove('disabled')
-				}
-
-				// xxx
-				let allFilled = true;
-				inputs.forEach(index => {
-					if (!index.value.trim()) {
-						allFilled = false;
-					}
-				});
-				updateBtn.disabled = !allFilled;
-				const message = document.getElementById(messageBox)
-				const input = document.getElementById(inputField)
-				if (input.value.length === parseInt(input.maxLength)) {
-					message.classList.remove('d-none');
-				} else {
-					message.classList.add('d-none');
-				}
-			}
-
-			checkInputs();
-
-			function submitForm(event) {
-				updateBtn.disabled = true;
-				updateBtn.textContent = 'Submitting...';
-			}
-
-			// Click Btns
 			let url = new URL(window.location.href);
 			let orgName = url.searchParams.get('orgName')
 			let orgStatus = url.searchParams.get('orgStatus')
@@ -228,11 +159,78 @@
 				query += "&expired=" + expired
 			}
 
+			// xxx
+			document.querySelectorAll('.reduceLicense').forEach(button => {
+				const num = parseInt(button.dataset.num);
+				const type = button.dataset.type;
+				let newExpiry = new Date(orgExpiredDate);
+
+				if (type === 'month') {
+					newExpiry.setMonth(newExpiry.getMonth() + num);
+				} else if (type === 'day') {
+					newExpiry.setDate(newExpiry.getDate() + num);
+				}
+
+				if (newExpiry <= today) {
+					button.classList.add('d-none');
+					button.setAttribute('d-none', true);
+				}
+			});
+
+			// Functions
+			function buttonType() {
+				const searchParams = new URLSearchParams(window.location.search);
+				const type = searchParams.get('type')
+				const resetBtn = document.getElementById("resetBtn")
+				if (type == 'update' || type == "extendLicense" || type == "reduceLicense") {
+					resetBtn.innerText = "Back"
+					resetBtn.classList.add("btn-primary")
+				} else {
+					resetBtn.innerText = "Cancel"
+					resetBtn.classList.add("btn-danger")
+				}
+			}
+			
+			function checkInputs(messageBox, inputField) {
+
+				const orgNameValue = document.getElementById('orgName').value
+				const orgAddressValue = document.getElementById('orgAddress').value
+				const orgPhoneValue = document.getElementById('orgPhone').value
+				const orgStatusValue = document.getElementById('orgStatus').value
+
+				if ((orgOldName === orgNameValue) && (orgOldAddress === orgAddressValue) && (orgOldPhone === orgPhoneValue) && (orgOldStatus === orgStatusValue)) {
+					updateBtn.classList.add('disabled')
+				} else {
+					updateBtn.classList.remove('disabled')
+				}
+
+				let allFilled = true;
+				inputs.forEach(index => {
+					if (!index.value.trim()) {
+						allFilled = false;
+					}
+				});
+				updateBtn.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+					message.classList.remove('d-none');
+				} else {
+					message.classList.add('d-none');
+				}
+			}
+
+			function submitForm(event) {
+				updateBtn.disabled = true;
+				updateBtn.textContent = 'Submitting...';
+			}
+			
 			function clickBtn() {
 				window.location.href = "/superadmin/organizations/update/" + orgId + query
 			}
 
 			function Back() {
+				console.log("Run Back")
 				window.location.href = "/superadmin/organizations" + query
 			}
 
@@ -296,6 +294,10 @@
 					}
 				}
 			}
+
+			// Recall function
+			checkInputs();
+			buttonType();
 
 		</script>
 		</main>

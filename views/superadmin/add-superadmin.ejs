@@ -1,13 +1,13 @@
 <%- include('../partials/superadmin/header.ejs') %>
     <%- include('../partials/superadmin/navbar.ejs') %>
 
-            <div class="container my-5">
+            <div class="container my-3">
                 <% if (errorMessage) { %>
                 <div id="errorBox" class="alert alert-danger" role="alert">
                     <%= errorMessage %>
                 </div>
                 <% } %>
-                <h2 class="mb-4">Add New System Admin</h2>
+                <h2 class="mb-3">Add New System Admin</h2>
                 <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
                     
                     <div class="mb-3">
