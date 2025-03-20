@@ -39,11 +39,11 @@
         }
 
         /* Tooltips */
-        .icons, .usericons{
+        .icons, .usericons, .saIcons {
             position: relative;
         }
 
-        .icons::before, .icons::after, .usericons::before, .usericons::after {
+        .icons::before, .icons::after, .usericons::before, .usericons::after, .saIcons::before, .saIcons::after {
             --scale: 0;
             --arrow-size: 10px;
 
@@ -54,7 +54,7 @@
             transform-origin: right;
         }
 
-        .icons::before, .usericons::before {
+        .icons::before, .usericons::before, .saIcons::before {
             --translate-x: calc(-100% - var(--arrow-size));
 
             content: attr(data-tooltip);
@@ -65,11 +65,11 @@
             background-color: var(--tooltip-color);
         }
 
-        .icons:hover::before, .icons:hover::after, .usericons:hover::before, .usericons:hover::after {
+        .icons:hover::before, .icons:hover::after, .usericons:hover::before, .usericons:hover::after, .saIcons:hover::before, .saIcons:hover::after {
             --scale: 1;
         }
 
-        .icons::after, .usericons::after {
+        .icons::after, .usericons::after, .saIcons::after {
             --translate-x: calc(-1 * var(--arrow-size));
 
             content: '';
@@ -79,12 +79,17 @@
             transform-origin: left center;
         }
 
+        /* Arrow margin */
         .icons::after {
             left: 25px;
         }
 
         .usericons::after {
             left: 18px;
+        }
+
+        .saIcons::after {
+            left: 23px;
         }
 
         /* Btns */

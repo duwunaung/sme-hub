@@ -81,11 +81,11 @@
                                                     </td>
                                                     <td class="text-center">
                                                         <% if (users[i].status == 'active' ) { %>
-                                                            <div class="icons" data-tooltip="Active" onmouseover="changeColor('#28a745')"><i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i></div>
+                                                            <div class="saIcons" data-tooltip="Active" onmouseover="changeColor('#28a745')"><i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i></div>
                                                         <% } else if (users[i].status == 'deleted' ) { %>
-                                                            <div class="icons" data-tooltip="Inactive" onmouseover="changeColor('#dc3545')"><i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i></div>
+                                                            <div class="saIcons" data-tooltip="Inactive" onmouseover="changeColor('#dc3545')"><i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i></div>
                                                         <% } else { %>
-                                                            <div class="icons" data-tooltip="Pending" onmouseover="changeColor('#ffc107')"><i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i></div>
+                                                            <div class="saIcons" data-tooltip="Pending" onmouseover="changeColor('#ffc107')"><i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i></div>
                                                         <% } %>
                                                     </td>
                                                     <td style="padding-left: 5%;">
@@ -212,7 +212,7 @@
 
                 // Tooltips
                 function changeColor(tooltipColor) {
-                    const icons = document.querySelectorAll('.icons')
+                    const icons = document.querySelectorAll('.saIcons')
                     icons.forEach (icon => {
                         icon.style.setProperty('--tooltip-color', tooltipColor);
                     })
