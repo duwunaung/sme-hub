@@ -8,17 +8,16 @@
 									<div id="errorBox" class="alert alert-danger" role="alert">
 										<%= errorMessage %>
 									</div>
-								<% } %>
-								<% if (successMessage) { %>
+								<% } else if (successMessage) { %>
 									<div id="successBox" class="alert alert-success" role="alert">
 										<%= successMessage %>
 									</div>
-								<% } %>
-                <form class="mb-4">
+									<% } %>
+                <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
                     <div class="mb-3">
                         <label for="userName" class="form-label">Username</label>
                         <input type="text" class="form-control" maxlength="100" name="name" id="userName"
-                            placeholder="Enter username" value="<%= user.name %>" oninput="checkInputs('nameUserError', 'userName')" disabled>
+                            placeholder="Enter username" value="<%= user.name %>" oninput="checkInputs('nameUserError', 'userName')" required>
 						              <p id="nameUserError" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
                     </div>
 										<div class="mb-3">
@@ -29,16 +28,69 @@
 					          <div class="mb-3">
                         <label for="userEmail" class="form-label" id="labelEmail">Email Address</label>
                         <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
-                            placeholder="Enter email address" value="<%= user.email %>" oninput="checkInputs('emailUserError', 'userEmail')" disabled>
+                            placeholder="Enter email address" value="<%= user.email %>" oninput="checkInputs('emailUserError', 'userEmail')" required>
 						                <p id="emailUserError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
                     </div>
                     <div class="mb-3">
                         <label for="userPhone" class="form-label">Phone</label>
                         <input type="tel" class="form-control" maxlength="45" id="userPhone" name="phone"
-                            placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" disabled>
+                            placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" required>
 						              <p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
 										</div>
-										<a class="btn btn-warning w-100" href="/superadmin/profile/edit">Edit Profile</a>
+
+										<!-- Password Change Section -->
+										<div class="mb-3">
+											<button type="button" class="btn btn-outline-primary mb-3" onclick="togglePasswordFields()">
+												Change Password
+											</button>
+											
+											<div id="passwordChangeSection" style="display: none;">
+												<!-- Current Password -->
+												<div class="mb-3">
+													<label for="currentPassword" class="form-label">Current Password</label>
+													<div class="input-group">
+														<input type="password" class="form-control" id="currentPassword" name="currentPassword"
+															maxlength="255" placeholder="Enter current password">
+														<span class="input-group-text" style="cursor: pointer" 
+															onclick="togglePassword('currentPassword', 'currentPasswordIcon')">
+															<i id="currentPasswordIcon" class="fa-solid fa-eye"></i>
+														</span>
+													</div>
+													<p id="currentPasswordError" class="mt-2 d-none text-danger"></p>
+												</div>
+											
+												<!-- New Password -->
+												<div class="mb-3">
+													<label for="newPassword" class="form-label">New Password</label>
+													<div class="input-group">
+														<input type="password" class="form-control" id="newPassword" name="newPassword"
+															maxlength="255" placeholder="Enter new password" oninput="validateNewPassword(event)">
+														<span class="input-group-text" style="cursor: pointer"
+															onclick="togglePassword('newPassword', 'newPasswordIcon')">
+															<i id="newPasswordIcon" class="fa-solid fa-eye"></i>
+														</span>
+													</div>
+													<p id="newPasswordError" class="mt-2 d-none text-danger"></p>
+												</div>
+											
+												<!-- Confirm New Password -->
+												<div class="mb-3">
+													<label for="confirmPassword" class="form-label">Confirm New Password</label>
+													<div class="input-group">
+														<input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+															maxlength="255" placeholder="Confirm new password" oninput="validateConfirmPassword(event)">
+														<span class="input-group-text" style="cursor: pointer"
+															onclick="togglePassword('confirmPassword', 'confirmPasswordIcon')">
+															<i id="confirmPasswordIcon" class="fa-solid fa-eye"></i>
+														</span>
+													</div>
+													<p id="confirmPasswordError" class="mt-2 d-none text-danger"></p>
+												</div>
+											</div>
+										</div>
+
+                    <button type="submit" id="updateBtn" class="btn btn-success w-100 mb-2">Save Changes</button>
+                    <a class="btn btn-danger w-100" onclick="clickBtn()">Delete your account</a>
 										<div class="mt-3">
                       <p>Registered Date: <span id="currentRegisteredDate"
                               class="fw-bold">
@@ -49,7 +101,225 @@
                 </form>
             </div>
 			<script>
+				// For Password
+				function togglePassword(passwordFieldId, iconId) {
+			    const passwordField = document.getElementById(passwordFieldId);
+			    const icon = document.getElementById(iconId);
+			    
+			    if (passwordField.type === 'password') {
+			        passwordField.type = 'text';
+			        icon.classList.remove('fa-eye');
+			        icon.classList.add('fa-eye-slash');
+			    } else {
+			        passwordField.type = 'password';
+			        icon.classList.remove('fa-eye-slash');
+			        icon.classList.add('fa-eye');
+			    }
+				}
+
+				function togglePasswordFields() {
+			    const passwordSection = document.getElementById('passwordChangeSection');
+			    passwordSection.style.display = passwordSection.style.display === 'none' ? 'block' : 'none';
+			   
+			    if (passwordSection.style.display === 'none') {
+			        document.getElementById('currentPassword').value = '';
+			        document.getElementById('newPassword').value = '';
+			        document.getElementById('confirmPassword').value = '';
+			    }
+				}
+
+				const addButton = document.getElementById('addBtn');
+				const form = document.getElementById('myForm');
+				const inputs = form.querySelectorAll('.form-control[required]');
+		
+				function checkInputs(messageBox, inputField) {
+					let allFilled = true;
+					inputs.forEach(index => {
+					if (!index.value.trim()) {
+						allFilled = false;
+					}
+					});
+					addButton.disabled = !allFilled;
+					const message = document.getElementById(messageBox)
+					const input = document.getElementById(inputField)
+					if (input.value.length === parseInt(input.maxLength)) {
+						message.classList.remove('d-none');
+					} else {
+						message.classList.add('d-none');
+					}
+				}
+
+				function validatePassword(password) {
+						const errors = [];
+						if (password.length < 8) {
+								errors.push("Password must be at least 8 characters long");
+						}
+						if (!/\d/.test(password)) {
+								errors.push("Password must contain at least one digit");
+						}
+						if (!/[A-Z]/.test(password)) {
+								errors.push("Password must contain at least one capital letter");
+						}
+						if (!/[a-z]/.test(password)) {
+								errors.push("Password must contain at least one small letter");
+						}
+						if (!/[!@#$%^&*]/.test(password)) {
+								errors.push("Password must contain at least one special character (!@#$%^&*)");
+						}
+						if (/[<>]/.test(password)) {
+								errors.push("Password cannot contain < or > characters");
+						}
+						return errors;
+				}
+
 				document.getElementById('pcProfile').classList.add('d-none')
+        
+        function clickBtn () {
+          window.location.href = "/superadmin/profile/delete"
+        }
+
+				const changePassword = document.getElementById('changePassword')
+        // xxx
+
+				const updateBtn = document.getElementById('updateBtn');
+				const userEmail = document.getElementById('userEmail');
+				const labelEmail = document.getElementById('labelEmail');
+
+				const userOldName = "<%= user.name %>"
+				const userOldEmail = "<%= user.email %>"
+				const userOldPhone = "<%= user.phone %>"
+
+				function checkInputs(messageBox, inputField) {
+
+					const userNameValue = document.getElementById('userName').value
+					const userEmailValue = document.getElementById('userEmail').value
+					const userPhoneValue = document.getElementById('userPhone').value
+
+			    const currentPassword = document.getElementById('currentPassword').value
+			    const newPassword = document.getElementById('newPassword').value
+			    const confirmPassword = document.getElementById('confirmPassword').value
+
+					if ( (userOldName == userNameValue) && (userOldEmail == userEmailValue) && (userOldPhone == userPhoneValue) && (!currentPassword) && (!newPassword) && (!confirmPassword) ) {
+						updateBtn.classList.add('disabled')
+					} else {
+						updateBtn.classList.remove('disabled')
+					}
+
+					let allFilled = true;
+					inputs.forEach(index => {
+					if (!index.value.trim()) {
+							allFilled = false;
+					}
+					});
+					updateBtn.disabled = !allFilled;
+					const message = document.getElementById(messageBox)
+					const input = document.getElementById(inputField)
+					if (input.value.length === parseInt(input.maxLength)) {
+				        message.classList.remove('d-none');
+				    } else {
+				        message.classList.add('d-none');
+				    }
+					if (inputField === 'userEmail')
+					{
+						userEmail.classList.remove('border-danger')
+						labelEmail.style.color = 'black'
+						userEmail.classList.remove('input-error')
+					}
+	            }
+
+							checkInputs();
+
+
+                function submitForm(event) {
+				    updateBtn.disabled = true;
+				    updateBtn.textContent = 'Submitting...';
+				}
+
+				const searchParams = new URLSearchParams(window.location.search);
+				const error = searchParams.get('error')
+
+				if (error === 'true') {
+					const type = searchParams.get('type')
+					if (type === 'dup-email') {
+						userEmail.classList.add('border-danger')
+						labelEmail.style.color = '#bb2124'
+						userEmail.onfocus = function() {
+				            userEmail.classList.add('input-error');
+				        };
+				        
+				        userEmail.onblur = function() {
+				            userEmail.classList.remove('input-error');
+				        };
+					}
+				}
+
+				// xxx
+				function submitForm(event) {
+			    event.preventDefault();
+			    
+			    const passwordSection = document.getElementById('passwordChangeSection');
+			    const currentPassword = document.getElementById('currentPassword');
+			    const newPassword = document.getElementById('newPassword');
+			    const confirmPassword = document.getElementById('confirmPassword');
+			    
+			    document.getElementById('currentPasswordError').classList.add('d-none');
+			    document.getElementById('newPasswordError').classList.add('d-none');
+			    document.getElementById('confirmPasswordError').classList.add('d-none');
+			    
+			    if (passwordSection.style.display !== 'none') {
+			        
+			        
+			        if (newPassword.value) {
+						if (!currentPassword.value) {
+				            document.getElementById('currentPasswordError').textContent = '*Current password is required';
+				            document.getElementById('currentPasswordError').classList.remove('d-none');
+				            return;
+				        }
+			            const passwordErrors = validatePassword(newPassword.value);
+			            
+			            if (newPassword.value === currentPassword.value) {
+			                passwordErrors.push("New password must be different from current password");
+			            }
+			            
+			            if (passwordErrors.length > 0) {
+			                document.getElementById('newPasswordError').textContent = passwordErrors.join(', ');
+			                document.getElementById('newPasswordError').classList.remove('d-none');
+			                return;
+			            }
+			            
+			            if (newPassword.value !== confirmPassword.value) {
+			                document.getElementById('confirmPasswordError').textContent = '*Passwords do not match';
+			                document.getElementById('confirmPasswordError').classList.remove('d-none');
+			                return;
+			            }
+			        }
+			    }
+			    
+			    document.getElementById('myForm').submit();
+			}
+
+			function validateNewPassword(e) {
+			    const passwordErrors = validatePassword(e.target.value);
+			    const errorElement = document.getElementById('newPasswordError');
+			    
+			    if (passwordErrors.length > 0) {
+			        errorElement.textContent = passwordErrors.join(', ');
+			        errorElement.classList.remove('d-none');
+			    } else {
+			        errorElement.classList.add('d-none');
+			    }
+			};
+			function validateConfirmPassword(e) {
+			    const newPassword = document.getElementById('newPassword').value;
+			    const errorElement = document.getElementById('confirmPasswordError');
+			    
+			    if (e.target.value !== newPassword) {
+			        errorElement.textContent = '*Passwords do not match';
+			        errorElement.classList.remove('d-none');
+			    } else {
+			        errorElement.classList.add('d-none');
+			    }
+			};
 			</script>
     </main>
 

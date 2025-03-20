@@ -127,7 +127,6 @@ exports.listUsers = (req, res) => {
     // Execute the query to fetch paginated users
     db_connection.query(query, params, (err, results) => {
         if (err) {
-            console.error(err);
             return res.status(500).send({ error: 'Failed to retrieve users' });
         }
 
@@ -248,7 +247,7 @@ exports.getUser = (req, res) => {
 };
 
 exports.updateUser = (req, res) => {
-    const userId = req.params.id;
+    const userId = req.params.id
     const { name, email, phone, role, status, orgId } = req.body;
 
     // Ensure superadmin is updating the user (validate org_id = 0 for superadmins)
@@ -383,3 +382,181 @@ exports.restoreUser = ( req, res ) => {
         })
     })
 }
+
+exports.getProfile = (req, res) => {
+
+    const superadminId = req.user.userId
+    
+    let query = `SELECT name, email, role, phone, orgId, status, registered, remark, expired, updatedBy, updatedAt FROM users WHERE users.id = ${superadminId}`;
+
+    db_connection.query(query, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+
+        return res.status(200).send({
+            success: true,
+            message: "We found this user!",
+            dev: "Thanks bro, you`re awesome",
+            data: results[0]
+        })
+    });
+};
+
+exports.checkPass = (req, res) => {
+
+    if (req.user.orgId != 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "The Superadmin tried to access organization profile page"
+        })
+    }
+
+    const userId = req.user.userId
+    db_connection.query("SELECT password FROM users WHERE id = ?", [userId], (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            })
+        }
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'User not found',
+                dev: "User not found"
+            })
+        }
+        return res.status(200).send({
+            success: true,
+            message: 'Here is the user',
+            dev: "Good Job, Bro!",
+            data: results[0]
+        })
+    })
+};
+
+exports.updateProfile = (req, res) => {
+
+    // Ensure superadmin is updating the user (validate org_id = 0 for superadmins)
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'Access denied',
+            dev: 'Outside organization cannot update user' 
+        });
+    }
+    
+    const userId = req.user.userId
+    const now = new Date()
+
+    const { name, email, phone, password } = req.body;
+    if (!name || !email || !phone ) {
+		return res.status(400).send(
+			{
+				success: false,
+                message: 'All fields are required',
+                dev: "Bro, give me correct ones"
+			}
+		)
+	}
+
+    const parameters = []
+	parameters.push(name)
+	parameters.push(email)
+	parameters.push(phone)
+    parameters.push(userId)
+    parameters.push(now)
+
+    let query = ''
+	if (password) {
+		query = "UPDATE users SET name = ?, email = ?, phone = ?, updatedBy = ?, updatedAt = ?, password = ? WHERE id = ?"
+		parameters.push(password)
+		parameters.push(userId)
+	} else {
+		query = "UPDATE users SET name = ?, email = ?, phone = ?, updatedBy = ?, updatedAt = ? WHERE id = ?"
+		parameters.push(userId)
+	}
+
+    db_connection.query( query , parameters, (err, results) => {            
+        if (err) {
+            if (err.code ==  "ER_DUP_ENTRY") {
+                return res.status(409).send(
+                    {
+                        success: false,
+                        message: 'Email duplicate error',
+                        dev: err.message
+                    }
+                );
+            } else {
+                return res.status(500).send(
+                    {
+                        success: false,
+                        message: 'Failed to update user',
+                        dev: err.message,
+                    }
+                );
+            }
+        }
+
+        return res.status(200).send ({
+            success: true,
+            message: 'Profile updated successfully',
+            dev: 'Admin profile updated successfully',
+            data: { name }
+        });
+    });
+};
+
+exports.deleteAccount = (req, res) => {
+
+    // Ensure superadmin is deleting the user (validate org_id = 0 for superadmins)
+    if (req.user.orgId !== 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'Access denied',
+            dev: 'Outside organization cannot delete user',
+        });
+    }
+
+    const userId = req.user.userId
+    const now = new Date()
+
+    // Soft delete: change status to 'deleted'
+    db_connection.query('UPDATE users SET status = "deleted", updatedBy = ?, updatedAt = ? WHERE id = ? AND orgId = 0', [userId, now, userId], (err, result) => {
+        if (err) {
+            return res.status(500).send({ 
+                success: false,
+                message: 'Failed to delete user',
+                dev: err.message
+            });
+        }
+
+        if (result.affectedRows === 0) {
+            return res.status(404).send ({
+                success: false,
+                message: 'User not found', 
+                dev: 'User with the provided ID was not found' 
+            });
+        }
+
+        res.send({ 
+            success: true,
+            message: 'User deleted successfully',
+            dev: 'User deleted successfully' 
+        });
+    });
+};
