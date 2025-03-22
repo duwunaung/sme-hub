@@ -264,14 +264,28 @@
 				}
 				const newExpirationDate = document.getElementById('newExpirationDate')
 				const newDate = new Date(orgExpiredDate)
-				if (type == 'month') {
-					newDate.setMonth(newDate.getMonth() + num);
-					newExpirationDate.innerHTML = newDate.toDateString()
-				} else if (type == 'day') {
-					newDate.setDate(newDate.getDate() + num);
-					newExpirationDate.innerHTML = newDate.toDateString()
+				const today = new Date()
+
+				if (newDate < today) {
+					if (type == 'month') {
+						today.setMonth(today.getMonth() + num);
+						newExpirationDate.innerHTML = today.toDateString()
+					} else if (type == 'day') {
+						today.setDate(today.getDate() + num);
+						newExpirationDate.innerHTML = today.toDateString()
+					} else {
+						newExpirationDate.innerHTML = 'Now'
+					}
 				} else {
-					newExpirationDate.innerHTML = 'Now'
+					if (type == 'month') {
+						newDate.setMonth(newDate.getMonth() + num);
+						newExpirationDate.innerHTML = newDate.toDateString()
+					} else if (type == 'day') {
+						newDate.setDate(newDate.getDate() + num);
+						newExpirationDate.innerHTML = newDate.toDateString()
+					} else {
+						newExpirationDate.innerHTML = 'Now'
+					}
 				}
 
 				const licType = document.getElementById('licType')

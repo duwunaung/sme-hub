@@ -116,7 +116,7 @@
                                                     <a class="dropdown-item status" id="pending" onclick="changeStatus('pending')">Pending</a>
                                                 </ul>
                                             </div>
-                                            <button class="btn sortBtn" id="refresh" onclick="refresh()">Refresh</button>
+                                            <button class="btn sortBtn" id="refresh" onclick="reset()">Reset</button>
                                         </div>
                                     </nav>
                                     <!-- xxx -->
@@ -130,7 +130,7 @@
                                                 <table class="table table-striped table-hover">
                                                     <thead class="table-dark">
                                                         <tr>
-                                                            <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">Id<span></span></th>
+                                                            <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No<span></span></th>
                                                             <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name<span></span></th>
 															<th>Email</th>
                                                             <th>Phone</th>
@@ -148,17 +148,17 @@
                                                                 </td>
                                                                 <td>
                                                                     <%= users[i].name.length > 15 
-											                        ? users[i].name.substring(0, 15) + "..." 
+											                        ? users[i].name.substring(0, 12) + "..." 
 											                        : users[i].name %>
                                                                 </td>
 																<td>
 																	<%= users[i].email.length > 25
-											                        ? users[i].email.substring(0, 25) + "..." 
+											                        ? users[i].email.substring(0, 22) + "..." 
 											                        : users[i].email %>
                                                                 </td>
                                                                 <td>
 																	<%= users[i].phone.length > 15 
-											                        ? users[i].phone.substring(0, 15) + "..." 
+											                        ? users[i].phone.substring(0, 12) + "..." 
 											                        : users[i].phone %>
                                                                 </td>
                                                                 <td>
@@ -327,8 +327,8 @@
             }
 
             // Refresh
-            function refresh() {
-                window.location.href = "http://localhost:3000/superadmin/organizations/detail/" + orgId + query + "&userPage=1&activeUsers=true"
+            function reset() {
+                window.location.href = "/superadmin/organizations/detail/" + orgId + query + "&userPage=1&activeUsers=true"
             }
             
             // Ensure users section 'active' in detail-organization ( While get query = 'activeUsers' )

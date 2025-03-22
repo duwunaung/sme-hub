@@ -43,7 +43,7 @@
                                         <a class="dropdown-item status" id="expire" onclick="changeStatus('expire')">Expired</a>
                                     </ul>
                                 </div>
-                                <button class="btn sortBtn mx-2" id="refresh" onclick="refresh()">Refresh</button>
+                                <button class="btn sortBtn mx-2" id="refresh" onclick="reset()">Reset</button>
                             </div>
                         </nav>
                         <!-- xxx -->
@@ -58,7 +58,7 @@
                             <table class="table table-striped table-hover">
                                 <thead class="table-dark">
                                     <tr>
-                                        <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">Id<span></span></th>
+                                        <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No<span></span></th>
                                         <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Organization Name<span></span></th>
                                         <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(2, 'date', this)">Expiration Date<span></span></th>
                                         <th class="text-center">Status</th>
@@ -74,7 +74,7 @@
                                             </td>
                                             <td>
 												<%= orgs[i].name.length > 30 
-						                        ? orgs[i].name.substring(0, 30) + "..." 
+						                        ? orgs[i].name.substring(0, 27) + "..." 
 						                        : orgs[i].name %>
                                             </td>
                                             <td>
@@ -301,8 +301,8 @@
             }    
 
             // Refresh
-            function refresh() {
-                window.location.href = "http://localhost:3000/superadmin/organizations?expired=false"
+            function reset() {
+                window.location.href = "/superadmin/organizations?expired=false"
             }
 
             // Search
