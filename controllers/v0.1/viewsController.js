@@ -788,6 +788,8 @@ exports.adminProfile = (req, res) => {
                     res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Input field shouldn't be empty!", successMessage: null });
                 } else if (type == 'deleteAccount') {
                     res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Cannot delete your account at the moment!", successMessage: null });
+                } else if (type == 'invalidPassword') {
+                    res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Invalid Password!", successMessage: null });
                 } else {
                     res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Internal Server Error!", successMessage: null });
                 }
