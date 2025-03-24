@@ -111,7 +111,10 @@ exports.dashboard = (req, res) => {
 						GROUP BY baseCountry
 						ORDER BY org_count DESC;
 						`
-
+	let totalOrgUsers = `SELECT 
+					    (SELECT COUNT(*) FROM orgs) AS total_organizations,
+					    (SELECT COUNT(*) FROM users) AS total_users;
+						`
     db_connection.query(expiredQuery, (err, expiredResults) => {
         if (err) {
             return res.status(500).send({
@@ -154,17 +157,30 @@ exports.dashboard = (req, res) => {
 								error: err
 							});
 						}
-						return res.status(200).send({
-							success: true,
-							message: 'Dashboard data fetched successfully',
-							data: {
-								new_organizations: newOrgResults,
-								expired_organizations: expiredResults,
-								six_month_transactions: sixMonTransResult,
-								seven_day_transactions: sevenDayTransResult,
-								org_by_country: orgByCountryResult
+						db_connection.query(totalOrgUsers, (err, totalOrgUsersResult) => {
+							if (err) {
+								return res.status(500).send({
+									success: false,
+									message: 'Error fetching organizations and users total data',
+									error: err
+								});
 							}
-						});
+							const totalOrg = totalOrgUsersResult[0].total_organizations;
+							const totalUsers = totalOrgUsersResult[0].total_users;
+							return res.status(200).send({
+								success: true,
+								message: 'Dashboard data fetched successfully',
+								data: {
+									new_organizations: newOrgResults,
+									expired_organizations: expiredResults,
+									six_month_transactions: sixMonTransResult,
+									seven_day_transactions: sevenDayTransResult,
+									org_by_country: orgByCountryResult,
+									total_users: totalUsers,
+									total_organizations: totalOrg
+								}
+							});
+						})
 					})
 				})
 
