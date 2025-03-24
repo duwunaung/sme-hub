@@ -1,35 +1,306 @@
 <%- include('../partials/superadmin/header.ejs') %>
-    <%- include('../partials/superadmin/navbar.ejs') %>
+<%- include('../partials/superadmin/navbar.ejs') %>
+		<div class="content">
+		  <h2>Welcome to the Dashboard</h2>
+		  
+		  <!-- Counter Cards Row -->
+		  <div class="row mt-4">
+		    <!-- Total Organizations -->
+		    <div class="col-md-6">
+		      <div class="card text-center shadow-sm">
+		        <div class="card-body">
+		          <h5 class="card-title">Total Organizations</h5>
+		          <h2 id="totalOrganizations" class="text-primary">0</h2>
+		        </div>
+		      </div>
+		    </div>
+		    <!-- Total Users -->
+		    <div class="col-md-6">
+		      <div class="card text-center shadow-sm">
+		        <div class="card-body">
+		          <h5 class="card-title">Total Users</h5>
+		          <h2 id="totalUsers" class="text-primary">0</h2>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		  
+		  <!-- First Row of Charts -->
+		  <div class="row mt-4">
+		    <!-- Monthly New Organizations Chart -->
+		    <div class="col-md-6 mb-4">
+		      <div class="card shadow-sm">
+		        <div class="card-body">
+		          <h5 class="card-title">New Organizations (Monthly)</h5>
+		          <canvas id="newOrgsChart"></canvas>
+		        </div>
+		      </div>
+		    </div>
+		    
+		    <!-- Monthly Terminated Organizations Chart -->
+		    <div class="col-md-6 mb-4">
+		      <div class="card shadow-sm">
+		        <div class="card-body">
+		          <h5 class="card-title">Inactive Organizations (Monthly)</h5>
+		          <canvas id="terminatedOrgsChart"></canvas>
+		        </div>
+		      </div>
+		    </div>
+		  </div>
+		  
+		  <!-- Second Row of Charts -->
+		  <div class="row mt-2">
+		    <!-- Weekly Transactions Chart -->
+		    <div class="col-md-6 mb-4">
+		      <div class="card shadow-sm">
+		        <div class="card-body">
+		          <h5 class="card-title">Last 7 Days Transactions</h5>
+		          <canvas id="weeklyTransactionsChart"></canvas>
+		        </div>
+		      </div>
+		    </div>
+		    
+		    <!-- Monthly Transactions Chart -->
+		    <div class="col-md-6 mb-4">
+		      <div class="card shadow-sm">
+		        <div class="card-body">
+		          <h5 class="card-title">Last 6 Months Transactions</h5>
+		          <canvas id="monthlyTransactionsChart"></canvas>
+		        </div>
+		      </div>
+		    </div>
 
+			<!-- Organizations by Country -->
+			<div class="col-md-6 mb-4">
+				<div class="card shadow-sm">
+				  <div class="card-body">
+					<h5 class="card-title">Organizations by Country</h5>
+					<canvas id="orgsByCountryChart"></canvas>
+				  </div>
+				</div>
+			</div>
+		  </div>
+		</div>
+	</main>
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		function animateCounter(elementId, finalValue, baseDuration = 1000) {
+		  const element = document.getElementById(elementId);
+		  if (!element) return;
+		  const numDigits = Math.floor(Math.log10(finalValue)) + 1;
+		  let duration;
+		  if (numDigits <= 1) {
+		    duration = baseDuration;
+		  } else if (numDigits === 2) {
+		    duration = baseDuration * 1.5;
+		  } else if (numDigits === 3) {
+		    duration = baseDuration * 2;
+		  } else {
+		    duration = baseDuration * 2.5;
+		  }
+		  let startValue = 0;
+		  const increment = finalValue / (duration / 16);
+		  let currentValue = startValue;
+		  const counter = setInterval(function() {
+		    currentValue += increment;
+		    if (currentValue >= finalValue) {
+		      element.textContent = finalValue.toLocaleString();
+		      clearInterval(counter);
+		    } else {
+		      element.textContent = Math.floor(currentValue).toLocaleString();
+		    }
+		  }, 16);
+		}
 
-            <div class="content">
-                <!-- <div id="errorBox" class="alert alert-danger" role="alert">
-                    အရမ်းကြမ်းတာတွေ လာတော့မှာမလို့ ခဏစောင့်ပေးကြပါ။
-                </div> -->
-                <h2>Welcome to the Dashboard</h2>
-                <!-- <p class="text-muted">Here are your system statistics:</p> -->
+		function initCharts() {
+		  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+		  const currentMonth = new Date().getMonth();
+		  
+		  // Get last 6 months (including current month)
+		  const lastSixMonths = [];
+		  for (let i = 5; i >= 0; i--) {
+		    const monthIndex = (currentMonth - i + 12) % 12;
+		    lastSixMonths.push(months[monthIndex]);
+		  }
+		  
+		  const newOrganizationsData = JSON.parse("<%- JSON.stringify(data.new_organizations.map(item => item.new_organizations)) %>");
+		  const expiredOrganizationsData = JSON.parse("<%- JSON.stringify(data.expired_organizations.map(item => item.expired_organizations)) %>");
 
-                <div class="row mt-4">
-                    <!-- Total Organizations -->
-                    <div class="col-md-6">
-                        <div class="card text-center shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Organizations</h5>
-                                <h2 id="totalOrganizations" class="text-primary">0</h2>
-                            </div>
-                        </div>
-                    </div>
+		  const newOrgData = newOrganizationsData.reverse();
+		  const expiredOrgData = expiredOrganizationsData.reverse();
+		  const reorderedNewOrgs = [];
+		  const reorderedExpiredOrgs = [];
 
-                    <!-- Total Users -->
-                    <div class="col-md-6">
-                        <div class="card text-center shadow-sm">
-                            <div class="card-body">
-                                <h5 class="card-title">Total Users</h5>
-                                <h2 id="totalUsers" class="text-primary">0</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
-        <%- include('../partials/superadmin/footer.ejs') %>
+		  const sixMonthTrans = JSON.parse("<%- JSON.stringify(data.six_month_transactions.map(item => item.total_count)) %>");
+		  const sevenDayTrans = JSON.parse("<%- JSON.stringify(data.seven_day_transactions.map(item => item.total_count)) %>");
+
+		  // Only get data for the last 6 months
+		  for (let i = 0; i < 6; i++) {
+		    const dataIndex = (currentMonth - 4 + i + 12) % 12;
+		    const monthNum = dataIndex === 0 ? 12 : dataIndex;
+		    
+		    reorderedNewOrgs.push(newOrgData[monthNum - 1]);
+		    reorderedExpiredOrgs.push(expiredOrgData[monthNum - 1]);
+		  }
+
+		  // Chart 1: New Organizations Monthly - Last 6 months
+		  const newOrgsCtx = document.getElementById('newOrgsChart').getContext('2d');
+		  new Chart(newOrgsCtx, {
+		    type: 'bar',
+		    data: {
+		      labels: lastSixMonths,
+		      datasets: [{
+		        label: 'New Organizations',
+		        data: reorderedNewOrgs,
+		        backgroundColor: 'rgba(54, 162, 235, 0.7)',
+		        borderColor: 'rgba(54, 162, 235, 1)',
+		        borderWidth: 1
+		      }]
+		    },
+		    options: {
+		      responsive: true,
+		      scales: {
+		        y: {
+		          beginAtZero: true,
+		          ticks: {
+		            precision: 0
+		          }
+		        }
+		      }
+		    }
+		  });
+		  
+		  // Chart 2: Terminated Organizations Monthly - Last 6 months
+		  const terminatedOrgsCtx = document.getElementById('terminatedOrgsChart').getContext('2d');
+		  new Chart(terminatedOrgsCtx, {
+		    type: 'bar',
+		    data: {
+		      labels: lastSixMonths,
+		      datasets: [{
+		        label: 'Inactive Organizations',
+		        data: reorderedExpiredOrgs,
+		        backgroundColor: 'rgba(255, 99, 132, 0.7)',
+		        borderColor: 'rgba(255, 99, 132, 1)',
+		        borderWidth: 1
+		      }]
+		    },
+		    options: {
+		      responsive: true,
+		      scales: {
+		        y: {
+		          beginAtZero: true,
+		          ticks: {
+		            precision: 0
+		          }
+		        }
+		      }
+		    }
+		  });
+		  
+		  // Chart 3: Last 7 Days Transactions
+		  const weekDays = [];
+		  const today = new Date();
+		  for (let i = 6; i >= 0; i--) {
+		    const date = new Date(today);
+		    date.setDate(today.getDate() - i);
+		    weekDays.push(date.toLocaleDateString('en-US', { weekday: 'short' }));
+		  }
+		  
+		  const weeklyTransactionsCtx = document.getElementById('weeklyTransactionsChart').getContext('2d');
+		  new Chart(weeklyTransactionsCtx, {
+		    type: 'bar',
+		    data: {
+		      labels: weekDays,
+		      datasets: [{
+		        label: 'Transactions per Day',
+		        data: sevenDayTrans,
+		        backgroundColor: 'rgba(75, 192, 192, 0.7)',
+		        borderColor: 'rgba(75, 192, 192, 1)',
+		        borderWidth: 1
+		      }]
+		    },
+		    options: {
+		      responsive: true,
+		      scales: {
+		        y: {
+		          beginAtZero: true,
+		          ticks: {
+		            precision: 0
+		          }
+		        }
+		      }
+		    }
+		  });
+		  
+		  // Chart 4: Last 6 Months Transactions
+		  const monthlyTransactionsCtx = document.getElementById('monthlyTransactionsChart').getContext('2d');
+		  new Chart(monthlyTransactionsCtx, {
+		    type: 'bar',
+		    data: {
+		      labels: lastSixMonths,
+		      datasets: [{
+		        label: 'Transactions per Month',
+		        data: sixMonthTrans,
+		        backgroundColor: 'rgba(153, 102, 255, 0.7)',
+		        borderColor: 'rgba(153, 102, 255, 1)',
+		        borderWidth: 1
+		      }]
+		    },
+		    options: {
+		      responsive: true,
+		      scales: {
+		        y: {
+		          beginAtZero: true
+		        }
+		      }
+		    }
+		  });
+		  // Sample dynamic data (replace these with actual API data)
+		  const countries = <%- JSON.stringify(data.org_by_country.map(item => item.baseCountry)) %>;
+		  const orgCounts = JSON.parse("<%- JSON.stringify(data.org_by_country.map(item => item.org_count)) %>");
+		  
+		//   Function to generate random colors
+		  function generateColors(count) {
+		    const colors = [];
+		    for (let i = 0; i < count; i++) {
+		      const r = Math.floor(Math.random() * 255);
+		      const g = Math.floor(Math.random() * 255);
+		      const b = Math.floor(Math.random() * 255);
+		      colors.push(`rgba(${r}, ${g}, ${b}, 0.7)`);
+		    }
+		    return colors;
+		  }
+
+		  const backgroundColors = generateColors(countries.length);
+		  const borderColors = backgroundColors.map(color => color.replace('0.7', '1')); // Darker border
+
+		  // Chart: Organizations by Country (Pie Chart)
+		  const orgsByCountryCtx = document.getElementById('orgsByCountryChart').getContext('2d');
+		  
+		  new Chart(orgsByCountryCtx, {
+		    type: 'pie',
+		    data: {
+		      labels: countries,
+		      datasets: [{
+		        label: 'Organizations by Country',
+		        data: orgCounts,
+		        backgroundColor: backgroundColors,
+		        borderColor: borderColors,
+		        borderWidth: 1
+		      }]
+		    },
+		    options: {
+		      responsive: true
+		    }
+		  });
+		}
+
+		(function() {
+		  const orgCount = 125;
+		  const userCount = 458;
+		  animateCounter('totalOrganizations', orgCount);
+		  animateCounter('totalUsers', userCount);
+		  initCharts();
+		})();
+	</script>
+<%- include('../partials/superadmin/footer.ejs') %>
