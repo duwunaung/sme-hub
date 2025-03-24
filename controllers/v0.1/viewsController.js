@@ -10,7 +10,6 @@ exports.dashboard = (req, res) => {
                 'Authorization': `${req.session.token}`
             }
         }).then(response => {
-			console.log(response.data.data.org_by_country)
             res.render('superadmin/dashboard', { data: response.data.data, userName: req.session.user, userRole: req.session.role, token: req.session.token, user: req.session.user });
         }).catch(error => {
             res.render('superadmin/dashboard', { userName: req.session.user, userRole: req.session.role, token: req.session.token, user: req.session.user });
