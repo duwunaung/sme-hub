@@ -296,8 +296,8 @@
 		}
 
 		(function() {
-		  const orgCount = 125;
-		  const userCount = 458;
+		  const orgCount = parseInt("<%= data.total_organizations %>");
+		  const userCount = parseInt("<%= data.total_users %>");
 		  animateCounter('totalOrganizations', orgCount);
 		  animateCounter('totalUsers', userCount);
 		  initCharts();
