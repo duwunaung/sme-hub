@@ -1,5 +1,5 @@
 const express = require('express')
-const { login, logout, orgs, restoreOrg, deleteOrg, updateOrg, createUser, detailUser, updateUser, extendLicense, registerOrg, detailOrg, superadmins, deleteUser, restoreUser, createSuperAdmins, detailSuperadmin, restoreSuperadmin, deleteSuperadmin, updateSuperadmin, adminProfile, deleteAccount } = require("../../controllers/v0.1/viewsController")
+const { dashboard, login, logout, orgs, restoreOrg, deleteOrg, updateOrg, createUser, detailUser, updateUser, extendLicense, registerOrg, detailOrg, superadmins, deleteUser, restoreUser, createSuperAdmins, detailSuperadmin, restoreSuperadmin, deleteSuperadmin, updateSuperadmin, adminProfile, deleteAccount } = require("../../controllers/v0.1/viewsController")
 
 const checkSuperAdminSession = require('../../middlewares/viewSuperAdmin');
 const tmpSession = require('../../middlewares/tmp');
@@ -31,9 +31,7 @@ router.use('/profile', checkSuperAdminSession, adminProfile)
 router.use('/users', checkSuperAdminSession, superadmins)
 router.use('/profile/delete', checkSuperAdminSession, deleteAccount)
 
-router.use('/dashboard', checkSuperAdminSession, (req, res) => {
-    res.render('superadmin/dashboard', { userName: req.session.user, userRole: req.session.role, token: req.session.token, user: req.session.user })
-})
+router.use('/dashboard', checkSuperAdminSession, dashboard)
 
 router.use('/', (req, res) => {
     res.redirect('/superadmin/dashboard');
