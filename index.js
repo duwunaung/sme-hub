@@ -4,7 +4,11 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const session = require('express-session');
 
-const cors = require("cors");
+//middlewares
+const corsMiddleware = require('./middlewares/cors.js')
+const {helmetUIMiddleware, helmetMiddleware} = require('./middlewares/helmet.js')
+const setupLoggerMiddleware = require('./middlewares/morganLog.js')
+const {rateLimiterMiddleware, authRateLimiterMiddleware} = require('./middlewares/rateLimiter.js')
 
 // routes
 const utils_v01 = require('./routes/v0.1/utilsRoute')
@@ -27,9 +31,11 @@ const authenticateToken = require('./middlewares/authenticateToken')
 const authorizeRole = require('./middlewares/authorizeRole')
 
 const app = express();
-app.use(cors());
-app.use(express.static('uploads'))
 
+
+setupLoggerMiddleware(app);
+app.use(express.static('uploads'))
+app.use(corsMiddleware);
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -47,8 +53,18 @@ const l3Access = ['superadmin', 'admin', 'manager']
 const l4Access = ['superadmin', 'admin', 'manager', 'staff']
 const subscribers = ['admin', 'manager', 'staff', 'subscriber']
 
+// view engine setup
+// app.use(helmetUIMiddleware);
+app.use(rateLimiterMiddleware);
+app.set('view engine', 'ejs');
+app.use(express.static('public'));
 
+app.use('/superadmin', saViews_v01)
+app.use('/subscriber', suViews_v01)
 
+// API 
+// api middleware
+app.use(helmetMiddleware);
 app.use("/api/v0.1/utils", utils_v01);
 app.use("/api/v0.1/dashboard", authenticateToken, authorizeRole(l1Access), dashboard_v01);
 
@@ -66,12 +82,7 @@ app.use("/api/v0.1/subscribers/organization", authenticateToken, authorizeRole(s
 app.use("/api/v0.1/subscribers/user", authenticateToken, authorizeRole(subscribers), extUser_v01);
 app.use("/api/v0.1/subscribers/salesperson", authenticateToken, authorizeRole(subscribers), extSalesperson_v01);
 
-// view engine setup
-app.set('view engine', 'ejs');
-app.use(express.static('public'));
 
-app.use('/superadmin', saViews_v01)
-app.use('/subscriber', suViews_v01)
 // app.use('/', suViews_v01)
 app.listen(process.env.PORT, function () {
   console.log("Server is running on", process.env.PORT);
