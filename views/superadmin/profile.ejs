@@ -99,22 +99,41 @@
                       </p>
                     </div>
                 </form>
+				<!-- Confirmation Modal -->
+				<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
+					<div class="modal-dialog">
+					  <div class="modal-content">
+						<div class="modal-header">
+						  <h5 class="modal-title" id="confirmDeleteModalLabel">Confirm Account Deletion</h5>
+						  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body">
+						  Are you sure you want to <strong>delete</strong> your account? This action cannot be undone.
+						</div>
+						<div class="modal-footer">
+						  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+						  <a id="confirmDeleteBtn" href="/superadmin/profile/delete" class="btn btn-danger">Delete Account</a>
+						</div>
+					  </div>
+					</div>
+				  </div>
+  
             </div>
 			<script>
 				// For Password
 				function togglePassword(passwordFieldId, iconId) {
-			    const passwordField = document.getElementById(passwordFieldId);
-			    const icon = document.getElementById(iconId);
-			    
-			    if (passwordField.type === 'password') {
-			        passwordField.type = 'text';
-			        icon.classList.remove('fa-eye');
-			        icon.classList.add('fa-eye-slash');
-			    } else {
-			        passwordField.type = 'password';
-			        icon.classList.remove('fa-eye-slash');
-			        icon.classList.add('fa-eye');
-			    }
+				    const passwordField = document.getElementById(passwordFieldId);
+				    const icon = document.getElementById(iconId);
+				    
+				    if (passwordField.type === 'password') {
+				        passwordField.type = 'text';
+				        icon.classList.remove('fa-eye');
+				        icon.classList.add('fa-eye-slash');
+				    } else {
+				        passwordField.type = 'password';
+				        icon.classList.remove('fa-eye-slash');
+				        icon.classList.add('fa-eye');
+				    }
 				}
 
 				function togglePasswordFields() {
@@ -174,20 +193,19 @@
 
 				document.getElementById('pcProfile').classList.add('d-none')
         
-        function clickBtn () {
-          window.location.href = "/superadmin/profile/delete"
-        }
+		        function clickBtn () {
+					var myModal = new bootstrap.Modal(document.getElementById('confirmDeleteModal'));
+    				myModal.show();
+		        }
 
 				const changePassword = document.getElementById('changePassword')
-        // xxx
-
 				const updateBtn = document.getElementById('updateBtn');
 				const userEmail = document.getElementById('userEmail');
 				const labelEmail = document.getElementById('labelEmail');
 
-				const userOldName = "<%= user.name %>"
-				const userOldEmail = "<%= user.email %>"
-				const userOldPhone = "<%= user.phone %>"
+				// const userOldName = "<%= user.name %>"
+				// const userOldEmail = "<%= user.email %>"
+				// const userOldPhone = "<%= user.phone %>"
 
 				function checkInputs(messageBox, inputField) {
 
@@ -195,15 +213,15 @@
 					const userEmailValue = document.getElementById('userEmail').value
 					const userPhoneValue = document.getElementById('userPhone').value
 
-			    const currentPassword = document.getElementById('currentPassword').value
-			    const newPassword = document.getElementById('newPassword').value
-			    const confirmPassword = document.getElementById('confirmPassword').value
+				    const currentPassword = document.getElementById('currentPassword').value
+				    const newPassword = document.getElementById('newPassword').value
+				    const confirmPassword = document.getElementById('confirmPassword').value
 
-					if ( (userOldName == userNameValue) && (userOldEmail == userEmailValue) && (userOldPhone == userPhoneValue) && (!currentPassword) && (!newPassword) && (!confirmPassword) ) {
-						updateBtn.classList.add('disabled')
-					} else {
-						updateBtn.classList.remove('disabled')
-					}
+					// if (( (userOldName == userNameValue) && (userOldEmail == userEmailValue) && (userOldPhone == userPhoneValue) && (!currentPassword) && (!newPassword) && (!confirmPassword) ) || currentPassword) {
+					// 	updateBtn.classList.add('disabled')
+					// } else {
+					// 	updateBtn.classList.remove('disabled')
+					// }
 
 					let allFilled = true;
 					inputs.forEach(index => {
@@ -227,7 +245,7 @@
 					}
 	            }
 
-							checkInputs();
+				checkInputs();
 
 
                 function submitForm(event) {
@@ -255,71 +273,71 @@
 
 				// xxx
 				function submitForm(event) {
-			    event.preventDefault();
-			    
-			    const passwordSection = document.getElementById('passwordChangeSection');
-			    const currentPassword = document.getElementById('currentPassword');
-			    const newPassword = document.getElementById('newPassword');
-			    const confirmPassword = document.getElementById('confirmPassword');
-			    
-			    document.getElementById('currentPasswordError').classList.add('d-none');
-			    document.getElementById('newPasswordError').classList.add('d-none');
-			    document.getElementById('confirmPasswordError').classList.add('d-none');
-			    
-			    if (passwordSection.style.display !== 'none') {
-			        
-			        
-			        if (newPassword.value) {
-						if (!currentPassword.value) {
-				            document.getElementById('currentPasswordError').textContent = '*Current password is required';
-				            document.getElementById('currentPasswordError').classList.remove('d-none');
-				            return;
+				    event.preventDefault();
+				    
+				    const passwordSection = document.getElementById('passwordChangeSection');
+				    const currentPassword = document.getElementById('currentPassword');
+				    const newPassword = document.getElementById('newPassword');
+				    const confirmPassword = document.getElementById('confirmPassword');
+				    
+				    document.getElementById('currentPasswordError').classList.add('d-none');
+				    document.getElementById('newPasswordError').classList.add('d-none');
+				    document.getElementById('confirmPasswordError').classList.add('d-none');
+				    
+				    if (passwordSection.style.display !== 'none') {
+				        
+				        
+				        if (newPassword.value) {
+							if (!currentPassword.value) {
+					            document.getElementById('currentPasswordError').textContent = '*Current password is required';
+					            document.getElementById('currentPasswordError').classList.remove('d-none');
+					            return;
+					        }
+				            const passwordErrors = validatePassword(newPassword.value);
+				            
+				            if (newPassword.value === currentPassword.value) {
+				                passwordErrors.push("New password must be different from current password");
+				            }
+				            
+				            if (passwordErrors.length > 0) {
+				                document.getElementById('newPasswordError').textContent = passwordErrors.join(', ');
+				                document.getElementById('newPasswordError').classList.remove('d-none');
+				                return;
+				            }
+				            
+				            if (newPassword.value !== confirmPassword.value) {
+				                document.getElementById('confirmPasswordError').textContent = '*Passwords do not match';
+				                document.getElementById('confirmPasswordError').classList.remove('d-none');
+				                return;
+				            }
 				        }
-			            const passwordErrors = validatePassword(newPassword.value);
-			            
-			            if (newPassword.value === currentPassword.value) {
-			                passwordErrors.push("New password must be different from current password");
-			            }
-			            
-			            if (passwordErrors.length > 0) {
-			                document.getElementById('newPasswordError').textContent = passwordErrors.join(', ');
-			                document.getElementById('newPasswordError').classList.remove('d-none');
-			                return;
-			            }
-			            
-			            if (newPassword.value !== confirmPassword.value) {
-			                document.getElementById('confirmPasswordError').textContent = '*Passwords do not match';
-			                document.getElementById('confirmPasswordError').classList.remove('d-none');
-			                return;
-			            }
-			        }
-			    }
-			    
-			    document.getElementById('myForm').submit();
-			}
+				    }
+				    
+				    document.getElementById('myForm').submit();
+				}
 
-			function validateNewPassword(e) {
-			    const passwordErrors = validatePassword(e.target.value);
-			    const errorElement = document.getElementById('newPasswordError');
-			    
-			    if (passwordErrors.length > 0) {
-			        errorElement.textContent = passwordErrors.join(', ');
-			        errorElement.classList.remove('d-none');
-			    } else {
-			        errorElement.classList.add('d-none');
-			    }
-			};
-			function validateConfirmPassword(e) {
-			    const newPassword = document.getElementById('newPassword').value;
-			    const errorElement = document.getElementById('confirmPasswordError');
-			    
-			    if (e.target.value !== newPassword) {
-			        errorElement.textContent = '*Passwords do not match';
-			        errorElement.classList.remove('d-none');
-			    } else {
-			        errorElement.classList.add('d-none');
-			    }
-			};
+				function validateNewPassword(e) {
+				    const passwordErrors = validatePassword(e.target.value);
+				    const errorElement = document.getElementById('newPasswordError');
+				    
+				    if (passwordErrors.length > 0) {
+				        errorElement.textContent = passwordErrors.join(', ');
+				        errorElement.classList.remove('d-none');
+				    } else {
+				        errorElement.classList.add('d-none');
+				    }
+				};
+				function validateConfirmPassword(e) {
+				    const newPassword = document.getElementById('newPassword').value;
+				    const errorElement = document.getElementById('confirmPasswordError');
+				    
+				    if (e.target.value !== newPassword) {
+				        errorElement.textContent = '*Passwords do not match';
+				        errorElement.classList.remove('d-none');
+				    } else {
+				        errorElement.classList.add('d-none');
+				    }
+				};
 			</script>
     </main>
 
