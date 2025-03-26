@@ -31,7 +31,7 @@
 											
 											<!-- Name field -->
 											<div class="mb-3">
-												<label for="usrName" class="form-label">User Name</label>
+												<label for="usrName" class="form-label">User Name</label><span> *</span>
 												<input type="text" class="form-control inputRequired" maxlength="100" name="name" id="usrName"
 													placeholder="Enter username" value="<%= user.name %>" oninput="checkInputs('usrNameError', 'usrName')" required>
 												<p id="usrNameError" class="mt-2 d-none text-danger">*User Name can't exceed 100 characters!</p>
@@ -39,7 +39,7 @@
 				
 											<!-- Email field -->
 											<div class="mb-3">
-												<label for="usrEmail" class="form-label">Email Address</label>
+												<label for="usrEmail" class="form-label">Email Address</label><span> *</span>
 												<input type="text" class="form-control" id="usrEmail" maxlength="45" name="email" 
 													placeholder="Enter email address" value="<%= user.email %>" oninput="checkInputs('usrEmailError', 'usrEmail')" required>
 												<p id="usrEmailError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
@@ -47,7 +47,7 @@
 				
 											<!-- Phone field -->
 											<div class="mb-3">
-												<label for="usrPhone" class="form-label">Phone</label>
+												<label for="usrPhone" class="form-label">Phone</label><span> *</span>
 												<input type="tel" class="form-control" maxlength="45" id="usrPhone" name="phone"
 													placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('usrPhoneError', 'usrPhone')" required>
 												<p id="usrPhoneError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
