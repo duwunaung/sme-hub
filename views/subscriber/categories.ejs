@@ -440,7 +440,7 @@
 							
 							<thead class="table-dark">
 							  <tr >
-								<th style="width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">ID <span></span></th>
+								<th style="width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
 								<th style="width: 250px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
 								<th style="width: 180px; cursor: pointer;" onclick="sortTable(2, 'number', this)"><%= cat === 'income' ? 'Sale': 'Purchase' %> <span></span></th>
 								<th style="width: 100px; cursor: pointer; text-align: center;" >Status <span></span></th>
@@ -556,7 +556,7 @@
 			                    
 			                    <!-- Category Name -->
 			                    <div class="mb-3">
-			                        <label for="catName" class="form-label">Category Name</label>
+			                        <label for="catName" class="form-label">Category Name</label><span> *</span>
 			                        <input type="text" class="form-control" maxlength="100" name="name" id="catName"
 			                            placeholder="Enter category name" value="" oninput="checkInputs('catNameError', 'catName')" required>
 			                        <p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
@@ -564,21 +564,21 @@
 
 			                    <!-- Category Type Selection -->
 			                    <div class="mb-3">
-			                        <label class="form-label">Category Type</label>
+			                        <label class="form-label">Category Type</label><span> *</span>
 			                        <div class="form-check">
 			                            <input class="form-check-input" type="radio" name="categoryType" id="standalone" value="standalone" checked onclick="toggleParentCategory()">
-			                            <label class="form-check-label" for="standalone">Standalone Category</label>
+			                            <label class="form-check-label" for="standalone">Supplementary Category</label>
 			                        </div>
 			                        <div class="form-check">
 			                            <input class="form-check-input" type="radio" name="categoryType" id="underParent" value="underParent" onclick="toggleParentCategory()">
-			                            <label class="form-check-label" for="underParent">Under Parent <%= cat === 'income' ? 'Sale' : 'Purchase' %></label>
+			                            <label class="form-check-label" for="underParent">Primary Category</label>
 			                        </div>
 			                    </div>
 
 			                    <!-- Parent Category Dropdown (Hidden by Default) -->
 			                    <div class="mb-3" id="parentCategoryGroup" style="display: none;">
-			                        <label for="parentCategory" class="form-label">
-										Select Parent <%= cat === 'income' ? 'Sale' : 'Purchase' %>
+			                        <label for="parentCategory" class="form-label text-secondary">
+										Select Primary Category
 									</label>								
 			                        <select class="form-select" id="parentCategory" name="parentCategory">
 			                            <option value="">Choose...</option>
