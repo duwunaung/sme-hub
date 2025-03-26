@@ -201,8 +201,8 @@ exports.updateOrg = (req, res) => {
             
         })
     } else {        
-        const { name, address, phone, status } = req.body;
-        axios.put(`${process.env.API_URL}/organizations/update/${orgId}`, { name, address, phone, status }, {
+        const { name, address, phone, status, country } = req.body;
+        axios.put(`${process.env.API_URL}/organizations/update/${orgId}`, { name, address, phone, status , country}, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
@@ -250,9 +250,8 @@ exports.extendLicense = (req, res) => {
 exports.registerOrg = (req, res) => {
     if (req.method == 'POST') {
         const page = req.query.page
-
-        const { name, address, phone, status } = req.body;
-        axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status }, {
+        const { name, address, phone, status, country } = req.body;
+        axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status, country }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
