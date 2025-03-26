@@ -97,9 +97,9 @@ exports.createOrg = (req, res) => {
     const userId = req.user.userId
     const now = new Date()
     const expiry = calculatedExpiryDate()
-    const { name, address, phone, status = 'active' } = req.body
+    const { name, address, phone, status = 'active' , country} = req.body
 
-    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status, updatedBy, updatedAt) VALUES (?,?,?,?,?,?,?)", [name, address, phone, expiry, status, userId, now], (err, results) => {
+    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status, updatedBy, updatedAt, baseCountry) VALUES (?,?,?,?,?,?,?,?)", [name, address, phone, expiry, status, userId, now, country], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -193,9 +193,9 @@ exports.updateOrg = (req, res) => {
     const userId = req.user.userId
     const now = new Date()
     const orgId = req.params.id
-    const { name, address, phone, status } = req.body
+    const { name, address, phone, status, country } = req.body
 
-    db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, status = ?, updatedBy = ?, updatedAt = ? WHERE id = ?", [name, address, phone, status, userId, now, orgId], (err, results) => {
+    db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, status = ?, updatedBy = ?, updatedAt = ?, baseCountry = ? WHERE id = ?", [name, address, phone, status, userId, now, country, orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
