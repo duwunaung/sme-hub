@@ -17,18 +17,18 @@
                 <!-- user Details Form -->
                 <form method="POST" id="myForm" onsubmit="submitForm(event)">
                     <div class="mb-3">
-                        <label for="userName" class="form-label">Username</label>
+                        <label for="userName" class="form-label">Username</label><span> *</span>
                         <input type="text" class="form-control" maxlength="100" name="name" id="userName"
                             placeholder="Enter username" value="<%= user.name %>" oninput="checkInputs('nameUserError', 'userName')" required>
 						<p id="nameUserError" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
                     </div>
                     <div class="mb-3">
-                      <label for="orgName" class="form-label">Organization Name</label>
+                      <label for="orgName" class="form-label">Organization Name</label><span> *</span>
                       <input type="text" class="form-control" name="orgName" id="orgName"
                           placeholder="Enter organization name" value="<%= user.orgName %>" disabled>
                     </div>
 					          <div class="mb-3">
-                        <label for="userRole" class="form-label">Role</label>
+                        <label for="userRole" class="form-label">Role</label><span> *</span>
                         <select id="userRole" name="role" class="form-select" oninput="checkInputs()" required>
 
                             <% roles.forEach(role=> { %>
@@ -39,19 +39,19 @@
                         </select>
                     </div>
 					          <div class="mb-3">
-                        <label for="userEmail" class="form-label" id="labelEmail">Email Address</label>
+                        <label for="userEmail" class="form-label" id="labelEmail">Email Address</label><span> *</span>
                         <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
                             placeholder="Enter email address" value="<%= user.email %>" oninput="checkInputs('emailUserError', 'userEmail')" required>
 						<p id="emailUserError" class="mt-2 d-none text-danger">*Email Address can't exceed 45 characters!</p>
                     </div>
                     <div class="mb-3">
-                        <label for="userPhone" class="form-label">Phone</label>
+                        <label for="userPhone" class="form-label">Phone</label><span> *</span>
                         <input type="tel" class="form-control" maxlength="45" id="userPhone" name="phone"
                             placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" required>
 						<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
                     </div>
                     <div class="mb-3">
-                        <label for="userStatus" class="form-label">Status</label>
+                        <label for="userStatus" class="form-label">Status</label><span> *</span>
                         <select id="userStatus" name="status" class="form-select" oninput="checkInputs()" required>
 
                             <% options.forEach(option=> { %>
