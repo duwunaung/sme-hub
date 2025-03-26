@@ -11,7 +11,7 @@ exports.getOrgProfile = (req, res) => {
     }
 
     const orgId = req.user.orgId
-    db_connection.query("SELECT id, name, address, phone, baseCurrency, logo, expiredDate FROM orgs WHERE id = ?", [orgId], (err, results) => {
+    db_connection.query("SELECT id, name, address, phone, baseCurrency, logo, expiredDate, baseCountry FROM orgs WHERE id = ?", [orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -45,8 +45,8 @@ exports.updateOrgProfile = (req, res) => {
     }
 
     const orgId = req.user.orgId
-    const { name, address, phone, baseCurrency } = req.body
-	if (!name || !address || !phone || !baseCurrency) {
+    const { name, address, phone, baseCurrency, country } = req.body
+	if (!name || !address || !phone || !baseCurrency || !country) {
 		return res.status(400).send(
 			{
 				success: false,
@@ -61,18 +61,18 @@ exports.updateOrgProfile = (req, res) => {
 	parameters.push(address)
 	parameters.push(phone)
 	parameters.push(baseCurrency)
+	parameters.push(country)
 	let sql = ''
 	
 	const logo = req.body.logo
 	if (!logo) {
-		sql = "UPDATE orgs SET name = ?, address = ?, phone = ?, baseCurrency = ? WHERE id = ?"
+		sql = "UPDATE orgs SET name = ?, address = ?, phone = ?, baseCurrency = ? , baseCountry = ? WHERE id = ?"
 		parameters.push(orgId)
 	}  else {
-		sql = "UPDATE orgs SET name = ?, address = ?, phone = ?, baseCurrency = ? , logo = ? WHERE id = ?"
+		sql = "UPDATE orgs SET name = ?, address = ?, phone = ?, baseCurrency = ?, baseCountry = ? , logo = ? WHERE id = ?"
 		parameters.push(logo)
 		parameters.push(orgId)
 	}
-
     db_connection.query(sql, parameters, (err, results) => {
         if (err) {
             return res.status(500).send({
