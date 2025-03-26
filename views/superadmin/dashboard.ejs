@@ -1,89 +1,131 @@
 <%- include('../partials/superadmin/header.ejs') %>
 <%- include('../partials/superadmin/navbar.ejs') %>
-		<div class="content">
-		  <h2>Welcome to the Dashboard</h2>
-		  
-		  <!-- Counter Cards Row -->
-		  <div class="row mt-4">
-		    <!-- Total Organizations -->
-		    <div class="col-md-6">
-		      <div class="card text-center shadow-sm">
-		        <div class="card-body">
-		          <h5 class="card-title">Total Organizations</h5>
-		          <h2 id="totalOrganizations" class="text-primary">0</h2>
-		        </div>
-		      </div>
-		    </div>
-		    <!-- Total Users -->
-		    <div class="col-md-6">
-		      <div class="card text-center shadow-sm">
-		        <div class="card-body">
-		          <h5 class="card-title">Total Users</h5>
-		          <h2 id="totalUsers" class="text-primary">0</h2>
-		        </div>
-		      </div>
-		    </div>
-		  </div>
-		  
-		  <!-- First Row of Charts -->
-		  <div class="row mt-4">
-		    <!-- Monthly New Organizations Chart -->
-		    <div class="col-md-6 mb-4">
-		      <div class="card shadow-sm">
-		        <div class="card-body">
-		          <h5 class="card-title">New Organizations (Monthly)</h5>
-		          <canvas id="newOrgsChart"></canvas>
-		        </div>
-		      </div>
-		    </div>
-		    
-		    <!-- Monthly Terminated Organizations Chart -->
-		    <div class="col-md-6 mb-4">
-		      <div class="card shadow-sm">
-		        <div class="card-body">
-		          <h5 class="card-title">Inactive Organizations (Monthly)</h5>
-		          <canvas id="terminatedOrgsChart"></canvas>
-		        </div>
-		      </div>
-		    </div>
-		  </div>
-		  
-		  <!-- Second Row of Charts -->
-		  <div class="row mt-2">
-		    <!-- Weekly Transactions Chart -->
-		    <div class="col-md-6 mb-4">
-		      <div class="card shadow-sm">
-		        <div class="card-body">
-		          <h5 class="card-title">Last 7 Days Transactions</h5>
-		          <canvas id="weeklyTransactionsChart"></canvas>
-		        </div>
-		      </div>
-		    </div>
-		    
-		    <!-- Monthly Transactions Chart -->
-		    <div class="col-md-6 mb-4">
-		      <div class="card shadow-sm">
-		        <div class="card-body">
-		          <h5 class="card-title">Last 6 Months Transactions</h5>
-		          <canvas id="monthlyTransactionsChart"></canvas>
-		        </div>
-		      </div>
-		    </div>
+		<style>
+		    @media (max-width: 768px) {
+		        .content h2 {
+		            font-size: 1.5rem;
+		        }
+		        .card-title {
+		            font-size: 1rem;
+		        }
+		    }
 
-			<!-- Organizations by Country -->
-			<div class="col-md-6 mb-4">
-				<div class="card shadow-sm">
-				  <div class="card-body">
-					<h5 class="card-title">Organizations by Country</h5>
-					<canvas id="orgsByCountryChart"></canvas>
-				  </div>
-				</div>
-			</div>
-		  </div>
-		</div>
+		    .chart-container {
+		        position: relative;
+		        margin: auto;
+		        height: 250px;
+		        width: 100%;
+		    }
+
+		    @media (max-width: 576px) {
+		        .chart-container {
+		            height: 200px;
+		        }
+		        .card {
+		            margin-bottom: 1rem;
+		        }
+		    }
+
+		    /* Counter Cards */
+		    .counter-card {
+		        transition: transform 0.3s ease;
+		    }
+
+		    .counter-card:hover {
+		        transform: scale(1.05);
+		    }
+
+		    .row > [class*='col-'] {
+		        margin-bottom: 1rem;
+		    }
+		</style>
+
+		<div class="content container-fluid">
+		    <h2 class="text-center mb-4">Welcome to the Dashboard</h2>
+		  
+		    <!-- Counter Cards Row -->
+		    <div class="row">
+		        <div class="col-sm-6 col-md-6 col-lg-6">
+		            <div class="card text-center shadow-sm counter-card">
+		                <div class="card-body">
+		                    <h5 class="card-title">Total Organizations</h5>
+		                    <h2 id="totalOrganizations" class="text-primary">0</h2>
+		                </div>
+		            </div>
+		        </div>
+		        <div class="col-sm-6 col-md-6 col-lg-6">
+		            <div class="card text-center shadow-sm counter-card">
+		                <div class="card-body">
+		                    <h5 class="card-title">Total Users</h5>
+		                    <h2 id="totalUsers" class="text-primary">0</h2>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		  
+		    <!-- Charts Row 1 -->
+		    <div class="row mt-4">
+		        <div class="col-12 col-md-6 col-lg-4">
+		            <div class="card shadow-sm h-100">
+		                <div class="card-body">
+		                    <h5 class="card-title">New Organizations (Monthly)</h5>
+		                    <div class="chart-container">
+		                        <canvas id="newOrgsChart"></canvas>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		        <div class="col-12 col-md-6 col-lg-4">
+		            <div class="card shadow-sm h-100">
+		                <div class="card-body">
+		                    <h5 class="card-title">Inactive Organizations (Monthly)</h5>
+		                    <div class="chart-container">
+		                        <canvas id="terminatedOrgsChart"></canvas>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		        <div class="col-12 col-md-12 col-lg-4">
+		            <div class="card shadow-sm h-100">
+		                <div class="card-body">
+		                    <h5 class="card-title">Organizations by Country</h5>
+		                    <div class="chart-container">
+		                        <canvas id="orgsByCountryChart"></canvas>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		  
+		    <!-- Charts Row 2 -->
+		    <div class="row mt-4">
+		        <div class="col-12 col-md-6">
+		            <div class="card shadow-sm h-100">
+		                <div class="card-body">
+		                    <h5 class="card-title">Last 7 Days Transactions</h5>
+		                    <div class="chart-container">
+		                        <canvas id="weeklyTransactionsChart"></canvas>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		        <div class="col-12 col-md-6">
+		            <div class="card shadow-sm h-100">
+		                <div class="card-body">
+		                    <h5 class="card-title">Last 6 Months Transactions</h5>
+		                    <div class="chart-container">
+		                        <canvas id="monthlyTransactionsChart"></canvas>
+		                    </div>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		</div>				
 	</main>
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script>
+		Chart.defaults.responsive = true;
+		Chart.defaults.maintainAspectRatio = false;
 		function animateCounter(elementId, finalValue, baseDuration = 1000) {
 		  const element = document.getElementById(elementId);
 		  if (!element) return;
