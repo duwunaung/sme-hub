@@ -1,6 +1,87 @@
 <%- include('../partials/superadmin/header.ejs') %>
     <%- include('../partials/superadmin/navbar.ejs') %>
+			<style>
+		        .custom-nav {
+		            display: flex;
+		            flex-wrap: wrap;
+		            align-items: center;
+		            gap: 10px;
+		        }
 
+		        .search-container {
+		            flex-grow: 1;
+		            display: flex;
+		            min-width: 100%;
+		        }
+
+		        .action-container {
+		            display: flex;
+		            flex-wrap: wrap;
+		            align-items: center;
+		            gap: 10px;
+		            width: 100%;
+		            justify-content: space-between;
+		        }
+
+		        .btn-group {
+		            flex-grow: 1;
+		        }
+
+		        @media (max-width: 575.98px) {
+		            .custom-nav {
+		                flex-direction: column;
+		                align-items: stretch;
+		            }
+
+		            .search-container,
+		            .action-container {
+		                width: 100%;
+		            }
+
+		            .action-container .btn {
+		                flex-grow: 1;
+		                margin-bottom: 10px;
+		            }
+		        }
+
+		        @media (min-width: 576px) and (max-width: 767.98px) {
+		            .custom-nav {
+		                flex-wrap: wrap;
+		            }
+
+		            .search-container {
+		                flex-basis: 100%;
+		                margin-bottom: 10px;
+		            }
+
+		            .action-container {
+		                width: 100%;
+		                justify-content: center;
+		                gap: 15px;
+		            }
+		        }
+
+		        @media (min-width: 768px) {
+		            .custom-nav {
+		                flex-wrap: nowrap;
+		            }
+
+		            .search-container {
+		                min-width: auto;
+		                flex-grow: 1;
+		                margin-right: 15px;
+		            }
+
+		            .action-container {
+		                width: auto;
+		                gap: 10px;
+		            }
+		        }
+
+		        .dropdown-menu {
+		            min-width: 150px;
+		        }
+			</style>
             <div class="content">
                 <% if (errorMessage) { %>
                     <div id="errorBox" class="alert alert-danger" role="alert">
@@ -15,29 +96,40 @@
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h2>System Admins</h2>
                                     <a class="btn btnColor" onclick="clickBtn('add', 1)" href="#">
-                                        Add New System Admin
+                                        Add New
                                     </a>
                                 </div>
-                                <nav class="mb-3 d-flex w-100 justify-content-between">
-                                    <div class="d-flex searchBar" role="search">
-                                        <input class="form-control me-2" type="search" id="searchValue" onkeydown="checkEnter(event)" placeholder="Enter username (or) email address" value="<%= name %>" aria-label="Search" required>
-                                        <button class="btn btnColor" id="searchBtn" onclick="search()"><i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i></button>
-                                    </div>
-                                    <div>
-                                        <div class="btn-group">
-                                            <button type="button" id="filterBtn" class="btn dropdown-toggle px-3 sortBtn" data-bs-toggle="dropdown" aria-expanded="false">
-                                                Filter
-                                            </button>
-                                            <ul class="dropdown-menu dropdown-menu-end">
-                                                <a class="dropdown-item status dropdown-active" id="all" onclick="changeStatus('all')">All</a>
-                                                <a class="dropdown-item status" id="active" onclick="changeStatus('active')">Active</a>
-                                                <a class="dropdown-item status" id="deleted" onclick="changeStatus('deleted')">Inactive</a>
-                                                <a class="dropdown-item status" id="pending" onclick="changeStatus('pending')">Pending</a>
-                                            </ul>
-                                        </div>
-                                        <button class="btn sortBtn" id="refresh" onclick="reset()">Reset</button>
-                                    </div>
-                                </nav>
+                                <nav class="nav mb-3 custom-nav">
+									<div class="search-container searchBar" role="search">
+										<input class="form-control me-2" type="search" id="searchValue" 
+											   onkeydown="checkEnter(event)" 
+											   placeholder="Enter username (or) email address" 
+											   value="<%= name %>" 
+											   aria-label="Search" 
+											   style="max-width: 350px;"
+											   required>
+										<button class="btn btnColor" id="searchBtn" onclick="search()">
+											<i class="fa-solid fa-magnifying-glass" style="color: #fff;"></i>
+										</button>
+									</div>
+									<div class="action-container">
+										<div class="btn-group">
+											<button type="button" id="filterBtn" 
+													class="btn dropdown-toggle px-3 sortBtn" 
+													data-bs-toggle="dropdown" 
+													aria-expanded="false">
+												Filter
+											</button>
+											<ul class="dropdown-menu dropdown-menu-end">
+												<a class="dropdown-item status dropdown-active" id="all" onclick="changeStatus('all')">All</a>
+												<a class="dropdown-item status" id="active" onclick="changeStatus('active')">Active</a>
+												<a class="dropdown-item status" id="deleted" onclick="changeStatus('deleted')">Inactive</a>
+												<a class="dropdown-item status" id="pending" onclick="changeStatus('pending')">Pending</a>
+											</ul>
+										</div>
+										<button class="btn sortBtn" id="refresh" onclick="reset()">Reset</button>
+									</div>
+								</nav>
                                 <!-- Organizations Table -->
                                 <div class="table-responsive">
                                     <% if ( users.length==0 && pagination.page == 1 ) { %>
@@ -48,7 +140,7 @@
                                     <table class="table table-striped table-hover">
                                         <thead class="table-dark">
                                             <tr>
-                                                <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No<span></span></th>
+                                                <th style="min-width: 70px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No.<span></span></th>
                                                 <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name<span></span></th>
                                                 <th>Email</th>
                                                 <th>Phone</th>
@@ -60,21 +152,21 @@
                                             <!-- Dynamic rows go here -->
                                             <% for (let i=0; i < users.length; i++) { %>
                                                 <tr>
-                                                    <td>
+                                                    <td class="text-nowrap ">
                                                         <%= i + (parseInt(pagination.page) - 1)*10 + 1 %>
                                                     </td>
 
-                                                    <td>
+                                                    <td class="text-nowrap ">
 														<%= users[i].name.length > 25 
 								                        ? users[i].name.substring(0, 22) + "..." 
 								                        : users[i].name %>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-nowrap ">
 														<%= users[i].email.length > 25 
 								                        ? users[i].email.substring(0, 22) + "..." 
 								                        : users[i].email %>
                                                     </td>
-                                                    <td>
+                                                    <td class="text-nowrap ">
 														<%= users[i].phone.length > 15 
 								                        ? users[i].phone.substring(0, 12) + "..." 
 								                        : users[i].phone %>
@@ -88,18 +180,18 @@
                                                             <div class="saIcons" data-tooltip="Pending" onmouseover="changeColor('#ffc107')"><i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i></div>
                                                         <% } %>
                                                     </td>
-                                                    <td style="padding-left: 5%;">
+                                                    <td style="padding-left: 5%;" class="d-flex flex-nowrap justify-content-center">
                                                         <a onclick="clickBtn('detail', '<%= users[i].id %>')" href="#"
-                                                            class="btn btn-primary btn-sm">View</a>
+                                                            class="btn btn-primary btn-sm btn-fixed-width me-1">View</a>
                                                         <a onclick="clickBtn('update', '<%= users[i].id %>')" href="#"
-                                                            class="btn btn-warning btn-sm">Edit</a>
+                                                            class="btn btn-warning btn-sm btn-fixed-width me-1">Edit</a>
 
                                                         <% if (users[i].status=='deleted' ) { %>
                                                             <a onclick="clickBtn('restore', '<%= users[i].id %>')" href="#"
-                                                            class="btn btn-danger btn-sm">Restore</a>
+                                                            class="btn btn-danger btn-sm btn-fixed-width me-1">Restore</a>
                                                         <% } else {%>
                                                             <a onclick="clickBtn('delete', '<%= users[i].id %>')" href="#"
-                                                            class="btn btn-danger btn-sm">Delete</a>
+                                                            class="btn btn-danger btn-sm btn-fixed-width me-1">Delete</a>
                                                         <% } %>
                                                     </td>
                                                 </tr>
