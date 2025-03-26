@@ -143,9 +143,9 @@ exports.editOrgProfile = (req, res) => {
 			res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, options: options, org: {}, successMessage: null, errorMessage: null });         
 		})
 	} else {
-		const {name, address, phone, baseCurrency } = req.body
+		const {name, address, phone, baseCurrency, country } = req.body
 		const logo = req.file ? req.file.filename : null
-		let parameters = { name, address, phone, baseCurrency}
+		let parameters = { name, address, phone, baseCurrency, country}
 		if (logo) {
 			parameters.logo = logo;
 		}
