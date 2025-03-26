@@ -11,28 +11,28 @@
                 <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
                     
                     <div class="mb-3">
-                        <label for="userName" class="form-label">Admin Name</label>
+                        <label for="userName" class="form-label">Admin Name</label><span> *</span>
                         <input type="text" class="form-control" maxlength="100" name="name" id="userName"
                             placeholder="Enter Admin name" value="<%= user.name %>" oninput="checkInputs('nameUserError', 'userName')" required>
 						<p id="nameUserError" class="mt-2 d-none text-danger">*Admin Name can't exceed 100 characters!</p>
                     </div>
 
 					<div class="mb-3">
-                        <label for="userEmail" class="form-label" id="labelEmail">Email</label>
+                        <label for="userEmail" class="form-label" id="labelEmail">Email</label><span> *</span>
                         <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
                             placeholder="Enter Admin Email" value="<%= user.email %>" oninput="checkInputs('emailUserError', 'userEmail')" required>
 						<p id="emailUserError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
                     </div>
 
                     <div class="mb-3">
-                        <label for="userPassword" class="form-label">Password</label>
+                        <label for="userPassword" class="form-label">Password</label><span> *</span>
                         <input type="password" class="form-control" name="password" id="userPassword"
                             placeholder="Enter Admin Password" value="" required readonly>
 						<input type="checkbox" class="me-2 mt-3" id="checkbox" onchange="showPassword(this)"><label for="checkbox">Show Password</label>
                     </div>
 
                     <div class="mb-3">
-                        <label for="userPhone" class="form-label">Phone</label>
+                        <label for="userPhone" class="form-label">Phone</label><span> *</span>
                         <input type="tel" class="form-control" maxlength="45" name="phone" id="userPhone"
                             placeholder="Enter Admin Phone Number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" required>
 						<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
