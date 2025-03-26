@@ -20,7 +20,7 @@
 				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
 				    <!-- Category Name -->
 				    <div class="mb-3">
-				        <label for="catName" class="form-label">Category Name</label>
+				        <label for="catName" class="form-label">Category Name</label><span> *</span>
 				        <input type="text" class="form-control" maxlength="100" name="name" id="catName"
 				            placeholder="Enter category name" value="<%= category.name %>" 
 				            oninput="checkInputs('catNameError', 'catName')" required>
@@ -29,7 +29,7 @@
 
 				    <!-- Status -->
 				    <div class="mb-3">
-				        <label for="catStatus" class="form-label">Status</label>
+				        <label for="catStatus" class="form-label">Status</label><span> *</span>
 				        <select id="catStatus" name="status" class="form-select" required>
 				            <% options.forEach(option => { %>
 				                <option value="<%= option.name %>" <%= option.name === category.status ? 'selected' : '' %> >
@@ -41,16 +41,16 @@
 
 				    <!-- Category Type Selection -->
 				    <div class="mb-3">
-				        <label class="form-label">Category Type</label>
+				        <label class="form-label">Category Type</label><span> *</span>
 				        <div class="form-check">
 				            <input class="form-check-input" type="radio" name="categoryType" id="standalone" value="standalone" 
 				                <%= !category.parentId ? 'checked' : '' %> onclick="toggleParentCategory()">
-				            <label class="form-check-label" for="standalone">Standalone Category</label>
+				            <label class="form-check-label" for="standalone">Supplementary Category</label>
 				        </div>
 				        <div class="form-check">
 				            <input class="form-check-input" type="radio" name="categoryType" id="underParent" value="underParent" 
 				                <%= category.parentId ? 'checked' : '' %> onclick="toggleParentCategory()">
-				            <label class="form-check-label" for="underParent">Under Parent Sale</label>
+				            <label class="form-check-label" for="underParent">Primary Category</label>
 				        </div>
 				    </div>
 
@@ -60,8 +60,7 @@
 					<%} else {%> 
 						<div class="mb-3" id="parentCategoryGroup" >
 					<%}%>
-				        <label for="parentCategory" class="form-label">Select Parent 
-				            <%= cat === 'income' ? 'Sale' : 'Purchase' %>
+				        <label for="parentCategory" class="form-label text-secondary">Select Primary Category
 				        </label>
 				        <select class="form-select" id="parentCategory" name="parent">
 				            <option value="">Choose...</option>
