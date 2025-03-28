@@ -22,6 +22,7 @@ const extCats_v01 = require('./routes/v0.1/extCatsRoute')
 const extTrans_v01 = require('./routes/v0.1/extTransRoute')
 const extOrg_v01 = require('./routes/v0.1/extOrgRoute')
 const extSalesperson_v01 = require('./routes/v0.1/extSalespersonRoute.js')
+const extDashboard_v01 = require('./routes/v0.1/extDashboardRoute.js')
 
 const saViews_v01 = require('./routes/v0.1/saViewsRoute')
 const suViews_v01 = require('./routes/v0.1/suViewsRoute')
@@ -81,6 +82,7 @@ app.use("/api/v0.1/subscribers/transactions", authenticateToken, authorizeRole(s
 app.use("/api/v0.1/subscribers/organization", authenticateToken, authorizeRole(subscribers), extOrg_v01);
 app.use("/api/v0.1/subscribers/user", authenticateToken, authorizeRole(subscribers), extUser_v01);
 app.use("/api/v0.1/subscribers/salesperson", authenticateToken, authorizeRole(subscribers), extSalesperson_v01);
+app.use("/api/v0.1/subscribers/dashboard", authenticateToken, authorizeRole(subscribers), extDashboard_v01);
 
 
 // app.use('/', suViews_v01)
