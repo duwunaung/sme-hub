@@ -185,6 +185,8 @@
 												<%= formattedAmount %> ks
 											<% } else if (transaction[i].baseCurrency === 'USD') { %>
 												$ <%= formattedAmount %>
+											<% } else if (transaction[i].baseCurrency === 'THB') { %>
+												฿ <%= formattedAmount %>
 											<% } else { %>
 												<%= formattedAmount %> <%= transaction[i].baseCurrency %>
 											<% } %>
