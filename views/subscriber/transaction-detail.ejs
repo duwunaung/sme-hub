@@ -85,6 +85,8 @@
 										<%= formattedPrice %> ks
 									<% } else if (transaction.baseCurrency === 'USD') { %>
 										$ <%= formattedPrice %>
+									<% } else if (transaction.baseCurrency === 'THB') { %>
+										฿ <%= formattedPrice %>
 									<% } else { %>
 										<%= formattedPrice %> <%= transaction.baseCurrency %>
 									<% } %>
@@ -103,6 +105,8 @@
 							
 								<% if (transaction.baseCurrency === 'MMK') { %>
 									<%= formattedAmount %> ks
+								<% } else if (transaction.baseCurrency === 'THB') { %>
+									฿ <%= formattedAmount %>
 								<% } else if (transaction.baseCurrency === 'USD') { %>
 									$ <%= formattedAmount %>
 								<% } else { %>
