@@ -232,7 +232,7 @@ exports.listExpenseCategory = (req, res) => {
             ec.id, 
             ec.name,
             ec.status,
-            COALESCE(SUM(e.amount * e.price), 0) AS totalAmount,
+            COALESCE(SUM(e.amount), 0) AS totalAmount,
             COUNT(e.id) AS totalTransactions
         FROM expcats ec
         LEFT JOIN exps e ON ec.id = e.catId
