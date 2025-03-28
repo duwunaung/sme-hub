@@ -577,6 +577,8 @@
 													<%= formattedAmount %> ks
 												<% } else if (transaction[i].baseCurrency === 'USD') { %>
 													$ <%= formattedAmount %>
+												<% } else if (transaction[i].baseCurrency === 'THB') { %>
+													฿ <%= formattedAmount %>
 												<% } else { %>
 													<%= formattedAmount %> <%= transaction[i].baseCurrency %>
 												<% } %>
@@ -834,6 +836,8 @@
 						amount = `${totalAmount}  ks`
 					} else if (baseCurrency === 'USD') {
 						amount = `$ ${totalAmount}`
+					} else if (baseCurrency === 'THB') {
+						amount = `฿ ${totalAmount}`
 					} else { 
 						amount = `${totalAmount} baseCurrency`
 					}
@@ -1069,6 +1073,8 @@
 			        document.getElementById('summaryTotalSum').innerText = `${formattedTotal} ks`;
 			    } else if (currency === "USD") {
 			        document.getElementById('summaryTotalSum').innerText = `$ ${formattedTotal}`;
+				} else if (currency === "THB") {
+						document.getElementById('summaryTotalSum').innerText = `฿ ${formattedTotal}`;
 			    } else {
 			        document.getElementById('summaryTotalSum').innerText = `${currency} ${formattedTotal}`;
 			    }
