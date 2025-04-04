@@ -100,8 +100,8 @@
 							
 							<div class="mb-3">
 								<label for="transCustomer" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
-								<input type="text" class="form-control inputRequired" maxlength="100" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="transCustomer"
-									placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name" value="<%= trans === 'income' ? transaction.customerName: transaction.vendorName %>" oninput="checkInputs('transCustomerError', 'transCustomer')" required>
+								<input type="text" class="form-control" maxlength="100" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="transCustomer"
+									placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name" value="<%= trans === 'income' ? transaction.customerName: transaction.vendorName %>" oninput="checkInputs('transCustomerError', 'transCustomer')">
 								<p id="transCustomerError" class="mt-2 d-none text-danger">*Customer Name can't exceed 100 characters!</p>
 							</div>
 							<div class="mb-3">
