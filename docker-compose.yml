@@ -1,0 +1,61 @@
+services:
+
+  db:
+    image: mysql:8.0.40
+    container_name: mysql_db
+    restart: unless-stopped
+    ports:
+      - "3360:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+      MYSQL_DATABASE: ${DB_NAME}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./db/structure.sql:/docker-entrypoint-initdb.d/structure.sql
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_PASS}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nodejs_app
+    restart: unless-stopped
+    ports:
+      - "${PORT:-3000}:${PORT:-3000}"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./logs:/app/logs
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      - PORT=${PORT}
+      - DB_HOST=db
+      - DB_USER=${DB_USER}
+      - DB_PASS=${DB_PASS}
+      - DB_NAME=${DB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - JWT_EXPIRES_IN=${JWT_EXPIRES_IN}
+      - API_URL=${API_URL}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - GMAIL=${GMAIL}
+      - APP_PASSWORD=${APP_PASSWORD}
+      - RECEIPT_FILESIZE=${RECEIPT_FILESIZE}
+      - NODE_ENV=${NODE_ENV}
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  mysql-data:
+    driver: local
