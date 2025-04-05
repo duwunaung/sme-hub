@@ -13,72 +13,113 @@ exports.barchartDashboard = async (req, res) => {
                     SELECT DATE_ADD(date, INTERVAL 1 DAY)
                     FROM days
                     WHERE date < CURDATE()
+                ),
+                daily_income AS (
+                    SELECT DATE(incomeDate) AS date, SUM(amount) AS total_income
+                    FROM incs 
+                    WHERE orgId = ?
+                    GROUP BY DATE(incomeDate)
+                ),
+                daily_expense AS (
+                    SELECT DATE(expenseDate) AS date, SUM(amount) AS total_expense
+                    FROM exps
+                    WHERE orgId = ?
+                    GROUP BY DATE(expenseDate)
                 )
                 SELECT 
                     days.date AS label,
-                    COALESCE(SUM(incs.amount), 0) AS income,
-                    COALESCE(SUM(exps.amount), 0) AS expense
+                    COALESCE(daily_income.total_income, 0) AS income,
+                    COALESCE(daily_expense.total_expense, 0) AS expense
                 FROM days
-                LEFT JOIN incs ON DATE(incs.incomeDate) = days.date AND incs.orgId = ?
-                LEFT JOIN exps ON DATE(exps.expenseDate) = days.date AND exps.orgId = ?
-                GROUP BY days.date
+                LEFT JOIN daily_income ON daily_income.date = days.date
+                LEFT JOIN daily_expense ON daily_expense.date = days.date
                 ORDER BY days.date
             `,
             week: `
                 WITH RECURSIVE weeks AS (
                     SELECT 
                         DATE_SUB(CURDATE(), INTERVAL 3 WEEK) AS start_date,
+                        DATE_ADD(DATE_SUB(CURDATE(), INTERVAL 3 WEEK), INTERVAL 6 DAY) AS end_date,
                         1 AS seq
                     UNION ALL
                     SELECT 
                         DATE_ADD(start_date, INTERVAL 1 WEEK),
+                        DATE_ADD(end_date, INTERVAL 1 WEEK),
                         seq + 1
                     FROM weeks
                     WHERE seq < 4
                 )
                 SELECT 
-                    CONCAT('Week ', seq) AS label,
-                    COALESCE(SUM(incs.amount), 0) AS income,
-                    COALESCE(SUM(exps.amount), 0) AS expense
-                FROM weeks
-                LEFT JOIN incs ON 
-                    incs.incomeDate >= weeks.start_date AND 
-                    incs.incomeDate < DATE_ADD(weeks.start_date, INTERVAL 1 WEEK) AND 
-                    incs.orgId = ?
-                LEFT JOIN exps ON 
-                    exps.expenseDate >= weeks.start_date AND 
-                    exps.expenseDate < DATE_ADD(weeks.start_date, INTERVAL 1 WEEK) AND 
-                    exps.orgId = ?
-                GROUP BY weeks.start_date, seq
-                ORDER BY weeks.start_date
+                    CONCAT('Week ', w.seq) AS label,
+                    COALESCE(i.total_income, 0) AS income,
+                    COALESCE(e.total_expense, 0) AS expense
+                FROM weeks w
+                LEFT JOIN (
+                    SELECT 
+                        w2.seq,
+                        SUM(i.amount) AS total_income
+                    FROM weeks w2
+                    LEFT JOIN incs i ON 
+                        i.incomeDate >= w2.start_date AND 
+                        i.incomeDate <= w2.end_date AND 
+                        i.orgId = ?
+                    GROUP BY w2.seq
+                ) i ON i.seq = w.seq
+                LEFT JOIN (
+                    SELECT 
+                        w3.seq,
+                        SUM(e.amount) AS total_expense
+                    FROM weeks w3
+                    LEFT JOIN exps e ON 
+                        e.expenseDate >= w3.start_date AND 
+                        e.expenseDate <= w3.end_date AND 
+                        e.orgId = ?
+                    GROUP BY w3.seq
+                ) e ON e.seq = w.seq
+                ORDER BY w.seq
             `,
             month: `
                 WITH RECURSIVE months AS (
                     SELECT 
-                        DATE_SUB(CURDATE(), INTERVAL 5 MONTH) AS month_date,
+                        DATE_FORMAT(DATE_SUB(CURDATE(), INTERVAL 5 MONTH), '%Y-%m-01') AS month_start,
+                        LAST_DAY(DATE_SUB(CURDATE(), INTERVAL 5 MONTH)) AS month_end,
                         1 AS seq
                     UNION ALL
                     SELECT 
-                        DATE_ADD(month_date, INTERVAL 1 MONTH),
+                        DATE_FORMAT(DATE_ADD(month_start, INTERVAL 1 MONTH), '%Y-%m-01'),
+                        LAST_DAY(DATE_ADD(month_start, INTERVAL 1 MONTH)),
                         seq + 1
                     FROM months
                     WHERE seq < 6
                 )
                 SELECT 
-                    DATE_FORMAT(months.month_date, '%b') AS label,
-                    COALESCE(SUM(incs.amount), 0) AS income,
-                    COALESCE(SUM(exps.amount), 0) AS expense
-                FROM months
-                LEFT JOIN incs ON 
-                    YEAR(incs.incomeDate) = YEAR(months.month_date) 
-                    AND MONTH(incs.incomeDate) = MONTH(months.month_date)
-                    AND incs.orgId = ?
-                LEFT JOIN exps ON 
-                    YEAR(exps.expenseDate) = YEAR(months.month_date) 
-                    AND MONTH(exps.expenseDate) = MONTH(months.month_date)
-                    AND exps.orgId = ?
-                GROUP BY months.month_date
-                ORDER BY months.month_date
+                    DATE_FORMAT(m.month_start, '%b') AS label,
+                    COALESCE(i.total_income, 0) AS income,
+                    COALESCE(e.total_expense, 0) AS expense
+                FROM months m
+                LEFT JOIN (
+                    SELECT 
+                        m2.seq,
+                        SUM(i.amount) AS total_income
+                    FROM months m2
+                    LEFT JOIN incs i ON 
+                        i.incomeDate >= m2.month_start AND 
+                        i.incomeDate <= m2.month_end AND 
+                        i.orgId = ?
+                    GROUP BY m2.seq
+                ) i ON i.seq = m.seq
+                LEFT JOIN (
+                    SELECT 
+                        m3.seq,
+                        SUM(e.amount) AS total_expense
+                    FROM months m3
+                    LEFT JOIN exps e ON 
+                        e.expenseDate >= m3.month_start AND 
+                        e.expenseDate <= m3.month_end AND 
+                        e.orgId = ?
+                    GROUP BY m3.seq
+                ) e ON e.seq = m.seq
+                ORDER BY m.seq
             `
         };
 
