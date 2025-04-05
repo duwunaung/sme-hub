@@ -120,7 +120,6 @@ exports.createOrg = (req, res) => {
                         ("Obtaining a loan", ${orgId}, 0, 'active', 0)`, (err, incats) => {
 
             if (err) {
-                console.log(err)
                 return res.status(500).send({
                     success: false,
                     message: 'Error while creating categories',
