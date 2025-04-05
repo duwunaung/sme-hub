@@ -395,12 +395,12 @@ exports.updateExpenseCat = (req, res) => {
 		})
 	} else {
 		const id = req.params.id
-		const { name, parent } = req.body;
+		const { name, categoryType } = req.body;
 		const parameters = { name }
-		let parentId;
-		if (parent && parent === 'purchase'){
-			parentId = 2;
-			parameters.parentId = parentId;
+		if (categoryType === 'underParent'){
+			parameters.parentId = 2;
+		} else {
+			parameters.parentId = 0;
 		}
 		const page = req.query.page || 1
 		axios.put(`${process.env.API_URL}/subscribers/categories/expense/${id}`, parameters, {
@@ -618,12 +618,12 @@ exports.updateIncomeCat = (req, res) => {
 		})
 	} else {
 		const id = req.params.id
-		const { name , parent } = req.body;
+		const { name , categoryType } = req.body;
 		const parameters = { name }
-		let parentId;
-		if (parent && parent === 'sale'){
-			parentId = 1;
-			parameters.parentId = parentId;
+		if (categoryType === 'underParent'){
+			parameters.parentId = 1;
+		} else {
+			parameters.paraentId = 0;
 		}
 		const page = req.query.page || 1
 		axios.put(`${process.env.API_URL}/subscribers/categories/income/${id}`, parameters, {
