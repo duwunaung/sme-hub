@@ -6,7 +6,7 @@ const session = require('express-session');
 
 //middlewares
 const corsMiddleware = require('./middlewares/cors.js')
-const {helmetUIMiddleware, helmetMiddleware} = require('./middlewares/helmet.js')
+const {helmetMiddleware} = require('./middlewares/helmet.js')
 const setupLoggerMiddleware = require('./middlewares/morganLog.js')
 const {rateLimiterMiddleware, authRateLimiterMiddleware} = require('./middlewares/rateLimiter.js')
 
@@ -31,6 +31,8 @@ const homePage_v01 = require('./routes/v0.1/homePageRoute')
 // middlewares
 const authenticateToken = require('./middlewares/authenticateToken')
 const authorizeRole = require('./middlewares/authorizeRole')
+const subAccess = require('./middlewares/subaccess')
+
 
 const app = express();
 
@@ -56,18 +58,18 @@ const l4Access = ['superadmin', 'admin', 'manager', 'staff']
 const subscribers = ['admin', 'manager', 'staff', 'subscriber']
 
 // view engine setup
-// app.use(helmetUIMiddleware);
+app.use(helmetMiddleware);
 app.use(rateLimiterMiddleware);
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
 
 app.use('/superadmin', saViews_v01)
-app.use('/subscriber', suViews_v01)
+app.use('/subscriber', subAccess , suViews_v01)
 
 
 // API 
 // api middleware
-// app.use(helmetMiddleware);
+
 app.use("/api/v0.1/utils", utils_v01);
 app.use("/api/v0.1/dashboard", authenticateToken, authorizeRole(l1Access), dashboard_v01);
 
