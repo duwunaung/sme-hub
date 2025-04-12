@@ -19,6 +19,7 @@ exports.dashboardSubscriber = (req, res) => {
         .then(dashboardRes => {
 			axios.get(barchartUrl, { headers: { 'Authorization': `${req.session.token}` } })
 			.then(barcharRes => {
+				console.log(barcharRes.data.data)
 				res.render('subscriber/home', { barchart: barcharRes.data.data, data: dashboardRes.data.data, baseCurrency: req.session.baseCurrency, token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo })
 			})
 			.catch(err => {

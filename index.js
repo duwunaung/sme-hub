@@ -26,6 +26,7 @@ const extDashboard_v01 = require('./routes/v0.1/extDashboardRoute.js')
 
 const saViews_v01 = require('./routes/v0.1/saViewsRoute')
 const suViews_v01 = require('./routes/v0.1/suViewsRoute')
+const homePage_v01 = require('./routes/v0.1/homePageRoute')
 
 // middlewares
 const authenticateToken = require('./middlewares/authenticateToken')
@@ -63,9 +64,10 @@ app.use(express.static('public'));
 app.use('/superadmin', saViews_v01)
 app.use('/subscriber', suViews_v01)
 
+
 // API 
 // api middleware
-app.use(helmetMiddleware);
+// app.use(helmetMiddleware);
 app.use("/api/v0.1/utils", utils_v01);
 app.use("/api/v0.1/dashboard", authenticateToken, authorizeRole(l1Access), dashboard_v01);
 
@@ -84,8 +86,7 @@ app.use("/api/v0.1/subscribers/user", authenticateToken, authorizeRole(subscribe
 app.use("/api/v0.1/subscribers/salesperson", authenticateToken, authorizeRole(subscribers), extSalesperson_v01);
 app.use("/api/v0.1/subscribers/dashboard", authenticateToken, authorizeRole(subscribers), extDashboard_v01);
 
-
-// app.use('/', suViews_v01)
+app.use('/', homePage_v01)
 app.listen(process.env.PORT, function () {
   console.log("Server is running on", process.env.PORT);
 })
