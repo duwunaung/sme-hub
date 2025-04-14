@@ -378,6 +378,36 @@
 <div id="overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
 
 <script>
+
+	const match = window.location.pathname.match(/^\/subscriber\/([^\/]+)/);
+	if (match) {
+		const section = match[1];
+		switch (section) {
+			case 'home':
+				setActiveButton('dashboardBtn');
+				break;
+			case 'transaction':
+				setActiveButton('transactionBtn');
+				break;
+			case 'category':
+				setActiveButton('categoryBtn');
+				break;
+			case 'salesperson':
+				setActiveButton('salespersonBtn');
+				break;
+			case 'user':
+				setActiveButton('usrProfileBtn');
+				break;
+			case 'organization':
+				setActiveButton('orgProfileBtn');
+				break;
+
+			default:
+				break;
+		}
+	}
+
+
     const currentPath = window.location.pathname;
     
     function setInitialActiveButton() {
