@@ -164,7 +164,15 @@ exports.editOrgProfile = (req, res) => {
 				if (type === 'update') {
 					res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: "Successfully Updated!", errorMessage: null }); 
 				}
-			} else {
+			} else if (error === 'true') {
+				if (type === 'fileError') {
+					res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: "Only image file (2 MB maximum) can be uploaded!" }); 
+				}
+				else {
+					res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null }); 
+				}
+			}
+			else {
 				res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null }); 
 			}
 		}).catch(error => {
@@ -173,6 +181,10 @@ exports.editOrgProfile = (req, res) => {
 	} else {
 		const {name, address, phone, baseCurrency, country } = req.body
 		const logo = req.file ? req.file.filename : null
+		if (req.fileError) {
+			res.redirect('/subscriber/organization/profile' + `?error=true&type=fileError`);
+			return ;
+		}
 		let parameters = { name, address, phone, baseCurrency, country}
 		if (logo) {
 			parameters.logo = logo;
@@ -734,12 +746,17 @@ exports.listExpenseTrans = (req, res) => {
 				}).then(responseSalesperson => {
 					const success = req.query.success
 					const type = req.query.type
+					const error = req.query.error
 					if (success === 'true'){
 						if (type === 'create') {
 							res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: "Successfully Created!"});
 						}
 					} else {
+						if (type === 'fileError' && error === 'true') {
+							res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: "Only image file (2 MB maximum) can be uploaded!" , successMessage: null});
+						} else {
 						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "expense", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+						}
 					}
 				}).catch(err => {
 					res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: [], transaction: [], salesperson: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
@@ -785,6 +802,10 @@ exports.createExpenseTrans = (req, res) => {
 	if (req.method == 'POST') {
 		
 		const { description, amount, expenseDate, catId, itemName, price, quantity, vendorName } = req.body;
+		if (req.fileError) {
+			res.redirect('/subscriber/transaction/expense?error=true&type=fileError')
+			return ;
+		  }
 		const receipt = req.file ? req.file.filename : null
 		let parameters = { expenseDate, catId }
 		if (description) {
@@ -832,10 +853,18 @@ exports.updateExpenseTrans = (req, res) => {
 					'Authorization': `${req.session.token}`
 				}
 			}).then(responseCategory => {
-				const {success, type} = req.query
+				const {success, type, error} = req.query
 				if (success === 'true' && type === 'update') {
 					res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, salesperson: [], organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data, errorMessage: null , successMessage: "Updated Successfully!"});
-				} else {
+				} else if (error === 'true') {
+					if (type === 'fileError') {
+						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data,  errorMessage: "Only image file (2 MB maximum) can be uploaded! " , successMessage: null});
+					}
+					else {
+						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
+					}
+				}
+				else {
 					res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
 				}
 			}).catch(error => {
@@ -851,6 +880,10 @@ exports.updateExpenseTrans = (req, res) => {
 		const categoryId = req.query.id
 		const page = req.query.page || 1
 		const { description, amount, expenseDate, catId , vendorName, itemName, price, quantity} = req.body;
+		if (req.fileError) {
+			res.redirect('/subscriber/transaction/expense/update/' + id + `?error=true&type=fileError&trans=income&page=${page}` );
+			return ;
+		}
 		const receipt = req.file ? req.file.filename : null
 		let parameters = { description, expenseDate, catId }
 		if (receipt) {
@@ -878,6 +911,83 @@ exports.updateExpenseTrans = (req, res) => {
 			}
 		}).catch(error => {
 			res.redirect('/subscriber/transaction/expense/update/' + id + `?error=true&type=sysError&trans=expense&page=${page}` );
+		})
+	}
+}
+
+exports.updateExpenseTransCat = (req, res) => {
+	if (req.method == 'GET') {
+		const id = req.params.id
+		const page = req.query.page || 1
+		axios.get(`${process.env.API_URL}/subscribers/expenses/${id}`, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			const parentId = response.data.data.parentId || 0
+			axios.get(`${process.env.API_URL}/subscribers/categories/expense/update/${parentId}`, {
+				headers: {
+					'Authorization': `${req.session.token}`
+				}
+			}).then(responseCategory => {
+				const {success, type, error} = req.query
+				if (success === 'true' && type === 'update') {
+					res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, salesperson: [], organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data, errorMessage: null , successMessage: "Updated Successfully!"});
+				} else if (error === 'true') {
+					if (type === 'fileError') {
+						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data,  errorMessage: "Only image file (2 MB maximum) can be uploaded! " , successMessage: null});
+					}
+					else {
+						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
+					}
+				}
+				else {
+					res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName,trans: "expense", transaction: response.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
+				}
+			}).catch(error => {
+				res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, salesperson: [],organizationName: req.session.orgName,trans: "expense",  transaction: {}, category: [],  errorMessage: "System Error!", successMessage: null });
+			})
+		}).catch(error => {
+			res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},salesperson: [],organizationName: req.session.orgName, trans: "expense", transaction: {}, category: [],  errorMessage: "System Error!", successMessage: null });
+			
+		})
+	} else {
+		const id = req.params.id
+		const cat = req.query.cat
+		const categoryId = req.query.id
+		const page = req.query.page || 1
+		const { description, amount, expenseDate, catId , vendorName, itemName, price, quantity} = req.body;
+		if (req.fileError) {
+			res.redirect('/subscriber/category/transaction/expense/update/' + id + `?error=true&type=fileError&id=${categoryId}&cat=expense&page=${page}` );
+			return ;
+		}
+		const receipt = req.file ? req.file.filename : null
+		let parameters = { description, expenseDate, catId }
+		if (receipt) {
+			parameters.receipt = receipt;
+		}
+		if (!amount) {
+			const amount = parseInt(price) * parseInt(quantity)
+			parameters.amount = `${amount}`
+			parameters.itemName = itemName;
+			parameters.price = price;
+			parameters.quantity = quantity;
+			parameters.vendorName = vendorName;
+		} else {
+			parameters.amount = amount
+		}
+		axios.put(`${process.env.API_URL}/subscribers/expenses/update/${id}`, parameters, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			if (cat && categoryId){
+				res.redirect('/subscriber/category/transaction/expense/update/' + id + `?success=true&type=update&cat=expense&id=${categoryId}&page=${page}`)
+			} else {
+				res.redirect('/subscriber/category/transaction/expense/update/' + id + `?success=true&type=update&id=${categoryId}&cat=expense&page=${page}`)
+			}
+		}).catch(error => {
+			res.redirect('/subscriber/category/transaction/expense/update/' + id + `?error=true&type=sysError&id=${categoryId}&cat=expense&page=${page}` );
 		})
 	}
 }
@@ -943,12 +1053,17 @@ exports.listIncomeTrans = (req, res) => {
 				}).then(responseSalesperson => {
 					const success = req.query.success
 					const type = req.query.type
+					const error = req.query.error
 					if (success === 'true') {
 						if (type === 'create') {
 							res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, salesperson: responseSalesperson.data.data ,transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: "Successfully Created!"});
 						}
 					} else {
-						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+						if (type === 'fileError') {
+							res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: "Only image file (2 MB maximum) can be uploaded!" , successMessage: null});
+						} else {
+							res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data,salesperson: responseSalesperson.data.data , transaction: response.data.data, pagination: response.data.pagination, errorMessage: null , successMessage: null});
+						}
 					}
 				}).catch(err => {
 					if (err.status === 404) {
@@ -998,6 +1113,10 @@ exports.listIncomeTrans = (req, res) => {
 exports.createIncomeTrans = (req, res) => {
 	if (req.method == 'POST') {
 	  const { description, amount, incomeDate, catId, itemName, price, quantity, salesperson, customer, salespersonName, salespersonNameNew } = req.body;
+	  if (req.fileError) {
+		res.redirect('/subscriber/transaction/income?error=true&type=fileError')
+		return ;
+	  }
 	  const receipt = req.file ? req.file.filename : null;
 	  let parameters = { incomeDate, catId };
 	  
@@ -1084,10 +1203,18 @@ exports.updateIncomeTrans = (req, res) => {
 						'Authorization': `${req.session.token}`
 					}
 				}).then(responseSalesperson => {
-					const {success, type} = req.query
+					const {success, type, error} = req.query
 					if (success === 'true' && type === 'update') {
 						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data, errorMessage: null , successMessage: "Updated Successfully!"});
-					} else {
+					} 
+					else if (error === 'true'){
+						if (type === 'fileError') {
+							res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data,  errorMessage: "Only image file (2 MB maximum) can be uploaded! " , successMessage: null});
+						} else {
+							res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
+						}
+					}						
+					else {
 						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
 					}
 				}).catch(err => {
@@ -1106,6 +1233,10 @@ exports.updateIncomeTrans = (req, res) => {
 		const categoryId = req.query.id
 		const page = req.query.page || 1
 		const { description, amount, incomeDate, catId, salespersonId, customer, itemName, price, quantity } = req.body;
+		if (req.fileError) {
+			res.redirect('/subscriber/transaction/income/update/' + id + `?error=true&type=fileError&trans=income&page=${page}` );
+			return ;
+		}
 		const receipt = req.file ? req.file.filename : null
 		let parameters = { description, incomeDate, catId }
 		if (receipt) {
@@ -1134,6 +1265,92 @@ exports.updateIncomeTrans = (req, res) => {
 			}
 		}).catch(error => {
 			res.redirect('/subscriber/transaction/income/update/' + id + `?error=true&type=sysError&trans=income&page=${page}` );
+		})
+	}
+}
+
+exports.updateIncomeTransCat = (req, res) => {
+	if (req.method == 'GET') {
+		const id = req.params.id
+		const page = req.query.page || 1
+		axios.get(`${process.env.API_URL}/subscribers/incomes/${id}`, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			const parentId = response.data.data.parentId || 0
+			axios.get(`${process.env.API_URL}/subscribers/categories/income/update/${parentId}`, {
+				headers: {
+					'Authorization': `${req.session.token}`
+				}
+			}).then(responseCategory => {
+				axios.get(`${process.env.API_URL}/subscribers/salesperson/all`, {
+					headers: {
+						'Authorization': `${req.session.token}`
+					}
+				}).then(responseSalesperson => {
+					const {success, type, error} = req.query
+					if (success === 'true' && type === 'update') {
+						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data, errorMessage: null , successMessage: "Updated Successfully!"});
+					} 
+					else if (error === 'true'){
+						if (type === 'fileError') {
+							res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data,  errorMessage: "Only image file (2 MB maximum) can be uploaded! " , successMessage: null});
+						} else {
+							res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
+						}
+					}						
+					else {
+						res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName,trans: "income", transaction: response.data.data, salesperson: responseSalesperson.data.data, category: responseCategory.data.data,  errorMessage: null , successMessage: null});
+					}
+				}).catch(err => {
+					res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income",  transaction: {}, category: [], salesperson: [],   errorMessage: "System Error!", successMessage: null });
+				})
+			}).catch(error => {
+				res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page}, organizationName: req.session.orgName,trans: "income",  transaction: {}, category: [],salesperson: [],   errorMessage: "System Error!", successMessage: null });
+			})
+		}).catch(error => {
+			res.render('subscriber/transaction-edit', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, pagination: {page: page},organizationName: req.session.orgName, trans: "income", transaction: {}, category: [], salesperson: [],  errorMessage: "System Error!", successMessage: null });
+			
+		})
+	} else {
+		const id = req.params.id
+		const cat = req.query.cat
+		const categoryId = req.query.id
+		const page = req.query.page || 1
+		const { description, amount, incomeDate, catId, salespersonId, customer, itemName, price, quantity } = req.body;
+		if (req.fileError) {
+			res.redirect('/subscriber/category/transaction/income/update/' + id + `?error=true&type=fileError&id=${categoryId}&cat=income&page=${page}` );
+			return ;
+		}
+		const receipt = req.file ? req.file.filename : null
+		let parameters = { description, incomeDate, catId }
+		if (receipt) {
+			parameters.receipt = receipt;
+		}
+		if (!amount) {
+			const amount = parseInt(price) * parseInt(quantity)
+			parameters.amount = `${amount}`
+			parameters.itemName = itemName;
+			parameters.price = price;
+			parameters.quantity = quantity;
+			parameters.salespersonId = salespersonId;
+			parameters.customer = customer;
+		} else {
+			parameters.amount = amount
+		}
+		axios.put(`${process.env.API_URL}/subscribers/incomes/update/${id}`,parameters, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			if (cat && categoryId){
+				res.redirect('/subscriber/category/transaction/income/update/' + id + `?success=true&type=update&cat=income&id=${categoryId}&page=${page}`)
+			} else {
+				res.redirect('/subscriber/category/transaction/income/update/' + id + `?success=true&type=update&cat=income&id=${categoryId}&page=${page}`)
+			}
+		}).catch(error => {
+			res.redirect('/subscriber/category/transaction/income/update/' + id + `?error=true&type=sysError&cat=income&id=${categoryId}&page=${page}` );
 		})
 	}
 }
