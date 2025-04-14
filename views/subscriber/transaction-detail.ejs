@@ -59,7 +59,7 @@
 							<label for="transDate" class="form-label">Date</label>
 							<div id="transDate" class="form-control"></div>
 						</div>
-						<% if (transaction.parentId === 1 || transaction.parentId === 2) {%> 
+						<% if ((transaction.salesperson && transaction.salesperson.length > 0) || (transaction.itemName && transaction.itemName.length > 0)) {%> 
 							<% if(trans === 'income') {%> 
 								<div class="mb-3">
 									<label for="transSalesperson" class="form-label">Salesperson Name</label>
