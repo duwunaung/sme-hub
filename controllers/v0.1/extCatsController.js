@@ -598,13 +598,14 @@ exports.getExpenseCategory = (req, res) => {
 
 exports.updateExpenseCategory = (req, res) => {
     const { id } = req.params;
-    const { name , parentId } = req.body;
+    let { name , parentId } = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
 	let query;
 	const queryParams = []
+	if (!parentId) {parentId = 0;}
 	query = `UPDATE expcats SET name = ? , parentId = ? WHERE id = ? AND orgId = ?`
 	queryParams.push(name)
 	queryParams.push(parentId)
@@ -1018,12 +1019,13 @@ exports.getIncomeCategory = (req, res) => {
 
 exports.updateIncomeCategory = (req, res) => {
     const { id } = req.params;
-    const { name , parentId} = req.body;
+    let { name , parentId} = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
     }
+	if (!parentId) {parentId = 0;}
 	let query;
 	const queryParams = []
 	query = `UPDATE inccats SET name = ? , parentId = ? WHERE id = ? AND orgId = ?`
