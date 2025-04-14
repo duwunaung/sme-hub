@@ -42,9 +42,7 @@
 				    <!-- Category Type Selection -->
 				    <div class="mb-3">
 				        <label class="form-label">Category Type</label><span> *</span>
-						<p type="text" class="form-control" style="background-color: #dee1e5;"><%= category.parentId ? "Primary Category" : "Supplementary Category" %></p>
-						<input type="text" class="d-none" name="categoryType" value="<%= category.parentId ? 'underParent' : 'standalone' %>">
-				        <!-- <div class="form-check">
+				        <div class="form-check">
 				            <input class="form-check-input" type="radio" name="categoryType" id="standalone" value="standalone" 
 				                <%= !category.parentId ? 'checked' : '' %> onclick="toggleParentCategory()">
 				            <label class="form-check-label" for="standalone">Supplementary Category</label>
@@ -53,11 +51,11 @@
 				            <input class="form-check-input" type="radio" name="categoryType" id="underParent" value="underParent" 
 				                <%= category.parentId ? 'checked' : '' %> onclick="toggleParentCategory()">
 				            <label class="form-check-label" for="underParent">Primary Category</label>
-				        </div> -->
+				        </div>
 				    </div>
 
 				    <!-- Parent Category Dropdown (Hidden if "Standalone" is selected) -->
-					<!-- <% if (category.parentId !== 1 && category.parentId !== 2) {%> 
+					<% if (category.parentId !== 1 && category.parentId !== 2) {%> 
 						<div class="mb-3" id="parentCategoryGroup" style="display: none;">
 					<%} else {%> 
 						<div class="mb-3" id="parentCategoryGroup" >
@@ -68,7 +66,7 @@
 				            <option value="">Choose...</option>
 				            <option value="<%= cat === 'income' ? 'sale' : 'purchase' %>" selected><%= cat === 'income' ? 'Sale' : 'Purchase' %></option>
 				        </select>
-				    </div> -->
+				    </div>
 
 				    <!-- Buttons -->
 				    <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
@@ -125,10 +123,10 @@
 					addButton.disabled = true;
 					addButton.textContent = 'Submitting...';
 				}
-				// function toggleParentCategory() {
-			    //     document.getElementById('parentCategoryGroup').style.display = 
-			    //         document.getElementById('underParent').checked ? 'block' : 'none';
-			    // }
+				function toggleParentCategory() {
+			        document.getElementById('parentCategoryGroup').style.display = 
+			            document.getElementById('underParent').checked ? 'block' : 'none';
+			    }
 			</script>
 		</main>
 	</div>
