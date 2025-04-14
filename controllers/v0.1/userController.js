@@ -44,35 +44,35 @@ exports.createUser = async (req, res) => {
                         })
                     }
                 } else {
-                    var transporter = nodemailer.createTransport({
-                        service: 'gmail',
-                        auth: {
-                            user: process.env.GMAIL,
-                            pass: process.env.APP_PASSWORD
-                        }
-                    });
-                    var mailOptions = {
-                        from: process.env.GMAIL,
-                        to: email,
-                        subject: 'Welcome to Dat Tech Solutions',
-                        html: '<h1>Hi, Welcome to Dat Tech Solutions</h1><p>Thanks for joining us</p><br><p>To start using our service, kindly visit to this link with Password "' + password + '"</p><p>Best Regards</p><p>Dat Tech Solutions</p>'
-                    };
+                    // var transporter = nodemailer.createTransport({
+                    //     service: 'gmail',
+                    //     auth: {
+                    //         user: process.env.GMAIL,
+                    //         pass: process.env.APP_PASSWORD
+                    //     }
+                    // });
+                    // var mailOptions = {
+                    //     from: process.env.GMAIL,
+                    //     to: email,
+                    //     subject: 'Welcome to Dat Tech Solutions',
+                    //     html: '<h1>Hi, Welcome to Dat Tech Solutions</h1><p>Thanks for joining us</p><br><p>To start using our service, kindly visit to this link with Password "' + password + '"</p><p>Best Regards</p><p>Dat Tech Solutions</p>'
+                    // };
 
-                    transporter.sendMail(mailOptions, function (error, info) {
-                        if (error) {
-                            res.status(500).send({
-                                success: false,
-                                message: 'internal server error',
-                                dev: error
-                            })
-                        } else {
+                    // transporter.sendMail(mailOptions, function (error, info) {
+                    //     if (error) {
+                    //         res.status(500).send({
+                    //             success: false,
+                    //             message: 'internal server error',
+                    //             dev: error
+                    //         })
+                    //     } else {
                             res.status(201).send({
                                 success: true,
                                 message: 'User created successfully',
                                 data: { name, email, phone, role, status }
                             })
-                        }
-                    });
+                    //     }
+                    // });
 
                 }
             })
