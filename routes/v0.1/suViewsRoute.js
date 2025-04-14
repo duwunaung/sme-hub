@@ -21,6 +21,8 @@ router.use('/transaction/expense', checkSubscriberSession, listExpenseTrans )
 
 router.use('/transaction/transactions', checkSubscriberSession, listAllTransactions )
 
+router.use('/category/transaction/income/detail/:id', checkSubscriberSession, detailIncomeTrans )
+router.use('/category/transaction/income/update/:id', checkSubscriberSession,upload.single("receipt"), updateIncomeTrans )
 router.use('/category/income/create', checkSubscriberSession, createIncomeCat )
 router.use('/category/income/detail/:id', checkSubscriberSession, detailIncomeCat )
 router.use('/category/income/update/:id', checkSubscriberSession, updateIncomeCat )
@@ -28,6 +30,8 @@ router.use('/category/income/delete/:id', checkSubscriberSession, deleteIncomeCa
 router.use('/category/income/restore/:id', checkSubscriberSession, restoreIncomeCat )
 router.use('/category/income', checkSubscriberSession, listIncomeCat )
 
+router.use('/category/transaction/expense/detail/:id', checkSubscriberSession, detailExpenseTrans )
+router.use('/category/transaction/expense/update/:id', checkSubscriberSession,upload.single("receipt"), updateExpenseTrans )
 router.use('/category/expense/create', checkSubscriberSession, createExpenseCat )
 router.use('/category/expense/detail/:id', checkSubscriberSession, detailExpenseCat )
 router.use('/category/expense/update/:id', checkSubscriberSession, updateExpenseCat )
