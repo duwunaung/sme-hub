@@ -504,7 +504,7 @@
 												class="btn btn-light dropdown-toggle" 
 												data-bs-toggle="dropdown" 
 												aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
-											<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i>Date
+											<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i><span id="dateFilterName">Date</span>
 										</button>
 										<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
 											<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
@@ -599,7 +599,7 @@
 												}) %>
 											</td>
 											<td class="text-nowrap ">
-												<%= transaction[i].category %>
+												<%= transaction[i].category.length > 30 ? transaction[i].category.substring(0, 30) + '...' : transaction[i].category %>
 											</td>
 											<td class="text-nowrap ">
 												<%= transaction[i].createdBy %>
@@ -1055,6 +1055,7 @@
 			const type = searchParams.get('type')
 			const num = searchParams.get('num')
 			const catId = searchParams.get('catId')
+			
 			let categoryBtns = document.querySelectorAll('#categoryBtns')
 			
 			const totalTrans = "<%= transaction.length %>"
@@ -1063,7 +1064,10 @@
 			} else {
 				document.getElementById('summaryTranTotal').innerText = "0"
 			}
-
+			const search = searchParams.get('search')
+			if (typeof search === 'string' && search.trim().length > 0) {
+				document.getElementById('searchInput').value = search;
+			}
 			const totalSum = "<%= totalSum %>";
 			if (parseInt(totalTrans) > 0 && totalSum) {
 				const currency = "<%= transaction.length > 0 ? transaction[0].baseCurrency : '' %>";
@@ -1097,25 +1101,34 @@
 			if (type === 'month') {
 				if (num === '0') {
 					document.getElementById('summaryDate').innerText = "ALL"
+					document.getElementById('dateFilterName').innerText = "Date"
 				} else if (num === '1') {
 					document.getElementById('summaryDate').innerText = "This Month"
+					document.getElementById('dateFilterName').innerText = "This Month"
 				} else if (num === '3') {
 					document.getElementById('summaryDate').innerText = "Last 3 Months"
+					document.getElementById('dateFilterName').innerText = "Last 3 Months"
 				} else if (num === '-1') {
 					document.getElementById('summaryDate').innerText = "Last Month"
+					document.getElementById('dateFilterName').innerText = "Last Month"
 				}
 			} else if (type === 'week') {
 				document.getElementById('summaryDate').innerText = "This Week"
+				document.getElementById('dateFilterName').innerText = "This Week"
 			} else if (type === 'day') {
 				if (num === '1') {
 					document.getElementById('summaryDate').innerText = "Today"
+					document.getElementById('dateFilterName').innerText = "Today"
 				} else if (num === '7') {
 					document.getElementById('summaryDate').innerText = "Last 7 Days"
+					document.getElementById('dateFilterName').innerText = "Last 7 Days"
 				} else if (num === '30') {
 					document.getElementById('summaryDate').innerText = "Last 30 Days"
+					document.getElementById('dateFilterName').innerText = "Last 30 Days"
 				}
 			} else {
 				document.getElementById('summaryDate').innerText = "ALL"
+				document.getElementById('dateFilterName').innerText = "Date"
 			}
 
 			const parentSaleFields = document.getElementById("parentSaleFields");
