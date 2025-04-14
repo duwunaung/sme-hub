@@ -671,7 +671,7 @@ exports.getIncome = (req, res) => {
             })
         }
 		
-		if (results[0].parentId === 1) {
+		if (results[0].parentId === 1 || results[0].salespersonId) {
 			const salespersonId = results[0].salespersonId
 			let querySalesperson = `SELECT name FROM salesperson WHERE id = ${salespersonId}`
 			db_connection.query(querySalesperson, (error, result) => {
@@ -682,8 +682,16 @@ exports.getIncome = (req, res) => {
 						dev: err
 					})
 				}
-				const salesperson = result[0].name
-				results[0].salesperson = salesperson
+				if (result.length > 0) {
+					const salesperson = result[0].name
+					results[0].salesperson = salesperson
+					return res.status(200).send({
+						success: true,
+						message: "We found the data!",
+						dev: "Thanks bro, you`re awesome",
+						data: results[0]
+					})
+				}
 				return res.status(200).send({
 					success: true,
 					message: "We found the data!",
