@@ -77,16 +77,16 @@ app.use("/api/v0.1/dashboard", authenticateToken, authorizeRole(l1Access), dashb
 app.use("/api/v0.1/organizations", authenticateToken, authorizeRole(l1Access), organization_v01)
 app.use("/api/v0.1/users", authenticateToken, authorizeRole(l1Access), user_v01)
 
-app.use('/api/v0.1/subscribers', extUser_v01)
-
-app.use('/api/v0.1/subscribers/categories', authenticateToken, authorizeRole(subscribers), extCats_v01)
-app.use("/api/v0.1/subscribers/incomes", authenticateToken, authorizeRole(subscribers), extInc_v01);
-app.use("/api/v0.1/subscribers/expenses", authenticateToken, authorizeRole(subscribers), extExp_v01);
-app.use("/api/v0.1/subscribers/transactions", authenticateToken, authorizeRole(subscribers), extTrans_v01);
-app.use("/api/v0.1/subscribers/organization", authenticateToken, authorizeRole(subscribers), extOrg_v01);
-app.use("/api/v0.1/subscribers/user", authenticateToken, authorizeRole(subscribers), extUser_v01);
-app.use("/api/v0.1/subscribers/salesperson", authenticateToken, authorizeRole(subscribers), extSalesperson_v01);
-app.use("/api/v0.1/subscribers/dashboard", authenticateToken, authorizeRole(subscribers), extDashboard_v01);
+// subscriber API
+app.use('/api/v0.1/subscribers', subAccess, extUser_v01)
+app.use('/api/v0.1/subscribers/categories', subAccess, authenticateToken, authorizeRole(subscribers), extCats_v01)
+app.use("/api/v0.1/subscribers/incomes", subAccess, authenticateToken, authorizeRole(subscribers), extInc_v01);
+app.use("/api/v0.1/subscribers/expenses", subAccess, authenticateToken, authorizeRole(subscribers), extExp_v01);
+app.use("/api/v0.1/subscribers/transactions", subAccess, authenticateToken, authorizeRole(subscribers), extTrans_v01);
+app.use("/api/v0.1/subscribers/organization", subAccess, authenticateToken, authorizeRole(subscribers), extOrg_v01);
+app.use("/api/v0.1/subscribers/user", subAccess, authenticateToken, authorizeRole(subscribers), extUser_v01);
+app.use("/api/v0.1/subscribers/salesperson", subAccess, authenticateToken, authorizeRole(subscribers), extSalesperson_v01);
+app.use("/api/v0.1/subscribers/dashboard", subAccess, authenticateToken, authorizeRole(subscribers), extDashboard_v01);
 
 app.use('/', homePage_v01)
 app.listen(process.env.PORT, function () {
