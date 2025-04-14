@@ -55,7 +55,7 @@
 					</div>
 					<% } %>
 					<!-- Category Details Form -->
-					<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)">
+					<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)" onkeydown="return event.key != 'Enter';">
 						<div class="mb-3">
 							<label for="transDescription" class="form-label">Description *</label>
 							<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
@@ -67,7 +67,7 @@
 							<input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
 								placeholder="Select date" value="" required>
 						</div>
-						<% if (transaction.parentId === 1 || transaction.parentId === 2) {%> 
+						<% if ((transaction.itemName && transaction.itemName.length > 0)) {%> 
 							<% if(salesperson.length > 0 && trans === 'income') {%> 
 								<div class="mb-3">
 									<label for="transSalesperson" class="form-label">Salesperson *</label>
@@ -127,7 +127,7 @@
 								<div class="form-control text-secondary" id="totalAmount" placeholder="Total Amount" >Total Amount</div>
 							</div>
 						<%} %>
-						<% if (!(transaction.parentId === 1 || transaction.parentId === 2)) {%>
+						<% if (!((transaction.itemName && transaction.itemName.length > 0))) {%>
 							<div class="mb-3">
 								<label for="transAmount" class="form-label">Amount *</label>
 								<input type="number" class="form-control inputRequired" maxlength="30" name="amount" id="transAmount"
