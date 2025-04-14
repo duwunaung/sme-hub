@@ -655,6 +655,7 @@
                                 <input type="password" class="form-control" name="password" id="userPassword" placeholder=""
                                     value="" readonly required>
 								<input type="checkbox" class="me-2 mt-3" id="checkbox" onchange="showPassword(this)"><label for="checkbox">Show Password</label>
+								<p class="text-danger">*Please save the password before creating a user account!*</p>
                             </div>
 
                             <div class="mb-3">
@@ -675,12 +676,31 @@
                                         <% }); %>
                                 </select>
                             </div>
-                            <button onclick="clickBtn('adduser', 1)" type="submit" id="addBtn" class="btn btn-primary w-100">Add New User</button>
+                            <button type="button" onclick="showConfirmModal()" id="addBtn" class="btn btn-primary w-100">Add New User</button>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+		<!-- Password Confirmation Modal -->
+		<div id="confirmPasswordModal" class="modal" style="display: none; position: fixed; z-index: 1500; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+		    <div class="modal-dialog" style="margin: 15% auto; width: 80%; max-width: 500px;">
+		        <div class="modal-content" style="background-color: #fefefe; padding: 20px; border: 1px solid #888; border-radius: 5px;">
+		            <div class="modal-header">
+		                <h5 class="modal-title">Password Confirmation</h5>
+		                <button type="button" class="btn-close" onclick="closeConfirmModal()"></button>
+		            </div>
+		            <div class="modal-body">
+		                <p>Have you saved the generated password? You won't be able to see it again after creating the account.</p>
+		                <p class="fw-bold">Password: <span id="modalPasswordDisplay"></span></p>
+		            </div>
+		            <div class="modal-footer">
+		                <button type="button" class="btn btn-secondary" onclick="closeConfirmModal()">Cancel</button>
+		                <button type="button" class="btn btn-primary" onclick="confirmSubmission()">Yes, I've saved it</button>
+		            </div>
+		        </div>
+		    </div>
+		</div>
         <script>
             const form = document.getElementById('addUserForm');
             const addButton = document.getElementById('addBtn');
@@ -720,6 +740,39 @@
 
                 form.action = "/superadmin/organizations/adduser/<%= org.id %>" + query + userQuery
 			}
+
+			function showConfirmModal() {
+		        if (!form.checkValidity()) {
+		            form.reportValidity();
+		            return;
+		        }
+		        
+		        document.getElementById('modalPasswordDisplay').textContent = userPassword.value;
+		        
+		        confirmPasswordModal.style.display = 'block';
+		    }
+
+		    function closeConfirmModal() {
+		        confirmPasswordModal.style.display = 'none';
+		    }
+
+		    function confirmSubmission() {
+		        closeConfirmModal();
+		        
+		        addButton.disabled = true;
+		        addButton.textContent = 'Submitting...';
+		        
+		        form.action = "/superadmin/organizations/adduser/<%= org.id %>" + query + userQuery;
+		        form.method = "POST";
+		        form.onsubmit = null;
+		        form.submit();
+		    }
+
+		    window.onclick = function(event) {
+		        if (event.target === confirmPasswordModal) {
+		            closeConfirmModal();
+		        }
+		    }
 
             // Pagination
             function pagination( type, num ) {
