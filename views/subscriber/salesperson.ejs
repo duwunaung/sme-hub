@@ -90,11 +90,13 @@
 			    justify-content: flex-end;
 			}
 			@media (max-width: 576px ) {
-				#searchInput {
-					width: 180px !important;
-				}
-				#searchInput:focus {
-					width: 180px !important;
+				#filterGroup {
+					display: flex;
+					flex-wrap: wrap;
+					gap: 0.5rem;
+					flex-direction: column;
+					justify-content: flex-end;
+					align-items: stretch;
 				}
 			}
 			.icons {
@@ -169,7 +171,7 @@
 						</button>
 					</div>
 					<!-- Search Bar -->
-					<div class="container-div my-3">
+					<div class="container-div my-3" id="filterGroup">
 		
 						<div class="d-flex search-container me-2">
 							<input type="text" 
@@ -181,11 +183,11 @@
 								<img src="/search_icon.svg" alt="search icon" id="searchIcon">
 							</button>
 						</div>
-						<div class="btn-group" style="position: relative;">
+						<div class="btn-group" style="position: relative; max-width: 180px;">
 							<button type="button" 
 									class="btn btn-light dropdown-toggle" 
 									style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;" onclick="displayMenu('dropdown-menu-date')">
-								<i class="fas fa-calendar me-1"></i>Date
+								<i class="fas fa-calendar me-1"></i><span id="dateFilterName">Date</span>
 							</button>
 							<ul class="dropdown-menu dropdown-menu-end mt-2" id="dropdown-menu-date" style="position: absolute; top: 38px; right: 3px;">
 								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
@@ -712,6 +714,35 @@
 			        submitForm.submit();
 			    }
 			}
-
+			const searchParams = new URLSearchParams(window.location.search);
+			const type = searchParams.get('type')
+			const num = searchParams.get('num')
+			const search = searchParams.get('search')
+			if (typeof search === 'string' && search.trim().length > 0) {
+				document.getElementById('searchInput').value = search;
+			}
+			if (type === 'month') {
+				if (num === '0') {
+					document.getElementById('dateFilterName').innerText = "Date"
+				} else if (num === '1') {
+					document.getElementById('dateFilterName').innerText = "This Month"
+				} else if (num === '3') {
+					document.getElementById('dateFilterName').innerText = "Last 3 Months"
+				} else if (num === '-1') {
+					document.getElementById('dateFilterName').innerText = "Last Month"
+				}
+			} else if (type === 'week') {
+				document.getElementById('dateFilterName').innerText = "This Week"
+			} else if (type === 'day') {
+				if (num === '1') {
+					document.getElementById('dateFilterName').innerText = "Today"
+				} else if (num === '7') {
+					document.getElementById('dateFilterName').innerText = "Last 7 Days"
+				} else if (num === '30') {
+					document.getElementById('dateFilterName').innerText = "Last 30 Days"
+				}
+			} else {
+				document.getElementById('dateFilterName').innerText = "Date"
+			}
 		</script>
         <%- include('../partials/subscriber/footer.ejs') %>
