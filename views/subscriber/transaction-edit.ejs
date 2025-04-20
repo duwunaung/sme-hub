@@ -58,7 +58,7 @@
 					<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)" onkeydown="return event.key != 'Enter';">
 						<div class="mb-3" >
 							<label for="transId" class="form-label">Transaction ID</label>
-							<div id="transId" class="form-control" style="background-color: #e9ecef;"><%= transaction.id %></div>
+							<div id="transId" class="form-control" style="background-color: #e9ecef;"><span id="transIDPrefix"></span><%= transaction.id %></div>
 						</div>
 						<div class="mb-3">
 							<label for="transDescription" class="form-label">Description *</label>
@@ -193,7 +193,7 @@
 							<input type="file" class="form-control" name="receipt" 
 								   id="transReceipt" accept="image/*" onchange="previewReceipt(this)">
 						</div>
-						<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
+						<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Transaction</button>
 						<a href="" class="btn w-100" id="resetBtn"></a>
 			
 					</form>
@@ -284,8 +284,10 @@
 					let isoString = '';
 					if (trans === 'income' || cat === 'income') {
 					    isoString = "<%= transaction.incomeDate %>";
+						document.getElementById('transIDPrefix').innerText = 'INC';
 					} else {
 					    isoString = "<%= transaction.expenseDate %>";
+						document.getElementById('transIDPrefix').innerText = 'EXP';
 					}
 					let localDate = new Date(isoString);
 					let formattedDate = localDate.toLocaleString('en-US', {
