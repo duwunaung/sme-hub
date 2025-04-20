@@ -48,6 +48,10 @@ services:
       - APP_PASSWORD=${APP_PASSWORD}
       - RECEIPT_FILESIZE=${RECEIPT_FILESIZE}
       - NODE_ENV=${NODE_ENV}
+      - REQUEST_LIMIT=${REQUEST_LIMIT}
+      - REFRESH_INTERVAL=${REFRESH_INTERVAL}
+      - APP_VERSION=${APP_VERSION}
+      - APP_CODENAME=${APP_CODENAME}
     networks:
       - app-network
 
