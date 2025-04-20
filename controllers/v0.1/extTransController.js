@@ -181,10 +181,10 @@ exports.createExpense = (req, res) => {
 
 exports.updateExpense = (req, res) => {
     const { id } = req.params
-    const { description, amount, expenseDate, catId,  itemName, price, quantity, vendorName } = req.body
+    const { description, amount, catId,  itemName, price, quantity, vendorName } = req.body
     const orgId = req.user.orgId
 
-    if (!description || !amount || !expenseDate || !catId) {
+    if (!description || !amount || !catId) {
         return res.status(400).send(
             {
                 success: false,
@@ -193,8 +193,8 @@ exports.updateExpense = (req, res) => {
             }
         )
     }
-	let sql = 'UPDATE exps SET description = ?, amount = ?, expenseDate = ? , catId = ?'
-	let values = [description, amount, expenseDate, catId];
+	let sql = 'UPDATE exps SET description = ?, amount = ? , catId = ?'
+	let values = [description, amount, catId];
 	const receipt = req.body.receipt;
 	const optionalFields = { receipt, itemName, price, quantity, vendorName };
 	Object.entries(optionalFields).forEach(([key, value]) => {
@@ -226,7 +226,6 @@ exports.updateExpense = (req, res) => {
                     id: id,
                     description: description,
                     amount: amount,
-                    expenseDate: expenseDate,
                     catId: catId
                 }
             }
@@ -564,11 +563,11 @@ exports.createIncome = (req, res) => {
 }
 
 exports.updateIncome = (req, res) => {
-	const { description, amount, incomeDate, catId, itemName, price, quantity, salespersonId } = req.body
+	const { description, amount, catId, itemName, price, quantity, salespersonId } = req.body
 	const orgId = req.user.orgId
 	const createdBy = req.user.userId
 	const { id } = req.params
-	if (!description || !amount || !incomeDate || !catId) {
+	if (!description || !amount || !catId) {
 		return res.status(400).send(
 			{
 				success: false,
@@ -577,8 +576,8 @@ exports.updateIncome = (req, res) => {
 			}
 		)
 	}
-	let sql = 'UPDATE incs SET description = ?, amount = ?, incomeDate = ? , catId = ?'
-	let values = [description, amount, incomeDate, catId];
+	let sql = 'UPDATE incs SET description = ?, amount = ? , catId = ?'
+	let values = [description, amount, catId];
 	const customerName = req.body.customer;
 	const receipt = req.body.receipt;
 	const optionalFields = { receipt, itemName, price, quantity, salespersonId, customerName };
