@@ -56,16 +56,19 @@
 					<% } %>
 					<!-- Category Details Form -->
 					<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)" onkeydown="return event.key != 'Enter';">
+						<div class="mb-3" >
+							<label for="transId" class="form-label">Transaction ID</label>
+							<div id="transId" class="form-control" style="background-color: #e9ecef;"><%= transaction.id %></div>
+						</div>
 						<div class="mb-3">
 							<label for="transDescription" class="form-label">Description *</label>
 							<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
 								placeholder="Enter description" value="<%= transaction.description %>" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
 							<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
 						</div>
-						<div class="mb-3">
-							<label for="transDate" class="form-label">Date *</label>
-							<input type="datetime-local" class="form-control"  name=<% if (trans === 'income' ) { %> "incomeDate" <% } else {%> "expenseDate" <% } %> id="transDate"
-								placeholder="Select date" value="" required>
+						<div class="mb-3" >
+							<label for="transDate" class="form-label">Created on</label>
+							<div id="transDate" class="form-control" style="background-color: #e9ecef;"></div>
 						</div>
 						<% if ((transaction.itemName && transaction.itemName.length > 0)) {%> 
 							<% if(salesperson.length > 0 && trans === 'income') {%> 
@@ -277,22 +280,25 @@
 					let trans = searchParams.get('trans')
 					let cat = searchParams.get('cat')
 					let id = searchParams.get('id')
+					const page = "<%= pagination.page %>"
 					let isoString = '';
 					if (trans === 'income' || cat === 'income') {
-						isoString = "<%= transaction.incomeDate %>";
+					    isoString = "<%= transaction.incomeDate %>";
 					} else {
-						isoString = "<%= transaction.expenseDate %>";
+					    isoString = "<%= transaction.expenseDate %>";
 					}
 					let localDate = new Date(isoString);
-					let year = localDate.getFullYear();
-					let month = String(localDate.getMonth() + 1).padStart(2, '0');
-					let day = String(localDate.getDate()).padStart(2, '0');
-					let hours = String(localDate.getHours()).padStart(2, '0');
-					let minutes = String(localDate.getMinutes()).padStart(2, '0');
-					let seconds = String(localDate.getSeconds()).padStart(2, '0');
-					let formattedDate = `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-					document.getElementById('transDate').value = formattedDate;
-					const page = "<%= pagination.page %>"
+					let formattedDate = localDate.toLocaleString('en-US', {
+					    year: 'numeric',
+					    month: 'short',
+					    day: '2-digit',
+					    hour: '2-digit',
+					    minute: '2-digit',
+					    second: '2-digit',
+					    hour12: true
+					});
+
+					document.getElementById('transDate').innerText = formattedDate;
 					function buttonType() {
 						searchParams = new URLSearchParams(window.location.search);
 						const type = searchParams.get('type')
@@ -377,6 +383,7 @@
 						calculateTotal();
 					}
 					
+							
 				</script>
 			</main>
 		</div>
