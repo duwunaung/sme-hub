@@ -310,6 +310,9 @@
 		background-color: rgb(248, 249, 250);
 		z-index: 1000;
 	}
+	#userNamePosition:hover {
+		cursor: pointer;
+	}
 </style>
 
 <nav class="navbar navbar-dark bg-dark navbar-expand-lg justify-content-center">
@@ -321,11 +324,11 @@
 	</div>
     <div class="top-bar">
         <div id="userProfile" class="d-flex justify-content-center align-items-center">
-            <div class="me-3 d-none d-sm-flex flex-column align-items-end" id="userNamePosition">
+            <div class="me-3 d-none d-sm-flex flex-column align-items-end" id="userNamePosition" onclick="goToUserProfilePage()">
                 <span id="userName" class="d-block fw-bold" style="font-size: large;"><%= userName %></span>
                 <span id="userPosition"><%= userRole%></span>
             </div>
-            <div id="profileBtn" onclick="goToUserProfilePage()">
+            <div id="profileBtn" onclick="goToProfilePage()">
                 <% if (logo) {%> 
                     <img src="/<%= logo %>" alt="Logo" class="profile-logo-preview">
                 <%} else {%> 
