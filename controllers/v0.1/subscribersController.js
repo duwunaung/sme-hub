@@ -4,6 +4,8 @@ const { use, param } = require('../../routes/v0.1/utilsRoute');
 const bcrypt = require('bcryptjs');
 require('dotenv').config()
 const photoSize = process.env.RECEIPT_FILESIZE;
+const appVersion = process.env.APP_VERSION;
+const appCodeName = process.env.APP_CODENAME;
 
 exports.dashboardSubscriber = (req, res) => {
 	if (req.method == 'GET') {
@@ -90,17 +92,17 @@ exports.editUsrProfile = (req, res) => {
 				}
 			} else if (error === 'true') {
 				if (type === 'invalidPassword') {
-					res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "Invalid Password!" });
+					res.render('subscriber/user-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "Invalid Password!" });
 				} else if (type === 'sysError') {
-					res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "System Error!" });
+					res.render('subscriber/user-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "System Error!" });
 				} else if (type === 'dupEmail') {
-					res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "Email Already Existed!" });
+					res.render('subscriber/user-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: "Email Already Existed!" });
 				}
 			} else {
-				res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: null }); 
+				res.render('subscriber/user-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: null, errorMessage: null }); 
 			}
 		}).catch(error => {
-			res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName,  user: {}, successMessage: null, errorMessage: null });         
+			res.render('subscriber/user-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName,  user: {}, successMessage: null, errorMessage: null });         
 		})
 	} else {
 		const {name, email, phone } = req.body
@@ -164,21 +166,21 @@ exports.editOrgProfile = (req, res) => {
 			const {success, error, type} = req.query
 			if (success === 'true') {
 				if (type === 'update') {
-					res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: "Successfully Updated!", errorMessage: null }); 
+					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: "Successfully Updated!", errorMessage: null }); 
 				}
 			} else if (error === 'true') {
 				if (type === 'fileError') {
-					res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: `Only image file (${photoSize} MB maximum) can be uploaded!` }); 
+					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: `Only image file (${photoSize} MB maximum) can be uploaded!` }); 
 				}
 				else {
-					res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null }); 
+					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null }); 
 				}
 			}
 			else {
-				res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null }); 
+				res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null }); 
 			}
 		}).catch(error => {
-			res.render('subscriber/organization-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, options: options, org: {}, successMessage: null, errorMessage: null });         
+			res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, options: options, org: {}, successMessage: null, errorMessage: null });         
 		})
 	} else {
 		const {name, address, phone, baseCurrency, country } = req.body
