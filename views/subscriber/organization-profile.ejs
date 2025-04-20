@@ -198,7 +198,7 @@
 												<p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold">
 													<%= new Date(org.expiredDate).toDateString() %>
 											</span></p>
-												<p class="text-secondary">Version: 1.0.1 (Patrat)</p>
+												<p class="text-secondary">Version: <%= appVersion %> (<%= appCodeName %>)</p>
 											</div>
 											<div class="mt-4 d-flex justify-content-end">
 												<button id="extendBtn" class="btn btn-primary mb-2 me-2" onclick="extendLicense()">Extend License</button>
@@ -259,6 +259,7 @@
 
 			function extendLicense() {
 				event.preventDefault();
+				window.open('https://docs.google.com/forms/d/e/1FAIpQLSdC2LlFBYv8I6H6WaX0wGmdYtbAqNbvILHeG_Xw0eyciu5BiA/viewform?usp=header', '_blank');
 			}
 
 
