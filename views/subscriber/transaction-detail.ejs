@@ -53,7 +53,7 @@
 					<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
 						<div class="mb-3" >
 							<label for="transId" class="form-label">Transaction ID</label>
-							<div id="transId" class="form-control"><%= transaction.id %></div>
+							<div id="transId" class="form-control"><span id="transIDPrefix"></span><%= transaction.id %></div>
 						</div>
 						<div class="mb-3">
 							<label for="transDescription" class="form-label">Description</label>
@@ -183,8 +183,10 @@
 			let isoString = '';
 			if (trans === 'income' || cat === 'income') {
 			    isoString = "<%= transaction.incomeDate %>";
+				document.getElementById('transIDPrefix').innerText = 'INC';
 			} else {
 			    isoString = "<%= transaction.expenseDate %>";
+				document.getElementById('transIDPrefix').innerText = 'EXP';
 			}
 
 			let localDate = new Date(isoString);
