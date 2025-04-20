@@ -232,13 +232,19 @@
 			}
 
 			const incomeChartData = {
-			    labels: incomeData.map(item => item.category_name),
-			    amounts: incomeData.map(item => Number(item.total_amount))
+				labels: incomeData.map(item => {
+					const name = item.category_name;
+					return name.length > 15 ? name.substring(0, 15) + '...' : name;
+				}),
+				amounts: incomeData.map(item => Number(item.total_amount))
 			};
 
 			const expenseChartData = {
-			    labels: expenseData.map(item => item.category_name),
-			    amounts: expenseData.map(item => Number(item.total_amount))
+				labels: expenseData.map(item => {
+					const name = item.category_name;
+					return name.length > 15 ? name.substring(0, 15) + '...' : name;
+				}),
+				amounts: expenseData.map(item => Number(item.total_amount))
 			};
 
 			const searchParams = new URLSearchParams(window.location.search);
