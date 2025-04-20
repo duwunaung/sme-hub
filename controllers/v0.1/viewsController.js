@@ -2,6 +2,9 @@ const axios = require('axios');
 const { query } = require('express');
 const bcrypt = require('bcryptjs');
 const { resolve } = require('path');
+require('dotenv').config()
+const appVersion = process.env.APP_VERSION;
+const appCodeName = process.env.APP_CODENAME;
 
 exports.dashboard = (req, res) => {
 	if (req.method == 'GET') {
@@ -785,7 +788,7 @@ exports.adminProfile = (req, res) => {
 
             if (success) {
                 if (type == 'updateProfile') {
-                    res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: response.data.data, errorMessage: null, successMessage: "Successfully Updated" });
+                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: response.data.data, errorMessage: null, successMessage: "Successfully Updated" });
                 }
             } else if (error) {
                 const name = req.query.name
@@ -795,23 +798,23 @@ exports.adminProfile = (req, res) => {
                 const userData = { name, email, phone, role }
 
                 if (type == 'dup-email') {
-                    res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Duplicate Email!", successMessage: null });
+                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Duplicate Email!", successMessage: null });
                 } else if (type == '404Error') {
-                    res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "User not found!", successMessage: null });
+                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "User not found!", successMessage: null });
                 } else if (type == 'empty-value') {
-                    res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Input field shouldn't be empty!", successMessage: null });
+                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Input field shouldn't be empty!", successMessage: null });
                 } else if (type == 'deleteAccount') {
-                    res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Cannot delete your account at the moment!", successMessage: null });
+                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Cannot delete your account at the moment!", successMessage: null });
                 } else if (type == 'invalidPassword') {
-                    res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Invalid Password!", successMessage: null });
+                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Invalid Password!", successMessage: null });
                 } else {
-                    res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Internal Server Error!", successMessage: null });
+                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Internal Server Error!", successMessage: null });
                 }
             } else {
-                res.render('superadmin/profile', { userName: req.session.user, userRole: req.session.role, user: response.data.data, errorMessage: null, successMessage: null });
+                res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: response.data.data, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
-			res.render('superadmin/login', { userName: req.session.user, userRole: req.session.role, errorMessage: error.response.data.message });
+			res.render('superadmin/login', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, errorMessage: error.response.data.message });
         })
     } else {
         const updateProfile = async () => {
