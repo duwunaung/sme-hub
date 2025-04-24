@@ -763,10 +763,10 @@ exports.listExpenseTrans = (req, res) => {
 						}
 					}
 				}).catch(err => {
-					res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: [], transaction: [], salesperson: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+					res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: [], transaction: response.data.data, salesperson: [], pagination: {}, errorMessage: null, successMessage: null });
 				})
 			}).catch(error => {
-				res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: [], transaction: [],salesperson: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "expense", category: [], transaction: response.data.data,salesperson: [], pagination: {}, errorMessage: null, successMessage: null });
 			})
 		}).catch(error => {
 			axios.get(`${process.env.API_URL}/subscribers/categories/expense`, {
@@ -1071,13 +1071,13 @@ exports.listIncomeTrans = (req, res) => {
 					}
 				}).catch(err => {
 					if (err.status === 404) {
-						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [], pagination: {},salesperson: [] , errorMessage: null, successMessage: null });
+						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: response.data.data, pagination: {},salesperson: [] , errorMessage: null, successMessage: null });
 					} else {
-						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: [], pagination: {},salesperson: [] , errorMessage: "System Error!", successMessage: null });
+						res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: responseCategory.data.data, transaction: response.data.data, pagination: {},salesperson: [] , errorMessage: "System Error!", successMessage: null });
 					}
 				})
 			}).catch(error => {
-				res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: [], pagination: {}, salesperson: [] ,errorMessage: "System Error!", successMessage: null });
+				res.render('subscriber/transaction', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, trans: "income", category: [], transaction: response.data.data, pagination: {}, salesperson: [] ,errorMessage: "System Error!", successMessage: null });
 			})
 		}).catch(error => {
 			axios.get(`${process.env.API_URL}/subscribers/categories/income`, {
