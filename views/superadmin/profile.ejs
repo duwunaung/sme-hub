@@ -108,153 +108,165 @@
 		        <% } %>
 
 		        <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
-		            <div class="container mt-5">
-		                <div class="row justify-content-center">
-		                    <div class="col-12 col-md-8 col-lg-6 card-width">
-		                        <div class="card shadow-sm">
-		                            <div class="card-body">
-		                                <div class="row">
-		                                    <div class="col-12">
-		                                        <h2 class="mb-4 text-center">Admin Profile</h2>
-		                                        
-		                                        <!-- Username Input -->
-		                                        <div class="mb-3">
-		                                            <label for="userName" class="form-label">Username</label>
-		                                            <input type="text" class="form-control" maxlength="100" 
-		                                                   name="name" id="userName"
-		                                                   placeholder="Enter username" 
-		                                                   value="<%= user.name %>" 
-		                                                   oninput="checkInputs('nameUserError', 'userName')" 
-		                                                   required>
-		                                            <p id="nameUserError" class="mt-2 d-none text-danger">
-		                                                *Username can't exceed 100 characters!
-		                                            </p>
-		                                        </div>
-
-		                                        <!-- Role Input -->
-		                                        <div class="mb-3">
-		                                            <label for="userRole" class="form-label">Role</label>
-		                                            <input type="text" class="form-control" name="role" 
-		                                                   id="userRole"
-		                                                   placeholder="Enter user role" 
-		                                                   value="<%= user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase() %>" 
-		                                                   disabled>
-		                                        </div>
-
-		                                        <!-- Email Input -->
-		                                        <div class="mb-3">
-		                                            <label for="userEmail" class="form-label">Email Address</label>
-		                                            <input type="email" class="form-control" maxlength="45" 
-		                                                   name="email" id="userEmail"
-		                                                   placeholder="Enter email address" 
-		                                                   value="<%= user.email %>" 
-		                                                   oninput="checkInputs('emailUserError', 'userEmail')" 
-		                                                   required>
-		                                            <p id="emailUserError" class="mt-2 d-none text-danger">
-		                                                *Email can't exceed 45 characters!
-		                                            </p>
-		                                        </div>
-
-		                                        <!-- Phone Input -->
-		                                        <div class="mb-3">
-		                                            <label for="userPhone" class="form-label">Phone</label>
-		                                            <input type="tel" class="form-control" maxlength="45" 
-		                                                   id="userPhone" name="phone"
-		                                                   placeholder="Enter phone number" 
-		                                                   value="<%= user.phone %>" 
-		                                                   oninput="checkInputs('phoneUserError', 'userPhone')" 
-		                                                   required>
-		                                            <p id="phoneUserError" class="mt-2 d-none text-danger">
-		                                                *Phone can't exceed 45 characters!
-		                                            </p>
-		                                        </div>
-
-		                                        <!-- Password Change Section -->
-		                                        <div class="mb-3">
-		                                            <button type="button" class="btn btn-outline-primary mb-3" 
-		                                                    onclick="togglePasswordFields()">
-		                                                Change Password
-		                                            </button>
-		                                            
-		                                            <div id="passwordChangeSection" style="display: none;">
-		                                                <!-- Current Password -->
-		                                                <div class="mb-3">
-		                                                    <label for="currentPassword" class="form-label">Current Password</label>
-		                                                    <div class="input-group">
-		                                                        <input type="password" class="form-control" 
-		                                                               id="currentPassword" name="currentPassword"
-		                                                               maxlength="255" 
-		                                                               placeholder="Enter current password">
-		                                                        <span class="input-group-text" 
-		                                                              style="cursor: pointer" 
-		                                                              onclick="togglePassword('currentPassword', 'currentPasswordIcon')">
-		                                                            <i id="currentPasswordIcon" class="fa-solid fa-eye"></i>
-		                                                        </span>
-		                                                    </div>
-		                                                    <p id="currentPasswordError" class="mt-2 d-none text-danger"></p>
-		                                                </div>
-		                                            
-		                                                <!-- New Password -->
-		                                                <div class="mb-3">
-		                                                    <label for="newPassword" class="form-label">New Password</label>
-		                                                    <div class="input-group">
-		                                                        <input type="password" class="form-control" 
-		                                                               id="newPassword" name="newPassword"
-		                                                               maxlength="255" 
-		                                                               placeholder="Enter new password" 
-		                                                               oninput="validateNewPassword(event)">
-		                                                        <span class="input-group-text" 
-		                                                              style="cursor: pointer"
-		                                                              onclick="togglePassword('newPassword', 'newPasswordIcon')">
-		                                                            <i id="newPasswordIcon" class="fa-solid fa-eye"></i>
-		                                                        </span>
-		                                                    </div>
-		                                                    <p id="newPasswordError" class="mt-2 d-none text-danger"></p>
-		                                                </div>
-		                                            
-		                                                <!-- Confirm New Password -->
-		                                                <div class="mb-3">
-		                                                    <label for="confirmPassword" class="form-label">Confirm New Password</label>
-		                                                    <div class="input-group">
-		                                                        <input type="password" class="form-control" 
-		                                                               id="confirmPassword" name="confirmPassword"
-		                                                               maxlength="255" 
-		                                                               placeholder="Confirm new password" 
-		                                                               oninput="validateConfirmPassword(event)">
-		                                                        <span class="input-group-text" 
-		                                                              style="cursor: pointer"
-		                                                              onclick="togglePassword('confirmPassword', 'confirmPasswordIcon')">
-		                                                            <i id="confirmPasswordIcon" class="fa-solid fa-eye"></i>
-		                                                        </span>
-		                                                    </div>
-		                                                    <p id="confirmPasswordError" class="mt-2 d-none text-danger"></p>
-		                                                </div>
-		                                            </div>
-		                                        </div>
-
-		                                        <!-- Registered Date -->
-		                                        <div class="mb-3">
-		                                            <p>Registered Date: 
-		                                                <span id="currentRegisteredDate" class="fw-bold">
-		                                                    <%= new Date(user.registered).toDateString() %>
-		                                                </span>
-		                                            </p>
-													<p class="text-secondary">Version: <%= appVersion %> (<%= appCodeName %>)</p>
-		                                        </div>
-
-		                                        <!-- Action Buttons -->
-		                                        <div class="d-flex justify-content-end btn-group-responsive gap-2">
-		                                            <a class="btn btn-danger" onclick="clickBtn()" style="width: 140px;">Delete Account</a>
-		                                            <button type="submit" id="updateBtn" class="btn btn-success" style="width: 140px;">Save Changes</button>
-		                                        </div>
-		                                    </div>
-		                                </div>
-		                            </div>
-		                        </div>
-		                    </div>
-		                </div>
-		            </div>
-		        </form>
+					<div class="container mt-5">
+						<div class="row justify-content-center">
+							<div class="col-12 col-md-8 col-lg-6 card-width">
+								<div class="card shadow-sm">
+									<div class="card-body">
+										<div class="row">
+											<div class="col-12">
+												<h2 class="mb-4 text-center">Admin Profile</h2>
+												
+												<% if (typeof user === 'undefined' || user === null || user === {} || user.length < 1 || available === false) { %>
+												<!-- Show error message when user data is missing -->
+												<div class="alert alert-warning">
+													<p class="mb-0">User data is unavailable. Please try again or contact support.</p>
+												</div>
+												<a href="/superadmin/dashboard" class="btn btn-primary">Return to Dashboard</a>
+												<% } else { %>
+												
+												<!-- Username Input -->
+												<div class="mb-3">
+													<label for="userName" class="form-label">Username</label>
+													<input type="text" class="form-control" maxlength="100" 
+														   name="name" id="userName"
+														   placeholder="Enter username" 
+														   value="<%= user.name || '' %>" 
+														   oninput="checkInputs('nameUserError', 'userName')" 
+														   required>
+													<p id="nameUserError" class="mt-2 d-none text-danger">
+														*Username can't exceed 100 characters!
+													</p>
+												</div>
+				
+												<!-- Role Input -->
+												<div class="mb-3">
+													<label for="userRole" class="form-label">Role</label>
+													<input type="text" class="form-control" name="role" 
+														   id="userRole"
+														   placeholder="Enter user role" 
+														   value="<%= user.role ? user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase() : 'N/A' %>" 
+														   disabled>
+												</div>
+				
+												<!-- Email Input -->
+												<div class="mb-3">
+													<label for="userEmail" class="form-label">Email Address</label>
+													<input type="email" class="form-control" maxlength="45" 
+														   name="email" id="userEmail"
+														   placeholder="Enter email address" 
+														   value="<%= user.email || '' %>" 
+														   oninput="checkInputs('emailUserError', 'userEmail')" 
+														   required>
+													<p id="emailUserError" class="mt-2 d-none text-danger">
+														*Email can't exceed 45 characters!
+													</p>
+												</div>
+				
+												<!-- Phone Input -->
+												<div class="mb-3">
+													<label for="userPhone" class="form-label">Phone</label>
+													<input type="tel" class="form-control" maxlength="45" 
+														   id="userPhone" name="phone"
+														   placeholder="Enter phone number" 
+														   value="<%= user.phone || '' %>" 
+														   oninput="checkInputs('phoneUserError', 'userPhone')" 
+														   required>
+													<p id="phoneUserError" class="mt-2 d-none text-danger">
+														*Phone can't exceed 45 characters!
+													</p>
+												</div>
+				
+												<!-- Password Change Section -->
+												<div class="mb-3">
+													<button type="button" class="btn btn-outline-primary mb-3" 
+															onclick="togglePasswordFields()">
+														Change Password
+													</button>
+													
+													<div id="passwordChangeSection" style="display: none;">
+														<!-- Current Password -->
+														<div class="mb-3">
+															<label for="currentPassword" class="form-label">Current Password</label>
+															<div class="input-group">
+																<input type="password" class="form-control" 
+																	   id="currentPassword" name="currentPassword"
+																	   maxlength="255" 
+																	   placeholder="Enter current password">
+																<span class="input-group-text" 
+																	  style="cursor: pointer" 
+																	  onclick="togglePassword('currentPassword', 'currentPasswordIcon')">
+																	<i id="currentPasswordIcon" class="fa-solid fa-eye"></i>
+																</span>
+															</div>
+															<p id="currentPasswordError" class="mt-2 d-none text-danger"></p>
+														</div>
+													
+														<!-- New Password -->
+														<div class="mb-3">
+															<label for="newPassword" class="form-label">New Password</label>
+															<div class="input-group">
+																<input type="password" class="form-control" 
+																	   id="newPassword" name="newPassword"
+																	   maxlength="255" 
+																	   placeholder="Enter new password" 
+																	   oninput="validateNewPassword(event)">
+																<span class="input-group-text" 
+																	  style="cursor: pointer"
+																	  onclick="togglePassword('newPassword', 'newPasswordIcon')">
+																	<i id="newPasswordIcon" class="fa-solid fa-eye"></i>
+																</span>
+															</div>
+															<p id="newPasswordError" class="mt-2 d-none text-danger"></p>
+														</div>
+													
+														<!-- Confirm New Password -->
+														<div class="mb-3">
+															<label for="confirmPassword" class="form-label">Confirm New Password</label>
+															<div class="input-group">
+																<input type="password" class="form-control" 
+																	   id="confirmPassword" name="confirmPassword"
+																	   maxlength="255" 
+																	   placeholder="Confirm new password" 
+																	   oninput="validateConfirmPassword(event)">
+																<span class="input-group-text" 
+																	  style="cursor: pointer"
+																	  onclick="togglePassword('confirmPassword', 'confirmPasswordIcon')">
+																	<i id="confirmPasswordIcon" class="fa-solid fa-eye"></i>
+																</span>
+															</div>
+															<p id="confirmPasswordError" class="mt-2 d-none text-danger"></p>
+														</div>
+													</div>
+												</div>
+				
+												<!-- Registered Date -->
+												<div class="mb-3">
+													<p>Registered Date: 
+														<span id="currentRegisteredDate" class="fw-bold">
+															<%= user.registered ? new Date(user.registered).toDateString() : 'N/A' %>
+														</span>
+													</p>
+													<p class="text-secondary">Version: <%= typeof appVersion !== 'undefined' ? appVersion : 'Unknown' %> 
+														(<%= typeof appCodeName !== 'undefined' ? appCodeName : 'Unknown' %>)
+													</p>
+												</div>
+				
+												<!-- Action Buttons -->
+												<div class="d-flex justify-content-end btn-group-responsive gap-2">
+													<a class="btn btn-danger" onclick="clickBtn()" style="width: 140px;">Delete Account</a>
+													<button type="submit" id="updateBtn" class="btn btn-success" style="width: 140px;">Save Changes</button>
+												</div>
+												
+												<% } %>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
 
 		        <!-- Confirmation Modal -->
 		        <div class="modal fade" id="confirmDeleteModal" tabindex="-1" 
