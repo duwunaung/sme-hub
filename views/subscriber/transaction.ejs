@@ -638,14 +638,19 @@
 	                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
 	                    </div>
 	                    <div class="modal-body">
+							<% if (category.length >= 1) {%> 
 	                        <form id="addNewTransactionForm" action="/subscriber/transaction/<%= trans %>/create" method="post" enctype="multipart/form-data" onsubmit="setCurrentDateTime(event)">
 								<div class="mb-3">
 									<label for="transCategory" class="form-label">Category *</label>
+									<% if (category.length >= 1) {%> 
 									<select id="transCategory" name="catId" class="form-select inputRequired" required onchange="toggleFormFields()">
 										<% category.forEach(option => { %>
 											<option value="<%= option.id %>" data-parent="<%= option.parentId %>"><%= option.name %></option>
 										<% }); %>
 									</select>
+									<%} else {%> 
+										<div>No Category</div>
+										<%} %>
 								</div>
 							
 								<!-- Standalone Fields -->
@@ -724,6 +729,9 @@
 							
 								<button type="submit" id="addBtn" class="btn btn-primary w-100">Add Transaction</button>
 							</form>
+							<%} else {%>
+								<div>No Category</div>
+								<%} %>
 	                    </div>
 	                </div>
 	            </div>
@@ -820,6 +828,14 @@
 		
 		
 		<script>
+			const today = new Date();
+			const day = today.getDate();
+			const weekday = today.toLocaleDateString("en-US", { weekday: "long" });
+			const month = today.toLocaleDateString("en-US", { month: "long" });
+
+			document.getElementById("dateDay").textContent = day;
+			document.getElementById("dayDay").textContent = weekday + ",";
+			document.getElementById("monthMonth").textContent = month;
 			function calculateTotal() {
 				const quantity = document.getElementById('quantity').value;
 				const price = document.getElementById('pricePerUnit').value;
@@ -852,14 +868,7 @@
 				calculateTotal();
 			}
 
-			const today = new Date();
-			const day = today.getDate();
-			const weekday = today.toLocaleDateString("en-US", { weekday: "long" });
-			const month = today.toLocaleDateString("en-US", { month: "long" });
-
-			document.getElementById("dateDay").textContent = day;
-			document.getElementById("dayDay").textContent = weekday + ",";
-			document.getElementById("monthMonth").textContent = month;
+			
 			let sortDirections = {};
 
 			function sortTable(columnIndex, type, headerElement) {
