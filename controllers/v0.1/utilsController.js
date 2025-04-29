@@ -16,14 +16,14 @@ exports.register = async (req, res) => {
                 dev: "This user is from other organization not from us"
             })
         }
-        const { name, email, phone, password, remark, orgId, role } = req.body
+        const { name, email, phone, password, remark, orgId, role , userTime} = req.body
 
         const hashedPassword = await bcrypt.hash(password, 10)
         const expiredDate = calculatedExpiryDate()
-
+		const userId = req.user.userId
         db_connection.query(
-            'INSERT INTO users (name, email, phone, password, registered, status, expired, remark, orgId, role) VALUES (?,?,?,?,?,?,?,?,?,?)',
-            [name, email, phone, hashedPassword, new Date(), 'active', expiredDate, remark, orgId, role],
+            'INSERT INTO users (name, email, phone, password, registered, status, expired, remark, orgId, role, updatedAt, updatedBy) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)',
+            [name, email, phone, hashedPassword, userTime, 'active', expiredDate, remark, orgId, role, userTime, userId],
             (err, result) => {
                 if (err) {
                     if (err.code ==  "ER_DUP_ENTRY") {
