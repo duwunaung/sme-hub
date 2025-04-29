@@ -95,11 +95,9 @@ exports.createOrg = (req, res) => {
         })
     }
     const userId = req.user.userId
-    const now = new Date()
     const expiry = calculatedExpiryDate()
-    const { name, address, phone, status = 'active' , country} = req.body
-
-    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status, updatedBy, updatedAt, baseCountry) VALUES (?,?,?,?,?,?,?,?)", [name, address, phone, expiry, status, userId, now, country], (err, results) => {
+    const { name, address, phone, status = 'active' , country, userTime} = req.body
+    db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status, updatedBy, updatedAt, baseCountry) VALUES (?,?,?,?,?,?,?,?)", [name, address, phone, expiry, status, userId, userTime, country], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -192,9 +190,8 @@ exports.updateOrg = (req, res) => {
     const userId = req.user.userId
     const now = new Date()
     const orgId = req.params.id
-    const { name, address, phone, status, country } = req.body
-
-    db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, status = ?, updatedBy = ?, updatedAt = ?, baseCountry = ? WHERE id = ?", [name, address, phone, status, userId, now, country, orgId], (err, results) => {
+    const { name, address, phone, status, country, userTime } = req.body
+    db_connection.query("UPDATE orgs SET name = ?, address = ?, phone = ?, status = ?, updatedBy = ?, updatedAt = ?, baseCountry = ? WHERE id = ?", [name, address, phone, status, userId, userTime, country, orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -229,7 +226,8 @@ exports.licenseOrg = (req, res) => {
     const orgId = req.params.id
     const { num, type } = req.body
 	const userId = req.user.userId
-    const today = new Date()
+    const todayString = req.body.userTime;
+	const today = new Date(todayString);
 	const year = today.getFullYear();
 	const month = String(today.getMonth() + 1).padStart(2, '0');
 	const day = String(today.getDate()).padStart(2, '0');
