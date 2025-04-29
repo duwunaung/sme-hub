@@ -44,6 +44,7 @@
                                 </option>
                                 <% }); %>
                         </select>
+						<input type="hidden" id="userTime" name="userTime">
                     </div>
                     <button type="submit" id="updateBtn" class="btn btn-success w-100 mb-2">Update</button>
                     <a onclick="clickBtn()" href="#" id="resetBtn"	class="btn  w-100"></a>
@@ -53,10 +54,18 @@
                             <%= new Date(user.registered).toDateString() %>
 													</span>
                         </p>
+						<p>The last updated by <strong id="updatedBy"><%= user.superadminName %></strong> at <span id="updatedAt" class="fw-bold">
+							<%= new Date(user.updatedAt).toLocaleString('en-US', { 
+								year: 'numeric', month: 'long', day: 'numeric',
+								hour: 'numeric', minute: 'numeric', second: 'numeric',
+								hour12: true 
+							}) %>
+						</span></p>	
                     </div>
                 </form>
             </div>
 			<script>
+				
 				function buttonType() {
 	                const searchParams = new URLSearchParams(window.location.search);
 	                const type = searchParams.get('type')
@@ -125,6 +134,14 @@
 
 
                 function submitForm(event) {
+					const now = new Date();
+				    const localTime = now.getFullYear() + "-" +
+				                      String(now.getMonth() + 1).padStart(2, '0') + "-" +
+				                      String(now.getDate()).padStart(2, '0') + " " +
+				                      String(now.getHours()).padStart(2, '0') + ":" +
+				                      String(now.getMinutes()).padStart(2, '0') + ":" +
+				                      String(now.getSeconds()).padStart(2, '0');
+				    document.getElementById('userTime').value = localTime;
 				    updateBtn.disabled = true;
 				    updateBtn.textContent = 'Submitting...';
 				}
