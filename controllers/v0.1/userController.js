@@ -25,11 +25,12 @@ exports.createUser = async (req, res) => {
             });
         }
         const userId = req.user.userId
-        const now = new Date()
+        const userTime = req.body.userTime
         db_connection.query('INSERT INTO users (name, password, phone, role, email, orgId, status, registered, expired, updatedBy, updatedAt) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
-            [name, hashedPassword, phone, role, email, orgId, status, new Date(), expiredDate, userId, now],
+            [name, hashedPassword, phone, role, email, orgId, status, new Date(), expiredDate, userId, userTime],
             (err, result) => {
                 if (err) {
+					console.log(err)
                     if (err.code ==  "ER_DUP_ENTRY") {
                         return res.status(409).send({
                             success: false,
@@ -259,10 +260,10 @@ exports.updateUser = (req, res) => {
         });
     }
     const superadminId = req.user.userId
-    const now = new Date()
+    const userTime = req.body.userTime
     db_connection.query(
         'UPDATE users SET name = ?, email = ?, phone = ?, role = ?, status = ?, orgId = ?, updatedBy = ?, updatedAt = ? WHERE id = ?',
-        [name, email, phone, role, status, orgId, superadminId, now, userId],
+        [name, email, phone, role, status, orgId, superadminId, userTime, userId],
         (err, result) => {
             if (err) {
                 if (err.code ==  "ER_DUP_ENTRY") {
