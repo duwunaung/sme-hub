@@ -53,11 +53,13 @@
                     <a onclick="Back()" href="#" class="btn btn-primary w-100 mt-1">Back to
                         users table</a>
                 </form>
-                <p>The last updated by <strong id="updatedBy"><%= user.superadminName %></strong> at <span id="updatedAt"
-                    class="fw-bold">
-                    <%= new Date(user.updatedAt).toString().split('GMT')[0]; %>
-                    </span>
-                </p>
+                <p>The last updated by <strong id="updatedBy"><%= user.superadminName %></strong> at <span id="updatedAt" class="fw-bold">
+					<%= new Date(user.updatedAt).toLocaleString('en-US', { 
+						year: 'numeric', month: 'long', day: 'numeric',
+						hour: 'numeric', minute: 'numeric', second: 'numeric',
+						hour12: true 
+					}) %>
+				</span></p>				
             </div>
             <script>
                 // Click Btns
