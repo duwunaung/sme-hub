@@ -38,6 +38,7 @@
                             placeholder="Enter Admin Phone Number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" required>
 						<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
                     </div>
+					<input type="hidden" id="userTime" name="userTime">
 
                     <button type="button" class="btn btn-success w-100 mb-2" id="addBtn" onclick="showConfirmModal()">Add</button>
                     <a onclick="clickBtn()" href="#" class="btn btn-danger w-100">Cancel</a>
@@ -111,31 +112,58 @@
             }
 
 			function submitForm(event) {
-			    addButton.disabled = true;
-			    addButton.textContent = 'Submitting...';
+				event.preventDefault();
+				const now = new Date();
+				const localTime = now.getFullYear() + "-" +
+									String(now.getMonth() + 1).padStart(2, '0') + "-" +
+									String(now.getDate()).padStart(2, '0') + " " +
+									String(now.getHours()).padStart(2, '0') + ":" +
+									String(now.getMinutes()).padStart(2, '0') + ":" +
+									String(now.getSeconds()).padStart(2, '0');
+				document.getElementById('userTime').value = localTime;
+				const addButton = document.getElementById('addBtn');
+				addButton.disabled = true;
+				addButton.textContent = 'Submitting...';
+				const form = document.getElementById('myForm');
+				form.submit();
 			}
+
 			function showConfirmModal() {
-	            if (!form.checkValidity()) {
-	                form.reportValidity();
-	                return;
-	            }
-	            
-	            document.getElementById('modalPassword').textContent = userPassword.value;
-	            confirmModal.style.display = 'block';
-	        }
+				const form = document.getElementById('myForm');
+				if (!form.checkValidity()) {
+					form.reportValidity();
+					return;
+				}
+				const userPassword = document.getElementById('userPassword');
+				document.getElementById('modalPassword').textContent = userPassword.value;
+				const confirmModal = document.getElementById('confirmModal');
+				confirmModal.style.display = 'block';
+			}
 
-	        function closeModal() {
-	            confirmModal.style.display = 'none';
-	        }
+			function closeModal() {
+				const confirmModal = document.getElementById('confirmModal');
+				confirmModal.style.display = 'none';
+			}
 
-	        function confirmSubmission() {
-	            closeModal();
-	            addButton.disabled = true;
-	            addButton.textContent = 'Submitting...';
-	            form.method = "POST";
-	            form.onsubmit = null;
-	            form.submit();
-	        }
+			function confirmSubmission() {
+				const now = new Date();
+				const localTime = now.getFullYear() + "-" +
+									String(now.getMonth() + 1).padStart(2, '0') + "-" +
+									String(now.getDate()).padStart(2, '0') + " " +
+									String(now.getHours()).padStart(2, '0') + ":" +
+									String(now.getMinutes()).padStart(2, '0') + ":" +
+									String(now.getSeconds()).padStart(2, '0');
+				document.getElementById('userTime').value = localTime;
+
+				closeModal();
+				const addButton = document.getElementById('addBtn');
+				const form = document.getElementById('myForm');
+				addButton.disabled = true;
+				addButton.textContent = 'Submitting...';
+				form.method = "POST";
+				form.onsubmit = null;
+				form.submit();
+			}
 
 	        window.onclick = function(event) {
 	            if (event.target === confirmModal) {
