@@ -77,6 +77,9 @@
 		        .table th, .table td {
 		            padding: 0.5rem;
 		        }
+				.icons::before, .usericons::before, .saIcons::before {
+					left: 30px;
+				}
 		    </style>
             <div class="content">
 
@@ -161,11 +164,11 @@
                                             </td>
                                             <td class="text-center">
                                                 <% if (orgs[i].status == 'active' ) { %>
-                                                    <div class="icons me-4" data-tooltip="Active" onmouseover="changeColor('#28a745')"><i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i></div>
+                                                    <div class="icons" data-tooltip="Active" onmouseover="changeColor('#28a745')"><i class="fa-solid fa-circle-check" style="color: green; font-size: 1.1rem;"></i></div>
                                                 <% } else if (orgs[i].status == 'deleted' ) { %>
-                                                    <div class="icons me-4" data-tooltip="Inactive" onmouseover="changeColor('#dc3545')"><i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i></div>
+                                                    <div class="icons" data-tooltip="Inactive" onmouseover="changeColor('#dc3545')"><i class="fa-solid fa-circle-xmark" style="color: red; font-size: 1.1rem;"></i></div>
                                                 <% } else { %>
-                                                    <div class="icons me-4" data-tooltip="Pending" onmouseover="changeColor('#ffc107')"><i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i></div>
+                                                    <div class="icons" data-tooltip="Pending" onmouseover="changeColor('#ffc107')"><i class="fa-solid fa-circle-exclamation" style="color: orange; font-size: 1.1rem;"></i></div>
                                                 <% } %>
                                             </td>
                                             <td style="padding-left: 5%;" class="d-flex flex-nowrap justify-content-center">
@@ -506,6 +509,7 @@
                                         </option>
                                         <% }); %>
                                 </select>
+								<input type="hidden" id="userTime" name="userTime">
                             </div>
                             <button type="submit" id="addBtn" class="btn btnColor w-100">Add Organization</button>
                         </form>
@@ -514,7 +518,6 @@
             </div>
         </div>
         <script>
-
             // Sort
             let sortDirections = {};
 
@@ -573,12 +576,21 @@
             }
 
             function submitForm(event) {
-                form = document.getElementById('addOrganizationForm')
+				event.preventDefault();
 
-			    addButton.disabled = true;
-			    addButton.textContent = 'Submitting...';
-
-                form.action = "/superadmin/add-superadmin" + query
+				const now = new Date();
+				const localTime = now.getFullYear() + "-" +
+									String(now.getMonth() + 1).padStart(2, '0') + "-" +
+									String(now.getDate()).padStart(2, '0') + " " +
+									String(now.getHours()).padStart(2, '0') + ":" +
+									String(now.getMinutes()).padStart(2, '0') + ":" +
+									String(now.getSeconds()).padStart(2, '0');
+				document.getElementById('userTime').value = localTime;
+				const form = document.getElementById('addOrganizationForm');
+				const addButton = document.getElementById('addBtn');
+				addButton.disabled = true;
+				addButton.textContent = 'Submitting...';
+				form.submit();
 			}
             // xxx
 
