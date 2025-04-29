@@ -126,6 +126,7 @@
 											</option>
 											<% }); %>
 									</select>
+									<input type="hidden" id="userTime" name="userTime">
 								</div>
 								<button onclick="clickBtn()" type="submit" id="updateBtn" class="btn btn-success w-100 mb-2">Update
 									Organization</button>
@@ -158,15 +159,20 @@
 								</div>
 								<div class="mt-3">
 									<p>The last updated by <strong id="updatedBy">
-											<%= org.userName %>
-										</strong> at <span id="updatedAt" class="fw-bold">
-											<%= new Date(org.updatedAt).toString().split('GMT')[0]; %>
-										</span>
-									</p>
+										<%= org.userName %>
+									</strong> at <span id="updatedAt" class="fw-bold">
+										<%= new Date(org.updatedAt).toLocaleString('en-US', { 
+											year: 'numeric', month: 'long', day: 'numeric', 
+											hour: 'numeric', minute: 'numeric', second: 'numeric', 
+											hour12: true 
+										}) %>
+									</span></p>
+									
 									<p>Current Expiration Date : <span id="currentExpirationDate" class="fw-bold mx-2">
-											<%= new Date(org.expiredDate).toDateString() %>
-										</span>
-									</p>
+										<%= new Date(org.expiredDate).toLocaleDateString('en-US', { 
+											year: 'numeric', month: 'long', day: 'numeric' 
+										}) %>
+									</span></p>									
 								</div>
 							</div>
 							<!-- Modal HTML -->
@@ -197,6 +203,7 @@
 							</div>
 		</div>
 		<script>
+			
 			// Variables declaration
 			const orgExpiredDate = new Date("<%= org.expiredDate %>");
 
@@ -300,6 +307,14 @@
 			}
 
 			function submitForm(event) {
+				const now = new Date();
+			    const localTime = now.getFullYear() + "-" +
+			                      String(now.getMonth() + 1).padStart(2, '0') + "-" +
+			                      String(now.getDate()).padStart(2, '0') + " " +
+			                      String(now.getHours()).padStart(2, '0') + ":" +
+			                      String(now.getMinutes()).padStart(2, '0') + ":" +
+			                      String(now.getSeconds()).padStart(2, '0');
+			    document.getElementById('userTime').value = localTime;
 				updateBtn.disabled = true;
 				updateBtn.textContent = 'Submitting...';
 			}
@@ -376,13 +391,15 @@
 				const confirmBtn = document.getElementById('confirmBtn')
 
 				confirmBtn.onclick = () => {
+					const now = new Date();
+					const encodedUserTime = encodeURIComponent(now);
 					if (!type && !num) {
-						const expireDays = Math.ceil(orgExpiredDate / (1000 * 60 * 60 * 24)) - Math.ceil(today / (1000 * 60 * 60 * 24));
-						const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day` + '&' + query.slice(1);
-						window.location.href = newHref;
+					    const expireDays = Math.ceil(orgExpiredDate / (1000 * 60 * 60 * 24)) - Math.ceil(today / (1000 * 60 * 60 * 24));
+					    const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day&userTime=${encodedUserTime}&` + query.slice(1);
+					    window.location.href = newHref;
 					} else {
-						const newURL = '/superadmin/organizations/license/' + orgId + '?num=' + num + '&type=' + type + '&' + query.slice(1);
-						window.location.href = newURL;
+					    const newURL = `/superadmin/organizations/license/${orgId}?num=${num}&type=${type}&userTime=${encodedUserTime}&` + query.slice(1);
+					    window.location.href = newURL;
 					}
 				}
 			}
