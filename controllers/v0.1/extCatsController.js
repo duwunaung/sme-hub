@@ -598,7 +598,7 @@ exports.getExpenseCategory = (req, res) => {
 
 exports.updateExpenseCategory = (req, res) => {
     const { id } = req.params;
-    let { name , parentId } = req.body;
+    let { name , parentId, status } = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
     if (!name) {
         return res.status(400).send({ error: 'Name is required' });
@@ -606,9 +606,10 @@ exports.updateExpenseCategory = (req, res) => {
 	let query;
 	const queryParams = []
 	if (!parentId) {parentId = 0;}
-	query = `UPDATE expcats SET name = ? , parentId = ? WHERE id = ? AND orgId = ?`
+	query = `UPDATE expcats SET name = ? , parentId = ?, status = ? WHERE id = ? AND orgId = ?`
 	queryParams.push(name)
 	queryParams.push(parentId)
+	queryParams.push(status)
 	queryParams.push(id)
 	queryParams.push(orgId)
     db_connection.query(query, queryParams, (err, results) => {
@@ -1019,7 +1020,7 @@ exports.getIncomeCategory = (req, res) => {
 
 exports.updateIncomeCategory = (req, res) => {
     const { id } = req.params;
-    let { name , parentId} = req.body;
+    let { name , parentId, status} = req.body;
     const orgId = req.user.orgId; // Ensure the category belongs to the user's organization
 
     if (!name) {
@@ -1028,9 +1029,10 @@ exports.updateIncomeCategory = (req, res) => {
 	if (!parentId) {parentId = 0;}
 	let query;
 	const queryParams = []
-	query = `UPDATE inccats SET name = ? , parentId = ? WHERE id = ? AND orgId = ?`
+	query = `UPDATE inccats SET name = ? , parentId = ?, status = ? WHERE id = ? AND orgId = ?`
 	queryParams.push(name)
 	queryParams.push(parentId)
+	queryParams.push(status)
 	queryParams.push(id)
 	queryParams.push(orgId)
     db_connection.query(query, queryParams, (err, results) => {
