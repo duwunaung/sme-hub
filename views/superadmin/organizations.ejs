@@ -132,7 +132,7 @@
 
                         <!-- Organizations Table -->
                         <div class="table-responsive">
-                            <% if ( orgs.length==0 && pagination.page == 1 ) { %>
+                            <% if ( orgs && orgs.length==0 && pagination.page == 1 ) { %>
                                 <div class="alert alert-warning" role="alert">
                                     No organization found.
                                 </div>
