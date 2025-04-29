@@ -88,7 +88,7 @@ exports.editUsrProfile = (req, res) => {
 			const {success, error, type} = req.query
 			if (success === 'true') {
 				if (type === 'update') {
-					res.render('subscriber/user-profile', {userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: "Successfully Updated!", errorMessage: null }); 
+					res.render('subscriber/user-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName,  user: response.data.data, successMessage: "Successfully Updated!", errorMessage: null }); 
 				}
 			} else if (error === 'true') {
 				if (type === 'invalidPassword') {
@@ -411,8 +411,8 @@ exports.updateExpenseCat = (req, res) => {
 		})
 	} else {
 		const id = req.params.id
-		const { name, categoryType } = req.body;
-		const parameters = { name }
+		const { name, categoryType, status } = req.body;
+		const parameters = { name, status }
 		if (categoryType === 'underParent'){
 			parameters.parentId = 2;
 		} else {
@@ -634,8 +634,8 @@ exports.updateIncomeCat = (req, res) => {
 		})
 	} else {
 		const id = req.params.id
-		const { name , categoryType } = req.body;
-		const parameters = { name }
+		const { name , categoryType, status } = req.body;
+		const parameters = { name, status }
 		if (categoryType === 'underParent'){
 			parameters.parentId = 1;
 		} else {
