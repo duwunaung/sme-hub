@@ -204,8 +204,9 @@ exports.updateOrg = (req, res) => {
             
         })
     } else {        
-        const { name, address, phone, status, country } = req.body;
-        axios.put(`${process.env.API_URL}/organizations/update/${orgId}`, { name, address, phone, status , country}, {
+        const { name, address, phone, status, country, userTime } = req.body;
+		
+        axios.put(`${process.env.API_URL}/organizations/update/${orgId}`, { name, address, phone, status , country, userTime}, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
@@ -228,8 +229,8 @@ exports.extendLicense = (req, res) => {
 
         const num = req.query.num
         const type = req.query.type
-
-        axios.put(`${process.env.API_URL}/organizations/license/${orgId}`, { num, type }, {
+		const userTime = req.query.userTime
+        axios.put(`${process.env.API_URL}/organizations/license/${orgId}`, { num, type , userTime }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
@@ -253,8 +254,8 @@ exports.extendLicense = (req, res) => {
 exports.registerOrg = (req, res) => {
     if (req.method == 'POST') {
         const page = req.query.page
-        const { name, address, phone, status, country } = req.body;
-        axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status, country }, {
+        const { name, address, phone, status, country, userTime } = req.body;
+        axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status, country , userTime}, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
@@ -401,11 +402,11 @@ exports.createUser = (req, res) => {
         const userStatus = req.query.userStatus || 'all'
         const userRole = req.query.userRole || 'allRoles'
 
-        const { name, email, password, role, phone } = req.body;
+        const { name, email, password, role, phone, userTime } = req.body;
         const orgId = req.params.id
         const status = 'active'
 
-        axios.post(`${process.env.API_URL}/users/create`, { name, email, phone, password, role, orgId, status }, {
+        axios.post(`${process.env.API_URL}/users/create`, { name, email, phone, password, role, orgId, status, userTime }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
@@ -544,13 +545,14 @@ exports.updateUser = (req, res) => {
             const success = req.query.success;
             const errorMsg = req.query.error;
             const type = req.query.type;
+			const {orgName, status, registered, remark, expired, updatedBy, updatedAt, superadminName} = response.data.data
             if (success) {
                 res.render('superadmin/edit-user', { userName: req.session.user, userRole: req.session.role, user: response.data.data, orgId: orgId, options: options, roles: roles, errorMessage: null, successMessage: "Successfully Updated!" });
             } else if (errorMsg) {
 				const name = req.query.name
 				const phone = req.query.phone
 				const email = req.query.email
-				const userData = {name, phone, email}
+				const userData = {name, phone, email, orgName, status, registered, remark, expired, updatedBy, updatedAt, superadminName}
                 const orgId = req.params.id
                 if ( type == "dup-email") {
                     res.render('superadmin/edit-user', { userName: req.session.user, userRole: req.session.role, user: userData, orgId: orgId, options: options, roles: roles, errorMessage: "Duplicate Email!", successMessage: null });
@@ -570,7 +572,7 @@ exports.updateUser = (req, res) => {
 			}
         })
     } else {
-        const { name, email, phone, status, role, orgName } = req.body;
+        const { name, email, phone, status, role, orgName, userTime } = req.body;
 
         const org = req.query.orgName
         const orgStatus = req.query.orgStatus
@@ -580,7 +582,7 @@ exports.updateUser = (req, res) => {
         const userStatus = req.query.userStatus || "all"
         const userRole = req.query.userRole || "allRoles"
         
-        axios.put(`${process.env.API_URL}/users/${userId}`, { name, orgName, email, phone, role, status, orgId }, {
+        axios.put(`${process.env.API_URL}/users/${userId}`, { name, orgName, email, phone, role, status, orgId, userTime }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
@@ -617,7 +619,7 @@ exports.createSuperAdmins = (req, res) => {
     } else 
         if (req.method == 'POST') {
             const role = "superadmin"
-            const { name, email, password, phone } = req.body;
+            const { name, email, password, phone , userTime} = req.body;
             const orgId = 0
             const status = 'pending'
 
@@ -626,7 +628,7 @@ exports.createSuperAdmins = (req, res) => {
             
             const page = req.query.page
 
-            axios.post(`${process.env.API_URL}/utils/register`, { name, email, phone, password, role, orgId, status }, {
+            axios.post(`${process.env.API_URL}/utils/register`, { name, email, phone, password, role, orgId, status , userTime}, {
                 headers: {
                     'Authorization': `${req.session.token}`
                 }
@@ -725,6 +727,7 @@ exports.updateSuperadmin = (req, res) => {
             const success = req.query.success;
 			const errorMsg = req.query.error;
 			const type = req.query.type;
+			const {role, orgId, status, registered, remark, expired, updatedAt, updatedBy, orgName, superadminName} = response.data.data
 			if (response.data.data['orgId'] !== 0) {
 				throw error
 			}
@@ -732,7 +735,7 @@ exports.updateSuperadmin = (req, res) => {
 				const name = req.query.uName
 				const phone = req.query.phone
 				const email = req.query.email
-				const userData = {name, phone, email}
+				const userData = {name, phone, email, role, orgId, status, registered, remark, expired, updatedAt, updatedBy, orgName, superadminName}
                 if (type === "dup-email") {
 					res.render('superadmin/edit-superadmin', { userName: req.session.user, userRole: req.session.role, user: userData, options: options, errorMessage: "Duplicate Email!", successMessage: null });
 				} else if(type === "sysError") {
@@ -758,8 +761,8 @@ exports.updateSuperadmin = (req, res) => {
         const urlStatus = req.query.status || "all"
 
 		const role = "superadmin"
-        const { name, email, phone, status } = req.body;
-        axios.put(`${process.env.API_URL}/users/${userId}`, { name, email, phone, role, status, orgId }, {
+        const { name, email, phone, status, userTime } = req.body;
+        axios.put(`${process.env.API_URL}/users/${userId}`, { name, email, phone, role, status, orgId, userTime }, {
             headers: {
                 'Authorization': `${req.session.token}`
             }
