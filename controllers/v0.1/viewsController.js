@@ -15,7 +15,7 @@ exports.dashboard = (req, res) => {
         }).then(response => {
             res.render('superadmin/dashboard', { data: response.data.data, userName: req.session.user, userRole: req.session.role, token: req.session.token, user: req.session.user });
         }).catch(error => {
-            res.render('superadmin/dashboard', { userName: req.session.user, userRole: req.session.role, token: req.session.token, user: req.session.user });
+            res.render('superadmin/dashboard', { data: {}, userName: req.session.user, userRole: req.session.role, token: req.session.token, user: req.session.user });
         })
     }
 }
@@ -100,7 +100,7 @@ exports.orgs = (req, res) => {
                 res.render('superadmin/organizations', { userName: req.session.user, userRole: req.session.role, orgs: response.data.data, pagination: response.data.pagination, name: name, status: status, options: options, errorMessage: null , successMessage: null});
             }
         }).catch(error => {
-            res.render('superadmin/organizations', { orgs: [], name: {}, status: {}, options: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
+            res.render('superadmin/organizations', { userName: req.session.user, userRole: req.session.role, orgs: [], name: {}, status: {}, options: [], pagination: {}, errorMessage: "System Error!", successMessage: null });
         })
     }
 }
@@ -337,7 +337,7 @@ exports.detailOrg = (req, res) => {
                     }
                 }
             }).catch(error => {
-                res.render('superadmin/detail-organization', { userName: req.session.user, userRole: req.session.role, org: {}, users: [], name: {}, orgPage: orgPage, pagination: {}, errorMessage: "System Error!", options: options, status: userStatus, role: userRole, roles: roles, successMessage: null });
+                res.render('superadmin/detail-organization', { userName: req.session.user, userRole: req.session.role, org: response.data.data, users: [], name: {}, orgPage: orgPage, pagination: {}, errorMessage: "System Error!", options: options, status: userStatus, role: userRole, roles: roles, successMessage: null });
             })
         }).catch(error => {
 			if (error.status == 404) {
@@ -780,6 +780,7 @@ exports.updateSuperadmin = (req, res) => {
 
 exports.adminProfile = (req, res) => {
 	if (req.method == 'GET') {
+		let available = true;
         axios.get(`${process.env.API_URL}/users/profile/get`, {
             headers: {
                 'Authorization': `${req.session.token}`
@@ -791,7 +792,7 @@ exports.adminProfile = (req, res) => {
 
             if (success) {
                 if (type == 'updateProfile') {
-                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: response.data.data, errorMessage: null, successMessage: "Successfully Updated" });
+                    res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: response.data.data, errorMessage: null, successMessage: "Successfully Updated" });
                 }
             } else if (error) {
                 const name = req.query.name
@@ -800,24 +801,26 @@ exports.adminProfile = (req, res) => {
                 const role = 'superadmin'
                 const userData = { name, email, phone, role }
 
+
                 if (type == 'dup-email') {
-                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Duplicate Email!", successMessage: null });
+                    res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Duplicate Email!", successMessage: null });
                 } else if (type == '404Error') {
-                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "User not found!", successMessage: null });
+                    res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "User not found!", successMessage: null });
                 } else if (type == 'empty-value') {
-                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Input field shouldn't be empty!", successMessage: null });
+                    res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Input field shouldn't be empty!", successMessage: null });
                 } else if (type == 'deleteAccount') {
-                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Cannot delete your account at the moment!", successMessage: null });
+                    res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Cannot delete your account at the moment!", successMessage: null });
                 } else if (type == 'invalidPassword') {
-                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Invalid Password!", successMessage: null });
+                    res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Invalid Password!", successMessage: null });
                 } else {
-                    res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Internal Server Error!", successMessage: null });
+                    res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: userData, errorMessage: "Internal Server Error!", successMessage: null });
                 }
             } else {
-                res.render('superadmin/profile', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: response.data.data, errorMessage: null, successMessage: null });
+                res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: response.data.data, errorMessage: null, successMessage: null });
             }
         }).catch(error => {
-			res.render('superadmin/login', {appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, errorMessage: error.response.data.message });
+			available = false;
+			res.render('superadmin/profile', {available: available, appVersion: appVersion, appCodeName: appCodeName,  userName: req.session.user, userRole: req.session.role, user: {}, errorMessage: error.response.data.message });
         })
     } else {
         const updateProfile = async () => {
@@ -842,13 +845,14 @@ exports.adminProfile = (req, res) => {
                     }
                 }
                 // xxx
-                await axios.put(
+                const response = await axios.put(
                     `${process.env.API_URL}/users/profile/update`, parameters, {
                         headers: {
                             'Authorization': `${req.session.token}`
                         }
                     }
                 );
+				req.session.user = response.data.data.name;
                 res.redirect('/superadmin/profile?success=true&type=updateProfile');
             } catch (error) {
                 if (error.status == 409) {
