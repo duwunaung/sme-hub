@@ -53,6 +53,13 @@
                             <%= new Date(user.registered).toDateString() %>
                         </span>
                         </p>
+						<p>The last updated by <strong id="updatedBy"><%= user.superadminName %></strong> at <span id="updatedAt" class="fw-bold">
+							<%= new Date(user.updatedAt).toLocaleString('en-US', { 
+								year: 'numeric', month: 'long', day: 'numeric',
+								hour: 'numeric', minute: 'numeric', second: 'numeric',
+								hour12: true 
+							}) %>
+						</span></p>	
                     </div>
                 </form>
             </div>
