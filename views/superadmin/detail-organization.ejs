@@ -81,6 +81,9 @@
 		            align-items: center;
 		            justify-content: center;
 		        }
+				.icons::before, .usericons::before, .saIcons::before {
+					left: 22px;
+				}
 		    </style>
             <div class="container my-3">
 
@@ -149,11 +152,13 @@
                                         class="btn btn-warning w-100">Edit
                                         Organization</a>
                                     <div class="mt-3">
-                                        <p>The last updated by <strong id="updatedBy"><%= org.userName %></strong> at <span id="updatedAt"
-                                            class="fw-bold">
-                                            <%= new Date(org.updatedAt).toString().split('GMT')[0]; %>
-                                            </span>
-                                        </p>
+                                        <p>The last updated by <strong id="updatedBy"><%= org.userName %></strong> at <span id="updatedAt" class="fw-bold">
+											<%= new Date(org.updatedAt).toLocaleString('en-US', { 
+												year: 'numeric', month: 'long', day: 'numeric',
+												hour: 'numeric', minute: 'numeric', second: 'numeric',
+												hour12: true 
+											}) %>
+										</span></p>										
                                         <p>Current Expiration Date : <span id="currentExpirationDate"
                                                 class="fw-bold mx-2">
                                             <%= new Date(org.expiredDate).toDateString() %>
@@ -664,7 +669,7 @@
                                     placeholder="Enter User Phone" value="" oninput="checkInputs('phoneUserError', 'userPhone')" required>
 								<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
                             </div>
-                            
+                            <input type="hidden" id="userTime" name="userTime">
 
                             <div class="mb-3">
                                 <label for="userRole" class="form-label">Role</label><span> *</span>
@@ -675,6 +680,7 @@
                                         </option>
                                         <% }); %>
                                 </select>
+								
                             </div>
                             <button type="button" onclick="showConfirmModal()" id="addBtn" class="btn btn-primary w-100">Add New User</button>
                         </form>
@@ -702,6 +708,7 @@
 		    </div>
 		</div>
         <script>
+			
             const form = document.getElementById('addUserForm');
             const addButton = document.getElementById('addBtn');
             const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
@@ -733,40 +740,60 @@
             }
 
             function submitForm(event) {
-                const form = document.getElementById('addUserForm')
-
-			    addButton.disabled = true;
-			    addButton.textContent = 'Submitting...';
-
-                form.action = "/superadmin/organizations/adduser/<%= org.id %>" + query + userQuery
+				event.preventDefault();
+				const now = new Date();
+				const localTime = now.getFullYear() + "-" +
+				String(now.getMonth() + 1).padStart(2, '0') + "-" +
+				String(now.getDate()).padStart(2, '0') + " " +
+				String(now.getHours()).padStart(2, '0') + ":" +
+				String(now.getMinutes()).padStart(2, '0') + ":" +
+				String(now.getSeconds()).padStart(2, '0');
+				document.getElementById('userTime').value = localTime;
+				const form = document.getElementById('addUserForm');
+				const addButton = document.getElementById('addBtn');
+				addButton.disabled = true;
+				addButton.textContent = 'Submitting...';
+				form.submit();
 			}
 
 			function showConfirmModal() {
-		        if (!form.checkValidity()) {
-		            form.reportValidity();
-		            return;
-		        }
-		        
-		        document.getElementById('modalPasswordDisplay').textContent = userPassword.value;
-		        
-		        confirmPasswordModal.style.display = 'block';
-		    }
+				const form = document.getElementById('addUserForm');
+				if (!form.checkValidity()) {
+				form.reportValidity();
+				return;
+				}
+				const userPassword = document.getElementById('userPassword');
+				document.getElementById('modalPasswordDisplay').textContent = userPassword.value;
+				const confirmPasswordModal = document.getElementById('confirmPasswordModal');
+				confirmPasswordModal.style.display = 'block';
+			}
 
-		    function closeConfirmModal() {
-		        confirmPasswordModal.style.display = 'none';
-		    }
+			function closeConfirmModal() {
+				const confirmPasswordModal = document.getElementById('confirmPasswordModal');
+				confirmPasswordModal.style.display = 'none';
+			}
 
-		    function confirmSubmission() {
-		        closeConfirmModal();
-		        
-		        addButton.disabled = true;
-		        addButton.textContent = 'Submitting...';
-		        
-		        form.action = "/superadmin/organizations/adduser/<%= org.id %>" + query + userQuery;
-		        form.method = "POST";
-		        form.onsubmit = null;
-		        form.submit();
-		    }
+			function confirmSubmission() {
+				const now = new Date();
+				const localTime = now.getFullYear() + "-" +
+									String(now.getMonth() + 1).padStart(2, '0') + "-" +
+									String(now.getDate()).padStart(2, '0') + " " +
+									String(now.getHours()).padStart(2, '0') + ":" +
+									String(now.getMinutes()).padStart(2, '0') + ":" +
+									String(now.getSeconds()).padStart(2, '0');
+				document.getElementById('userTime').value = localTime;
+
+				closeConfirmModal();
+				const form = document.getElementById('addUserForm');
+				const addButton = document.getElementById('addBtn');
+				addButton.disabled = true;
+				addButton.textContent = 'Submitting...';
+
+				// form.action = "/superadmin/organizations/adduser/<%= org.id %>" + query + userQuery;
+
+				form.onsubmit = null;
+				form.submit();
+			}
 
 		    window.onclick = function(event) {
 		        if (event.target === confirmPasswordModal) {
