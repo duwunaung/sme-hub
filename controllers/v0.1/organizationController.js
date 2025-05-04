@@ -232,13 +232,6 @@ exports.licenseOrg = (req, res) => {
 	const month = String(today.getMonth() + 1).padStart(2, '0');
 	const day = String(today.getDate()).padStart(2, '0');
 	const formattedToday = `${year}-${month}-${day}`;
-	const now = new Date(userTime)
-	const localTime = now.getFullYear() + "-" +
-						String(now.getMonth() + 1).padStart(2, '0') + "-" +
-						String(now.getDate()).padStart(2, '0') + " " +
-						String(now.getHours()).padStart(2, '0') + ":" +
-						String(now.getMinutes()).padStart(2, '0') + ":" +
-						String(now.getSeconds()).padStart(2, '0');
     db_connection.query("SELECT * FROM orgs WHERE id = ?", [orgId], (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -276,7 +269,7 @@ exports.licenseOrg = (req, res) => {
 				message: 'not acceptable'
 			})
 		} else {
-			db_connection.query("UPDATE orgs SET expiredDate = ?, updatedBy = ?, updatedAt = ? WHERE id = ?", [expiry, userId, localTime, orgId], (error, results) => {
+			db_connection.query("UPDATE orgs SET expiredDate = ?, updatedBy = ?, updatedAt = ? WHERE id = ?", [expiry, userId, userTime, orgId], (error, results) => {
 				if (error) {
 					return res.status(500).send({
 						success: false,

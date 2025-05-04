@@ -392,7 +392,13 @@
 
 				confirmBtn.onclick = () => {
 					const now = new Date();
-					const encodedUserTime = encodeURIComponent(now);
+					const localTime = now.getFullYear() + "-" +
+			                      String(now.getMonth() + 1).padStart(2, '0') + "-" +
+			                      String(now.getDate()).padStart(2, '0') + " " +
+			                      String(now.getHours()).padStart(2, '0') + ":" +
+			                      String(now.getMinutes()).padStart(2, '0') + ":" +
+			                      String(now.getSeconds()).padStart(2, '0');
+					const encodedUserTime = encodeURIComponent(localTime);
 					if (!type && !num) {
 					    const expireDays = Math.ceil(orgExpiredDate / (1000 * 60 * 60 * 24)) - Math.ceil(today / (1000 * 60 * 60 * 24));
 					    const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day&userTime=${encodedUserTime}&` + query.slice(1);
