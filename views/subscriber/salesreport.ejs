@@ -1,0 +1,104 @@
+<%- include('../partials/subscriber/header.ejs') %>
+<%- include('../partials/subscriber/navbar.ejs') %>
+
+<style>
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-btn {
+  cursor: pointer;
+}
+.dropdown-menu {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.dropdown-item:hover {
+  background-color: rgba(13,110,253,0.1);
+}
+.main-content {
+  margin-top: 100px;
+}
+</style>
+
+<div class="main-content">
+  <!-- Main Content -->
+  <div id="mainContainer"></div>
+  
+  <main class="container">
+    <div class="content">
+      <!-- Messages -->
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= errorMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      
+      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= successMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+    </div>
+    
+    <!-- Dropdown Filter -->
+    <div class="d-flex justify-content-end mb-3">
+      <div class="dropdown">
+        <button class="btn btn-light dropdown-toggle" 
+                type="button" 
+                id="filterDropdown"
+                data-bs-toggle="dropdown" 
+                aria-expanded="false" 
+                style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+          Select
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="filterDropdown">
+          <li><button class="dropdown-item" type="button" onclick="selectFilter(this, 'all')">All</button></li>
+          <li><button class="dropdown-item" type="button" onclick="selectFilter(this, 'today')">Today</button></li>
+          <li><button class="dropdown-item" type="button" onclick="selectFilter(this, 'week')">This Week</button></li>
+          <li><button class="dropdown-item" type="button" onclick="selectFilter(this, 'month')">This Month</button></li>
+        </ul>
+      </div>
+    </div>
+    
+    <div id="contentArea">
+    </div>
+	<div style="height: 300px;"></div>
+  </main>
+</div>
+
+<script>
+
+function selectFilter(element, filter) {
+  const menuBtn = document.getElementById('menuBtn');
+  const selectedText = element.textContent;
+  
+  menuBtn.textContent = selectedText;
+  
+  console.log('Selected filter:', filter);
+  
+  filterContent(filter);
+}
+
+function filterContent(filter) {
+  console.log('Filtering by:', filter);
+}
+
+setTimeout(function() {
+  const alerts = document.querySelectorAll('.alert');
+  for (let i = 0; i < alerts.length; i++) {
+    if (alerts[i].classList.contains('show')) {
+      alerts[i].classList.remove('show');
+      setTimeout(function() { 
+        if (alerts[i].parentNode) {
+          alerts[i].parentNode.removeChild(alerts[i]);
+        }
+      }, 150);
+    }
+  }
+}, 5000);
+</script>
+
+<%- include('../partials/subscriber/footer.ejs') %>
