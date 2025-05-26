@@ -160,6 +160,7 @@ exports.createExpense = (req, res) => {
 	query += ') VALUES (' + values.map(() => '?').join(', ') + ')';
     db_connection.query(query, values, (err, result) => {
         if (err) {
+			console.log(err)
             return res.status(500).send(
                 {
                     success: false,
