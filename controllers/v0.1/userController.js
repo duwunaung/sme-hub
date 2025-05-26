@@ -30,7 +30,6 @@ exports.createUser = async (req, res) => {
             [name, hashedPassword, phone, role, email, orgId, status, new Date(), expiredDate, userId, userTime],
             (err, result) => {
                 if (err) {
-					console.log(err)
                     if (err.code ==  "ER_DUP_ENTRY") {
                         return res.status(409).send({
                             success: false,
