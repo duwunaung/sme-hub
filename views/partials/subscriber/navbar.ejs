@@ -364,7 +364,7 @@
                 <img src="/category_icon.svg" alt="Category icon" id="categoryIcon"> <span id="dashboardText">Categories</span></a></li>
             <li><a href="/subscriber/salesperson" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="salespersonBtn" onclick="setActiveButton('salespersonBtn')">
                 <i class="fa-solid fa-users" id="salespersonIcon"></i> <span id="dashboardText">Salespersons</span></a></li>
-            <li><a href="#" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="reportBtn" onclick="setActiveButton('reportBtn')">
+            <li><a href="/subscriber/report" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="reportBtn" onclick="setActiveButton('reportBtn')">
                 <img src="/report_icon.svg" alt="Report icon" id="reportIcon"> <span id="dashboardText">Report</span></a></li>
             <li><a href="/subscriber/user/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="usrProfileBtn" onclick="setActiveButton('usrProfileBtn')">
                 <i class="fa-regular fa-user"  id="usrProfileIcon"></i> <span id="dashboardText">User Profile</span></a></li>
@@ -404,6 +404,8 @@
 			case 'organization':
 				setActiveButton('orgProfileBtn');
 				break;
+			case 'report':
+				setActiveButton('reportBtn')
 
 			default:
 				break;
