@@ -273,3 +273,73 @@ exports.dashboard = (req, res) => {
 		})
 	});	
 }
+
+exports.overviewDashboard = (req, res) => {
+  const orgId = req.user.orgId;
+
+  const cashQuery = `
+    SELECT 
+      (IFNULL((SELECT SUM(amount) FROM incs WHERE orgId = ?), 0) -
+       IFNULL((SELECT SUM(amount) FROM exps WHERE orgId = ?), 0)) AS cashInHand
+  `;
+
+  const incomeQuery = `
+    SELECT description, incomeDate, amount 
+    FROM incs 
+    WHERE orgId = ? 
+    ORDER BY incomeDate DESC 
+    LIMIT 5
+  `;
+
+  const expenseQuery = `
+    SELECT description, expenseDate, amount 
+    FROM exps 
+    WHERE orgId = ? 
+    ORDER BY expenseDate DESC 
+    LIMIT 5
+  `;
+
+  // Execute all queries
+  db_connection.query(cashQuery, [orgId, orgId], (err, cashResult) => {
+    if (err) {
+      return res.status(500).send({
+        success: false,
+        message: 'Internal server error on cash query',
+        dev: err
+      });
+    }
+
+    db_connection.query(incomeQuery, [orgId], (err, incomeResults) => {
+      if (err) {
+        return res.status(500).send({
+          success: false,
+          message: 'Internal server error on income query',
+          dev: err
+        });
+      }
+
+      db_connection.query(expenseQuery, [orgId], (err, expenseResults) => {
+        if (err) {
+          return res.status(500).send({
+            success: false,
+            message: 'Internal server error on expense query',
+            dev: err
+          });
+        }
+
+        // Final response
+        res.status(200).send({
+          success: true,
+          message: 'Overview dashboard data fetched successfully',
+          dev: "Good Job, Bro!",
+          data: {
+            cashInHand: cashResult[0].cashInHand,
+            incomeTrans: incomeResults,
+            expenseTrans: expenseResults
+          }
+        });
+      });
+    });
+  });
+};
+
