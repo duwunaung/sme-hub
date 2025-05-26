@@ -16,8 +16,123 @@
 							<%= successMessage %>
 						</div>
 						<% } %>
+					<div class="container my-4">
+					  <h2 class="mt-3 mx-3">Dashboard</h2>
+
+					  <!-- Cash in Hand -->
+					  <div class="card text-center mb-4">
+					    <div class="card-body">
+					      <h5 class="card-title">Cash in Hand</h5>
+					      <% if (typeof overviewData !== 'undefined') { %>
+					        <p class="card-text display-6 <%= overviewData.cashInHand >= 0 ? 'text-income' : 'text-expense' %>" id="cashInHand">
+							  <% let formattedAmount = Math.abs(overviewData.cashInHand).toLocaleString(); %>
+								<% if (baseCurrency === 'MMK') { %>
+									<%= formattedAmount %> ks
+								<% } else if (baseCurrency === 'USD') { %>
+									$ <%= formattedAmount %>
+								<% } else if (baseCurrency === 'THB') { %>
+									฿ <%= formattedAmount %>
+								<% } else { %>
+									<%= formattedAmount %> <%= baseCurrency %>
+								<% } %>
+					        </p>
+					      <% } else { %>
+					        <p class="card-text display-6 text-muted" id="cashInHand">Loading...</p>
+					      <% } %>
+					    </div>
+					  </div>
+
+					  <!-- Recent Transactions -->
+					  <div class="row">
+					    <!-- Income Transactions -->
+					    <div class="col-md-6 mb-3">
+					      <div class="card">
+					        <div class="card-header bg-income text-white">
+					          Recent Income
+					        </div>
+					        <ul class="list-group list-group-flush" id="incomeList">
+					          <% if (typeof overviewData !== 'undefined' && overviewData.incomeTrans.length > 0) { %>
+					            <% overviewData.incomeTrans.forEach(item => { %>
+					              <li class="list-group-item">
+									<small class="me-2">
+										<%= new Date(item.incomeDate).toLocaleString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric', 
+													hour: '2-digit', 
+													minute: '2-digit', 
+													second: '2-digit', 
+													hour12: true 
+												}) %>  - 
+									</small>
+					                <strong><%= item.description.length > 30 ? item.description.substring(0, 30) + '...' : item.description %> </strong> - 
+									<span class="text-income"><% let formattedAmount = item.amount.toLocaleString(); %>
+									<% if (baseCurrency === 'MMK') { %>
+										<%= formattedAmount %> ks
+									<% } else if (baseCurrency === 'USD') { %>
+										$ <%= formattedAmount %>
+									<% } else if (baseCurrency === 'THB') { %>
+										฿ <%= formattedAmount %>
+									<% } else { %>
+										<%= formattedAmount %> <%= baseCurrency %>
+									<% } %>
+									</span>
+					              </li>
+					            <% }); %>
+					          <% } else { %>
+					            <li class="list-group-item text-muted">No income data available.</li>
+					          <% } %>
+					        </ul>
+					      </div>
+					    </div>
+
+					    <!-- Expense Transactions -->
+					    <div class="col-md-6 mb-3">
+					      <div class="card">
+					        <div class="card-header bg-expense text-white">
+					          Recent Expenses
+					        </div>
+					        <ul class="list-group list-group-flush" id="expenseList">
+					          <% if (typeof overviewData !== 'undefined' && overviewData.expenseTrans.length > 0) { %>
+					            <% overviewData.expenseTrans.forEach(item => { %>
+					              <li class="list-group-item">
+									<small>
+									<%= new Date(item.expenseDate).toLocaleString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric', 
+													hour: '2-digit', 
+													minute: '2-digit', 
+													second: '2-digit', 
+													hour12: true 
+												}) %>
+									</small> - 
+					                <strong><%= item.description.length > 30 ? item.description.substring(0, 30) + '...' : item.description %></strong>
+					                - 
+					                <span class="text-expense"><% let formattedAmount = item.amount.toLocaleString(); %>
+									<% if (baseCurrency === 'MMK') { %>
+										<%= formattedAmount %> ks
+									<% } else if (baseCurrency === 'USD') { %>
+										$ <%= formattedAmount %>
+									<% } else if (baseCurrency === 'THB') { %>
+										฿ <%= formattedAmount %>
+									<% } else { %>
+										<%= formattedAmount %> <%= baseCurrency %>
+									<% } %>
+									</span>
+					              </li>
+					            <% }); %>
+					          <% } else { %>
+					            <li class="list-group-item text-muted">No expense data available.</li>
+					          <% } %>
+					        </ul>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+
 		            <div class="d-flex align-items-center justify-content-between mb-3">
-		                <h2 class="mt-3 mx-3">Dashboard</h2>
+		                <h2 class="mt-3 mx-3">Overview</h2>
 		                <div class="mt-3 ">
 		                    <div class="btn-group">
 		                        <button type="button"
@@ -47,7 +162,7 @@
 		                    <div class="card text-center shadow-sm">
 		                        <div class="card-body">
 		                            <h5 class="card-title">Income</h5>
-		                            <h2 id="totalIncome" class="text-primary">
+		                            <h2 id="totalIncome" class="text-income">
 		                                0
 		                            </h2>
 		                        </div>
@@ -58,7 +173,7 @@
 		                    <div class="card text-center shadow-sm">
 		                        <div class="card-body">
 		                            <h5 class="card-title">Expense</h5>
-		                            <h2 id="totalExpense" class="text-primary">
+		                            <h2 id="totalExpense" class="text-expense">
 		                                0
 		                            </h2>
 		                        </div>
