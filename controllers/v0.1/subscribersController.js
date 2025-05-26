@@ -12,6 +12,7 @@ exports.dashboardSubscriber = (req, res) => {
         const { num, type } = req.query;
         let dashboardUrl = `${process.env.API_URL}/subscribers/dashboard`;
 		let barchartUrl = `${process.env.API_URL}/subscribers/dashboard/barchart`;
+		let overviewDataUrl = `${process.env.API_URL}/subscribers/dashboard/overview`;
         const queryParams = [];
         if (num) queryParams.push(`num=${num}`);
         if (type) queryParams.push(`type=${type}`);
@@ -23,14 +24,19 @@ exports.dashboardSubscriber = (req, res) => {
         .then(dashboardRes => {
 			axios.get(barchartUrl, { headers: { 'Authorization': `${req.session.token}` } })
 			.then(barcharRes => {
-				res.render('subscriber/home', { barchart: barcharRes.data.data, data: dashboardRes.data.data, baseCurrency: req.session.baseCurrency, token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo , successMessage:null, errorMessage:null})
+				axios.get(overviewDataUrl, { headers: { 'Authorization': `${req.session.token}`}})
+				.then(overviewRes => {
+					res.render('subscriber/home', { overviewData: overviewRes.data.data, barchart: barcharRes.data.data, data: dashboardRes.data.data, baseCurrency: req.session.baseCurrency, token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo , successMessage:null, errorMessage:null})
+				}).catch(error => {
+					res.render('subscriber/home', { overviewData: {} , barchart: barcharRes.data.data, data: dashboardRes.data.data, baseCurrency: req.session.baseCurrency, token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo , successMessage:null, errorMessage:null})
+				})
 			})
 			.catch(err => {
-				res.render('subscriber/home', {barchart: {}, data: dashboardRes.data.data, baseCurrency: req.session.baseCurrency, token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo, successMessage:null, errorMessage:null })
+				res.render('subscriber/home', {overviewData: {} ,barchart: {}, data: dashboardRes.data.data, baseCurrency: req.session.baseCurrency, token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo, successMessage:null, errorMessage:null })
 			})
         })
         .catch(error => {
-			res.render('subscriber/home', {barchart: {}, data: {}, baseCurrency: req.session.baseCurrency, token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo, errorMessage: "Internal Server Error", successMessage: null })
+			res.render('subscriber/home', {overviewData: {} ,barchart: {}, data: {}, baseCurrency: req.session.baseCurrency, token: req.session.token, userName: req.session.user, userRole: req.session.role, organizationName: req.session.orgName, logo: req.session.orgLogo, errorMessage: "Internal Server Error", successMessage: null })
         });
     }
 }
@@ -1511,4 +1517,135 @@ exports.deleteSalesperson = (req, res) => {
 			res.redirect('/subscriber/salesperson' + '?error=true&type=sysError')
 		})
 	}
+}
+
+exports.reportMainPage = (req, res) => {
+	if (req.method == 'GET') {
+		const page = req.query.page || 1;
+		const pageSize = req.query.pageSize || 10;
+        let transactionsUrl = `${process.env.API_URL}/subscribers/transactions`;
+        const queryParams = [];
+		if (page) queryParams.push(`page=${page}`)
+		if (pageSize) queryParams.push(`pageSize=${pageSize}`)
+		// set num = 1 and type = month to fetch the data of transaction records for this month
+        queryParams.push(`num=1`);
+        queryParams.push(`type=month`);
+
+        if (queryParams.length > 0) {
+            transactionsUrl += `?${queryParams.join('&')}`;
+        }
+        axios.get(transactionsUrl, { headers: { 'Authorization': `${req.session.token}` } })
+        .then(transactionsRes => {
+            res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
+				baseCurrency: req.session.baseCurrency, 
+				logo: req.session.orgLogo,
+                organizationName: req.session.orgName,
+                trans: "all",
+                category: [],
+				salesperson: [],
+                transaction: transactionsRes.data.data,
+                pagination: transactionsRes.data.pagination,
+                errorMessage: null,
+                successMessage: null
+            });
+        })
+        .catch(error => {
+            res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
+				baseCurrency: req.session.baseCurrency, 
+				logo: req.session.orgLogo,
+                organizationName: req.session.orgName,
+                trans: "all",
+                category: [],
+				salesperson: [],
+                transaction: [],
+                pagination: {},
+                errorMessage: "System Error!",
+                successMessage: null
+            });
+        });
+    }
+}
+
+exports.reportSalesPage = (req, res) => {
+	if (req.method == 'GET') {
+        // let url = `${process.env.API_URL}/subscribers/report/salesperson`;
+        // axios.get(url, { headers: { 'Authorization': `${req.session.token}` } })
+        // .then(result => {
+        //     res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
+		// 		baseCurrency: req.session.baseCurrency, 
+		// 		logo: req.session.orgLogo,
+        //         organizationName: req.session.orgName,
+        //     });
+        // })
+        // .catch(error => {
+        //     res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
+		// 		baseCurrency: req.session.baseCurrency, 
+		// 		logo: req.session.orgLogo,
+        //         organizationName: req.session.orgName,
+        //     });
+        // });
+		res.render('subscriber/salesreport', {userName: req.session.user, userRole: req.session.role,
+				baseCurrency: req.session.baseCurrency, 
+				logo: req.session.orgLogo,
+                organizationName: req.session.orgName,
+				errorMessage: null,
+				successMessage: null
+        });
+    }
+}
+
+exports.reportCatPage = (req, res) => {
+	if (req.method == 'GET') {
+        // let url = `${process.env.API_URL}/subscribers/report/category`;
+        // axios.get(url, { headers: { 'Authorization': `${req.session.token}` } })
+        // .then(result => {
+        //     res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
+		// 		baseCurrency: req.session.baseCurrency, 
+		// 		logo: req.session.orgLogo,
+        //         organizationName: req.session.orgName,
+        //     });
+        // })
+        // .catch(error => {
+        //     res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
+		// 		baseCurrency: req.session.baseCurrency, 
+		// 		logo: req.session.orgLogo,
+        //         organizationName: req.session.orgName,
+        //     });
+        // });
+		res.render('subscriber/catreport', {userName: req.session.user, userRole: req.session.role,
+				baseCurrency: req.session.baseCurrency, 
+				logo: req.session.orgLogo,
+                organizationName: req.session.orgName,
+				errorMessage: null,
+				successMessage: null
+        });
+    }
+}
+
+exports.reportDatePage = (req, res) => {
+	if (req.method == 'GET') {
+        // let url = `${process.env.API_URL}/subscribers/report/date`;
+        // axios.get(url, { headers: { 'Authorization': `${req.session.token}` } })
+        // .then(result => {
+        //     res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
+		// 		baseCurrency: req.session.baseCurrency, 
+		// 		logo: req.session.orgLogo,
+        //         organizationName: req.session.orgName,
+        //     });
+        // })
+        // .catch(error => {
+        //     res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
+		// 		baseCurrency: req.session.baseCurrency, 
+		// 		logo: req.session.orgLogo,
+        //         organizationName: req.session.orgName,
+        //     });
+        // });
+		res.render('subscriber/datereport', {userName: req.session.user, userRole: req.session.role,
+				baseCurrency: req.session.baseCurrency, 
+				logo: req.session.orgLogo,
+                organizationName: req.session.orgName,
+				errorMessage: null,
+				successMessage: null
+        });
+    }
 }
