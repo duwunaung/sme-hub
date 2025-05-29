@@ -21,7 +21,7 @@
 }
 </style>
 
-<div class="main-content">
+<div class="main-content" style="padding-bottom: 300px;">
   <!-- Main Content -->
   <div id="mainContainer"></div>
   
@@ -43,47 +43,183 @@
       <% } %>
     </div>
     
-    <!-- Dropdown Filter -->
-    <div class="d-flex justify-content-end mb-3">
-      <div class="dropdown">
-        <button class="btn btn-light dropdown-toggle" 
-                type="button" 
-                id="filterDropdown"
-                data-bs-toggle="dropdown" 
-                aria-expanded="false" 
-                style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
-          Select
-        </button>
-        <ul class="dropdown-menu dropdown-menu-end shadow-sm" aria-labelledby="filterDropdown">
-          <li><button class="dropdown-item" type="button" onclick="selectFilter(this, 'all')">All</button></li>
-          <li><button class="dropdown-item" type="button" onclick="selectFilter(this, 'today')">Today</button></li>
-          <li><button class="dropdown-item" type="button" onclick="selectFilter(this, 'week')">This Week</button></li>
-          <li><button class="dropdown-item" type="button" onclick="selectFilter(this, 'month')">This Month</button></li>
-        </ul>
-      </div>
-    </div>
+	<div>
+		<button class="btn btn-primary" onclick="goBack()">
+			Back
+		</button>
+	</div>
     
     <div id="contentArea">
+		<div class="d-flex justify-content-between" style="margin: 10px 10px;">
+			<!-- Search Bar -->
+			<div class="d-flex search-container me-2">
+				<input type="text" 
+					   class="form-control" 
+					   placeholder="Search..." 
+					   id="searchInput" 
+					   onkeydown="searchKey(event)">
+				<button class="btn" id="searchBarButton" onclick="performSearch()">
+					<img src="/search_icon.svg" alt="search icon" id="searchIcon">
+				</button>
+			</div>
+			<!-- Date Filter -->
+			<div class="btn-group">
+				<button type="button" 
+						class="btn btn-light dropdown-toggle" 
+						data-bs-toggle="dropdown" 
+						aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+					<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i><span id="filterName">Date</span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+				</ul>
+			</div>
+
+			<!-- Custom Date Filter -->
+			<div>
+			  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#customDateModal">
+			    Custom Date
+			  </button>
+			</div>
+			<!-- Export As Csv -->
+			 <div>
+			  <button class="btn btn-primary" onclick="exportCsv()">
+				Export As CSV
+			  </button>
+			</div>
+		</div>
+	</div>
+	
+
+	<!-- Modal for custom date -->
+	<div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content shadow">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="customDateModalLabel">Select Date Range</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        <div class="mb-3">
+	          <label for="start-date" class="form-label">From</label>
+	          <input type="date" class="form-control" id="start-date" onchange="updateEndMin()">
+	        </div>
+	        <div class="mb-3">
+	          <label for="end-date" class="form-label">To</label>
+	          <input type="date" class="form-control" id="end-date">
+	        </div>
+	      </div>
+		  <div>
+			<p id="errMsgDate" class="text-danger d-none">*Please select start date and end date!</p>
+		  </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-danger" onclick="getDateRange()">Apply</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+		<!-- salesperson Table -->
+		<div class="table-responsive">
+			<table class="table table-striped table-hover">
+				<thead class="table-dark">
+				  <tr>
+					<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
+					<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
+					<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
+					<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
+					<th style="min-width: 80px; text-align: center;">Actions</th>
+				</tr>
+				</thead>
+				<tbody>
+					<tbody id="salespersonTable">
+						<% if (salesperson.length > 0) { %>
+							<% for (let i = 0; i < salesperson.length; i++) { %>
+								<tr>
+									<td class="text-nowrap"><%= i + 1 %></td>
+									<td class="text-nowrap"><%= salesperson[i].name.length > 30 ? salesperson[i].name.substring(0, 30) + '...' : salesperson[i].name %></td>
+									<td class="text-nowrap text-income">
+										<% let totalSales = parseInt(salesperson[i].totalSales) %>
+										<% let formattedAmount = totalSales.toLocaleString(); %>
+										<% if (baseCurrency === 'MMK') { %>
+											<%= formattedAmount %> ks
+										<% } else if (baseCurrency === 'USD') { %>
+											$ <%= formattedAmount %>
+										<% } else if (baseCurrency === 'THB') { %>
+											฿ <%= formattedAmount %>
+										<% } else { %>
+											<%= formattedAmount %> <%= baseCurrency %>
+										<% } %>
+									</td>
+									<td class="text-nowrap">
+										<%= salesperson[i].totalTransactions %>
+									</td>
+									<td>
+										<div class="d-flex flex-nowrap justify-content-center">
+											<button onclick="viewDetail('<%= salesperson[i].id %>')"
+												class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
+												Summary
+											</button>
+											<button onclick="viewDetailTrans('<%= salesperson[i].id %>')"
+												class="btn btn-danger btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
+												View
+											</button>
+										</div>
+									</td>
+								</tr>
+							<% } %>
+						<% } else { %>
+							<tr>
+								<td colspan="5" class="text-center text-muted">No salespersons found.</td>
+							</tr>
+						<% } %>
+					</tbody>
+				</tbody>
+			</table>
+		</div>
     </div>
+
 	<div style="height: 300px;"></div>
   </main>
 </div>
 
 <script>
 
-function selectFilter(element, filter) {
-  const menuBtn = document.getElementById('menuBtn');
-  const selectedText = element.textContent;
-  
-  menuBtn.textContent = selectedText;
-  
-  console.log('Selected filter:', filter);
-  
-  filterContent(filter);
-}
+let sortDirections = {};
 
-function filterContent(filter) {
-  console.log('Filtering by:', filter);
+function sortTable(columnIndex, type, headerElement) {
+	let table = document.getElementById("salespersonTable");
+	let rows = Array.from(table.getElementsByTagName("tr"));
+	let ascending = !sortDirections[columnIndex];
+	sortDirections[columnIndex] = ascending;
+
+	rows.sort((rowA, rowB) => {
+		let cellA = rowA.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+		let cellB = rowB.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+
+		if (type === "number") {
+			cellA = parseFloat(cellA.replace(/[^0-9.-]/g, "")) || 0;
+			cellB = parseFloat(cellB.replace(/[^0-9.-]/g, "")) || 0;
+			return ascending ? cellA - cellB : cellB - cellA;
+		} else if (type === "date") {
+			cellA = new Date(cellA).getTime() || 0;
+			cellB = new Date(cellB).getTime() || 0;
+			return ascending ? cellA - cellB : cellB - cellA;
+		} else {
+			return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+		}
+	});
+	rows.forEach(row => table.appendChild(row));
+	document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
+	headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
 }
 
 setTimeout(function() {
@@ -99,6 +235,126 @@ setTimeout(function() {
     }
   }
 }, 5000);
+
+function filterDate(num, type) {
+    let url = new URL(window.location.href);
+    if (num && type && num !== 0) {
+        url.searchParams.set("num", num);
+		url.searchParams.set("type", type);
+		url.searchParams.delete("from");
+		url.searchParams.delete("to");
+		url.searchParams.delete("export");
+    } else {
+        url.searchParams.delete("num");
+		url.searchParams.delete("type");
+		url.searchParams.delete("from");
+		url.searchParams.delete("to");
+		url.searchParams.delete("export");
+    }
+    window.location.href = url.toString();
+}
+
+function updateEndMin() {
+	document.getElementById('errMsgDate').classList.add('d-none')
+    var start = document.getElementById("start-date");
+    var end = document.getElementById("end-date");
+    end.min = start.value;
+}
+
+function getDateRange() {
+    var start = document.getElementById("start-date").value;
+    var end = document.getElementById("end-date").value;
+
+    if (start && end) {
+        var endDateObj = new Date(end);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        var endPlusOne = endDateObj.toISOString().split('T')[0];
+
+        var modal = bootstrap.Modal.getInstance(document.getElementById('customDateModal'));
+        modal.hide();
+
+        let url = new URL(window.location.href);
+        url.searchParams.delete("num");
+        url.searchParams.delete("type");
+		url.searchParams.delete("export");
+        url.searchParams.set("from", start);
+        url.searchParams.set("to", endPlusOne);
+        window.location.href = url.toString();
+    } else {
+        document.getElementById('errMsgDate').classList.remove('d-none');
+    }
+}
+
+function exportCsv() {
+	let url = new URL(window.location.href);
+    url.searchParams.set("export", "true");
+    window.location.href = url.toString();
+}
+
+function searchKey(event){
+	if (event.key === 'Enter') {
+		performSearch();
+	}
+}
+
+function performSearch() {
+    let input = document.getElementById("searchInput").value.trim();
+    let url = new URL(window.location.href);
+    
+    if (input) {
+        url.searchParams.set("search", input);
+    } else {
+        url.searchParams.delete("search");
+    }
+    window.location.href = url.toString();
+}
+
+function viewDetail(id) {
+	let url = `/subscriber/report/salesperson/${id}?num=30&type=day`
+    window.location.href = url.toString();
+}
+
+function viewDetailTrans(id) {
+	let url = `/subscriber/report/salesperson/trans/${id}?num=30&type=day`
+    window.location.href = url.toString();
+}
+
+function goBack() {
+	let url = `/subscriber/report?num=30&type=day`
+    window.location.href = url.toString();
+}
+
+const searchParams = new URLSearchParams(window.location.search);
+const type = searchParams.get('type')
+const num = searchParams.get('num')
+const search = searchParams.get('search')
+if (typeof search === 'string' && search.trim().length > 0) {
+	document.getElementById('searchInput').value = search;
+}
+if (type === 'month') {
+	if (num === '0') {
+		document.getElementById('filterName').innerText = "Date"
+	} else if (num === '1') {
+		document.getElementById('filterName').innerText = "This Month"
+	} else if (num === '3') {
+		document.getElementById('filterName').innerText = "Last 3 Months"
+	} else if (num === '-1') {
+		document.getElementById('filterName').innerText = "Last Month"
+	}
+} else if (type === 'week') {
+	document.getElementById('filterName').innerText = "This Week"
+} else if (type === 'day') {
+	if (num === '1') {
+		document.getElementById('filterName').innerText = "Today"
+	} else if (num === '7') {
+		document.getElementById('filterName').innerText = "Last 7 Days"
+	} else if (num === '30') {
+		document.getElementById('filterName').innerText = "Last 30 Days"
+	}
+} else {
+	document.getElementById('filterName').innerText = "Date"
+}
+
 </script>
 
 <%- include('../partials/subscriber/footer.ejs') %>
