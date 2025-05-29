@@ -82,6 +82,7 @@
 			.navBtnStyle {
 				max-width: 150px;
 			}
+
 		</style>
 		<div class="main-content">
 			<!-- Main Content -->
@@ -106,8 +107,73 @@
 					  <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('category')">By Category</button>
 					</div>
 
+					<div class="d-flex justify-content-between" style="margin: 10px 10px;">
+						<!-- Date Filter -->
+						<div class="btn-group">
+							<button type="button" 
+									class="btn btn-light dropdown-toggle" 
+									data-bs-toggle="dropdown" 
+									aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+								<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i><span id="filterName">Date</span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+							</ul>
+						</div>
+
+						<!-- Custom Date Filter -->
+						<div>
+						  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#customDateModal">
+						    Custom Date
+						  </button>
+						</div>
+						<!-- Export As Csv -->
+						 <div>
+						  <button class="btn btn-primary" onclick="exportCsv()">
+							Export As CSV
+						  </button>
+						</div>
+					</div>
+					
+
+					<!-- Modal for custom date -->
+					<div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel" aria-hidden="true">
+					  <div class="modal-dialog">
+					    <div class="modal-content shadow">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="customDateModalLabel">Select Date Range</h5>
+					        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					      </div>
+					      <div class="modal-body">
+					        <div class="mb-3">
+					          <label for="start-date" class="form-label">From</label>
+					          <input type="date" class="form-control" id="start-date" onchange="updateEndMin()">
+					        </div>
+					        <div class="mb-3">
+					          <label for="end-date" class="form-label">To</label>
+					          <input type="date" class="form-control" id="end-date">
+					        </div>
+					      </div>
+						  <div>
+							<p id="errMsgDate" class="text-danger d-none">*Please select start date and end date!</p>
+						  </div>
+					      <div class="modal-footer">
+					        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					        <button type="button" class="btn btn-danger" onclick="getDateRange()">Apply</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+
 					<!-- Transaction Table -->
-					<div class="table-responsive">
+					<div class="table-responsive" style="margin-bottom: 300px;">
 						<table class="table table-striped table-hover">
 							<thead class="table-dark">
 								<tr>
@@ -117,9 +183,6 @@
 									<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(3, 'date', this)">Date <span></span></th>
 									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(4, 'string', this)">Category <span></span></th>
 									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
-									<% if (trans !== 'all') { %>
-										<th style="min-width: 130px; text-align: center;">Actions</th>
-									<% } %>
 								</tr>
 							</thead>
 							<tbody id="transactionTable">
@@ -135,7 +198,7 @@
 									<% for (let i = 0; i < transaction.length; i++) { %>
 										<tr>
 											<td class="text-nowrap ">
-												<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>
+												<%= i + 1 %>
 											</td>
 											<td class="text-nowrap " style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
 												<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
@@ -173,16 +236,6 @@
 											<td class="text-nowrap ">
 												<%= transaction[i].createdBy %>
 											</td>
-											<% if (trans !== 'all') { %>
-												<td>
-													<div class="d-flex flex-nowrap justify-content-center">
-														<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
-															class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">View</a>
-														<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
-															class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">Edit</a>
-													</div>
-												</td>
-											<% } %>
 										</tr>
 									<% } %>
 								<% } else { %>
@@ -197,93 +250,6 @@
 					
 	            </div>
 	        </main>
-			<!-- PageSize -->
-			<div class="btn-group my-2" style="max-width: 100px;">
-				<button type="button" 
-						class="btn btn-outline-dark dropdown-toggle" 
-						data-bs-toggle="dropdown" 
-						aria-expanded="false">
-					Page Size
-				</button>
-				<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-pageSize" style="max-height: 280px; overflow-y: auto;">
-					
-					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(5)">
-						5
-					</button>
-					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(10)">
-						10
-					</button>
-					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(15)">
-						15
-					</button>
-					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(20)">
-						20
-					</button>
-					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(30)">
-						30
-					</button>
-				</ul>
-			</div>
-			<!-- Pagination -->
-			<% if (pagination && pagination.totalPages > 1) { %>
-				<nav aria-label="Pagination" id="paginationNav">
-					<ul class="pagination justify-content-center">
-						<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
-							<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(1)' : '' %>><<</a>
-						</li>
-			   
-						<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
-							<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(' + (pagination.page - 1) + ')' : '' %>><</a>
-						</li>
-			   
-						<% if (pagination.page > 2) { %>
-							<li class="page-item"><a class="page-link" onclick="goToPage(1)">1</a></li>
-							<% if (pagination.page > 3) { %>
-								<li class="page-item disabled"><a class="page-link">...</a></li>
-							<% } %>
-						<% } %>
-						
-						<% if (pagination.page > 1) { %>
-							<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(parseInt(pagination.totalPages), parseInt(pagination.page) + 1); i++) { %>
-								<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
-									<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
-								</li>
-							<% } %>
-						<% } else { %>
-							<% for (let i = 1; i <= Math.min(2, pagination.totalPages); i++) { %>
-								<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
-									<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
-								</li>
-							<% } %>
-						<% } %>
-			   
-						<% if (pagination.page < pagination.totalPages - 1) { %>
-							<% if (pagination.page < pagination.totalPages - 2) { %>
-								<li class="page-item disabled"><a class="page-link">...</a></li>
-								<li class="page-item">
-									<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
-										<%= pagination.totalPages %>
-									</a>
-								</li>
-							<% } else if (pagination.page < pagination.totalPages) { %>
-								<li class="page-item">
-									<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
-										<%= pagination.totalPages %>
-									</a>
-								</li>
-							<% } %>
-						<% } %>
-			   
-						<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
-							<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + (parseInt(pagination.page) + 1) + ')' : '' %>>></a>
-						</li>
-			   
-						<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
-							<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + pagination.totalPages + ')' : '' %>>>></a>
-						</li>
-					</ul>
-				</nav>
-			<% } %>
 		</div>
 		<div style="height: 300px;"></div>
 		
@@ -319,31 +285,97 @@
 			    headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
 			}
 			
-			function goToPage(pageNumber) {
-			    const baseUrl = new URL(window.location.href);
-			    baseUrl.searchParams.set("page", pageNumber);
-			    window.location.href = baseUrl.toString();
-			}
-	
-			function setPageSize(pagesize) {
-				let url = new URL(window.location.href);
-			    if (pagesize && pagesize !== 10) {
-			        url.searchParams.set("pageSize", pagesize);
-					url.searchParams.delete("page");
-			    } else {
-			        url.searchParams.delete("pageSize");
-					url.searchParams.delete("page");
-			    }
-			    window.location.href = url.toString();
-			}
 			function goToNav(direction) {
 			  const currentPath = window.location.pathname;
-			  const targetPath = "/subscriber/report/" + direction;
+			  let targetPath = "/subscriber/report/" + direction;
 			  if (currentPath === targetPath) {
 			    return;
 			  }
 			  window.location.href = window.location.origin + targetPath;
 			}
 
+			function filterDate(num, type) {
+			    let url = new URL(window.location.href);
+			    if (num && type && num !== 0) {
+			        url.searchParams.set("num", num);
+					url.searchParams.set("type", type);
+					url.searchParams.delete("from");
+					url.searchParams.delete("to");
+					url.searchParams.delete("export");
+			    } else {
+			        url.searchParams.delete("num");
+					url.searchParams.delete("type");
+					url.searchParams.delete("from");
+					url.searchParams.delete("to");
+					url.searchParams.delete("export");
+			    }
+			    window.location.href = url.toString();
+			}
+
+			function updateEndMin() {
+				document.getElementById('errMsgDate').classList.add('d-none')
+			    var start = document.getElementById("start-date");
+			    var end = document.getElementById("end-date");
+			    end.min = start.value;
+			}
+
+			function getDateRange() {
+			    var start = document.getElementById("start-date").value;
+			    var end = document.getElementById("end-date").value;
+
+			    if (start && end) {
+			        var endDateObj = new Date(end);
+			        endDateObj.setDate(endDateObj.getDate() + 1);
+			        var endPlusOne = endDateObj.toISOString().split('T')[0];
+
+			        var modal = bootstrap.Modal.getInstance(document.getElementById('customDateModal'));
+			        modal.hide();
+
+			        let url = new URL(window.location.href);
+			        url.searchParams.delete("num");
+			        url.searchParams.delete("type");
+					url.searchParams.delete("export");
+			        url.searchParams.set("from", start);
+			        url.searchParams.set("to", endPlusOne);
+			        window.location.href = url.toString();
+			    } else {
+			        document.getElementById('errMsgDate').classList.remove('d-none');
+			    }
+			}
+
+			function exportCsv() {
+				let url = new URL(window.location.href);
+		        url.searchParams.set("export", "true");
+		        window.location.href = url.toString();
+			}
+
+
+			const searchParams = new URLSearchParams(window.location.search);
+			const type = searchParams.get('type')
+			const num = searchParams.get('num')
+			
+			if (type === 'month') {
+				if (num === '0') {
+					document.getElementById('filterName').innerText = "Date"
+				} else if (num === '1') {
+					document.getElementById('filterName').innerText = "This Month"
+				} else if (num === '3') {
+					document.getElementById('filterName').innerText = "Last 3 Months"
+				} else if (num === '-1') {
+					document.getElementById('filterName').innerText = "Last Month"
+				}
+			} else if (type === 'week') {
+				document.getElementById('filterName').innerText = "This Week"
+			} else if (type === 'day') {
+				if (num === '1') {
+					document.getElementById('filterName').innerText = "Today"
+				} else if (num === '7') {
+					document.getElementById('filterName').innerText = "Last 7 Days"
+				} else if (num === '30') {
+					document.getElementById('filterName').innerText = "Last 30 Days"
+				}
+			} else {
+				document.getElementById('filterName').innerText = "Date"
+			}
 		</script>
         <%- include('../partials/subscriber/footer.ejs') %>
