@@ -411,7 +411,10 @@
 			const searchParams = new URLSearchParams(window.location.search);
 			const type = searchParams.get('type')
 			const num = searchParams.get('num')
-			
+			const search = searchParams.get('search')
+			if (typeof search === 'string' && search.trim().length > 0) {
+				document.getElementById('searchInput').value = search;
+			}
 			const totalTrans = "<%= transaction.length %>"
 			if (totalTrans) {
 				document.getElementById('summaryTranTotal').innerText = totalTrans
