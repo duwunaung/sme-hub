@@ -1,0 +1,393 @@
+<%- include('../partials/subscriber/header.ejs') %>
+<%- include('../partials/subscriber/navbar.ejs') %>
+
+<style>
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-btn {
+  cursor: pointer;
+}
+.dropdown-menu {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.dropdown-item:hover {
+  background-color: rgba(13,110,253,0.1);
+}
+.main-content {
+  margin-top: 100px;
+}
+</style>
+
+<div class="main-content" style="padding-bottom: 300px;">
+  <!-- Main Content -->
+  <div id="mainContainer"></div>
+  
+  <main class="container">
+    <div class="content">
+      <!-- Messages -->
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= errorMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      
+      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= successMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+    </div>
+    <div>
+		<button class="btn btn-primary" onclick="goBack()">
+			Back
+		</button>
+		<h2><%= salespersonName %></h2>
+	</div>
+    <div id="contentArea">
+		<div class="d-flex justify-content-between" style="margin: 10px 10px;">
+			<!-- Date Filter -->
+			<div class="btn-group">
+				<button type="button" 
+						class="btn btn-light dropdown-toggle" 
+						data-bs-toggle="dropdown" 
+						aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+					<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i><span id="filterName">Date</span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+				</ul>
+			</div>
+
+			<!-- Custom Date Filter -->
+			<div>
+				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+				  Open Filter
+				</button>
+			</div>
+			<!-- Export As Csv -->
+			 <div>
+			  <button class="btn btn-primary" onclick="exportCsv()">
+				Export As CSV
+			  </button>
+			</div>
+		</div>
+
+		<!-- report Table -->
+		<div class="table-responsive">
+		    <table class="table table-striped table-hover">
+		        <thead class="table-dark">
+		          <tr>
+		            <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
+					<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(1, 'date', this)">Date <span></span></th>
+		            <th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
+		            <th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
+		            
+		            <% 
+		            let hasItemName = report.length > 0 && report[0].hasOwnProperty('itemName') && report[0].itemName !== undefined && report[0].itemName !== null;
+		            let hasQuantity = report.length > 0 && report[0].hasOwnProperty('quantity') && report[0].quantity !== undefined && report[0].quantity !== null;
+		            let sortIndex = 4; // Track column index for sorting
+		            %>
+		            <% if (hasItemName) { %>
+		                <th style="min-width: 80px; cursor: pointer;" onclick="sortTable(<%= sortIndex %>, 'string', this)">Item Name <span></span></th>
+		                <% sortIndex++; %>
+		            <% } %>
+		            <% if (hasQuantity) { %>
+		                <th style="min-width: 80px; cursor: pointer;" onclick="sortTable(<%= sortIndex %>, 'number', this)">Quantity <span></span></th>
+		            <% } %>
+		        </tr>
+		        </thead>
+		        <tbody>
+		            <tbody id="salespersonTable">
+		                <% if (report.length > 0) { %>
+		                    <% for (let i = 0; i < report.length; i++) { %>
+		                        <tr>
+		                            <td class="text-nowrap"><%= i + 1 %></td>
+									<td class="text-nowrap">
+										<%
+											let dateString = '';
+
+											if (report[i].incomeDate) {
+												dateString = new Date(report[i].incomeDate).toLocaleString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric', 
+													hour: '2-digit', 
+													minute: '2-digit', 
+													second: '2-digit', 
+													hour12: true 
+												});
+											} else if (report[i].date) {
+												dateString = new Date(report[i].date).toLocaleDateString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric'
+												});
+											} else if (report[i].year && report[i].month) {
+												const tempDate = new Date(`${report[i].year}-${report[i].month}-01`);
+												dateString = tempDate.toLocaleDateString('en-US', { 
+													month: 'short', 
+													year: 'numeric' 
+												});
+											} else if (report[i].year) {
+												dateString = report[i].year.toString();
+											}
+										%>
+										<%= dateString %>
+
+		                            </td>
+		                            <td class="text-nowrap text-income">
+		                                <% let totalSales = parseInt(report[i].totalSales) %>
+		                                <% let formattedAmount = totalSales.toLocaleString(); %>
+		                                <% if (baseCurrency === 'MMK') { %>
+		                                    <%= formattedAmount %> ks
+		                                <% } else if (baseCurrency === 'USD') { %>
+		                                    $ <%= formattedAmount %>
+		                                <% } else if (baseCurrency === 'THB') { %>
+		                                    ฿ <%= formattedAmount %>
+		                                <% } else { %>
+		                                    <%= formattedAmount %> <%= baseCurrency %>
+		                                <% } %>
+		                            </td>
+		                            <td class="text-nowrap">
+		                                <%= report[i].totalTransactions %>
+		                            </td>
+		                            
+		                            <% if (hasItemName) { %>
+		                                <td class="text-nowrap">
+		                                    <%= report[i].itemName || '' %>
+		                                </td>
+		                            <% } %>
+		                            <% if (hasQuantity) { %>
+		                                <td class="text-nowrap">
+		                                    <%= report[i].quantity || '' %>
+		                                </td>
+		                            <% } %>
+		                        </tr>
+		                    <% } %>
+		                <% } else { %>
+		                    <tr>
+		                        <% let totalCols = 4 + (hasItemName ? 1 : 0) + (hasQuantity ? 1 : 0); %>
+		                        <td colspan="<%= totalCols %>" class="text-center text-muted">No data found.</td>
+		                    </tr>
+		                <% } %>
+		            </tbody>
+		        </tbody>
+		    </table>
+		</div>
+    </div>
+
+	<!-- Timeframe Modal -->
+	<div class="modal fade" id="filterModal" tabindex="-1" aria-labelledby="filterModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <form method="GET" action="/subscriber/report/salesperson/<%=salespersonId%>" class="modal-content">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="filterModalLabel">Choose Data Filter</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+
+	      <div class="modal-body">
+	        <!-- Single hidden input for filterType - will be set by JavaScript -->
+	        <input type="hidden" name="filterType" id="activeFilterType" value="days">
+	        
+	        <!-- Tabs -->
+	        <ul class="nav nav-tabs mb-3" id="filterTab" role="tablist">
+	          <li class="nav-item" role="presentation">
+	            <button class="nav-link active" id="day-tab" data-bs-toggle="tab" data-bs-target="#dayTab" type="button" role="tab" onclick="setFilterType('days')">
+	              Day
+	            </button>
+	          </li>
+	          <li class="nav-item" role="presentation">
+	            <button class="nav-link" id="month-tab" data-bs-toggle="tab" data-bs-target="#monthTab" type="button" role="tab" onclick="setFilterType('months')">
+	              Month
+	            </button>
+	          </li>
+	          <li class="nav-item" role="presentation">
+	            <button class="nav-link" id="year-tab" data-bs-toggle="tab" data-bs-target="#yearTab" type="button" role="tab" onclick="setFilterType('allyears')">
+	              Year
+	            </button>
+	          </li>
+	        </ul>
+
+	        <!-- Tab Content -->
+	        <div class="tab-content">
+	          <!-- Day Tab -->
+	          <div class="tab-pane fade show active" id="dayTab" role="tabpanel">
+	            <div class="mb-3">
+	              <label for="dayYear" class="form-label">Select Year</label>
+	              <select class="form-select" id="dayYear" name="yearDay">
+	                <% for (let y = new Date().getFullYear(); y >= 2015; y--) { %>
+	                  <option value="<%= y %>"><%= y %></option>
+	                <% } %>
+	              </select>
+	            </div>
+	            <div class="mb-3">
+	              <label for="dayMonth" class="form-label">Select Month</label>
+	              <select class="form-select" id="dayMonth" name="monthDay">
+	                <% const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"]; %>
+	                <% monthNames.forEach((name, index) => { %>
+	                  <option value="<%= String(index + 1).padStart(2, '0') %>"><%= name %></option>
+	                <% }); %>
+	              </select>
+	            </div>
+	          </div>
+
+	          <!-- Month Tab -->
+	          <div class="tab-pane fade" id="monthTab" role="tabpanel">
+	            <div class="mb-3">
+	              <label for="monthYear" class="form-label">Select Year</label>
+	              <select class="form-select" id="monthYear" name="yearMonth">
+	                <% for (let y = new Date().getFullYear(); y >= 2015; y--) { %>
+	                  <option value="<%= y %>"><%= y %></option>
+	                <% } %>
+	              </select>
+	            </div>
+	          </div>
+
+	          <!-- Year Tab -->
+	          <div class="tab-pane fade" id="yearTab" role="tabpanel">
+	            <p class="text-muted">You will get summary of all available years.</p>
+	          </div>
+	        </div>
+	      </div>
+
+	      <div class="modal-footer">
+	        <button type="submit" class="btn btn-success">Apply Filter</button>
+	      </div>
+	    </form>
+	  </div>
+	</div>
+
+	<div style="height: 300px;"></div>
+  </main>
+</div>
+
+<script>
+
+const parseFlexibleDate = (dateStr) => {
+	let parsed = new Date(dateStr);
+	if (!isNaN(parsed)) return parsed.getTime();
+	const monthYearMatch = dateStr.match(/^([A-Za-z]+)\s+(\d{4})$/);
+	if (monthYearMatch) {
+		const [_, month, year] = monthYearMatch;
+		parsed = new Date(`${month} 1, ${year}`);
+		if (!isNaN(parsed)) return parsed.getTime();
+	}
+	const yearMatch = dateStr.match(/^\d{4}$/);
+	if (yearMatch) {
+		parsed = new Date(`${dateStr}-01-01`);
+		if (!isNaN(parsed)) return parsed.getTime();
+	}
+	return 0;
+};
+
+let sortDirections = {};
+
+function sortTable(columnIndex, type, headerElement) {
+	let table = document.getElementById("salespersonTable");
+	let rows = Array.from(table.getElementsByTagName("tr"));
+	let ascending = !sortDirections[columnIndex];
+	sortDirections[columnIndex] = ascending;
+
+	rows.sort((rowA, rowB) => {
+		let cellA = rowA.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+		let cellB = rowB.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+
+		if (type === "number") {
+			cellA = parseFloat(cellA.replace(/[^0-9.-]/g, "")) || 0;
+			cellB = parseFloat(cellB.replace(/[^0-9.-]/g, "")) || 0;
+			return ascending ? cellA - cellB : cellB - cellA;
+		} else if (type === "date") {
+			cellA = parseFlexibleDate(cellA);
+			cellB = parseFlexibleDate(cellB);
+			return ascending ? cellA - cellB : cellB - cellA;
+		} else {
+			return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+		}
+	});
+	rows.forEach(row => table.appendChild(row));
+	document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
+	headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
+}
+
+function goBack() {
+	let url = `/subscriber/report/salesperson/`
+    window.location.href = url.toString();
+}
+
+function filterDate(num, type) {
+    let url = new URL(window.location.href);
+    if (num && type && num !== 0) {
+        url.searchParams.set("num", num);
+		url.searchParams.set("type", type);
+		url.searchParams.delete("from");
+		url.searchParams.delete("to");
+		url.searchParams.delete("export");
+		url.searchParams.delete("filterType");
+		url.searchParams.delete("yearDay");
+		url.searchParams.delete("monthDay");
+		url.searchParams.delete("yearMonth");
+    } else {
+        url.searchParams.delete("num");
+		url.searchParams.delete("type");
+		url.searchParams.delete("from");
+		url.searchParams.delete("to");
+		url.searchParams.delete("export");
+		url.searchParams.delete("filterType");
+		url.searchParams.delete("yearDay");
+		url.searchParams.delete("monthDay");
+		url.searchParams.delete("yearMonth");
+    }
+    window.location.href = url.toString();
+}
+
+function exportCsv() {
+	let url = new URL(window.location.href);
+    url.searchParams.set("export", "true");
+    window.location.href = url.toString();
+}
+
+function setFilterType(type) {
+  document.getElementById('activeFilterType').value = type;
+}
+
+const searchParams = new URLSearchParams(window.location.search);
+const type = searchParams.get('type')
+const num = searchParams.get('num')
+if (type === 'month') {
+	if (num === '0') {
+		document.getElementById('filterName').innerText = "Date"
+	} else if (num === '1') {
+		document.getElementById('filterName').innerText = "This Month"
+	} else if (num === '3') {
+		document.getElementById('filterName').innerText = "Last 3 Months"
+	} else if (num === '-1') {
+		document.getElementById('filterName').innerText = "Last Month"
+	}
+} else if (type === 'week') {
+	document.getElementById('filterName').innerText = "This Week"
+} else if (type === 'day') {
+	if (num === '1') {
+		document.getElementById('filterName').innerText = "Today"
+	} else if (num === '7') {
+		document.getElementById('filterName').innerText = "Last 7 Days"
+	} else if (num === '30') {
+		document.getElementById('filterName').innerText = "Last 30 Days"
+	}
+} else {
+	document.getElementById('filterName').innerText = "Date"
+}
+</script>
+
+<%- include('../partials/subscriber/footer.ejs') %>
