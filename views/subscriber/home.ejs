@@ -1,6 +1,6 @@
 <%- include('../partials/subscriber/header.ejs') %>
 <%- include('../partials/subscriber/navbar.ejs') %>
-		<div class="main-content">
+		<div class="main-content" style="padding-bottom: 300px;">
 		    <div id="mainContainer" style="margin-top: 100px;"></div>
 		    <!-- Main Content -->
 		    <main>
@@ -17,7 +17,7 @@
 						</div>
 						<% } %>
 					<div class="container my-4">
-					  <h2 class="mt-3 mx-3">Dashboard</h2>
+					  <h2 class="mt-3 mx-3">Overview</h2>
 
 					  <!-- Cash in Hand -->
 					  <div class="card text-center mb-4">
@@ -132,7 +132,7 @@
 					</div>
 
 		            <div class="d-flex align-items-center justify-content-between mb-3">
-		                <h2 class="mt-3 mx-3">Overview</h2>
+		                <h2 class="mt-3 mx-3">Custom Reports</h2>
 		                <div class="mt-3 ">
 		                    <div class="btn-group">
 		                        <button type="button"
@@ -224,7 +224,7 @@
 		                </div>
 
 						<!-- New Bar Chart Section -->
-						<div class="row mt-4" style="max-width: 700px;">
+						<div class="row mt-4" style="width: 100%;">
 							<div class="col-12 mb-3">
 								<div class="card shadow-sm">
 									<div class="card-body">
@@ -236,7 +236,7 @@
 												<button type="button" class="btn btn-outline-primary" onclick="updateBarChart('month')" id="month">Month</button>
 											</div>
 										</div>
-										<canvas id="incomeExpenseBarChart" style="max-height: 400px; max-width: 500px;"></canvas>
+										<canvas id="incomeExpenseBarChart" style="max-height: 350px; width: 100%;"></canvas>
 									</div>
 								</div>
 							</div>
