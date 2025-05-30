@@ -25,16 +25,23 @@
 					      <h5 class="card-title">Cash in Hand</h5>
 					      <% if (typeof overviewData !== 'undefined') { %>
 					        <p class="card-text display-6 <%= overviewData.cashInHand >= 0 ? 'text-income' : 'text-expense' %>" id="cashInHand">
-							  <% let formattedAmount = Math.abs(overviewData.cashInHand).toLocaleString(); %>
+							  <%
+								    let formattedAmount = Math.abs(overviewData.cashInHand).toLocaleString();
+								    if (overviewData.cashInHand < 0) {
+								        formattedAmount = `(${formattedAmount})`;
+								    }
+								%>
+
 								<% if (baseCurrency === 'MMK') { %>
-									<%= formattedAmount %> ks
+								    <%= formattedAmount %> ks
 								<% } else if (baseCurrency === 'USD') { %>
-									$ <%= formattedAmount %>
+								    $ <%= formattedAmount %>
 								<% } else if (baseCurrency === 'THB') { %>
-									฿ <%= formattedAmount %>
+								    ฿ <%= formattedAmount %>
 								<% } else { %>
-									<%= formattedAmount %> <%= baseCurrency %>
+								    <%= formattedAmount %> <%= baseCurrency %>
 								<% } %>
+
 					        </p>
 					      <% } else { %>
 					        <p class="card-text display-6 text-muted" id="cashInHand">Loading...</p>
