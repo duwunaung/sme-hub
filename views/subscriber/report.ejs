@@ -125,15 +125,16 @@
 								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
 								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
 								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" data-bs-toggle="modal" data-bs-target="#customDateModal">Custom Date</button>
 							</ul>
 						</div>
 
 						<!-- Custom Date Filter -->
-						<div>
+						<!-- <div>
 						  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#customDateModal">
 						    Custom Date
 						  </button>
-						</div>
+						</div> -->
 						<!-- Export As Csv -->
 						 <div>
 						  <button class="btn btn-primary" onclick="exportCsv()">
@@ -353,7 +354,9 @@
 			const searchParams = new URLSearchParams(window.location.search);
 			const type = searchParams.get('type')
 			const num = searchParams.get('num')
-			
+			const from = searchParams.get('from')
+			const to = searchParams.get('to')
+
 			if (type === 'month') {
 				if (num === '0') {
 					document.getElementById('filterName').innerText = "Date"
@@ -375,7 +378,10 @@
 					document.getElementById('filterName').innerText = "Last 30 Days"
 				}
 			} else {
-				document.getElementById('filterName').innerText = "Date"
+				if (from && to)
+					document.getElementById('filterName').innerText = "Custom Date"
+				else
+					document.getElementById('filterName').innerText = "Date"
 			}
 		</script>
         <%- include('../partials/subscriber/footer.ejs') %>
