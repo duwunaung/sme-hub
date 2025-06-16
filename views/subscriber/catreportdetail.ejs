@@ -52,7 +52,7 @@
     <div id="contentArea">
 		<div class="d-flex justify-content-between" style="margin: 10px 10px;">
 			<!-- Search Bar -->
-			<div class="d-flex search-container me-2">
+			<!-- <div class="d-flex search-container me-2">
 				<input type="text" 
 					   class="form-control" 
 					   placeholder="Search..." 
@@ -61,7 +61,7 @@
 				<button class="btn" id="searchBarButton" onclick="performSearch()">
 					<img src="/search_icon.svg" alt="search icon" id="searchIcon">
 				</button>
-			</div>
+			</div> -->
 			<!-- Date Filter -->
 			<div class="btn-group">
 				<button type="button" 
@@ -134,10 +134,9 @@
 				<thead class="table-dark">
 				  <tr>
 					<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
-					<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Category Name <span></span></th>
+					<th style="min-width: 100px; cursor: pointer;" onclick="sortTable(1, 'date', this)">Date <span></span></th>
 					<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
 					<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
-					<th style="min-width: 80px; text-align: center;">Actions</th>
 				</tr>
 				</thead>
 				<tbody>
@@ -146,7 +145,15 @@
 							<% for (let i = 0; i < category.length; i++) { %>
 								<tr>
 									<td class="text-nowrap"><%= i + 1 %></td>
-									<td class="text-nowrap"><%= category[i].name.length > 30 ? category[i].name.substring(0, 30) + '...' : category[i].name %></td>
+									<td class="text-nowrap ">
+										<%= new Date(
+											category[i].transactionDate
+										).toLocaleString('en-US', { 
+											day: '2-digit', 
+											month: 'short', 
+											year: 'numeric'
+										}) %>
+									</td>
 									<td class="text-nowrap <%= category[i].type === 'income' ? 'text-income' : 'text-expense' %>">
 										<% let totalSales = parseInt(category[i].totalSales) %>
 										<% let formattedAmount = totalSales.toLocaleString(); %>
@@ -162,14 +169,6 @@
 									</td>
 									<td class="text-nowrap">
 										<%= category[i].totalTransactions %>
-									</td>
-									<td>
-										<div class="d-flex flex-nowrap justify-content-center">
-											<button onclick="viewDetail('<%= category[i].id %>', '<%= category[i].type %>')"
-												class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
-												Summary
-											</button>
-										</div>
 									</td>
 								</tr>
 							<% } %>
@@ -274,23 +273,23 @@ function exportCsv() {
     window.location.href = url.toString();
 }
 
-function searchKey(event){
-	if (event.key === 'Enter') {
-		performSearch();
-	}
-}
+// function searchKey(event){
+// 	if (event.key === 'Enter') {
+// 		performSearch();
+// 	}
+// }
 
-function performSearch() {
-    let input = document.getElementById("searchInput").value.trim();
-    let url = new URL(window.location.href);
+// function performSearch() {
+//     let input = document.getElementById("searchInput").value.trim();
+//     let url = new URL(window.location.href);
     
-    if (input) {
-        url.searchParams.set("search", input);
-    } else {
-        url.searchParams.delete("search");
-    }
-    window.location.href = url.toString();
-}
+//     if (input) {
+//         url.searchParams.set("search", input);
+//     } else {
+//         url.searchParams.delete("search");
+//     }
+//     window.location.href = url.toString();
+// }
 
 function viewDetail(id, type) {
 	let url = ''
@@ -302,7 +301,7 @@ function viewDetail(id, type) {
 }
 
 function goBack() {
-	let url = `/subscriber/report?num=30&type=day`
+	let url = `/subscriber/report/category?num=30&type=day`
     window.location.href = url.toString();
 }
 

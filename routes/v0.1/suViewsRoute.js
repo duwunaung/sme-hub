@@ -1,5 +1,5 @@
 const express = require('express')
-const {reportSalesDetailTransPage, reportSalesDetailPage, reportSalesPage, reportCatPage, reportDatePage, reportMainPage, updateExpenseTransCat, updateIncomeTransCat, dashboardSubscriber, deleteSalesperson, restoreSalesperson, updateSalesperson, createSalesperson, listSalesperson, editUsrProfile, editOrgProfile, login, logout, listExpenseCat, createExpenseCat, createIncomeCat, listIncomeCat , deleteIncomeCat, restoreIncomeCat , deleteExpenseCat, restoreExpenseCat , updateIncomeCat, updateExpenseCat, listIncomeTrans, listExpenseTrans , createIncomeTrans, createExpenseTrans , updateIncomeTrans, updateExpenseTrans , detailIncomeTrans, detailExpenseTrans, detailIncomeCat, detailExpenseCat, listAllTransactions} = require("../../controllers/v0.1/subscribersController")
+const {reportCatIncDetailPage, reportCatExpDetailPage, reportSalesDetailTransPage, reportSalesDetailPage, reportSalesPage, reportCatPage, reportDatePage, reportMainPage, updateExpenseTransCat, updateIncomeTransCat, dashboardSubscriber, deleteSalesperson, restoreSalesperson, updateSalesperson, createSalesperson, listSalesperson, editUsrProfile, editOrgProfile, login, logout, listExpenseCat, createExpenseCat, createIncomeCat, listIncomeCat , deleteIncomeCat, restoreIncomeCat , deleteExpenseCat, restoreExpenseCat , updateIncomeCat, updateExpenseCat, listIncomeTrans, listExpenseTrans , createIncomeTrans, createExpenseTrans , updateIncomeTrans, updateExpenseTrans , detailIncomeTrans, detailExpenseTrans, detailIncomeCat, detailExpenseCat, listAllTransactions} = require("../../controllers/v0.1/subscribersController")
 
 const checkSubscriberSession = require('../../middlewares/viewSubscribers');
 const tmpSession = require('../../middlewares/tmp');
@@ -49,6 +49,8 @@ router.use('/report/salesperson/trans/:id', checkSubscriberSession, reportSalesD
 router.use('/report/salesperson/:id', checkSubscriberSession, reportSalesDetailPage )
 router.use('/report/salesperson', checkSubscriberSession, reportSalesPage )
 router.use('/report/date', checkSubscriberSession, reportDatePage )
+router.use('/report/category/income/:id', checkSubscriberSession, reportCatIncDetailPage )
+router.use('/report/category/expense/:id', checkSubscriberSession, reportCatExpDetailPage )
 router.use('/report/category', checkSubscriberSession, reportCatPage )
 router.use('/report', checkSubscriberSession, reportMainPage )
 

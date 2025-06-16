@@ -1575,6 +1575,58 @@ const formatDataBySales = (data) => {
   });
 };
 
+const formatDataByCat = (data) => {
+  return data.map((txn, index) => {
+    const formattedAmount = new Intl.NumberFormat('en-US').format(txn.totalSales);
+    const currencySymbol = (() => {
+      switch (txn.baseCurrency) {
+        case 'USD': return `$ ${formattedAmount}`;
+        case 'MMK': return `${formattedAmount} ks`;
+        case 'THB': return `฿ ${formattedAmount}`;
+        default: return formattedAmount;
+      }
+    })();
+
+    return {
+      id: index + 1,
+	  name: txn.name,
+      totalSales: currencySymbol,
+	  totalTransactions: txn.totalTransactions,
+      baseCurrency: txn.baseCurrency,
+	  type: txn.type
+    };
+  });
+};
+
+const formatDataByCatDetail = (data) => {
+  return data.map((txn, index) => {
+    const formattedAmount = new Intl.NumberFormat('en-US').format(txn.totalSales);
+    const currencySymbol = (() => {
+      switch (txn.baseCurrency) {
+        case 'USD': return `$ ${formattedAmount}`;
+        case 'MMK': return `${formattedAmount} ks`;
+        case 'THB': return `฿ ${formattedAmount}`;
+        default: return formattedAmount;
+      }
+    })();
+	const formattedDate = txn.transactionDate && txn.transactionDate.trim() !== ''
+      ? new Date(txn.transactionDate).toLocaleString('en-US', {
+          month: 'long', day: 'numeric', year: 'numeric'
+        })
+      : '';
+
+    return {
+      id: index + 1,
+	  name: txn.name,
+	  transactionDate: formattedDate,
+      totalSales: currencySymbol,
+	  totalTransactions: txn.totalTransactions,
+      baseCurrency: txn.baseCurrency,
+	  type: txn.type
+    };
+  });
+};
+
 const formatDataBySalesDetail = (data) => {
   return data.map((txn, index) => {
     const formattedAmount = new Intl.NumberFormat('en-US').format(txn.totalSales);
@@ -1715,6 +1767,7 @@ exports.reportMainPage = (req, res) => {
 					}
 					const formattedData = formatTransactionData(data)
 					exportCsvResponse(res, formattedData, "transactions-report");
+					return;
 				}
 
 				res.render('subscriber/report', {
@@ -1791,6 +1844,7 @@ exports.reportSalesPage = (req, res) => {
 				}
 				const formattedData = formatDataBySales(data)
 				exportCsvResponse(res, formattedData, "report-by-salesperson");
+				return ;
 			}
 			res.render('subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data , options: options, errorMessage: null , successMessage: null});
 		}).catch(error => {
@@ -2112,30 +2166,51 @@ async function fetchSalespersonName(salespersonId, token) {
 
 exports.reportCatPage = (req, res) => {
 	if (req.method == 'GET') {
-        // let url = `${process.env.API_URL}/subscribers/report/category`;
-        // axios.get(url, { headers: { 'Authorization': `${req.session.token}` } })
-        // .then(result => {
-        //     res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
-		// 		baseCurrency: req.session.baseCurrency, 
-		// 		logo: req.session.orgLogo,
-        //         organizationName: req.session.orgName,
-        //     });
-        // })
-        // .catch(error => {
-        //     res.render('subscriber/report', {userName: req.session.user, userRole: req.session.role,
-		// 		baseCurrency: req.session.baseCurrency, 
-		// 		logo: req.session.orgLogo,
-        //         organizationName: req.session.orgName,
-        //     });
-        // });
-		res.render('subscriber/catreport', {userName: req.session.user, userRole: req.session.role,
-				baseCurrency: req.session.baseCurrency, 
-				logo: req.session.orgLogo,
-                organizationName: req.session.orgName,
-				errorMessage: null,
-				successMessage: null
-        });
-    }
+		const { search , num, type, from, to, export: exportCsv} = req.query
+		let url_api = `${process.env.API_URL}/subscribers/categories/listall`
+		const queryParams = [];
+		if (search) {
+			queryParams.push(`search=${search}`);
+		}
+		if (num) {
+			queryParams.push(`num=${num}`)
+		}
+		if (type) {
+			queryParams.push(`type=${type}`)
+		}
+		if (from) {
+			queryParams.push(`fromDate=${from}`)
+		}
+		if (to) {
+			queryParams.push(`toDate=${to}`)
+		}
+		if (queryParams.length > 0) {
+			url_api += `?${queryParams.join('&')}`;
+		}
+		axios.get(url_api, {
+			headers: {
+				'Authorization': `${req.session.token}`
+			}
+		}).then(response => {
+			const data = response.data.data;
+			if (exportCsv === 'true') {
+				if (!data || data.length === 0) {
+					res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "The report cannot be exported!", successMessage: null });
+				}
+				const formattedData = formatDataByCat(data)
+				exportCsvResponse(res, formattedData, "report-by-category");
+				return ;
+			}
+			res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: null , successMessage: null});
+		}).catch(error => {
+			console.log(error)
+			if (error.status === 404) {
+				res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: null, successMessage: null });
+			} else {
+				res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "System Error!", successMessage: null });
+			}
+		})
+	}
 }
 
 exports.reportDatePage = (req, res) => {
@@ -2164,4 +2239,68 @@ exports.reportDatePage = (req, res) => {
 				successMessage: null
         });
     }
+}
+
+function reportCatDetail (req, res, url_api) {
+	const { search , num, type, from, to, export: exportCsv} = req.query
+	const queryParams = [];
+	if (search) {
+		queryParams.push(`search=${search}`);
+	}
+	if (num) {
+		queryParams.push(`num=${num}`)
+	}
+	if (type) {
+		queryParams.push(`type=${type}`)
+	}
+	if (from) {
+		queryParams.push(`fromDate=${from}`)
+	}
+	if (to) {
+		queryParams.push(`toDate=${to}`)
+	}
+	if (queryParams.length > 0) {
+		url_api += `?${queryParams.join('&')}`;
+	}
+	console.log(url_api)
+	axios.get(url_api, {
+		headers: {
+			'Authorization': `${req.session.token}`
+		}
+	}).then(response => {
+		const data = response.data.data;
+		console.log(data)
+		if (exportCsv === 'true') {
+			if (!data || data.length === 0) {
+				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "The report cannot be exported!", successMessage: null });
+			}
+			const formattedData = formatDataByCatDetail(data)
+			exportCsvResponse(res, formattedData, "report-by-category-detail");
+			return ;
+		}
+		res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: null , successMessage: null});
+	}).catch(error => {
+		if (error.status === 404) {
+			res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: null, successMessage: null });
+		} else {
+			res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "System Error!", successMessage: null });
+		}
+	})
+}
+
+exports.reportCatIncDetailPage = (req, res) => {
+	if (req.method == 'GET') {
+		const {id} = req.params
+		let url_api = `${process.env.API_URL}/subscribers/categories/income/detail/report/${id}`
+		reportCatDetail(req, res, url_api)
+	}
+}
+
+exports.reportCatExpDetailPage = (req, res) => {
+	if (req.method == 'GET') {
+		const {id} = req.params
+		let url_api = `${process.env.API_URL}/subscribers/categories/expense/detail/report/${id}`
+		console.log(url_api)
+		reportCatDetail(req, res, url_api)
+	}
 }

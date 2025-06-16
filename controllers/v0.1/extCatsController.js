@@ -1298,3 +1298,270 @@ exports.listIncomeCategory = (req, res) => {
         });
     });
 };
+
+exports.listAllCatsData = (req, res) => {
+    const { fromDate, toDate, num, type, search } = req.query;
+
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "Superadmin tried to access category summary"
+        });
+    }
+
+    const orgId = req.user.orgId;
+    let incomeConditions = [];
+    let expenseConditions = [];
+    let incomeParams = [];
+    let expenseParams = [];
+
+    if (fromDate) {
+        incomeConditions.push('i.incomeDate >= ?');
+        expenseConditions.push('e.expenseDate >= ?');
+        incomeParams.push(fromDate);
+        expenseParams.push(fromDate);
+    }
+
+    if (toDate) {
+        incomeConditions.push('i.incomeDate < ?');
+        expenseConditions.push('e.expenseDate < ?');
+        incomeParams.push(toDate);
+        expenseParams.push(toDate);
+    }
+
+    if (num && type && ['day', 'week', 'month'].includes(type)) {
+        const numValue = parseInt(num);
+        
+        if (type === 'day') {
+            if (numValue === 1) {
+                incomeConditions.push('i.incomeDate >= CURDATE() AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)');
+                expenseConditions.push('e.expenseDate >= CURDATE() AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)');
+            } else {
+                incomeConditions.push('i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)');
+                expenseConditions.push('e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? DAY) AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)');
+                incomeParams.push(numValue);
+                expenseParams.push(numValue);
+            }
+        } else if (type === 'week') {
+            if (numValue === 1) {
+                incomeConditions.push('i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) AND i.incomeDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)');
+                expenseConditions.push('e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY) AND e.expenseDate < DATE_ADD(CURDATE(), INTERVAL 1 DAY)');
+            } else {
+                incomeConditions.push('i.incomeDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)');
+                expenseConditions.push('e.expenseDate >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)');
+                incomeParams.push(numValue);
+                expenseParams.push(numValue);
+            }
+        } else if (type === 'month') {
+            if (numValue === 1) {
+                incomeConditions.push("i.incomeDate >= DATE_FORMAT(NOW(), '%Y-%m-01')");
+                expenseConditions.push("e.expenseDate >= DATE_FORMAT(NOW(), '%Y-%m-01')");
+            } else if (numValue === -1) {
+                incomeConditions.push("i.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01') AND i.incomeDate < DATE_FORMAT(NOW(), '%Y-%m-01')");
+                expenseConditions.push("e.expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01') AND e.expenseDate < DATE_FORMAT(NOW(), '%Y-%m-01')");
+            } else {
+                incomeConditions.push("i.incomeDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')");
+                expenseConditions.push("e.expenseDate >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')");
+                incomeParams.push(numValue);
+                expenseParams.push(numValue);
+            }
+        }
+    }
+
+    const incomeConditionStr = incomeConditions.length > 0 ? incomeConditions.join(' AND ') : '1=1';
+    const expenseConditionStr = expenseConditions.length > 0 ? expenseConditions.join(' AND ') : '1=1';
+
+    let searchCondition = '';
+    let searchParams = [];
+    
+    if (search && search.trim()) {
+        searchCondition = 'WHERE name LIKE ?';
+        searchParams.push(`%${search.trim()}%`);
+    }
+
+    const query = `
+        SELECT * FROM (
+            SELECT
+                ic.name AS name,
+				ic.id AS id,
+                SUM(CASE WHEN i.id IS NOT NULL AND (${incomeConditionStr}) THEN i.amount ELSE 0 END) AS totalSales,
+                COUNT(CASE WHEN i.id IS NOT NULL AND (${incomeConditionStr}) THEN i.id ELSE NULL END) AS totalTransactions,
+                o.baseCurrency,
+                'income' AS type
+            FROM inccats ic
+            LEFT JOIN incs i ON ic.id = i.catId
+            JOIN orgs o ON ic.orgId = o.id
+            WHERE ic.orgId = ?
+            GROUP BY ic.id, ic.name, o.baseCurrency
+
+            UNION ALL
+
+            SELECT
+                ec.name AS name,
+				ec.id AS id,
+                SUM(CASE WHEN e.id IS NOT NULL AND (${expenseConditionStr}) THEN e.amount ELSE 0 END) AS totalSales,
+                COUNT(CASE WHEN e.id IS NOT NULL AND (${expenseConditionStr}) THEN e.id ELSE NULL END) AS totalTransactions,
+                o.baseCurrency,
+                'expense' AS type
+            FROM expcats ec
+            LEFT JOIN exps e ON ec.id = e.catId
+            JOIN orgs o ON ec.orgId = o.id
+            WHERE ec.orgId = ?
+            GROUP BY ec.id, ec.name, o.baseCurrency
+        ) AS summary
+        ${searchCondition}
+        ORDER BY totalSales DESC
+    `;
+
+	const queryParams = [
+        ...incomeParams,
+        ...incomeParams,  
+        orgId,
+        ...expenseParams,
+        ...expenseParams,
+        orgId,
+        ...searchParams
+    ];
+    
+    db_connection.query(query, queryParams, (err, results) => {
+        if (err) {
+            return res.status(500).send({
+                success: false,
+                message: 'Internal server error',
+                dev: err
+            });
+        }
+
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'No category data found',
+                dev: "Category summary not found"
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            message: 'Category summary loaded',
+            dev: 'Categories with totalSales and transactions by date filter',
+            data: results
+        });
+    });
+};
+
+function detailCatReport(req, res, catType) {
+    const { num, type, fromDate, toDate } = req.query;
+    
+    if (req.user.orgId === 0) {
+        return res.status(403).send({
+            success: false,
+            message: 'You cannot access at the moment, kindly contact admin team',
+            dev: "The Superadmin tried to access Salespersons list"
+        });
+    }
+    
+    const orgId = req.user.orgId;
+    const id = req.params.id;
+    const queryParams = [];
+    const dateType = catType === 'income' ? 'incomeDate' : 'expenseDate';
+    const tableType = catType === 'income' ? 'inccats' : 'expcats';
+    const table = catType === 'income' ? 'incs' : 'exps';
+    
+    let query = `
+        SELECT
+            ic.name AS name,
+            DATE(i.${dateType}) AS transactionDate,
+            SUM(i.amount) AS totalSales,
+            COUNT(i.id) AS totalTransactions,
+			'${catType}' AS type,
+            o.baseCurrency AS baseCurrency
+        FROM ${table} i
+        JOIN ${tableType} ic ON i.catId = ic.id
+        JOIN orgs o ON o.id = ?
+        WHERE i.orgId = ? AND i.catId = ?
+    `;
+    
+    queryParams.push(orgId);
+    queryParams.push(orgId);
+    queryParams.push(id);
+    
+    if (fromDate) {
+        query += ` AND DATE(i.${dateType}) >= ?`;
+        queryParams.push(fromDate);
+    }
+    
+    if (toDate) {
+        query += ` AND DATE(i.${dateType}) < ?`;
+        queryParams.push(toDate);
+    }
+    
+    if (num && type && ["day", "week", "month"].includes(type)) {
+        if (type === "week") {
+            if (parseInt(num) === 1) {
+                query += ` AND i.${dateType} >= DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY)
+                          AND i.${dateType} < DATE_ADD(DATE_SUB(CURDATE(), INTERVAL WEEKDAY(CURDATE()) DAY), INTERVAL 7 DAY)`;
+            } else {
+                query += ` AND i.${dateType} >= DATE_SUB(CURDATE(), INTERVAL ? WEEK)`;
+                queryParams.push(num);
+            }
+        } else if (type === "month") {
+            if (parseInt(num) === 1) {
+                query += ` AND i.${dateType} >= DATE_FORMAT(NOW(), '%Y-%m-01')
+                          AND i.${dateType} < DATE_ADD(DATE_FORMAT(NOW(), '%Y-%m-01'), INTERVAL 1 MONTH)`;
+            } else if (parseInt(num) === -1) {
+                query += ` AND i.${dateType} >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 MONTH), '%Y-%m-01')
+                          AND i.${dateType} < DATE_FORMAT(NOW(), '%Y-%m-01')`;
+            } else {
+                query += ` AND i.${dateType} >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL ? MONTH), '%Y-%m-01')`;
+                queryParams.push(num - 1);
+            }
+        } else if (type === "day") {
+            if (parseInt(num) === 1) {
+                query += ` AND DATE(i.${dateType}) = CURDATE()`;
+            } else {
+                query += ` AND i.${dateType} >= DATE_SUB(CURDATE(), INTERVAL ? DAY)
+                          AND i.${dateType} < DATE_ADD(CURDATE(), INTERVAL 1 DAY)`;
+                queryParams.push(num);
+            }
+        }
+    }
+    
+    query += `
+        GROUP BY ic.id, ic.name, DATE(i.${dateType}), o.baseCurrency
+        ORDER BY DATE(i.${dateType}) DESC, ic.name ASC
+    `;
+    db_connection.query(query, queryParams, (err, results) => {
+        if (err) {
+            console.log(err);
+            return res.status(500).send({
+                success: false,
+                message: 'internal server error',
+                dev: err
+            });
+        }
+        
+        if (results.length === 0) {
+            return res.status(404).send({
+                success: false,
+                message: 'data not found',
+                dev: "data not found"
+            });
+        }
+        
+        res.status(200).send({
+            success: true,
+            message: 'Here is the data with total sales per day',
+            dev: "Good Job, Bro!",
+            data: results
+        });
+    });
+}
+
+exports.detailIncCatReport = (req, res) => {
+    detailCatReport(req, res, 'income');
+}
+
+exports.detailExpCatReport = (req, res) => {
+    detailCatReport(req, res, 'expense');
+}
