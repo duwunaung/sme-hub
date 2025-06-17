@@ -269,17 +269,17 @@
 			top: 12px;
 			margin-left: 60px;
 		}
-        .top-bar {
+        /* .top-bar {
             width: calc(100% - 280px);
             left: 280px;
-        }
+        } */
         
-        .main-content {
-		    margin-left: 280px;
-		    width: calc(100% - 280px);
-		    overflow-x: hidden;
-		    position: relative;
-		}
+	        /* .main-content {
+			    margin-left: 280px;
+			    width: calc(100% - 280px);
+			    overflow-x: hidden;
+			    position: relative;
+			} */
 		#menuBtn {
 			display: none;
 		}
@@ -313,9 +313,41 @@
 	#userNamePosition:hover {
 		cursor: pointer;
 	}
+	#settingsDropdowns li a:hover {
+	    background-color: #f1f1f1;
+	    color: #000;
+	    text-decoration: none;
+	}
+	#settingsDropdowns li a {
+	    transition: background-color 0.3s ease, color 0.3s ease;
+	}
+
+	#navTop div a:hover {
+		background-color: #f1f1f1;
+	    color: #000;
+	    text-decoration: none;
+
+	}
+
+	#navTop div a {
+		transition: background-color 0.3s ease, color 0.3s ease;
+	}
+
+	.topBtnNav {
+		padding: 5px 10px;
+		border-radius: 10px;
+		color: #606060;
+		font-weight: bold;
+	}
+
+	.topBtnBgActivate {
+		background-color: #f1f1f1;
+	    color: #000;
+		text-decoration: none;
+	}
 </style>
 
-<nav class="navbar navbar-dark bg-dark navbar-expand-lg justify-content-center">
+<nav class="navbar navbar-dark navbar-expand-lg justify-content-center">
     <button id="menuBtn" class="btn btn-dark menu-icon me-3" onclick="toggleSidebar()">
         <img src="/closed_menu.svg" class="adjustImgSize" alt="menu logo" id="menulogo">
     </button>
@@ -323,9 +355,34 @@
 		<img src="/dummy.svg" alt="menu logo" id="menulogoDiv">
 	</div>
     <div class="top-bar">
+		<div id="menuBtnDiv" class="btn btn-dark d-none me-3">
+			<img src="/dummy.svg" alt="menu logo" id="menulogoDiv">
+		</div>
+		<div class=" text-dark fs-5 d-flex align-items-center p-1" style="margin-left: 80px; margin-right: 10px;">
+			<span class="fw-bold me-4 ms-2" style="font-size: larger; width: 150px;">
+				 Flow Sight
+			</span>
+		</div>
+		<div id="navTop" class="d-none d-lg-flex gap-4 position-relative justify-content-center" style="width: 100%; margin-right: 320px;">
+		    <div><a href="/subscriber/home" class="nav-link topBtnNav" id="dashboardTop" onclick="changeBgColor('dashboardTop')">Dashboard</a></div>
+		    <div><a href="/subscriber/transaction/transactions" id="transactionTop" class="nav-link topBtnNav" onclick="changeBgColor('transactionTop')">Transactions</a></div>
+		    <div><a href="/subscriber/report?num=30&type=day" id="reportTop" class="nav-link topBtnNav" onclick="changeBgColor('reportTop')">Reports</a></div>
+			<div class="position-relative px-3 d-none d-lg-flex" style=" z-index: 1001;">
+		        <div style="cursor: pointer;" class="nav-link" onclick="toggleSettingDropdown(event)">
+		            <img src="/settings_icon.svg" alt="Settings icon" id="settingsIcon">
+				</div>
+		        <ul id="settingsDropdowns" class="list-unstyled position-absolute bg-white shadow rounded ms-2 mt-2 d-none" style="width: 200px; top:30px; right: 20px;">
+		            <li><a href="/subscriber/salesperson" class="text-dark d-block py-2 px-3">People</a></li>
+		            <li><a href="/subscriber/category/income" class="text-dark d-block py-2 px-3">Categories</a></li>
+		            <li><a href="/subscriber/user/profile" class="text-dark d-block py-2 px-3">User Profile</a></li>
+		            <li><a href="/subscriber/organization/profile" class="text-dark d-block py-2 px-3">Organization Profile</a></li>
+		        </ul>
+		    </div>
+		</div>
+		
         <div id="userProfile" class="d-flex justify-content-center align-items-center">
             <div class="me-3 d-none d-sm-flex flex-column align-items-end" id="userNamePosition" onclick="goToUserProfilePage()">
-                <span id="userName" class="d-block fw-bold" style="font-size: large;"><%= userName %></span>
+                <span id="userName" class="d-block fw-bold" style="font-size: large;"><%= userName %> </span>
                 <span id="userPosition"><%= userRole%></span>
             </div>
             <div id="profileBtn" onclick="goToProfilePage()">
@@ -342,38 +399,38 @@
 </nav>
 
 <!-- Sidebar -->
-<div class="sidebar bg-light" id="sidebar">
-	<div id="sidebarHeader">
+<div class="sidebar bg-light d-lg-none" id="sidebar">
+	<!-- <div id="sidebarHeader">
 		<div class="sidebar-header">
 			<div class="offcanvas-title text-dark fs-5 d-flex align-items-center p-1" id="sidebarLabel">
 				<span class="fw-bold me-4 ms-2" style="font-size: larger;">
-					<!-- <%= organizationName.toUpperCase() %> -->
 					 Flow Sight
 				</span>
 			</div>
 		</div>
-	</div>
+	</div> -->
     
     <div class="sidebar-body" id="sidebarBody">
         <ul class="list-unstyled">
             <li><a href="/subscriber/home" class="text-dark d-block py-2 d-flex align-items-center" id="dashboardBtn" onclick="setActiveButton('dashboardBtn')">
-                <img src="/dashboard_icon.svg" alt="Dashboard icon" id="dashboardIcon"> <span id="dashboardText">Dashboard</span></a></li>
+				<span id="dashboardText">Dashboard</span></a></li>
             <li><a href="/subscriber/transaction/transactions" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="transactionBtn" onclick="setActiveButton('transactionBtn')">
-                <img src="/transaction_icon.svg" alt="transaction icon" id="transactionIcon"> <span id="dashboardText">Transactions</span></a></li>
-            <li><a href="/subscriber/category/income" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="categoryBtn" onclick="setActiveButton('categoryBtn')">
-                <img src="/category_icon.svg" alt="Category icon" id="categoryIcon"> <span id="dashboardText">Categories</span></a></li>
-            <li><a href="/subscriber/salesperson" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="salespersonBtn" onclick="setActiveButton('salespersonBtn')">
-                <i class="fa-solid fa-users" id="salespersonIcon"></i> <span id="dashboardText">Salespersons</span></a></li>
+				<span id="dashboardText">Transactions</span></a></li>
             <li><a href="/subscriber/report?num=30&type=day" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="reportBtn" onclick="setActiveButton('reportBtn')">
-                <img src="/report_icon.svg" alt="Report icon" id="reportIcon"> <span id="dashboardText">Report</span></a></li>
-            <li><a href="/subscriber/user/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="usrProfileBtn" onclick="setActiveButton('usrProfileBtn')">
-                <i class="fa-regular fa-user"  id="usrProfileIcon"></i> <span id="dashboardText">User Profile</span></a></li>
-            <li><a href="/subscriber/organization/profile" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="orgProfileBtn" onclick="setActiveButton('orgProfileBtn')">
-                <i class="fa-regular fa-building" id="orgProfileIcon"></i> <span id="dashboardText">Organization</span></a></li>
-            <li><a href="#" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="settingsBtn" onclick="setActiveButton('settingsBtn')">
-                <img src="/settings_icon.svg" alt="Settings icon" id="settingsIcon"> <span id="dashboardText">Settings</span></a></li>
+				<span id="dashboardText">Reports</span></a></li>
+			<li>
+			    <a href="#" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="settingsBtn" onclick="toggleSettingsDropdown(event)">
+			        <span>Settings</span>
+			    </a>
+			    <ul id="settingsDropdown" class="list-unstyled ms-4 d-none">
+					<li><a href="/subscriber/salesperson" class="text-dark d-block py-2 my-1">People</a></li>
+					<li><a href="/subscriber/category/income" class="text-dark d-block py-2 my-1">Categories</a></li>
+			        <li><a href="/subscriber/user/profile" class="text-dark d-block py-2 my-1">User Profile</a></li>
+			        <li><a href="/subscriber/organization/profile" class="text-dark d-block py-2 my-1">Organization Profile</a></li>
+			    </ul>
+			</li>
             <li><a href="/subscriber/logout" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="signoutBtn" onclick="setActiveButton('signoutBtn')">
-                <img src="/signout_icon.svg" alt="Sign Out icon" id="signoutIcon"> <span id="dashboardText">Sign Out</span></a></li>
+				<span id="dashboardText">Sign Out</span></a></li>
         </ul>
     </div>
 </div>
@@ -388,24 +445,27 @@
 		switch (section) {
 			case 'home':
 				setActiveButton('dashboardBtn');
+				changeBgColor('dashboardTop');
 				break;
 			case 'transaction':
 				setActiveButton('transactionBtn');
+				changeBgColor('transactionTop');
 				break;
 			case 'category':
-				setActiveButton('categoryBtn');
+				setActiveButton('settingsBtn');
 				break;
 			case 'salesperson':
-				setActiveButton('salespersonBtn');
+				setActiveButton('settingsBtn');
 				break;
 			case 'user':
-				setActiveButton('usrProfileBtn');
+				setActiveButton('settingsBtn');
 				break;
 			case 'organization':
-				setActiveButton('orgProfileBtn');
+				setActiveButton('settingsBtn');
 				break;
 			case 'report':
-				setActiveButton('reportBtn')
+				setActiveButton('reportBtn');
+				changeBgColor('reportTop');
 
 			default:
 				break;
@@ -537,4 +597,25 @@
             }
         }
     }
+
+	function toggleSettingDropdown(event) {
+	    event.preventDefault();
+	    const dropdown = document.getElementById('settingsDropdowns');
+	    dropdown.classList.toggle('d-none');
+	}
+
+	function toggleSettingsDropdown(event) {
+	    event.preventDefault();
+	    const dropdown = document.getElementById('settingsDropdown');
+	    dropdown.classList.toggle('d-none');
+		setActiveButton('settingsBtn');
+	}
+
+	function changeBgColor(id) {
+		const allButtons = document.querySelectorAll('.navTop div a');
+		allButtons.forEach((i) => {
+			i.classList.remove('topBtnBgActivate');
+		})
+		document.getElementById(id).classList.add('topBtnBgActivate')
+	}
 </script>
