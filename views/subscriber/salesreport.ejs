@@ -19,6 +19,22 @@
 .main-content {
   margin-top: 100px;
 }
+.actionBtn:hover {
+	background-color: #6e6e6e;
+	color: white;
+}
+
+.actionBtn {
+	cursor: pointer;
+	background-color: #4D4D4D;
+	color: white;
+	font-weight: 400;
+	border: none;
+	padding: 5px 10px;
+	border-radius: 6px;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+	transition: all 0.15s ease-in-out;
+}
 </style>
 
 <div class="main-content" style="padding-bottom: 300px;">
@@ -130,59 +146,65 @@
 
 		<!-- salesperson Table -->
 		<div class="table-responsive">
-			<table class="table table-striped table-hover">
-				<thead class="table-dark">
+			<table class="table table-hover">
+				<thead style="height: 50px;">
 				  <tr>
 					<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
 					<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
 					<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
 					<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
-					<th style="min-width: 80px; text-align: center;">Actions</th>
+					<th style="min-width: 160px;">Actions</th>
 				</tr>
 				</thead>
-				<tbody>
-					<tbody id="salespersonTable">
-						<% if (salesperson.length > 0) { %>
-							<% for (let i = 0; i < salesperson.length; i++) { %>
-								<tr>
-									<td class="text-nowrap"><%= i + 1 %></td>
-									<td class="text-nowrap"><%= salesperson[i].name.length > 30 ? salesperson[i].name.substring(0, 30) + '...' : salesperson[i].name %></td>
-									<td class="text-nowrap text-income">
-										<% let totalSales = parseInt(salesperson[i].totalSales) %>
-										<% let formattedAmount = totalSales.toLocaleString(); %>
-										<% if (baseCurrency === 'MMK') { %>
-											<%= formattedAmount %> ks
-										<% } else if (baseCurrency === 'USD') { %>
-											$ <%= formattedAmount %>
-										<% } else if (baseCurrency === 'THB') { %>
-											฿ <%= formattedAmount %>
-										<% } else { %>
-											<%= formattedAmount %> <%= baseCurrency %>
-										<% } %>
-									</td>
-									<td class="text-nowrap">
-										<%= salesperson[i].totalTransactions %>
-									</td>
-									<td>
-										<div class="d-flex flex-nowrap justify-content-center">
-											<button onclick="viewDetail('<%= salesperson[i].id %>')"
-												class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
-												Summary
-											</button>
-											<button onclick="viewDetailTrans('<%= salesperson[i].id %>')"
-												class="btn btn-danger btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
-												View
-											</button>
-										</div>
-									</td>
-								</tr>
-							<% } %>
-						<% } else { %>
-							<tr>
-								<td colspan="5" class="text-center text-muted">No salespersons found.</td>
+				<tbody id="salespersonTable">
+					<% if (salesperson.length > 0) { %>
+						<% for (let i = 0; i < salesperson.length; i++) { %>
+							<tr style="height: 55px;">
+								<td class="text-nowrap"><%= i + 1 %></td>
+								<td class="text-nowrap"><%= salesperson[i].name.length > 30 ? salesperson[i].name.substring(0, 30) + '...' : salesperson[i].name %></td>
+								<td class="text-nowrap text-income">
+									<% let totalSales = parseInt(salesperson[i].totalSales) %>
+									<% let formattedAmount = totalSales.toLocaleString(); %>
+									<% if (baseCurrency === 'MMK') { %>
+										<%= formattedAmount %> ks
+									<% } else if (baseCurrency === 'USD') { %>
+										$ <%= formattedAmount %>
+									<% } else if (baseCurrency === 'THB') { %>
+										฿ <%= formattedAmount %>
+									<% } else { %>
+										<%= formattedAmount %> <%= baseCurrency %>
+									<% } %>
+								</td>
+								<td class="text-nowrap">
+									<%= salesperson[i].totalTransactions %>
+								</td>
+								<td>
+									<div >
+								        <button class="actionBtn" onclick="toggleDropdownAction(event, '<%= i + 1 %>')">
+								            Actions
+								        </button>
+								        <div id="actionsDropdowns-<%= i + 1 %>" 
+								             class="d-none" >
+								            <div class="d-flex " style="margin-top: 10px;">
+								                <button onclick="viewDetail('<%= salesperson[i].id %>')"
+													class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
+													Summary
+												</button>
+								                <button onclick="viewDetailTrans('<%= salesperson[i].id %>')"
+													class="btn btn-danger btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
+													View
+												</button>
+								            </div>
+								        </div>
+								    </div>
+								</td>
 							</tr>
 						<% } %>
-					</tbody>
+					<% } else { %>
+						<tr>
+							<td colspan="5" class="text-center text-muted">No salespersons found.</td>
+						</tr>
+					<% } %>
 				</tbody>
 			</table>
 		</div>
@@ -323,6 +345,43 @@ function viewDetailTrans(id) {
 function goBack() {
 	let url = `/subscriber/report?num=30&type=day`
     window.location.href = url.toString();
+}
+
+function toggleDropdownAction(event, id) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    document.querySelectorAll('[id^="actionsDropdowns-"]').forEach(dropdown => {
+        if (dropdown.id !== `actionsDropdowns-${id}` && !dropdown.classList.contains('d-none')) {
+            dropdown.classList.add('d-none');
+        }
+    });
+    
+    const dropdown = document.getElementById(`actionsDropdowns-${id}`);
+    if (dropdown) {
+        dropdown.classList.toggle('d-none');
+        
+        if (!dropdown.classList.contains('d-none')) {
+            positionDropdown(event.target, dropdown);
+        }
+    }
+}
+
+function positionDropdown(button, dropdown) {
+    const buttonRect = button.getBoundingClientRect();
+    const dropdownRect = dropdown.getBoundingClientRect();
+    
+    dropdown.style.top = '';
+    dropdown.style.right = '';
+    dropdown.style.left = '';
+    
+    dropdown.style.top = (buttonRect.bottom + window.scrollY + 5) + 'px';
+    dropdown.style.left = (buttonRect.left + window.scrollX) + 'px';
+    
+    const viewportWidth = window.innerWidth;
+    if (buttonRect.left + dropdownRect.width > viewportWidth) {
+        dropdown.style.left = (buttonRect.right + window.scrollX - dropdownRect.width) + 'px';
+    }
 }
 
 const searchParams = new URLSearchParams(window.location.search);
