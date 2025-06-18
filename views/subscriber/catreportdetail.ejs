@@ -130,8 +130,8 @@
 
 		<!-- Category Summary Report Table -->
 		<div class="table-responsive">
-			<table class="table table-striped table-hover">
-				<thead class="table-dark">
+			<table class="table table-hover">
+				<thead style="height: 50px;">
 				  <tr>
 					<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
 					<th style="min-width: 100px; cursor: pointer;" onclick="sortTable(1, 'date', this)">Date <span></span></th>
@@ -139,45 +139,43 @@
 					<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
 				</tr>
 				</thead>
-				<tbody>
-					<tbody id="salespersonTable">
-						<% if (category.length > 0) { %>
-							<% for (let i = 0; i < category.length; i++) { %>
-								<tr>
-									<td class="text-nowrap"><%= i + 1 %></td>
-									<td class="text-nowrap ">
-										<%= new Date(
-											category[i].transactionDate
-										).toLocaleString('en-US', { 
-											day: '2-digit', 
-											month: 'short', 
-											year: 'numeric'
-										}) %>
-									</td>
-									<td class="text-nowrap <%= category[i].type === 'income' ? 'text-income' : 'text-expense' %>">
-										<% let totalSales = parseInt(category[i].totalSales) %>
-										<% let formattedAmount = totalSales.toLocaleString(); %>
-										<% if (baseCurrency === 'MMK') { %>
-											<%= formattedAmount %> ks
-										<% } else if (baseCurrency === 'USD') { %>
-											$ <%= formattedAmount %>
-										<% } else if (baseCurrency === 'THB') { %>
-											฿ <%= formattedAmount %>
-										<% } else { %>
-											<%= formattedAmount %> <%= baseCurrency %>
-										<% } %>
-									</td>
-									<td class="text-nowrap">
-										<%= category[i].totalTransactions %>
-									</td>
-								</tr>
-							<% } %>
-						<% } else { %>
-							<tr>
-								<td colspan="5" class="text-center text-muted">No salespersons found.</td>
+				<tbody id="salespersonTable">
+					<% if (category.length > 0) { %>
+						<% for (let i = 0; i < category.length; i++) { %>
+							<tr style="height: 55px;">
+								<td class="text-nowrap"><%= i + 1 %></td>
+								<td class="text-nowrap ">
+									<%= new Date(
+										category[i].transactionDate
+									).toLocaleString('en-US', { 
+										day: '2-digit', 
+										month: 'short', 
+										year: 'numeric'
+									}) %>
+								</td>
+								<td class="text-nowrap <%= category[i].type === 'income' ? 'text-income' : 'text-expense' %>">
+									<% let totalSales = parseInt(category[i].totalSales) %>
+									<% let formattedAmount = totalSales.toLocaleString(); %>
+									<% if (baseCurrency === 'MMK') { %>
+										<%= formattedAmount %> ks
+									<% } else if (baseCurrency === 'USD') { %>
+										$ <%= formattedAmount %>
+									<% } else if (baseCurrency === 'THB') { %>
+										฿ <%= formattedAmount %>
+									<% } else { %>
+										<%= formattedAmount %> <%= baseCurrency %>
+									<% } %>
+								</td>
+								<td class="text-nowrap">
+									<%= category[i].totalTransactions %>
+								</td>
 							</tr>
 						<% } %>
-					</tbody>
+					<% } else { %>
+						<tr>
+							<td colspan="5" class="text-center text-muted">No salespersons found.</td>
+						</tr>
+					<% } %>
 				</tbody>
 			</table>
 		</div>
