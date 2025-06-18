@@ -103,7 +103,7 @@
 					<!-- Nav Buttons -->
 					<div class="btn-group d-flex justify-content-center" role="group" aria-label="Basic example" style="margin: 50px 0;">
 					  <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('salesperson')">By Salesperson</button>
-					  <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('date')">By Date</button>
+					  <!-- <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('date')">By Date</button> -->
 					  <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('category')">By Category</button>
 					</div>
 
@@ -175,8 +175,8 @@
 
 					<!-- Transaction Table -->
 					<div class="table-responsive" style="margin-bottom: 300px;">
-						<table class="table table-striped table-hover">
-							<thead class="table-dark">
+						<table class="table table-hover">
+							<thead style="height: 50px;">
 								<tr>
 									<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
 									<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Description <span></span></th>
@@ -197,7 +197,7 @@
 								%>
 								<% if (transaction.length > 0) { %>
 									<% for (let i = 0; i < transaction.length; i++) { %>
-										<tr>
+										<tr style="height: 55px;">
 											<td class="text-nowrap ">
 												<%= i + 1 %>
 											</td>
