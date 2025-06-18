@@ -86,8 +86,8 @@
 
 		<!-- report Table -->
 		<div class="table-responsive">
-		    <table class="table table-striped table-hover">
-		        <thead class="table-dark">
+		    <table class="table table-hover">
+		        <thead style="height: 50px;">
 		          <tr>
 		            <th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
 					<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(1, 'date', this)">Date <span></span></th>
@@ -108,82 +108,80 @@
 		            <% } %>
 		        </tr>
 		        </thead>
-		        <tbody>
-		            <tbody id="salespersonTable">
-		                <% if (report.length > 0) { %>
-		                    <% for (let i = 0; i < report.length; i++) { %>
-		                        <tr>
-		                            <td class="text-nowrap"><%= i + 1 %></td>
-									<td class="text-nowrap">
-										<%
-											let dateString = '';
+	            <tbody id="salespersonTable">
+	                <% if (report.length > 0) { %>
+	                    <% for (let i = 0; i < report.length; i++) { %>
+	                        <tr style="height: 50px;">
+	                            <td class="text-nowrap"><%= i + 1 %></td>
+								<td class="text-nowrap">
+									<%
+										let dateString = '';
 
-											if (report[i].incomeDate) {
-												dateString = new Date(report[i].incomeDate).toLocaleString('en-US', { 
-													day: '2-digit', 
-													month: 'short', 
-													year: 'numeric', 
-													hour: '2-digit', 
-													minute: '2-digit', 
-													second: '2-digit', 
-													hour12: true 
-												});
-											} else if (report[i].date) {
-												dateString = new Date(report[i].date).toLocaleDateString('en-US', { 
-													day: '2-digit', 
-													month: 'short', 
-													year: 'numeric'
-												});
-											} else if (report[i].year && report[i].month) {
-												const tempDate = new Date(`${report[i].year}-${report[i].month}-01`);
-												dateString = tempDate.toLocaleDateString('en-US', { 
-													month: 'short', 
-													year: 'numeric' 
-												});
-											} else if (report[i].year) {
-												dateString = report[i].year.toString();
-											}
-										%>
-										<%= dateString %>
+										if (report[i].incomeDate) {
+											dateString = new Date(report[i].incomeDate).toLocaleString('en-US', { 
+												day: '2-digit', 
+												month: 'short', 
+												year: 'numeric', 
+												hour: '2-digit', 
+												minute: '2-digit', 
+												second: '2-digit', 
+												hour12: true 
+											});
+										} else if (report[i].date) {
+											dateString = new Date(report[i].date).toLocaleDateString('en-US', { 
+												day: '2-digit', 
+												month: 'short', 
+												year: 'numeric'
+											});
+										} else if (report[i].year && report[i].month) {
+											const tempDate = new Date(`${report[i].year}-${report[i].month}-01`);
+											dateString = tempDate.toLocaleDateString('en-US', { 
+												month: 'short', 
+												year: 'numeric' 
+											});
+										} else if (report[i].year) {
+											dateString = report[i].year.toString();
+										}
+									%>
+									<%= dateString %>
 
-		                            </td>
-		                            <td class="text-nowrap text-income">
-		                                <% let totalSales = parseInt(report[i].totalSales) %>
-		                                <% let formattedAmount = totalSales.toLocaleString(); %>
-		                                <% if (baseCurrency === 'MMK') { %>
-		                                    <%= formattedAmount %> ks
-		                                <% } else if (baseCurrency === 'USD') { %>
-		                                    $ <%= formattedAmount %>
-		                                <% } else if (baseCurrency === 'THB') { %>
-		                                    ฿ <%= formattedAmount %>
-		                                <% } else { %>
-		                                    <%= formattedAmount %> <%= baseCurrency %>
-		                                <% } %>
-		                            </td>
-		                            <td class="text-nowrap">
-		                                <%= report[i].totalTransactions %>
-		                            </td>
-		                            
-		                            <% if (hasItemName) { %>
-		                                <td class="text-nowrap">
-		                                    <%= report[i].itemName || '' %>
-		                                </td>
-		                            <% } %>
-		                            <% if (hasQuantity) { %>
-		                                <td class="text-nowrap">
-		                                    <%= report[i].quantity || '' %>
-		                                </td>
-		                            <% } %>
-		                        </tr>
-		                    <% } %>
-		                <% } else { %>
-		                    <tr>
-		                        <% let totalCols = 4 + (hasItemName ? 1 : 0) + (hasQuantity ? 1 : 0); %>
-		                        <td colspan="<%= totalCols %>" class="text-center text-muted">No data found.</td>
-		                    </tr>
-		                <% } %>
-		            </tbody>
-		        </tbody>
+	                            </td>
+	                            <td class="text-nowrap text-income">
+	                                <% let totalSales = parseInt(report[i].totalSales) %>
+	                                <% let formattedAmount = totalSales.toLocaleString(); %>
+	                                <% if (baseCurrency === 'MMK') { %>
+	                                    <%= formattedAmount %> ks
+	                                <% } else if (baseCurrency === 'USD') { %>
+	                                    $ <%= formattedAmount %>
+	                                <% } else if (baseCurrency === 'THB') { %>
+	                                    ฿ <%= formattedAmount %>
+	                                <% } else { %>
+	                                    <%= formattedAmount %> <%= baseCurrency %>
+	                                <% } %>
+	                            </td>
+	                            <td class="text-nowrap">
+	                                <%= report[i].totalTransactions %>
+	                            </td>
+	                            
+	                            <% if (hasItemName) { %>
+	                                <td class="text-nowrap">
+	                                    <%= report[i].itemName || '' %>
+	                                </td>
+	                            <% } %>
+	                            <% if (hasQuantity) { %>
+	                                <td class="text-nowrap">
+	                                    <%= report[i].quantity || '' %>
+	                                </td>
+	                            <% } %>
+	                        </tr>
+	                    <% } %>
+	                <% } else { %>
+	                    <tr>
+	                        <% let totalCols = 4 + (hasItemName ? 1 : 0) + (hasQuantity ? 1 : 0); %>
+	                        <td colspan="<%= totalCols %>" class="text-center text-muted">No data found.</td>
+	                    </tr>
+	                <% } %>
+	            </tbody>
 		    </table>
 		</div>
     </div>
