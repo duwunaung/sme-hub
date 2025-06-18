@@ -362,6 +362,24 @@
 	            height: 15px;
 	            transition: all 0.3s ease-in-out;
 	        }
+
+			.actionBtn:hover {
+				background-color: #6e6e6e;
+				color: white;
+			}
+
+			.actionBtn {
+				cursor: pointer;
+				background-color: #4D4D4D;
+				color: white;
+				font-weight: 400;
+				border: none;
+				padding: 5px 10px;
+				border-radius: 6px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+				transition: all 0.15s ease-in-out;
+			}
+
 		</style>
 		<div class="main-content">
 			<!-- Main Content -->
@@ -539,17 +557,17 @@
 					</div>
 					<!-- Transaction Table -->
 					<div class="table-responsive">
-						<table class="table table-striped table-hover">
-							<thead class="table-dark">
+						<table class="table  table-hover">
+							<thead style="height: 50px;">
 								<tr>
 									<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
-									<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Description <span></span></th>
-									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Amount <span></span></th>
-									<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(3, 'date', this)">Date <span></span></th>
+									<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(1, 'date', this)">Date <span></span></th>
+									<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'string', this)">Description <span></span></th>
+									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Amount <span></span></th>
 									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(4, 'string', this)">Category <span></span></th>
 									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
 									<% if (trans !== 'all') { %>
-										<th style="min-width: 130px; text-align: center;">Actions</th>
+										<th style="min-width: 140px;">Actions</th>
 									<% } %>
 								</tr>
 							</thead>
@@ -564,24 +582,9 @@
 								%>
 								<% if (transaction.length > 0) { %>
 									<% for (let i = 0; i < transaction.length; i++) { %>
-										<tr>
+										<tr style="height: 55px;">
 											<td class="text-nowrap ">
 												<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>
-											</td>
-											<td class="text-nowrap " style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
-												<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
-											</td>
-											<td class="text-nowrap <%= transaction[i].transactionType === 'income' || trans === 'income' ? 'text-income' : 'text-expense' %>">
-												<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
-												<% if (transaction[i].baseCurrency === 'MMK') { %>
-													<%= formattedAmount %> ks
-												<% } else if (transaction[i].baseCurrency === 'USD') { %>
-													$ <%= formattedAmount %>
-												<% } else if (transaction[i].baseCurrency === 'THB') { %>
-													฿ <%= formattedAmount %>
-												<% } else { %>
-													<%= formattedAmount %> <%= transaction[i].baseCurrency %>
-												<% } %>
 											</td>
 											<td class="text-nowrap ">
 												<%= new Date(
@@ -598,6 +601,22 @@
 													hour12: true 
 												}) %>
 											</td>
+											<td class="text-nowrap " style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+												<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
+											</td>
+											<td class="text-nowrap <%= transaction[i].transactionType === 'income' || trans === 'income' ? 'text-income' : 'text-expense' %>">
+												<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
+												<% if (transaction[i].baseCurrency === 'MMK') { %>
+													<%= formattedAmount %> ks
+												<% } else if (transaction[i].baseCurrency === 'USD') { %>
+													$ <%= formattedAmount %>
+												<% } else if (transaction[i].baseCurrency === 'THB') { %>
+													฿ <%= formattedAmount %>
+												<% } else { %>
+													<%= formattedAmount %> <%= transaction[i].baseCurrency %>
+												<% } %>
+											</td>
+											
 											<td class="text-nowrap ">
 												<%= transaction[i].category.length > 30 ? transaction[i].category.substring(0, 30) + '...' : transaction[i].category %>
 											</td>
@@ -606,12 +625,25 @@
 											</td>
 											<% if (trans !== 'all') { %>
 												<td>
-													<div class="d-flex flex-nowrap justify-content-center">
-														<a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
-															class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">View</a>
-														<a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
-															class="btn btn-warning btn-sm btn-fixed-width me-1" style="border-radius: 8px;">Edit</a>
-													</div>
+												    <div >
+												        <button class="actionBtn" onclick="toggleDropdownAction(event, '<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>')">
+												            Actions
+												        </button>
+												        <div id="actionsDropdowns-<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>" 
+												             class="d-none" 
+												             style="min-width: 120px; z-index: 1000;">
+												            <div class="d-flex justify-content-center" style="margin-top: 10px; width: 120px;">
+												                <a href="/subscriber/transaction/<%= trans %>/detail/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
+												                   class="btn btn-primary btn-sm d-block mb-1" style="height: 30px; width: 60px; border-radius: 8px; margin-right: 10px;">
+												                    View
+												                </a>
+												                <a href="/subscriber/transaction/<%= trans %>/update/<%= transaction[i].id %>?trans=<%= trans %>&page=<%= pagination.page %>"
+												                   class="btn btn-warning btn-sm d-block" style="height: 30px; width: 60px; border-radius: 8px;">
+												                    Edit
+												                </a>
+												            </div>
+												        </div>
+												    </div>
 												</td>
 											<% } %>
 										</tr>
@@ -1171,5 +1203,41 @@
 			    document.getElementById("salespersonName").value = salespersonName;
 			}
 			
+			function toggleDropdownAction(event, id) {
+			    event.preventDefault();
+			    event.stopPropagation();
+			    
+			    document.querySelectorAll('[id^="actionsDropdowns-"]').forEach(dropdown => {
+			        if (dropdown.id !== `actionsDropdowns-${id}` && !dropdown.classList.contains('d-none')) {
+			            dropdown.classList.add('d-none');
+			        }
+			    });
+			    
+			    const dropdown = document.getElementById(`actionsDropdowns-${id}`);
+			    if (dropdown) {
+			        dropdown.classList.toggle('d-none');
+			        
+			        if (!dropdown.classList.contains('d-none')) {
+			            positionDropdown(event.target, dropdown);
+			        }
+			    }
+			}
+
+			function positionDropdown(button, dropdown) {
+			    const buttonRect = button.getBoundingClientRect();
+			    const dropdownRect = dropdown.getBoundingClientRect();
+			    
+			    dropdown.style.top = '';
+			    dropdown.style.right = '';
+			    dropdown.style.left = '';
+			    
+			    dropdown.style.top = (buttonRect.bottom + window.scrollY + 5) + 'px';
+			    dropdown.style.left = (buttonRect.left + window.scrollX) + 'px';
+			    
+			    const viewportWidth = window.innerWidth;
+			    if (buttonRect.left + dropdownRect.width > viewportWidth) {
+			        dropdown.style.left = (buttonRect.right + window.scrollX - dropdownRect.width) + 'px';
+			    }
+			}
 		</script>
         <%- include('../partials/subscriber/footer.ejs') %>
