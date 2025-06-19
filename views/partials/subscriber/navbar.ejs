@@ -345,6 +345,17 @@
 	    color: #000;
 		text-decoration: none;
 	}
+	
+	#settingTop:hover {
+		background-color: #f1f1f1;
+	    color: #000;
+	    text-decoration: none;
+	}
+	#settingTop {
+		padding: 4px 8px;
+		border-radius: 8px;
+		transition: background-color 0.3s ease, color 0.3s ease;
+	}
 </style>
 
 <nav class="navbar navbar-dark navbar-expand-lg justify-content-center">
@@ -368,7 +379,7 @@
 		    <div><a href="/subscriber/transaction/transactions" id="transactionTop" class="nav-link topBtnNav" onclick="changeBgColor('transactionTop')">Transactions</a></div>
 		    <div><a href="/subscriber/report?num=30&type=day" id="reportTop" class="nav-link topBtnNav" onclick="changeBgColor('reportTop')">Reports</a></div>
 			<div class="position-relative px-3 d-none d-lg-flex" style=" z-index: 1001;">
-		        <div style="cursor: pointer;" class="nav-link" onclick="toggleSettingDropdown(event)">
+		        <div style="cursor: pointer;" class="nav-link" onclick="toggleSettingDropdown(event)" id="settingTop">
 		            <img src="/settings_icon.svg" alt="Settings icon" id="settingsIcon">
 				</div>
 		        <ul id="settingsDropdowns" class="list-unstyled position-absolute bg-white shadow rounded ms-2 mt-2 d-none" style="width: 200px; top:30px; right: 20px;">
@@ -453,15 +464,19 @@
 				break;
 			case 'category':
 				setActiveButton('settingsBtn');
+				changeBgColor('settingTop');
 				break;
 			case 'salesperson':
 				setActiveButton('settingsBtn');
+				changeBgColor('settingTop');
 				break;
 			case 'user':
 				setActiveButton('settingsBtn');
+				changeBgColor('settingTop');
 				break;
 			case 'organization':
 				setActiveButton('settingsBtn');
+				changeBgColor('settingTop');
 				break;
 			case 'report':
 				setActiveButton('reportBtn');
