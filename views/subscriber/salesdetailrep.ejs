@@ -43,8 +43,8 @@
       <% } %>
     </div>
     <div>
-		<button class="btn btn-primary" onclick="goBack()">
-			Back
+		<button class="backBtn" onclick="goBack()">
+			&lt; Back
 		</button>
 		<h2><%= salespersonName %></h2>
 	</div>
@@ -72,13 +72,14 @@
 
 			<!-- Custom Date Filter -->
 			<div>
-				<button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#filterModal">
+				<button type="button" class="exportBtn"
+				 data-bs-toggle="modal" data-bs-target="#filterModal">
 				  Open Filter
 				</button>
 			</div>
 			<!-- Export As Csv -->
 			 <div>
-			  <button class="btn btn-primary" onclick="exportCsv()">
+			  <button class="exportBtn" onclick="exportCsv()">
 				Export As CSV
 			  </button>
 			</div>
@@ -261,7 +262,7 @@
 	      </div>
 
 	      <div class="modal-footer">
-	        <button type="submit" class="btn btn-success">Apply Filter</button>
+	        <button type="submit" class="exportBtn">Apply Filter</button>
 	      </div>
 	    </form>
 	  </div>
