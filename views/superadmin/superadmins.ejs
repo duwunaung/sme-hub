@@ -86,16 +86,20 @@
 				}
 			</style>
             <div class="content">
-                <% if (errorMessage) { %>
-                    <div id="errorBox" class="alert alert-danger" role="alert">
-                        <%= errorMessage %>
-                    </div>
-                    <% } %>
-                        <% if (successMessage) { %>
-                            <div id="successBox" class="alert alert-success" role="alert">
-                                <%= successMessage %>
-                            </div>
-                            <% } %>
+                <!-- Messages -->
+			      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+			        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+			          <%= errorMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+			      
+			      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+			        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+			          <%= successMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <h2>System Admins</h2>
                                     <a class="btn btnColor" onclick="clickBtn('add', 1)" href="#">

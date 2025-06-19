@@ -96,16 +96,20 @@
 				}
 		    </style>
 			<div class="container my-3 mx-3">
-		        <!-- Error/Success Messages -->
-		        <% if (errorMessage) { %>
-		            <div id="errorBox" class="alert alert-danger" role="alert">
-		                <%= errorMessage %>
-		            </div>
-		        <% } else if (successMessage) { %>
-		            <div id="successBox" class="alert alert-success" role="alert">
-		                <%= successMessage %>
-		            </div>
-		        <% } %>
+		       <!-- Messages -->
+			      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+			        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+			          <%= errorMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+			      
+			      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+			        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+			          <%= successMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
 
 		        <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
 					<div class="container mt-5">

@@ -89,17 +89,20 @@
 			<div id="mainContainer" style="margin-top: 100px;"></div>
 	        <main >
 	            <div class="content">
-					<!-- Message -->
-					<% if (errorMessage) { %>
-					<div id="errorBox" class="alert alert-danger" role="alert">
-						<%= errorMessage %>
-					</div>
-					<% } %>
-					<% if (successMessage) { %>
-					<div id="successBox" class="alert alert-success" role="alert">
-						<%= successMessage %>
-					</div>
-					<% } %>
+					<!-- Messages -->
+				      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+				        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+				          <%= errorMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+				      
+				      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+				        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+				          <%= successMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
 					<!-- Nav Buttons -->
 					<div class="btn-group d-flex justify-content-center" role="group" aria-label="Basic example" style="margin: 50px 0;">
 					  <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('salesperson')">By Salesperson</button>
