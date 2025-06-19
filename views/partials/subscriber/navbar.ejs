@@ -345,7 +345,7 @@
 	    color: #000;
 		text-decoration: none;
 	}
-	
+
 	#settingTop:hover {
 		background-color: #f1f1f1;
 	    color: #000;
@@ -430,7 +430,7 @@
             <li><a href="/subscriber/report?num=30&type=day" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="reportBtn" onclick="setActiveButton('reportBtn')">
 				<span id="dashboardText">Reports</span></a></li>
 			<li>
-			    <a href="#" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="settingsBtn" onclick="toggleSettingsDropdown(event)">
+			    <a class="text-dark d-block py-2 d-flex align-items-center mt-3" id="settingsBtn" onclick="toggleSettingsDropdown(event)">
 			        <span>Settings</span>
 			    </a>
 			    <ul id="settingsDropdown" class="list-unstyled ms-4 d-none">
@@ -494,8 +494,8 @@
         const buttonMap = {
             '/subscriber/home': 'dashboardBtn',
             '/subscriber/transaction/transactions': 'transactionBtn',
-            '/subscriber/category/income': 'categoryBtn',
-            '/subscriber/salesperson': 'salespersonBtn'
+            '/subscriber/category/income': 'settingsBtn',
+            '/subscriber/salesperson': 'settingsBtn'
         };
 
         const activeButtonId = buttonMap[currentPath];

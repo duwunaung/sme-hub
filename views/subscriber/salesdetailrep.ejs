@@ -49,9 +49,9 @@
 		<h2><%= salespersonName %></h2>
 	</div>
     <div id="contentArea">
-		<div class="d-flex justify-content-between" style="margin: 10px 10px;">
+		<div class="d-block d-md-flex justify-content-between" style="margin: 10px 10px;">
 			<!-- Date Filter -->
-			<div class="btn-group">
+			<div class="btn-group my-1">
 				<button type="button" 
 						class="btn btn-light dropdown-toggle" 
 						data-bs-toggle="dropdown" 
@@ -71,14 +71,14 @@
 			</div>
 
 			<!-- Custom Date Filter -->
-			<div>
+			<div class="my-1">
 				<button type="button" class="exportBtn"
 				 data-bs-toggle="modal" data-bs-target="#filterModal">
 				  Open Filter
 				</button>
 			</div>
 			<!-- Export As Csv -->
-			 <div>
+			 <div class="my-1">
 			  <button class="exportBtn" onclick="exportCsv()">
 				Export As CSV
 			  </button>

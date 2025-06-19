@@ -2,6 +2,11 @@
 <%- include('../partials/subscriber/navbar.ejs') %>
 
 <style>
+@media (max-width: 576px){
+	#searchInput {
+		width: 160px !important;
+	}
+}
 .dropdown {
   position: relative;
   display: inline-block;
@@ -85,9 +90,9 @@
 	</div>
     
     <div id="contentArea">
-		<div class="d-flex justify-content-between" style="margin: 10px 10px;">
+		<div class="d-block d-md-flex justify-content-between" style="margin: 10px 10px;">
 			<!-- Search Bar -->
-			<div class="d-flex search-container me-2">
+			<div class="d-flex search-container me-2 my-1">
 				<input type="text" 
 					   class="form-control" 
 					   placeholder="Search..." 
@@ -98,7 +103,7 @@
 				</button>
 			</div>
 			<!-- Date Filter -->
-			<div class="btn-group">
+			<div class="btn-group my-1">
 				<button type="button" 
 						class="btn btn-light dropdown-toggle" 
 						data-bs-toggle="dropdown" 
@@ -125,7 +130,7 @@
 			  </button>
 			</div> -->
 			<!-- Export As Csv -->
-			 <div>
+			 <div class="my-1">
 			  <button class="exportBtn" onclick="exportCsv()">
 				Export As CSV
 			  </button>
