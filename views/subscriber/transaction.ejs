@@ -931,10 +931,6 @@
             }
 
 			function renderTransactions(id) {
-				const allBtns = document.querySelectorAll('#selectionAllBtn div button');
-				allBtns.forEach((i) => {
-					i.classList.remove('activeTransaction');
-				});
 				switch (id) {
 					case 'allTrans':
 						window.location.href = '/subscriber/transaction/transactions';
