@@ -35,6 +35,25 @@
 	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 	transition: all 0.15s ease-in-out;
 }
+#searchInput {
+    width: 250px;
+	height: 35px;
+	top: 58px;
+	left: 936px;
+	border-radius: 15px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #4D4D4D;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+    background-color: white;
+    color: #333;
+}
+
+#searchInput:focus {
+    box-shadow: 0px 4px 10px #4d4d4d5c;
+    border-color: #4D4D4D;
+}
 </style>
 
 <div class="main-content" style="padding-bottom: 300px;">
@@ -60,8 +79,8 @@
     </div>
     
 	<div>
-		<button class="btn btn-primary" onclick="goBack()">
-			Back
+		<button class="backBtn" onclick="goBack()">
+			&lt; Back
 		</button>
 	</div>
     
@@ -107,7 +126,7 @@
 			</div> -->
 			<!-- Export As Csv -->
 			 <div>
-			  <button class="btn btn-primary" onclick="exportCsv()">
+			  <button class="exportBtn" onclick="exportCsv()">
 				Export As CSV
 			  </button>
 			</div>
