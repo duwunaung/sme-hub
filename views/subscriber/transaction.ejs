@@ -119,82 +119,12 @@
 					flex-direction: column;
 					gap: 1rem !important;
 				}
-				#expenseIcon {
-					top: 33px !important;
-					left: 20px !important;
-				}
-				#incomeIcon {
-					top: 30px !important;
-					left: 20px !important;
-				}
-				#btnGroupCard {
-					width: 460px !important;
-					height: 200px !important;
-				}
-				#menuNameFirst, #dayDay, #monthMonth {
-					font-size: 16px !important;
-				}
-				#menuNameSec {
-					font-size: 14px !important;
-				}
-				#dateDay {
-					height: 40px !important;
-					width: 40px !important;
-					font-size: 14px;
-				}
-				#menuName{
-					margin-left: 31px !important;
-				}
-				#dateSection{
-					margin-right: 31px !important;
-				}
-				#addBtnNewTranGrp {
-					top: 220px !important;
-				}
-				#headCard{
-					margin-bottom: 100px !important;
-				}
 			}
 			@media (max-width: 576px) {
 				#btnIncome, #btnExpense, #addNewTranBtn {
 					height: 50px !important;
 					width: 130px !important;
 					font-size: 0.85rem;
-				}
-				#expenseIcon {
-					top: 30px !important;
-					left: 15px !important;
-				}
-				#incomeIcon {
-					top: 27px !important;
-					left: 15px !important;
-				}
-				#btnGroupCard {
-					width: 320px !important;
-					height: 150px !important;
-				}
-				#menuNameFirst, #dayDay, #monthMonth {
-					font-size: 14px !important;
-				}
-				#menuNameSec {
-					font-size: 12px !important;
-				}
-				#dateDay {
-					height: 32px !important;
-					width: 32px !important;
-					font-size: 13px;
-				}
-				#menuName {
-					margin-left: 15px !important;
-				}
-				#dateSection {
-					margin-right: 12px !important;
-				}
-				#addBtnNewTranGrp {
-					top: 170px !important;
-				}
-				#headCard{
-					margin-bottom: 90px !important;
 				}
 			}
 			#btnIncome, #btnExpense, #addNewTranBtn {
@@ -223,83 +153,6 @@
 			.expenseBtnColor:hover {
 			    background-color: #C42323 !important;
 			    color: white !important;
-			}
-			#expenseIcon {
-				height: 25px; width: 25px; position: absolute; top: 40px; left: 45px; transform: translateY(-50%);
-			}
-			#incomeIcon {
-				height: 25px; width: 25px; position: absolute; top: 38px; left: 45px; transform: translateY(-50%);
-			}
-			#btnGroupCard {
-				width: 600px;
-				height: 220px;
-				top: 155px;
-				left: 374px;
-				border-radius: 20px;
-				border-width: 1px;
-				box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
-				display: flex; 
-				flex-direction: column;
-				justify-content: center;
-			}
-			#headOfCard {
-			    display: flex;
-			    justify-content: space-between;
-			    align-items: center;
-			    width: 100%;
-				margin-bottom: 20px;
-			}
-
-			#menuName {
-			    display: flex;
-			    flex-direction: column;
-				margin-left: 30px;
-			}
-
-			#dateSection {
-			    display: flex;
-			    align-items: center;
-				margin-right: 30px;
-			}
-
-			#dateDay {
-			    width: 50px;
-			    height: 50px;
-			    background-color: #4D4D4D;
-			    color: white;
-			    display: flex;
-			    justify-content: center;
-			    align-items: center;
-			    border-radius: 50%;
-			    font-weight: bold;
-			    margin-right: 10px;
-			}
-
-			#dayMonth {
-			    display: flex;
-			    flex-direction: column;
-			}
-			#menuNameFirst {
-				color: #05004E; 
-				font-weight: 600; 
-				font-size: 20px; 
-				line-height: 32px; 
-				letter-spacing: 0px;
-			}
-			#menuNameSec {
-				font-weight: 400;
-				font-size: 16px;
-				line-height: 30px;
-				letter-spacing: 0px;
-			}
-			#addBtnNewTranGrp {
-				position: absolute;
-				top: 250px;
-				
-			}
-			#headCard{
-				position: relative;
-				margin-bottom: 120px;
 			}
 			.btnAddNewRight {
 				right: 51%;
@@ -379,6 +232,35 @@
 				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 				transition: all 0.15s ease-in-out;
 			}
+			.navBtnsStyle {
+				border: none;
+				width: 100px;
+				padding: 6px 0;
+				border-radius: 8px;
+				color: #4D4D4D;
+			}
+			.activeTransaction {
+				background-color: #4D4D4D;
+				color: white;
+				font-weight: bold;
+			}
+			.activeTransInc {
+				background-color: #00C382;
+				color: white;
+				font-weight: bold;
+			}
+			.activeTransExp {
+				background-color:#D62828;
+				color: white;
+				font-weight: bold;
+			}
+			.createTransBtn {
+				border: none;
+				padding: 12px 20px;
+				border-radius: 8px;
+				background-color: #4D4D4D;
+				color: white;
+			}
 
 		</style>
 		<div class="main-content">
@@ -386,84 +268,68 @@
 			<div id="mainContainer" style="margin-top: 100px;"></div>
 	        <main >
 	            <div class="content">
-					<!-- Message -->
-					<% if (errorMessage) { %>
-						<div id="errorBox" class="alert alert-danger" role="alert">
-							<%= errorMessage %>
+					<!-- Messages -->
+				      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+				        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+				          <%= errorMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+				      
+				      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+				        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+				          <%= successMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+					<div class="d-flex" id="selectionAllBtn">
+						<div class="me-4">
+							<button class="navBtnsStyle" id="allTrans" onclick="renderTransactions('allTrans')">All</button>
 						</div>
-						<% } %>
-						<% if (successMessage) { %>
-						<div id="successBox" class="alert alert-success" role="alert">
-							<%= successMessage %>
+						<div class="me-4">
+							<button class="navBtnsStyle" id="incTrans" onclick="renderTransactions('incTrans')">Income</button>
 						</div>
-						<% } %>
-					<div id="headCard">
-						<div class="container my-2" id="btnGroupCard">
-							<div id="headOfCard" class="d-flex">
-								<div id="menuName">
-									<div id="menuNameFirst">Transactions</div>
-									<div id="menuNameSec" class="text-secondary"><% if (trans === 'income' ) { %> Income <% } else if (trans === 'expense') {%> Expense <% } else if (trans === 'all') {%> All <% } %> Transactions</div>
-								</div>
-								<div id="dateSection">
-									<div id="dateDay"></div>
-									<div id="dayMonth">
-										<div id="dayDay"></div>
-										<div id="monthMonth"></div>
-									</div>
-								</div>
-							</div>					
-							<div id="btnGroup">
-								<div class="d-flex justify-content-center align-items-center gap-3">
-									<div class="d-flex align-items-center gap-2">
-										<div style="position: relative;">
-											<img src="/income_icon.svg" id="incomeIcon" style="cursor: pointer;" onclick="document.getElementById('btnIncome').click();">
-											<a type="button" href="/subscriber/transaction/income" 
-											   class="text-decoration-none btn <% if (trans === 'income') { %> incomeBtnColor <% } else { %> btn-secondary <% } %> flex-grow-1 ps-4" 
-											   id="btnIncome" onclick="handleClick('income', event)">
-											  <div class="btn-content">
-												<span class="text-light">INCOME</span>
-											  </div>
-											</a>
-										</div>
-									</div>
-							
-									<div class="d-flex align-items-center gap-2">
-										<div style="position: relative;">
-											<img src="/expense_icon.svg" id="expenseIcon" style="cursor: pointer;" onclick="document.getElementById('btnExpense').click();">
-											<a type="button" href="/subscriber/transaction/expense" 
-											   class="text-decoration-none btn <% if (trans === 'expense') { %> expenseBtnColor <% } else { %> btn-secondary <% } %> flex-grow-1 ps-4" 
-											   id="btnExpense" onclick="handleClick('expense', event)">
-											  <div class="btn-content">
-												<span class="text-light">EXPENSE</span>
-											  </div>
-											</a>
-										</div>
-									</div>
-								</div>
-							</div>
+						<div >
+							<button class="navBtnsStyle" id="expTrans" onclick="renderTransactions('expTrans')">Expense</button>
 						</div>
-						<div class="d-flex justify-content-between align-items-center mb-4 <%= trans === 'income' ? 'btnAddNewRight'  : 'btnAddNewLeft' %>" id="addBtnNewTranGrp">
-							<% if (trans !== 'all') { %>
-								<button class="btn <%= trans === 'income' ? 'incomeBtnColor'  : 'expenseBtnColor' %> text-light" data-bs-toggle="modal" data-bs-target="#addNewTransaction" id="addNewTranBtn">
-									Add Transaction
+					</div>
+					<div class="d-flex justify-content-between" style="margin-top: 25px;">
+						<div> 
+							<h3 style="font-weight: bold;" class="<%= trans === 'income' ? 'text-income' : trans === 'expense' ? 'text-expense' : '' %>">
+							<% if (trans === 'all'){%>
+								All
+							<%} else if (trans === 'income') {%> 
+								Income
+							<%}else {%>
+								Expense
+							<%} %> Transactions
+							</h3>
+						</div>
+						<div class="d-flex align-items-center gap-3">
+							<% if (trans === 'income' || trans === 'expense') {%> 
+								<div id="dateDisplay" class="text-center" style="font-weight: bold;"></div>
+								<button class="createTransBtn <%= trans === 'income' ? 'bg-income' : 'bg-expense' %>" data-bs-toggle="modal" data-bs-target="#addNewTransaction">
+						            <img src="<%= trans === 'income' ? '/income_icon.svg' : '/expense_icon.svg' %>" style="cursor: pointer; margin-bottom: 2px;" > Create Transaction
+						        </button>
+							<%} %>
+					    </div>
+					</div>		
+
+					<!-- Summary Card -->
+					<div class="card mb-2 w-auto" style="max-width: 350px;">
+						<div class="card-body">
+							<div class="d-flex justify-content-between align-items-center">
+								<p class="small mb-1">Date: <span id="summaryDate"></span></p>
+								<button class="btn btn-sm btn-light" id="refreshButton" onclick="refreshAction()" style="color: #4D4D4D; border: 1px solid #4D4D4D; border-radius: 8px;">
+									Reset
 								</button>
-							<% } %>
-						</div>
-						<div class="d-flex justify-content-between align-items-center mb-4 <%= trans === 'income' ? 'btnAddNewLeft'  : 'btnAddNewRight' %>" id="addBtnNewTranGrp">
-							<% if (trans !== 'all') { %>
-								<div id="addNewTranBtn" style="border: 1px solid #4D4D4D;">
-									<%= trans === 'income' ? 'INCOME'  : 'EXPENSE' %>
-								</div>
-							<% } %>
+							</div>
+							<p class="small mb-1">Category: <span id="summaryCategory"></span></p>
+							<p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
+							<p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
 						</div>
 					</div>
-					<!-- Nav Buttons -->
-					<div class="container my-2">
-						
-					</div>
-					
-					
-					
+
 					<!-- Filters and Search Bar -->
 					<div class="container-div my-2">
 						<div class="row align-items-center">
@@ -541,20 +407,7 @@
 							
 						</div>
 					</div>
-					<!-- Summary Card -->
-					<div class="card mb-2 w-auto" style="max-width: 350px;">
-						<div class="card-body">
-							<div class="d-flex justify-content-between align-items-center">
-								<p class="small mb-1">Date: <span id="summaryDate"></span></p>
-								<button class="btn btn-sm btn-light" id="refreshButton" onclick="refreshAction()" style="color: #4D4D4D; border: 1px solid #4D4D4D; border-radius: 8px;">
-									Reset
-								</button>
-							</div>
-							<p class="small mb-1">Category: <span id="summaryCategory"></span></p>
-							<p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
-							<p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
-						</div>
-					</div>
+					
 					<!-- Transaction Table -->
 					<div class="table-responsive">
 						<table class="table  table-hover">
@@ -860,6 +713,8 @@
 		
 		
 		<script>
+			setActiveTransactionButton()
+			
 			const searchParams = new URLSearchParams(window.location.search);
 			const type = searchParams.get('type')
 			const num = searchParams.get('num')
@@ -939,14 +794,28 @@
 				document.getElementById('summaryDate').innerText = "ALL"
 				document.getElementById('dateFilterName').innerText = "Date"
 			}
-			const today = new Date();
-			const day = today.getDate();
-			const weekday = today.toLocaleDateString("en-US", { weekday: "long" });
-			const month = today.toLocaleDateString("en-US", { month: "long" });
 
-			document.getElementById("dateDay").textContent = day;
-			document.getElementById("dayDay").textContent = weekday + ",";
-			document.getElementById("monthMonth").textContent = month;
+			const dateElement = document.getElementById('dateDisplay');
+			const todayDate = new Date();
+			const dayDate = todayDate.getDate();
+			const monthDate = todayDate.toLocaleString('default', { month: 'long' });
+			const year = todayDate.getFullYear();
+
+			function getOrdinal(n) {
+			    if (n > 3 && n < 21) return n + 'th';
+			    switch (n % 10) {
+			        case 1: return n + "st";
+			        case 2: return n + "nd";
+			        case 3: return n + "rd";
+			        default: return n + "th";
+			    }
+			}
+
+			const formattedDay = getOrdinal(dayDate);
+			if (dateElement) {
+			    dateElement.innerHTML = `${formattedDay} ${monthDate}<br>${year}`;
+			}
+
 			function calculateTotal() {
 				const quantity = document.getElementById('quantity').value;
 				const price = document.getElementById('pricePerUnit').value;
@@ -1040,36 +909,6 @@
 			    baseUrl.searchParams.set("page", pageNumber);
 			    window.location.href = baseUrl.toString();
 			}
-
-
-			function handleClick(buttonType, event) {
-			    event.preventDefault();
-
-			    const btnIncome = document.getElementById('btnIncome');
-			    const btnExpense = document.getElementById('btnExpense');
-			    if (buttonType === 'income') {
-			        if (btnIncome.classList.contains('incomeBtnColor')) {
-			            window.location.href = '/subscriber/transaction/transactions';
-			        } else {
-			            btnIncome.classList.remove('btn-secondary');
-			            btnIncome.classList.add('incomeBtnColor');
-			            btnExpense.classList.remove('expenseBtnColor');
-			            btnExpense.classList.add('btn-secondary');
-			            window.location.href = '/subscriber/transaction/income';
-			        }
-			    } else if (buttonType === 'expense') {
-			        if (btnExpense.classList.contains('expenseBtnColor')) {
-			            window.location.href = '/subscriber/transaction/transactions';
-			        } else {
-			            btnExpense.classList.remove('btn-secondary');
-			            btnExpense.classList.add('expenseBtnColor');
-			            btnIncome.classList.remove('incomeBtnColor');
-			            btnIncome.classList.add('btn-secondary');
-			            window.location.href = '/subscriber/transaction/expense';
-			        }
-			    }
-			}
-
 			
             function checkInputs(messageBox, inputField) {
 				const form = document.getElementById('addNewTransactionForm');
@@ -1091,6 +930,45 @@
 			    }
             }
 
+			function renderTransactions(id) {
+				const allBtns = document.querySelectorAll('#selectionAllBtn div button');
+				allBtns.forEach((i) => {
+					i.classList.remove('activeTransaction');
+				});
+				switch (id) {
+					case 'allTrans':
+						window.location.href = '/subscriber/transaction/transactions';
+						break;
+					case 'incTrans':
+						window.location.href = '/subscriber/transaction/income';
+						break;
+					case 'expTrans':
+						window.location.href = '/subscriber/transaction/expense';
+						break;
+					default:
+						window.location.href = '/subscriber/transaction/transactions';
+				}
+			}
+			
+			function setActiveTransactionButton() {
+				
+			    const currentPath = window.location.pathname;
+			    const allBtns = document.querySelectorAll('#selectionAllBtn div button');
+			    
+			    allBtns.forEach((btn) => {
+			        btn.classList.remove('activeTransaction');
+					btn.classList.remove('activeTransInc');
+					btn.classList.remove('activeTransExp');
+			    });
+			    if (currentPath.includes('/income')) {
+			        document.getElementById('incTrans').classList.add('activeTransInc');
+			    } else if (currentPath.includes('/expense')) {
+			        document.getElementById('expTrans').classList.add('activeTransExp');
+			    } else {
+			        document.getElementById('allTrans').classList.add('activeTransaction');
+			    }
+				
+			}
 
             function submitForm(event) {
 			    addButton.disabled = true;
@@ -1239,5 +1117,6 @@
 			        dropdown.style.left = (buttonRect.right + window.scrollX - dropdownRect.width) + 'px';
 			    }
 			}
+			
 		</script>
         <%- include('../partials/subscriber/footer.ejs') %>
