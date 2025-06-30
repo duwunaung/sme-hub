@@ -1,18 +1,18 @@
 const express = require('express')
-const { createExpense, updateExpense, deleteExpense, listExpenses, getMonthlyExpenses, getExpense } = require('../../controllers/v0.1/extTransController')
+const exp = require("./../../controllers/v0.1/extTransController/expTrans")
 
 const router = express.Router()
 
-router.get('/:id', getExpense)
+router.get('/:id', exp.getExpense)
 
-router.get('/', listExpenses)
+router.get('/', exp.listExpenses)
 
-router.post('/create', createExpense)
+router.post('/create', exp.createExpense)
 
-router.put('/update/:id', updateExpense)
+router.put('/update/:id', exp.updateExpense)
 
-router.delete('/delete/:id', deleteExpense)
+router.delete('/delete/:id', exp.deleteExpense)
 
-router.get('/monthly', getMonthlyExpenses)
+router.get('/monthly', exp.getMonthlyExpenses)
 
 module.exports = router

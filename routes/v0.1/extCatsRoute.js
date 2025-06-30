@@ -1,35 +1,36 @@
 const express = require('express')
-
-const { detailExpCatReport, detailIncCatReport, listAllCatsData, listIncCatUpdate,listExpCatUpdate, getIncCat, getExpCat, createExpenseCategory, listExpenseCategory, updateExpenseCategory, deleteExpenseCategory, createIncomeCategory, updateIncomeCategory, deleteIncomeCategory, listIncomeCategory, restoreIncomeCategory , restoreExpenseCategory , getIncomeCategory , getExpenseCategory , detailExpenseCategory, detailIncomeCategory, listIncCat, listExpCat, listAllCategories} = require('../../controllers/v0.1/extCatsController')
-
+const cats = require("./../../controllers/v0.1/extCatsController/categories")
+const exp = require("./../../controllers/v0.1/extCatsController/expcat")
+const inc = require("./../../controllers/v0.1/extCatsController/inccat")
+const rep = require("./../../controllers/v0.1/extCatsController/reportcat")
 const router = express.Router();
 
-router.post('/expense/create', createExpenseCategory);
-router.get('/expense/list', listExpenseCategory);
-router.get('/expense/detail/report/:id', detailExpCatReport);
-router.get('/expense/detail/:id', detailExpenseCategory);
-router.get('/expense/category/:name', getExpCat);
-router.get('/expense/:id', getExpenseCategory);
-router.put('/expense/:id', updateExpenseCategory);
-router.delete('/expense/:id', deleteExpenseCategory);
-router.put('/expense/restore/:id', restoreExpenseCategory);
-router.get('/expense/update/:parentId', listExpCatUpdate);
-router.get('/expense', listExpCat);
+router.post('/expense/create', exp.createExpenseCategory);
+router.get('/expense/list', exp.listExpenseCategory);
+router.get('/expense/detail/report/:id', rep.detailExpCatReport);
+router.get('/expense/detail/:id', exp.detailExpenseCategory);
+router.get('/expense/category/:name', exp.getExpCat);
+router.get('/expense/:id', exp.getExpenseCategory);
+router.put('/expense/:id', exp.updateExpenseCategory);
+router.delete('/expense/:id', exp.deleteExpenseCategory);
+router.put('/expense/restore/:id', exp.restoreExpenseCategory);
+router.get('/expense/update/:parentId', exp.listExpCatUpdate);
+router.get('/expense', exp.listExpCat);
 
 
-router.post('/income/create', createIncomeCategory);
-router.get('/income/list', listIncomeCategory);
-router.get('/income/detail/report/:id', detailIncCatReport);
-router.get('/income/detail/:id', detailIncomeCategory);
-router.put('/income/restore/:id', restoreIncomeCategory);
-router.get('/income/category/:name', getIncCat);
-router.get('/income/:id', getIncomeCategory);
-router.put('/income/:id', updateIncomeCategory);
-router.delete('/income/:id', deleteIncomeCategory);
-router.get('/income/update/:parentId', listIncCatUpdate);
-router.get('/income', listIncCat);
+router.post('/income/create', inc.createIncomeCategory);
+router.get('/income/list', inc.listIncomeCategory);
+router.get('/income/detail/report/:id', rep.detailIncCatReport);
+router.get('/income/detail/:id', inc.detailIncomeCategory);
+router.put('/income/restore/:id', inc.restoreIncomeCategory);
+router.get('/income/category/:name', inc.getIncCat);
+router.get('/income/:id', inc.getIncomeCategory);
+router.put('/income/:id', inc.updateIncomeCategory);
+router.delete('/income/:id', inc.deleteIncomeCategory);
+router.get('/income/update/:parentId', inc.listIncCatUpdate);
+router.get('/income', inc.listIncCat);
 
-router.get('/listall', listAllCatsData)
-router.get('/', listAllCategories);
+router.get('/listall', cats.listAllCatsData)
+router.get('/', cats.listAllCategories);
 
 module.exports = router;

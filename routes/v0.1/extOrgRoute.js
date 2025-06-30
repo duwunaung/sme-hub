@@ -1,5 +1,5 @@
 const express = require('express')
-const { getOrgProfile , updateOrgProfile } = require('../../controllers/v0.1/subOrgController')
+const { getOrgProfile , updateOrgProfile } = require('../../controllers/v0.1/subOrgController/orgProfile')
 
 const router = express.Router()
 
