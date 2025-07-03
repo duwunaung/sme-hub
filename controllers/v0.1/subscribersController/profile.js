@@ -127,7 +127,8 @@ exports.editOrgProfile = (req, res) => {
 			}
 		}).then(response => {
 			req.session.orgName = response.data.data.name
-			req.session.orgLogo = response.data.data.logo
+			if (logo)
+				req.session.orgLogo = response.data.data.logo
 			req.session.baseCurrency = response.data.data.baseCurrency
 			res.redirect('/subscriber/organization/profile'  + `?success=true&type=update`)
 		}).catch(error => {

@@ -2,6 +2,7 @@ const axios = require('axios');
 const { query } = require('express');
 const bcrypt = require('bcryptjs');
 const { resolve } = require('path');
+const exp = require('constants');
 require('dotenv').config()
 const appVersion = process.env.APP_VERSION;
 const appCodeName = process.env.APP_CODENAME;
@@ -574,9 +575,9 @@ exports.updateUser = (req, res) => {
     } else {
         const { name, email, phone, status, role, orgName, userTime } = req.body;
 
-        const org = req.query.orgName
-        const orgStatus = req.query.orgStatus
-        const expired = req.query.expired
+        const org = req.query.orgName || ""
+        const orgStatus = req.query.orgStatus || "all"
+        const expired = req.query.expired || "false"
 
         const userName = req.query.userName || ""
         const userStatus = req.query.userStatus || "all"
