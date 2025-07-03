@@ -249,13 +249,28 @@ exports.reportMainPage = (req, res) => {
 							category: [],
 							salesperson: [],
 							transaction: data,
-							errorMessage: "No data is found to be exported!",
+							errorMessage: "No data available to export!",
 							successMessage: null
 						});
 					}
 					const formattedData = formatTransactionData(data)
-					exportCsvResponse(res, formattedData, "transactions-report");
-					return;
+					exportCsvResponse(res, formattedData, "transactions-report", 'subscriber/report',
+						{
+							userName: req.session.user,
+							userRole: req.session.role,
+							baseCurrency: req.session.baseCurrency,
+							logo: req.session.orgLogo,
+							organizationName: req.session.orgName,
+							trans: 'all',
+							trans: 'all',
+							category: [],
+							salesperson: [],
+							transaction: data,
+							errorMessage: "Internal Server Error!",
+							successMessage: null
+						}
+					);
+					return ;
 				}
 
 				res.render('subscriber/report', {
@@ -328,16 +343,19 @@ exports.reportSalesPage = (req, res) => {
 
 			if (exportCsv === 'true') {
 				if (!data || data.length === 0) {
-					res.render('subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: [], options: [] , errorMessage: "The report cannot be exported!", successMessage: null });
+					res.render('subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: [], options: [] , errorMessage: "No data available to export!", successMessage: null });
 				}
 				const formattedData = formatDataBySales(data)
-				exportCsvResponse(res, formattedData, "report-by-salesperson");
+				exportCsvResponse(res, formattedData, "report-by-salesperson", 'subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data , options: options, errorMessage: "Internal Server Error!" , successMessage: null});
 				return ;
 			}
 			res.render('subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data , options: options, errorMessage: null , successMessage: null});
 		}).catch(error => {
 			if (error.status === 404) {
-				res.render('subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: [], options: [] , errorMessage: null, successMessage: null });
+				if (exportCsv === 'true')
+					res.render('subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: [], options: [] , errorMessage: "No data available to export!", successMessage: null });
+				else
+					res.render('subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: [], options: [] , errorMessage: null, successMessage: null });
 			} else {
 				res.render('subscriber/salesreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: [], options: [] , errorMessage: "System Error!", successMessage: null });
 			}
@@ -402,7 +420,19 @@ exports.reportSalesDetailTransPage = async (req, res) => {
 						successMessage: null
 		        	});
 				}
-				return exportCsvResponse(res, formattedData, "report-by-salesperson-detail");
+				return exportCsvResponse(res, formattedData, "report-by-salesperson-detail", 'subscriber/salesdetailtransrep', 
+					{
+						userName: req.session.user, 
+						userRole: req.session.role,
+						baseCurrency: req.session.baseCurrency, 
+						logo: req.session.orgLogo,
+		                organizationName: req.session.orgName,
+						report: data,
+						salespersonId: id,
+						salespersonName: salespersonName,
+						errorMessage: "Internal Server Error!",
+						successMessage: null
+		        	});
 			}
 			
 			res.render('subscriber/salesdetailtransrep', {
@@ -440,6 +470,8 @@ exports.reportSalesDetailTransPage = async (req, res) => {
 			} else if (reportError.request) {
 				errorMessage = "Network error. Please check your connection!";
 			}
+			if (reportError.response.status === 404 && exportCsv === 'true')
+				errorMessage = "No data available to export!"
 			
 			res.render('subscriber/salesdetailtransrep', {
 				userName: req.session.user, 
@@ -505,11 +537,22 @@ exports.reportSalesDetailPage = async (req, res) => {
 							report: data,
 							salespersonId: id,
 							salespersonName: salespersonName,
-							errorMessage: "No data found for the selected period!",
+							errorMessage: "No data available to export!",
 							successMessage: null
 			        	});
 					}
-					return exportCsvResponse(res, formattedData, "report-by-salesperson-detail");
+					return exportCsvResponse(res, formattedData, "report-by-salesperson-detail", 'subscriber/salesdetailrep', {
+						userName: req.session.user, 
+						userRole: req.session.role,
+						baseCurrency: req.session.baseCurrency, 
+						logo: req.session.orgLogo,
+		                organizationName: req.session.orgName,
+						report: data,
+						salespersonId: id,
+						salespersonName: salespersonName,
+						errorMessage: "Internal Server Error!",
+						successMessage: null
+		        	});
 				}
 				
 				res.render('subscriber/salesdetailrep', {
@@ -564,11 +607,22 @@ exports.reportSalesDetailPage = async (req, res) => {
 							report: data,
 							salespersonId: id,
 							salespersonName: salespersonName,
-							errorMessage: "No data found for the selected criteria!",
+							errorMessage: "No data available to export!",
 							successMessage: null
 			        	});
 					}
-					return exportCsvResponse(res, formattedData, "report-by-salesperson-detail");
+					return exportCsvResponse(res, formattedData, "report-by-salesperson-detail", 'subscriber/salesdetailrep', {
+					userName: req.session.user, 
+					userRole: req.session.role,
+					baseCurrency: req.session.baseCurrency, 
+					logo: req.session.orgLogo,
+	                organizationName: req.session.orgName,
+					report: data,
+					salespersonId: id,
+					salespersonName: salespersonName,
+					errorMessage: "Internal Server Error!",
+					successMessage: null
+	        	});
 				}
 				
 				res.render('subscriber/salesdetailrep', {
@@ -608,6 +662,8 @@ exports.reportSalesDetailPage = async (req, res) => {
 			} else if (reportError.request) {
 				errorMessage = "Network error. Please check your connection!";
 			}
+			if (reportError.response.status === 404 && exportCsv === 'true')
+				errorMessage = "No data available to export!"
 			
 			res.render('subscriber/salesdetailrep', {
 				userName: req.session.user, 
@@ -683,17 +739,19 @@ exports.reportCatPage = (req, res) => {
 			const data = response.data.data;
 			if (exportCsv === 'true') {
 				if (!data || data.length === 0) {
-					res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "The report cannot be exported!", successMessage: null });
+					res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "No data available to export!", successMessage: null });
 				}
 				const formattedData = formatDataByCat(data)
-				exportCsvResponse(res, formattedData, "report-by-category");
+				exportCsvResponse(res, formattedData, "report-by-category", 'subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data,  errorMessage: "Internal Server Error!", successMessage: null });
 				return ;
 			}
 			res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: null , successMessage: null});
 		}).catch(error => {
-			console.log(error)
 			if (error.status === 404) {
-				res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: null, successMessage: null });
+				if (exportCsv === 'true')
+					res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "No data available to export!", successMessage: null });
+				else
+					res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: null, successMessage: null });
 			} else {
 				res.render('subscriber/catreport', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "System Error!", successMessage: null });
 			}
@@ -760,16 +818,19 @@ function reportCatDetail (req, res, url_api) {
 		console.log(data)
 		if (exportCsv === 'true') {
 			if (!data || data.length === 0) {
-				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "The report cannot be exported!", successMessage: null });
+				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "No data available to export!", successMessage: null });
 			}
 			const formattedData = formatDataByCatDetail(data)
-			exportCsvResponse(res, formattedData, "report-by-category-detail");
+			exportCsvResponse(res, formattedData, "report-by-category-detail", 'subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: "Internal Server Error!" , successMessage: null});
 			return ;
 		}
 		res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: null , successMessage: null});
 	}).catch(error => {
 		if (error.status === 404) {
-			res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: null, successMessage: null });
+			if (exportCsv === 'true')
+				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "No data available to export!", successMessage: null });
+			else
+				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: null, successMessage: null });
 		} else {
 			res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "System Error!", successMessage: null });
 		}

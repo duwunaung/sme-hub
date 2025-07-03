@@ -305,8 +305,10 @@ function performSearch() {
     
     if (input) {
         url.searchParams.set("search", input);
+		url.searchParams.delete("export");
     } else {
         url.searchParams.delete("search");
+		url.searchParams.delete("export");
     }
     window.location.href = url.toString();
 }

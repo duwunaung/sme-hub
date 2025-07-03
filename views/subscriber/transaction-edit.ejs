@@ -287,24 +287,35 @@
 					const page = "<%= pagination.page %>"
 					let isoString = '';
 					if (trans === 'income' || cat === 'income') {
-					    isoString = "<%= transaction.incomeDate %>";
+					    isoString = `<%= new Date(
+										transaction.incomeDate 
+									).toLocaleString('en-US', { 
+										year: 'numeric',
+									    month: 'short',
+									    day: '2-digit',
+									    hour: '2-digit',
+									    minute: '2-digit',
+									    second: '2-digit',
+									    hour12: true
+									}) %>`;
 						document.getElementById('transIDPrefix').innerText = 'INC';
 					} else {
-					    isoString = "<%= transaction.expenseDate %>";
+					    isoString = `<%= new Date(
+										transaction.expenseDate 
+									).toLocaleString('en-US', { 
+										year: 'numeric',
+									    month: 'short',
+									    day: '2-digit',
+									    hour: '2-digit',
+									    minute: '2-digit',
+									    second: '2-digit',
+									    hour12: true
+									}) 
+						 			%>`;
 						document.getElementById('transIDPrefix').innerText = 'EXP';
 					}
-					let localDate = new Date(isoString);
-					let formattedDate = localDate.toLocaleString('en-US', {
-					    year: 'numeric',
-					    month: 'short',
-					    day: '2-digit',
-					    hour: '2-digit',
-					    minute: '2-digit',
-					    second: '2-digit',
-					    hour12: true
-					});
 
-					document.getElementById('transDate').innerText = formattedDate;
+					document.getElementById('transDate').innerText = isoString;
 					function buttonType() {
 						searchParams = new URLSearchParams(window.location.search);
 						const type = searchParams.get('type')

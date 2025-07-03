@@ -226,7 +226,7 @@
 						<% } %>
 					<% } else { %>
 						<tr>
-							<td colspan="5" class="text-center text-muted">No salespersons found.</td>
+							<td colspan="5" class="text-center text-muted">No data found.</td>
 						</tr>
 					<% } %>
 				</tbody>
@@ -350,8 +350,10 @@ function performSearch() {
     
     if (input) {
         url.searchParams.set("search", input);
+		url.searchParams.delete("export");
     } else {
         url.searchParams.delete("search");
+		url.searchParams.delete("export");
     }
     window.location.href = url.toString();
 }
