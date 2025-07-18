@@ -787,7 +787,7 @@ exports.reportDatePage = (req, res) => {
     }
 }
 
-function reportCatDetail (req, res, url_api) {
+function reportCatDetail (req, res, url_api, catType, catId) {
 	const { search , num, type, from, to, export: exportCsv} = req.query
 	const queryParams = [];
 	if (search) {
@@ -808,40 +808,48 @@ function reportCatDetail (req, res, url_api) {
 	if (queryParams.length > 0) {
 		url_api += `?${queryParams.join('&')}`;
 	}
-	console.log(url_api)
-	axios.get(url_api, {
+	axios.get(`${process.env.API_URL}/subscribers/categories/${catType}/${catId}`, {
 		headers: {
 			'Authorization': `${req.session.token}`
 		}
-	}).then(response => {
-		const data = response.data.data;
-		console.log(data)
-		if (exportCsv === 'true') {
-			if (!data || data.length === 0) {
-				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "No data available to export!", successMessage: null });
+	}).then(responseCategory => {
+		axios.get(url_api, {
+			headers: {
+				'Authorization': `${req.session.token}`
 			}
-			const formattedData = formatDataByCatDetail(data)
-			exportCsvResponse(res, formattedData, "report-by-category-detail", 'subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: "Internal Server Error!" , successMessage: null});
-			return ;
-		}
-		res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: null , successMessage: null});
+		}).then(response => {
+			const data = response.data.data;
+			console.log(data)
+			if (exportCsv === 'true') {
+				if (!data || data.length === 0) {
+					res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, catName: responseCategory.data.data.name, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "No data available to export!", successMessage: null });
+				}
+				const formattedData = formatDataByCatDetail(data)
+				exportCsvResponse(res, formattedData, "report-by-category-detail", 'subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, catName: responseCategory.data.data.name, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: "Internal Server Error!" , successMessage: null});
+				return ;
+			}
+			res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, catName: responseCategory.data.data.name, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: response.data.data , errorMessage: null , successMessage: null});
+		}).catch(error => {
+			if (error.status === 404) {
+				if (exportCsv === 'true')
+					res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, catName: responseCategory.data.data.name, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "No data available to export!", successMessage: null });
+				else
+					res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency,catName: responseCategory.data.data.name,  userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: null, successMessage: null });
+			} else {
+				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency,catName: responseCategory.data.data.name, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "System Error!", successMessage: null });
+			}
+		})
 	}).catch(error => {
-		if (error.status === 404) {
-			if (exportCsv === 'true')
-				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: "No data available to export!", successMessage: null });
-			else
-				res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [],  errorMessage: null, successMessage: null });
-		} else {
-			res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "System Error!", successMessage: null });
-		}
+		res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency,catName: null, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "System Error!", successMessage: null });
 	})
+	
 }
 
 exports.reportCatIncDetailPage = (req, res) => {
 	if (req.method == 'GET') {
 		const {id} = req.params
 		let url_api = `${process.env.API_URL}/subscribers/categories/income/detail/report/${id}`
-		reportCatDetail(req, res, url_api)
+		reportCatDetail(req, res, url_api, 'income', id)
 	}
 }
 
@@ -850,6 +858,6 @@ exports.reportCatExpDetailPage = (req, res) => {
 		const {id} = req.params
 		let url_api = `${process.env.API_URL}/subscribers/categories/expense/detail/report/${id}`
 		console.log(url_api)
-		reportCatDetail(req, res, url_api)
+		reportCatDetail(req, res, url_api, 'expense', id)
 	}
 }
