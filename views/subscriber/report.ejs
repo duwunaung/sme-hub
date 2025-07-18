@@ -294,6 +294,9 @@
 			function goToNav(direction) {
 			  const currentPath = window.location.pathname;
 			  let targetPath = "/subscriber/report/" + direction;
+			  if (direction === 'category') {
+			    targetPath = "/subscriber/report/category?num=30&type=day";
+			  }
 			  if (currentPath === targetPath) {
 			    return;
 			  }
