@@ -6,6 +6,10 @@
 	#searchInput {
 		width: 160px !important;
 	}
+	.table-container {
+		overflow-x: auto;
+		flex-direction: column;
+	}
 }
 .dropdown {
   position: relative;
@@ -58,6 +62,94 @@
 #searchInput:focus {
     box-shadow: 0px 4px 10px #4d4d4d5c;
     border-color: #4D4D4D;
+}
+.table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.table-responsive {
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table th:hover {
+    background-color: #e9ecef;
+}
+
+.table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-fixed-width {
+    min-width: 80px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 14px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 4px;
+    }
+    
+    .actionBtn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    .btn-fixed-width {
+        min-width: 60px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .table-responsive {
+        font-size: 12px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 6px 2px;
+    }
+}
+
+.chart-canvas {
+    max-height: 300px;
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    .chart-canvas {
+        max-height: 400px;
+    }
 }
 </style>
 
@@ -167,77 +259,109 @@
 	    </div>
 	  </div>
 	</div>
-
-		<!-- salesperson Table -->
-		<div class="table-responsive">
-			<table class="table table-hover">
-				<thead style="height: 50px;">
-				  <tr>
-					<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
-					<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
-					<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
-					<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
-					<th style="min-width: 160px;">Actions</th>
-				</tr>
-				</thead>
-				<tbody id="salespersonTable">
-					<% if (salesperson.length > 0) { %>
-						<% for (let i = 0; i < salesperson.length; i++) { %>
-							<tr style="height: 55px;">
-								<td class="text-nowrap"><%= i + 1 %></td>
-								<td class="text-nowrap"><%= salesperson[i].name.length > 30 ? salesperson[i].name.substring(0, 30) + '...' : salesperson[i].name %></td>
-								<td class="text-nowrap text-income">
-									<% let totalSales = parseInt(salesperson[i].totalSales) %>
-									<% let formattedAmount = totalSales.toLocaleString(); %>
-									<% if (baseCurrency === 'MMK') { %>
-										<%= formattedAmount %> ks
-									<% } else if (baseCurrency === 'USD') { %>
-										$ <%= formattedAmount %>
-									<% } else if (baseCurrency === 'THB') { %>
-										฿ <%= formattedAmount %>
-									<% } else { %>
-										<%= formattedAmount %> <%= baseCurrency %>
-									<% } %>
-								</td>
-								<td class="text-nowrap">
-									<%= salesperson[i].totalTransactions %>
-								</td>
-								<td>
-									<div >
-								        <button class="actionBtn" onclick="toggleDropdownAction(event, '<%= i + 1 %>')">
-								            Actions
-								        </button>
-								        <div id="actionsDropdowns-<%= i + 1 %>" 
-								             class="d-none" >
-								            <div class="d-flex " style="margin-top: 10px;">
-								                <button onclick="viewDetail('<%= salesperson[i].id %>')"
-													class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
-													Summary
-												</button>
-								                <button onclick="viewDetailTrans('<%= salesperson[i].id %>')"
-													class="btn btn-danger btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
-													View
-												</button>
-								            </div>
-								        </div>
-								    </div>
-								</td>
+	<div class="container-fluid p-3">
+        <div class="row g-3">
+            <!-- Table Section - Left on large screens, bottom on small screens -->
+            <div class="col-12 col-lg-8 order-2 order-lg-1">
+                <div class="table-container">
+					<!-- salesperson Table -->
+					<div class="table-responsive">
+						<table class="table table-hover">
+							<thead style="height: 50px;">
+							  <tr>
+								<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
+								<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Name <span></span></th>
+								<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
+								<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
+								<th style="min-width: 190px;">Actions</th>
 							</tr>
+							</thead>
+							<tbody id="salespersonTable">
+								<% if (salesperson.length > 0) { %>
+									<% for (let i = 0; i < salesperson.length; i++) { %>
+										<tr style="height: 55px;">
+											<td class="text-nowrap"><%= i + 1 %></td>
+											<td class="text-nowrap"><%= salesperson[i].name.length > 30 ? salesperson[i].name.substring(0, 30) + '...' : salesperson[i].name %></td>
+											<td class="text-nowrap text-income">
+												<% let totalSales = parseInt(salesperson[i].totalSales) %>
+												<% let formattedAmount = totalSales.toLocaleString(); %>
+												<% if (baseCurrency === 'MMK') { %>
+													<%= formattedAmount %> ks
+												<% } else if (baseCurrency === 'USD') { %>
+													$ <%= formattedAmount %>
+												<% } else if (baseCurrency === 'THB') { %>
+													฿ <%= formattedAmount %>
+												<% } else { %>
+													<%= formattedAmount %> <%= baseCurrency %>
+												<% } %>
+											</td>
+											<td class="text-nowrap">
+												<%= salesperson[i].totalTransactions %>
+											</td>
+											<td>
+												<div >
+											        <button class="actionBtn" onclick="toggleDropdownAction(event, '<%= i + 1 %>')">
+											            Actions
+											        </button>
+											        <div id="actionsDropdowns-<%= i + 1 %>" 
+											             class="d-none" >
+											            <div class="d-flex " style="margin-top: 10px;">
+											                <button onclick="viewDetail('<%= salesperson[i].id %>')"
+																class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
+																Summary
+															</button>
+											                <button onclick="viewDetailTrans('<%= salesperson[i].id %>')"
+																class="btn btn-danger btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
+																View
+															</button>
+											            </div>
+											        </div>
+											    </div>
+											</td>
+										</tr>
+									<% } %>
+								<% } else { %>
+									<tr>
+										<td colspan="5" class="text-center text-muted">No data found.</td>
+									</tr>
+								<% } %>
+							</tbody>
+						</table>
+					</div>
+				</div>
+        	</div>
+			<div class="col-12 col-lg-4 order-1 order-lg-2">
+                <div class="chart-container">
+                    <h5 class="card-title text-center mb-3">Sales Income by Salesperson</h5>
+					<% function checkSalesperson(salesperson) { %>
+						<% if (salesperson && salesperson.length > 0) { %>
+							<% for (let i = 0; i < salesperson.length; i++) { %>
+								<% if (salesperson[i].totalSales > 0) { %>
+									<% return true; %>
+								<% } %>
+							<% } %>
 						<% } %>
-					<% } else { %>
-						<tr>
-							<td colspan="5" class="text-center text-muted">No data found.</td>
-						</tr>
-					<% } %>
-				</tbody>
-			</table>
-		</div>
-    </div>
+					<%}%>
+					<% if (salesperson && salesperson.length > 0 && checkSalesperson(salesperson)) { %>
+                        <canvas id="salespersonIncomeChart" class="chart-canvas"></canvas>
+                    <% } else { %>
+                        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+                            <i class="fas fa-chart-pie text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-3 text-center">
+                                No data available. 
+                                <a href="/subscriber/transaction/income" class="text-primary">Add new income</a>
+                            </p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+    	</div>
+	</div>
 
 	<div style="height: 300px;"></div>
   </main>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
 
 let sortDirections = {};
@@ -410,6 +534,99 @@ function positionDropdown(button, dropdown) {
     }
 }
 
+function formatCurrency(value, baseCurrency) {
+    const numValue = Number(value);
+    switch(baseCurrency) {
+        case 'MMK':
+            return `${numValue.toLocaleString()} ks`;
+        case 'THB':
+            return `฿${numValue.toLocaleString()}`;
+        case 'USD':
+            return `$${numValue.toLocaleString()}`;
+        default:
+            return `${numValue.toLocaleString()} ${baseCurrency}`;
+    }
+}
+
+function generateColorPalette(numCategories) {
+    const baseColors = [
+        'rgba(255, 99, 132, 0.8)', // Soft Red
+        'rgba(54, 162, 235, 0.8)', // Soft Blue
+        'rgba(255, 206, 86, 0.8)', // Soft Yellow
+        'rgba(75, 192, 192, 0.8)', // Soft Teal
+        'rgba(153, 102, 255, 0.8)', // Soft Purple
+        'rgba(255, 159, 64, 0.8)', // Soft Orange
+        'rgba(199, 199, 199, 0.8)', // Soft Gray
+        'rgba(83, 102, 255, 0.8)', // Soft Indigo
+        'rgba(40, 159, 64, 0.8)', // Soft Green
+        'rgba(210, 99, 132, 0.8)' // Soft Crimson
+    ];
+    if (numCategories <= baseColors.length) {
+        return baseColors.slice(0, numCategories);
+    }
+    const additionalColors = [];
+    for (let i = baseColors.length; i < numCategories; i++) {
+        const hue = (i * 137.508) % 360;
+        const saturation = 70 + Math.sin(i) * 20;
+        const lightness = 55 + Math.cos(i) * 10;
+        const color = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`;
+        additionalColors.push(color);
+    }
+    return [...baseColors, ...additionalColors];
+}
+
+const salesperson = <%- JSON.stringify(salesperson || []) %>;
+const baseCurrency = "<%= baseCurrency %>";
+
+const salespersonChartData = {
+    labels: salesperson.map(item => {
+        const name = item.name;
+        return name.length > 15 ? name.substring(0, 15) + '...' : name;
+    }),
+    amounts: salesperson.map(item => Number(item.totalSales))
+};
+
+const ctx = document.getElementById('salespersonIncomeChart').getContext('2d');
+const backgroundColor = generateColorPalette(salespersonChartData.labels.length);
+const salespersonIncomeChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+        labels: salespersonChartData.labels,
+        datasets: [{
+            data: salespersonChartData.amounts,
+            backgroundColor: backgroundColor,
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    padding: 20,
+                    usePointStyle: true,
+                    font: {
+                        size: 12
+                    }
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        const label = context.label || '';
+                        const value = context.parsed;
+                        const formattedValue = formatCurrency(value, baseCurrency);
+                        return `${label}: ${formattedValue}`;
+                    }
+                }
+            }
+        }
+    }
+});
+
 const searchParams = new URLSearchParams(window.location.search);
 const type = searchParams.get('type')
 const num = searchParams.get('num')
@@ -445,6 +662,8 @@ if (type === 'month') {
 	else
 		document.getElementById('filterName').innerText = "Date"
 }
+
+
 
 </script>
 
