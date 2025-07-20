@@ -444,35 +444,36 @@ function sortTable(columnIndex, type, headerElement) {
 	headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
 }
 
-// Fix 1: Change the canvas ID reference
 const ctx = document.getElementById('reportIncomeChart').getContext('2d');
 
-// Fix 2: Use actual report data instead of hardcoded data
 const reportData = <%- JSON.stringify(report) %>;
 
-// Fix 3: Process the actual data structure
 const processedData = reportData.map(item => {
-    let dateString = '';
     let dateValue = null;
+    let dateString = '';
     
-    // Handle different date formats from your data
     if (item.incomeDate) {
         dateValue = new Date(item.incomeDate);
         dateString = dateValue.toLocaleDateString('en-US', { 
             day: '2-digit', 
-            month: 'short' 
+            month: 'short',
+            year: 'numeric',
+			timeZone: 'UTC'
         });
     } else if (item.date) {
         dateValue = new Date(item.date);
         dateString = dateValue.toLocaleDateString('en-US', { 
             day: '2-digit', 
-            month: 'short' 
+            month: 'short',
+            year: 'numeric',
+			timeZone: 'UTC'
         });
     } else if (item.year && item.month) {
-        dateValue = new Date(`${item.year}-${item.month}-01`);
+        dateValue = new Date(`${item.year}-${String(item.month).padStart(2, '0')}-01`);
         dateString = dateValue.toLocaleDateString('en-US', { 
             month: 'short', 
-            year: 'numeric' 
+            year: 'numeric',
+			timeZone: 'UTC' 
         });
     } else if (item.year) {
         dateString = item.year.toString();
@@ -485,14 +486,12 @@ const processedData = reportData.map(item => {
         totalTransactions: parseInt(item.totalTransactions) || 0,
         sortDate: dateValue
     };
-}).sort((a, b) => a.sortDate - b.sortDate); // Sort by date
+}).sort((a, b) => a.sortDate - b.sortDate);
 
-// Extract data for Chart.js
 const labels = processedData.map(item => item.date);
 const salesData = processedData.map(item => item.totalSales);
 const transactionData = processedData.map(item => item.totalTransactions);
 
-// Chart configuration with currency formatting
 const baseCurrency = '<%= baseCurrency %>';
 const config = {
     type: 'line',
@@ -647,7 +646,6 @@ if (canvasElement) {
     const reportIncomeChart = new Chart(canvasElement, config);
 }
 
-// Helper functions for interactivity
 function toggleDataset(type) {
     const datasetIndex = type === 'sales' ? 0 : 1;
     const meta = salesChart.getDatasetMeta(datasetIndex);

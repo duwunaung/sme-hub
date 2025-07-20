@@ -20,7 +20,7 @@ exports.getDetailReport = (req, res) => {
 			  SUM(i.amount) AS totalSales,
 			  COUNT(i.id) AS totalTransactions,
 			  o.baseCurrency AS baseCurrency,
-			  i.incomeDate AS date
+			  DATE(i.incomeDate) AS date
 			FROM incs i
 			JOIN salesperson s ON i.salespersonId = s.id
 			JOIN orgs o ON o.id = ?
@@ -72,8 +72,8 @@ exports.getDetailReport = (req, res) => {
     }
 
     query += `
-	    GROUP BY s.name, i.incomeDate
-		ORDER BY i.incomeDate DESC;
+	    GROUP BY s.name, DATE(i.incomeDate)
+		ORDER BY DATE(i.incomeDate) DESC;
     `;
 	db_connection.query(query, queryParams, (err, results) => {
         if (err) {
@@ -91,7 +91,6 @@ exports.getDetailReport = (req, res) => {
                 dev: "data not found"
             })
         }
-        
         res.status(200).send({
             success: true,
             message: 'Here is the data with total sales',
