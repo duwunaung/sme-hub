@@ -108,14 +108,14 @@ exports.createOrg = (req, res) => {
 
         const orgId = results.insertId
 
-        db_connection.query(`INSERT INTO inccats (name, orgId, createdBy, status, parentId) VALUES  
-                        ("Product sales", ${orgId}, 0, 'active', 1),
-                        ("Service sales", ${orgId}, 0, 'active', 1),
-                        ("Product sales(external)", ${orgId}, 0, 'active', 0),
-                        ("Service sales(external)", ${orgId}, 0, 'active', 0),
-                        ("Office furniture sales", ${orgId}, 0, 'active', 0),
-                        ("Office device sales", ${orgId}, 0, 'active', 0),
-                        ("Obtaining a loan", ${orgId}, 0, 'active', 0)`, (err, incats) => {
+        db_connection.query(`INSERT INTO inccats (name, orgId, createdBy, status, parentId, updatedBy) VALUES  
+                        ("Product sales", ${orgId}, 0, 'active', 1, 0),
+                        ("Service sales", ${orgId}, 0, 'active', 1, 0),
+                        ("Product sales(external)", ${orgId}, 0, 'active', 0, 0),
+                        ("Service sales(external)", ${orgId}, 0, 'active', 0, 0),
+                        ("Office furniture sales", ${orgId}, 0, 'active', 0, 0),
+                        ("Office device sales", ${orgId}, 0, 'active', 0, 0),
+                        ("Obtaining a loan", ${orgId}, 0, 'active', 0, 0)`, (err, incats) => {
 
             if (err) {
                 return res.status(500).send({
@@ -125,32 +125,32 @@ exports.createOrg = (req, res) => {
                 })
             }
 
-            db_connection.query(`INSERT INTO expcats (name, orgId, createdBy, status, parentId) VALUES  
-                        ("Purchase of goods", ${orgId}, 0, 'active', 2),
-                        ("Purchase of raw materials", ${orgId}, 0, 'active', 2),
-                        ("Purchase of goods(external)", ${orgId}, 0, 'active', 0),
-                        ("Purchase of raw materials(external)", ${orgId}, 0, 'active', 0),
-                        ("Purchase of office furniture", ${orgId}, 0, 'active', 0),
-                        ("Purchase of office device", ${orgId}, 0, 'active', 0),
-                        ("Purchase of office stationery", ${orgId}, 0, 'active', 0),
-                        ("Purchase of other office accessory", ${orgId}, 0, 'active', 0),
-                        ("Transportation costs", ${orgId}, 0, 'active', 0),
-                        ("Electric bills", ${orgId}, 0, 'active', 0),
-                        ("Water bills", ${orgId}, 0, 'active', 0),
-                        ("Office Rent", ${orgId}, 0, 'active', 0),
-                        ("Employee salary", ${orgId}, 0, 'active', 0),
-                        ("Labour day meal", ${orgId}, 0, 'active', 0),
-                        ("Costs for freelancer", ${orgId}, 0, 'active', 0),
-                        ("The costs of office software", ${orgId}, 0, 'active', 0),
-                        ("The costs of advertising", ${orgId}, 0, 'active', 0),
-                        ("The costs for social media", ${orgId}, 0, 'active', 0),
-                        ("The costs for license and permit", ${orgId}, 0, 'active', 0),
-                        ("Office equipment maintenance costs", ${orgId}, 0, 'active', 0),
-                        ("Taxs", ${orgId}, 0, 'active', 0),
-                        ("Audit and annual closing costs", ${orgId}, 0, 'active', 0),
-                        ("Sale commission", ${orgId}, 0, 'active', 0),
-                        ("Loan interest", ${orgId}, 0, 'active', 0),
-                        ("Loan repayment", ${orgId}, 0, 'active', 0)`, (err, expcats) => {
+            db_connection.query(`INSERT INTO expcats (name, orgId, createdBy, status, parentId, updatedBy) VALUES  
+                        ("Purchase of goods", ${orgId}, 0, 'active', 2, 0),
+                        ("Purchase of raw materials", ${orgId}, 0, 'active', 2, 0),
+                        ("Purchase of goods(external)", ${orgId}, 0, 'active', 0, 0),
+                        ("Purchase of raw materials(external)", ${orgId}, 0, 'active', 0, 0),
+                        ("Purchase of office furniture", ${orgId}, 0, 'active', 0, 0),
+                        ("Purchase of office device", ${orgId}, 0, 'active', 0, 0),
+                        ("Purchase of office stationery", ${orgId}, 0, 'active', 0, 0),
+                        ("Purchase of other office accessory", ${orgId}, 0, 'active', 0, 0),
+                        ("Transportation costs", ${orgId}, 0, 'active', 0, 0),
+                        ("Electric bills", ${orgId}, 0, 'active', 0, 0),
+                        ("Water bills", ${orgId}, 0, 'active', 0, 0),
+                        ("Office Rent", ${orgId}, 0, 'active', 0, 0),
+                        ("Employee salary", ${orgId}, 0, 'active', 0, 0),
+                        ("Labour day meal", ${orgId}, 0, 'active', 0, 0),
+                        ("Costs for freelancer", ${orgId}, 0, 'active', 0, 0),
+                        ("The costs of office software", ${orgId}, 0, 'active', 0, 0),
+                        ("The costs of advertising", ${orgId}, 0, 'active', 0, 0),
+                        ("The costs for social media", ${orgId}, 0, 'active', 0, 0),
+                        ("The costs for license and permit", ${orgId}, 0, 'active', 0, 0),
+                        ("Office equipment maintenance costs", ${orgId}, 0, 'active', 0, 0),
+                        ("Taxs", ${orgId}, 0, 'active', 0, 0),
+                        ("Audit and annual closing costs", ${orgId}, 0, 'active', 0, 0),
+                        ("Sale commission", ${orgId}, 0, 'active', 0, 0),
+                        ("Loan interest", ${orgId}, 0, 'active', 0, 0),
+                        ("Loan repayment", ${orgId}, 0, 'active', 0, 0)`, (err, expcats) => {
 
             if (err) {
                 return res.status(500).send({
