@@ -93,21 +93,21 @@ exports.editOrgProfile = (req, res) => {
 			const {success, error, type} = req.query
 			if (success === 'true') {
 				if (type === 'update') {
-					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: "Successfully Updated!", errorMessage: null }); 
+					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: "Successfully Updated!", errorMessage: null , linkExtend: process.env.LICENSE_EXTEND_URL}); 
 				}
 			} else if (error === 'true') {
 				if (type === 'fileError') {
-					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: `Only image file (${photoSize} MB maximum) can be uploaded!` }); 
+					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: `Only image file (${photoSize} MB maximum) can be uploaded!` , linkExtend: process.env.LICENSE_EXTEND_URL}); 
 				}
 				else {
-					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null }); 
+					res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null , linkExtend: process.env.LICENSE_EXTEND_URL}); 
 				}
 			}
 			else {
-				res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null }); 
+				res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, options: options, org: response.data.data, successMessage: null, errorMessage: null , linkExtend: process.env.LICENSE_EXTEND_URL}); 
 			}
 		}).catch(error => {
-			res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, options: options, org: {}, successMessage: null, errorMessage: null });         
+			res.render('subscriber/organization-profile', {appVersion: appVersion, appCodeName: appCodeName, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo,  organizationName: req.session.orgName, options: options, org: {}, successMessage: null, errorMessage: null , linkExtend: process.env.LICENSE_EXTEND_URL});         
 		})
 	} else {
 		const {name, address, phone, baseCurrency, country } = req.body

@@ -16,17 +16,17 @@ exports.login = (req, res) => {
 						req.session.baseCurrency = response.data.data.user.baseCurrency;
 						res.redirect('/subscriber/home');
 					} else {
-						res.render('subscriber/login', { errorMessage: response.data.message });
+						res.render('subscriber/login', { errorMessage: response.data.message , registerLink: process.env.USER_REGISTER_LINK});
 					}
 				})
 				.catch(error => {
-					res.render('subscriber/login', { errorMessage: error.response.data.message });
+					res.render('subscriber/login', { errorMessage: error.response.data.message , registerLink: process.env.USER_REGISTER_LINK});
 				})
 		} catch (error) {
-			res.render('subscriber/login', { errorMessage: 'An error occurred during login.' });
+			res.render('subscriber/login', { errorMessage: 'An error occurred during login.' , registerLink: process.env.USER_REGISTER_LINK});
 		}
 	} else {
-		res.render('subscriber/login', { errorMessage: null })
+		res.render('subscriber/login', { errorMessage: null , registerLink: process.env.USER_REGISTER_LINK})
 	}
 
 }
