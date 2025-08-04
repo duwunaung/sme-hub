@@ -96,7 +96,10 @@ exports.createOrg = (req, res) => {
     }
     const userId = req.user.userId
     const expiry = calculatedExpiryDate()
-    const { name, address, phone, status = 'active' , country, userTime} = req.body
+    const { name, address, phone, status = 'active' , country, userTime, income, expense} = req.body
+	const incomeCat = []
+	const expenseCat = []
+	
     db_connection.query("INSERT INTO orgs (name, address, phone, expiredDate, status, updatedBy, updatedAt, baseCountry) VALUES (?,?,?,?,?,?,?,?)", [name, address, phone, expiry, status, userId, userTime, country], (err, results) => {
         if (err) {
             return res.status(500).send({
@@ -107,17 +110,36 @@ exports.createOrg = (req, res) => {
         }
 
         const orgId = results.insertId
+		income['primary'].forEach(item => {
+			if (item.trim() != '') {
+				incomeCat.push(`("${item}", ${orgId}, 0, 'active', 1, 0)`)
+			}
+		})
+		income['supplementary'].forEach(item => {
+			if (item.trim() != '')
+				incomeCat.push(`("${item}", ${orgId}, 0, 'active', 0, 0)`)
+		})
 
-        db_connection.query(`INSERT INTO inccats (name, orgId, createdBy, status, parentId, updatedBy) VALUES  
-                        ("Product sales", ${orgId}, 0, 'active', 1, 0),
-                        ("Service sales", ${orgId}, 0, 'active', 1, 0),
-                        ("Product sales(external)", ${orgId}, 0, 'active', 0, 0),
-                        ("Service sales(external)", ${orgId}, 0, 'active', 0, 0),
-                        ("Office furniture sales", ${orgId}, 0, 'active', 0, 0),
-                        ("Office device sales", ${orgId}, 0, 'active', 0, 0),
-                        ("Obtaining a loan", ${orgId}, 0, 'active', 0, 0)`, (err, incats) => {
+		expense['primary'].forEach(item => {
+			if (item.trim() != '')
+				expenseCat.push(`("${item}", ${orgId}, 0, 'active', 1, 0)`)
+		})
+		expense['supplementary'].forEach(item => {
+			if (item.trim() != '')
+				expenseCat.push(`("${item}", ${orgId}, 0, 'active', 0, 0)`)
+		})
+		const insertIncomeCats = `
+		    INSERT INTO inccats (name, orgId, createdBy, status, parentId, updatedBy) 
+		    VALUES ${incomeCat.join(',')}`
+
+		const insertExpenseCats = `
+		    INSERT INTO expcats (name, orgId, createdBy, status, parentId, updatedBy) 
+		    VALUES ${expenseCat.join(',')}`
+
+        db_connection.query(insertIncomeCats, (err, incats) => {
 
             if (err) {
+				console.log(err)
                 return res.status(500).send({
                     success: false,
                     message: 'Error while creating categories',
@@ -125,32 +147,7 @@ exports.createOrg = (req, res) => {
                 })
             }
 
-            db_connection.query(`INSERT INTO expcats (name, orgId, createdBy, status, parentId, updatedBy) VALUES  
-                        ("Purchase of goods", ${orgId}, 0, 'active', 2, 0),
-                        ("Purchase of raw materials", ${orgId}, 0, 'active', 2, 0),
-                        ("Purchase of goods(external)", ${orgId}, 0, 'active', 0, 0),
-                        ("Purchase of raw materials(external)", ${orgId}, 0, 'active', 0, 0),
-                        ("Purchase of office furniture", ${orgId}, 0, 'active', 0, 0),
-                        ("Purchase of office device", ${orgId}, 0, 'active', 0, 0),
-                        ("Purchase of office stationery", ${orgId}, 0, 'active', 0, 0),
-                        ("Purchase of other office accessory", ${orgId}, 0, 'active', 0, 0),
-                        ("Transportation costs", ${orgId}, 0, 'active', 0, 0),
-                        ("Electric bills", ${orgId}, 0, 'active', 0, 0),
-                        ("Water bills", ${orgId}, 0, 'active', 0, 0),
-                        ("Office Rent", ${orgId}, 0, 'active', 0, 0),
-                        ("Employee salary", ${orgId}, 0, 'active', 0, 0),
-                        ("Labour day meal", ${orgId}, 0, 'active', 0, 0),
-                        ("Costs for freelancer", ${orgId}, 0, 'active', 0, 0),
-                        ("The costs of office software", ${orgId}, 0, 'active', 0, 0),
-                        ("The costs of advertising", ${orgId}, 0, 'active', 0, 0),
-                        ("The costs for social media", ${orgId}, 0, 'active', 0, 0),
-                        ("The costs for license and permit", ${orgId}, 0, 'active', 0, 0),
-                        ("Office equipment maintenance costs", ${orgId}, 0, 'active', 0, 0),
-                        ("Taxs", ${orgId}, 0, 'active', 0, 0),
-                        ("Audit and annual closing costs", ${orgId}, 0, 'active', 0, 0),
-                        ("Sale commission", ${orgId}, 0, 'active', 0, 0),
-                        ("Loan interest", ${orgId}, 0, 'active', 0, 0),
-                        ("Loan repayment", ${orgId}, 0, 'active', 0, 0)`, (err, expcats) => {
+            db_connection.query(insertExpenseCats, (err, expcats) => {
 
             if (err) {
                 return res.status(500).send({
