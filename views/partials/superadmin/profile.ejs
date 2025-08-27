@@ -1,0 +1,24 @@
+
+<div class="d-flex mt-3 mx-4" style="justify-content: space-between;">
+  <div class="d-flex">
+    <button onclick="goToProfile()" id="profileBtn" class="btn profile-icon me-3" data-bs-toggle="offcanvas" data-bs-target="#sidebar" aria-controls="sidebar">
+        <img src="/profile.svg" width="500%" alt="menu logo" id="profilelogo">
+    </button>
+    <div class="mt-1">
+        <h6 class="fw-bolder">HanZar NiOo</h6>
+        <h6 style="margin-top: -5px;">Superadmin</h6>
+    </div>
+  </div>
+  <div class="dateRectangle mt-3" style="align-items: center;">
+    <h6 class="date">Date : <span id="currentDate" class="fw-bolder mx-2"></span></h6>
+  </div>
+</div>
+<script>
+  const today = new Date();
+  const currentDate = today.toDateString();
+  document.getElementById("currentDate").innerText = currentDate;
+
+  function goToProfile () {
+    window.location.href = "/superadmin/users/detail/" + query
+  }
+</script>

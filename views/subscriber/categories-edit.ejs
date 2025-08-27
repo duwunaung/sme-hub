@@ -1,0 +1,138 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+	<div class="main-content">
+		<div id="mainContainer" style="margin-top: 100px;"></div>
+		<main class="col-md-9 col-lg-10">
+			<div class="container my-5">
+				<h2 class="mb-4">Update Category</h2>
+		
+				<!-- Messages -->
+			      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+			        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+			          <%= errorMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+			      
+			      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+			        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+			          <%= successMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+				<!-- Category Details Form -->
+				<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+				    <!-- Category Name -->
+				    <div class="mb-3">
+				        <label for="catName" class="form-label">Category Name</label><span> *</span>
+				        <input type="text" class="form-control" maxlength="100" name="name" id="catName"
+				            placeholder="Enter category name" value="<%= category.name %>" 
+				            oninput="checkInputs('catNameError', 'catName')" required>
+				        <p id="catNameError" class="mt-2 d-none text-danger">*Category Name can't exceed 100 characters!</p>
+				    </div>
+
+				    <!-- Status -->
+				    <div class="mb-3">
+				        <label for="catStatus" class="form-label">Status</label><span> *</span>
+				        <select id="catStatus" name="status" class="form-select" required>
+				            <% options.forEach(option => { %>
+				                <option value="<%= option.name %>" <%= option.name === category.status ? 'selected' : '' %> >
+				                    <%= option.name.toUpperCase() %>
+				                </option>
+				            <% }); %>
+				        </select>
+				    </div>
+
+				    <!-- Category Type Selection -->
+				    <div class="mb-3">
+				        <label class="form-label">Category Type</label><span> *</span>
+				        <div class="form-check">
+				            <input class="form-check-input" type="radio" name="categoryType" id="standalone" value="standalone" 
+				                <%= !category.parentId ? 'checked' : '' %> onclick="toggleParentCategory()">
+				            <label class="form-check-label" for="standalone">Supplementary Category</label>
+				        </div>
+				        <div class="form-check">
+				            <input class="form-check-input" type="radio" name="categoryType" id="underParent" value="underParent" 
+				                <%= category.parentId ? 'checked' : '' %> onclick="toggleParentCategory()">
+				            <label class="form-check-label" for="underParent">Primary Category</label>
+				        </div>
+				    </div>
+
+				    <!-- Parent Category Dropdown (Hidden if "Standalone" is selected) -->
+					<% if (category.parentId !== 1 && category.parentId !== 2) {%> 
+						<div class="mb-3" id="parentCategoryGroup" style="display: none;">
+					<%} else {%> 
+						<div class="mb-3" id="parentCategoryGroup" >
+					<%}%>
+				        <label for="parentCategory" class="form-label text-secondary">Select Primary Category
+				        </label>
+				        <select class="form-select" id="parentCategory" name="parent">
+				            <option value="">Choose...</option>
+				            <option value="<%= cat === 'income' ? 'sale' : 'purchase' %>" selected><%= cat === 'income' ? 'Sale' : 'Purchase' %></option>
+				        </select>
+				    </div>
+
+				    <!-- Buttons -->
+				    <button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Category</button>
+				    <a href="" class="btn w-100" id="resetBtn"></a>
+				</form>
+		
+			</div>
+			<script>
+
+				const page = "<%= pagination.page %>"
+				function buttonType() {
+					const searchParams = new URLSearchParams(window.location.search);
+					const type = searchParams.get('type')
+					const resetBtn = document.getElementById("resetBtn")
+					const pathname = window.location.pathname;
+					const basePath = pathname.split('/update')[0];
+			    	let newUrl;
+					newUrl = `${basePath}?page=${page}`
+					resetBtn.href = `${newUrl}`
+					if (type == 'update') {
+						resetBtn.innerText = "Back"
+						resetBtn.classList.add("btn-primary")
+					}
+					else {
+						resetBtn.innerText = "Cancel"
+						resetBtn.classList.add("btn-danger")
+					}
+		
+				}
+				buttonType();
+		
+				const addButton = document.getElementById('addBtn');
+				const form = document.getElementById('myForm');
+				const inputs = form.querySelectorAll('.form-control[required]');
+		
+				function checkInputs(messageBox, inputField) {
+					let allFilled = true;
+					inputs.forEach(index => {
+					if (!index.value.trim()) {
+						allFilled = false;
+					}
+					});
+					addButton.disabled = !allFilled;
+					const message = document.getElementById(messageBox)
+					const input = document.getElementById(inputField)
+					if (input.value.length === parseInt(input.maxLength)) {
+						message.classList.remove('d-none');
+					} else {
+						message.classList.add('d-none');
+					}
+				}
+		
+				function submitForm(event) {
+					addButton.disabled = true;
+					addButton.textContent = 'Submitting...';
+				}
+				function toggleParentCategory() {
+			        document.getElementById('parentCategoryGroup').style.display = 
+			            document.getElementById('underParent').checked ? 'block' : 'none';
+			    }
+			</script>
+		</main>
+	</div>
+	
+        <%- include('../partials/subscriber/footer.ejs') %>

@@ -1,0 +1,628 @@
+<%- include('../partials/subscriber/header.ejs') %>
+<%- include('../partials/subscriber/navbar.ejs') %>
+		<style>
+			@media (max-width: 768px) {
+				#transactionPopup {
+					left: 0px !important;
+				}
+			}
+			#createBtn:hover {
+				background-color: #606060;
+				color:rgb(230, 230, 230);
+			}
+
+			#createBtn{
+				padding: 10px 15px;
+				border: none;
+				border-radius: 8px;
+				background-color: #4D4D4D;
+				color: white;
+				transition: all 0.15s ease-in-out;
+			}
+			#transactionPopup {
+				position: absolute;
+				display: flex;
+				top: 50px;
+				left: 95px;
+				z-index: 999;
+			}
+		</style>
+		<div class="main-content" style="padding-bottom: 300px;">
+		    <div id="mainContainer" style="margin-top: 100px;"></div>
+		    <!-- Main Content -->
+		    <main>
+		        <div class="content">
+					<!-- Messages -->
+				      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+				        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+				          <%= errorMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+				      
+				      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+				        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+				          <%= successMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+					<div class="container my-4">
+					  <div class="d-flex justify-content-between align-items-center">
+						<h2 class="mt-3 mx-3">Overview</h2>
+						<div class="d-flex position-relative">
+						    <div id="dateDisplay" class="text-center me-3 d-none d-md-block" style="font-weight: bold;"><br></div>
+
+						    <div>
+						      <button class="btn btn-primary" id="createBtn" onclick="showTransactionOptions()">Create Transaction</button>
+						    </div>
+						    <div id="transactionPopup" class="d-none justify-content">
+						      <button class="btn me-1 bg-income text-white" onclick="createTransaction('income')">Income</button>
+						      <button class="btn  bg-expense text-white" onclick="createTransaction('expense')">Expense</button>
+						    </div>
+						  </div>
+					  </div>
+					  
+					  <!-- Cash in Hand -->
+					  <div class="card text-center mb-4">
+					    <div class="card-body">
+					      <h5 class="card-title">Cash in Hand</h5>
+					      <% if (typeof overviewData !== 'undefined') { %>
+					        <p class="card-text display-6 <%= overviewData.cashInHand >= 0 ? 'text-income' : 'text-expense' %>" id="cashInHand">
+							  <%
+								    let formattedAmount = Math.abs(overviewData.cashInHand).toLocaleString();
+								    if (overviewData.cashInHand < 0) {
+								        formattedAmount = `(${formattedAmount})`;
+								    }
+								%>
+
+								<% if (baseCurrency === 'MMK') { %>
+								    <%= formattedAmount %> ks
+								<% } else if (baseCurrency === 'USD') { %>
+								    $ <%= formattedAmount %>
+								<% } else if (baseCurrency === 'THB') { %>
+								    ฿ <%= formattedAmount %>
+								<% } else { %>
+								    <%= formattedAmount %> <%= baseCurrency %>
+								<% } %>
+
+					        </p>
+					      <% } else { %>
+					        <p class="card-text display-6 text-muted" id="cashInHand">Loading...</p>
+					      <% } %>
+					    </div>
+					  </div>
+
+					  <!-- Recent Transactions -->
+					  <div class="row">
+					    <!-- Income Transactions -->
+					    <div class="col-md-6 mb-3">
+					      <div class="card">
+					        <div class="card-header bg-income text-white">
+					          Recent Income
+					        </div>
+					        <ul class="list-group list-group-flush" id="incomeList">
+					          <% if (typeof overviewData !== 'undefined' && overviewData.incomeTrans.length > 0) { %>
+					            <% overviewData.incomeTrans.forEach(item => { %>
+					              <li class="list-group-item">
+									<small class="me-2">
+										<%= new Date(item.incomeDate).toLocaleString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric', 
+													hour: '2-digit', 
+													minute: '2-digit', 
+													second: '2-digit', 
+													hour12: true 
+												}) %>  - 
+									</small>
+					                <strong><%= item.description.length > 30 ? item.description.substring(0, 30) + '...' : item.description %> </strong> - 
+									<span class="text-income"><% let formattedAmount = item.amount.toLocaleString(); %>
+									<% if (baseCurrency === 'MMK') { %>
+										<%= formattedAmount %> ks
+									<% } else if (baseCurrency === 'USD') { %>
+										$ <%= formattedAmount %>
+									<% } else if (baseCurrency === 'THB') { %>
+										฿ <%= formattedAmount %>
+									<% } else { %>
+										<%= formattedAmount %> <%= baseCurrency %>
+									<% } %>
+									</span>
+					              </li>
+					            <% }); %>
+					          <% } else { %>
+					            <li class="list-group-item text-muted">No income data available.</li>
+					          <% } %>
+					        </ul>
+					      </div>
+					    </div>
+
+					    <!-- Expense Transactions -->
+					    <div class="col-md-6 mb-3">
+					      <div class="card">
+					        <div class="card-header bg-expense text-white">
+					          Recent Expenses
+					        </div>
+					        <ul class="list-group list-group-flush" id="expenseList">
+					          <% if (typeof overviewData !== 'undefined' && overviewData.expenseTrans.length > 0) { %>
+					            <% overviewData.expenseTrans.forEach(item => { %>
+					              <li class="list-group-item">
+									<small>
+									<%= new Date(item.expenseDate).toLocaleString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric', 
+													hour: '2-digit', 
+													minute: '2-digit', 
+													second: '2-digit', 
+													hour12: true 
+												}) %>
+									</small> - 
+					                <strong><%= item.description.length > 30 ? item.description.substring(0, 30) + '...' : item.description %></strong>
+					                - 
+					                <span class="text-expense"><% let formattedAmount = item.amount.toLocaleString(); %>
+									<% if (baseCurrency === 'MMK') { %>
+										<%= formattedAmount %> ks
+									<% } else if (baseCurrency === 'USD') { %>
+										$ <%= formattedAmount %>
+									<% } else if (baseCurrency === 'THB') { %>
+										฿ <%= formattedAmount %>
+									<% } else { %>
+										<%= formattedAmount %> <%= baseCurrency %>
+									<% } %>
+									</span>
+					              </li>
+					            <% }); %>
+					          <% } else { %>
+					            <li class="list-group-item text-muted">No expense data available.</li>
+					          <% } %>
+					        </ul>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+
+		            <div class="d-flex align-items-center justify-content-between mb-3">
+		                <h2 class="mt-3 mx-3">Custom Reports</h2>
+		                <div class="mt-3 ">
+		                    <div class="btn-group">
+		                        <button type="button"
+		                        class="btn btn-light dropdown-toggle"
+		                        data-bs-toggle="dropdown"
+		                        aria-expanded="false"
+		                        style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+		                        <i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i><span id="filterName">Date</span>
+		                        </button>
+		                        <ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
+		                            <button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+		                            <button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+		                            <button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+		                            <button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+		                            <button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+		                            <button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+		                            <button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+		                            <button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+		                        </ul>
+		                    </div>
+		                </div>
+		            </div>
+		            
+		            <div class="row mt-4">
+		                <!-- Total Income -->
+		                <div class="col-md-6 mb-3">
+		                    <div class="card text-center shadow-sm">
+		                        <div class="card-body">
+		                            <h5 class="card-title">Income</h5>
+		                            <h2 id="totalIncome" class="text-income">
+		                                0
+		                            </h2>
+		                        </div>
+		                    </div>
+		                </div>
+						<!-- Total Expense -->
+		                <div class="col-md-6 mb-3">
+		                    <div class="card text-center shadow-sm">
+		                        <div class="card-body">
+		                            <h5 class="card-title">Expense</h5>
+		                            <h2 id="totalExpense" class="text-expense">
+		                                0
+		                            </h2>
+		                        </div>
+		                    </div>
+		                </div>
+		                
+		            </div>
+
+		            <div class="row mt-4">
+		                <!-- Income by Categories Pie Chart -->
+		                <div class="col-md-6 mb-3">
+		                    <div class="card shadow-sm">
+		                        <div class="card-body">
+		                            <h5 class="card-title text-center">Income by Categories</h5>
+		                            <% if (data.incomeData && data.incomeData.length > 0) { %>
+		                                <canvas id="incomeChart" style="max-height: 300px;"></canvas>
+		                            <% } else { %>
+		                                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+		                                    <i class="fas fa-chart-pie text-muted" style="font-size: 3rem;"></i>
+		                                    <p class="text-muted mt-3 text-center">
+		                                        No income data available. 
+		                                        <a href="/subscriber/transaction/income" class="text-primary">Add new income</a>
+		                                    </p>
+		                                </div>
+		                            <% } %>
+		                        </div>
+		                    </div>
+		                </div>
+		                
+		                <!-- Expense by Categories Pie Chart -->
+		                <div class="col-md-6 mb-3">
+		                    <div class="card shadow-sm">
+		                        <div class="card-body">
+		                            <h5 class="card-title text-center">Expense by Categories</h5>
+		                            <% if (data.expenseData && data.expenseData.length > 0) { %>
+		                                <canvas id="expenseChart" style="max-height: 300px;"></canvas>
+		                            <% } else { %>
+		                                <div class="d-flex flex-column align-items-center justify-content-center h-100">
+		                                    <i class="fas fa-chart-pie text-muted" style="font-size: 3rem;"></i>
+		                                    <p class="text-muted mt-3 text-center">
+		                                        No expense data available. 
+		                                        <a href="/subscriber/transaction/expense" class="text-primary">Add new expense</a>
+		                                    </p>
+		                                </div>
+		                            <% } %>
+		                        </div>
+		                    </div>
+		                </div>
+
+						<!-- New Bar Chart Section -->
+						<div class="row mt-4" style="width: 100%;">
+							<div class="col-12 mb-3">
+								<div class="card shadow-sm">
+									<div class="card-body">
+										<div class="d-flex justify-content-between align-items-center mb-3">
+											<h5 class="card-title mb-0">Income vs Expense</h5>
+											<div class="btn-group btn-group-sm" role="group">
+												<button type="button" class="btn btn-outline-primary" onclick="updateBarChart('day')" id="day">Day</button>
+												<button type="button" class="btn btn-outline-primary" onclick="updateBarChart('week')" id="week">Week</button>
+												<button type="button" class="btn btn-outline-primary" onclick="updateBarChart('month')" id="month">Month</button>
+											</div>
+										</div>
+										<canvas id="incomeExpenseBarChart" style="max-height: 350px; width: 100%;"></canvas>
+									</div>
+								</div>
+							</div>
+						</div>
+		            </div>
+		        </div>
+		    </main>
+		</div>
+
+		<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+		<script>
+			const dateElement = document.getElementById('dateDisplay');
+			const today = new Date();
+			const day = today.getDate();
+			const month = today.toLocaleString('default', { month: 'long' });
+			const year = today.getFullYear();
+			function getOrdinal(n) {
+				if (n > 3 && n < 21) return n + 'th';
+				switch (n % 10) {
+					case 1: return n + "st";
+					case 2: return n + "nd";
+					case 3: return n + "rd";
+					default: return n + "th";
+				}
+			}
+			const formattedDay = getOrdinal(day);
+			dateElement.innerHTML = `${formattedDay} ${month}<br>${year}`;
+
+			function filterDate(num, type) {
+			    let url = new URL(window.location.href);
+			    if (num && type && num !== 0) {
+			        url.searchParams.set("num", num);
+			        url.searchParams.set("type", type);
+			        url.searchParams.delete("page");
+			    } else {
+			        url.searchParams.delete("num");
+			        url.searchParams.delete("type");
+			        url.searchParams.delete("page");
+			    }
+			    window.location.href = url.toString();
+			}
+
+			const baseCurrency = "<%= baseCurrency %>";
+			const expenseData = <%- JSON.stringify(data.expenseData || []) %>;
+			const incomeData = <%- JSON.stringify(data.incomeData || []) %>;
+
+			function formatCurrency(value, baseCurrency) {
+			    const numValue = Number(value);
+			    switch(baseCurrency) {
+			        case 'MMK':
+			            return `${numValue.toLocaleString()} ks`;
+			        case 'THB':
+			            return `฿${numValue.toLocaleString()}`;
+			        case 'USD':
+			            return `$${numValue.toLocaleString()}`;
+			        default:
+			            return `${numValue.toLocaleString()} ${baseCurrency}`;
+			    }
+			}
+
+			function generateColorPalette(numCategories) {
+			    const baseColors = [
+			        'rgba(255, 99, 132, 0.8)',   // Soft Red
+			        'rgba(54, 162, 235, 0.8)',   // Soft Blue
+			        'rgba(255, 206, 86, 0.8)',   // Soft Yellow
+			        'rgba(75, 192, 192, 0.8)',   // Soft Teal
+			        'rgba(153, 102, 255, 0.8)',  // Soft Purple
+			        'rgba(255, 159, 64, 0.8)',   // Soft Orange
+			        'rgba(199, 199, 199, 0.8)',  // Soft Gray
+			        'rgba(83, 102, 255, 0.8)',   // Soft Indigo
+			        'rgba(40, 159, 64, 0.8)',    // Soft Green
+			        'rgba(210, 99, 132, 0.8)'    // Soft Crimson
+			    ];
+			    if (numCategories <= baseColors.length) {
+			        return baseColors.slice(0, numCategories);
+			    }
+			    const additionalColors = [];
+			    
+			    for (let i = baseColors.length; i < numCategories; i++) {
+			        const hue = (i * 137.508) % 360;
+			        const saturation = 70 + Math.sin(i) * 20;
+			        const lightness = 55 + Math.cos(i) * 10;
+			        
+			        const color = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`;
+			        additionalColors.push(color);
+			    }
+			    return [...baseColors, ...additionalColors];
+			}
+
+			function renderPieChart(chartId, chartData, baseCurrency) {
+			    if (chartData.labels.length === 0) return;
+
+			    const ctx = document.getElementById(chartId).getContext('2d');
+			    
+			    const backgroundColor = generateColorPalette(chartData.labels.length);
+
+			    const chartConfig = {
+			        type: 'pie',
+			        data: {
+			            labels: chartData.labels,
+			            datasets: [{
+			                data: chartData.amounts,
+			                backgroundColor: backgroundColor
+			            }]
+			        },
+			        options: {
+			            responsive: true,
+			            plugins: {
+			                legend: {
+			                    position: 'bottom',
+			                    labels: {
+			                        usePointStyle: true,
+			                        pointStyle: 'circle'
+			                    }
+			                },
+			                tooltip: {
+			                    callbacks: {
+			                        label: function(context) {
+			                            const value = context.parsed;
+			                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+			                            const percentage = ((value / total) * 100).toFixed(1);
+			                            const formattedValue = formatCurrency(value, baseCurrency);
+			                            return `${context.label}: ${formattedValue} (${percentage}%)`;
+			                        }
+			                    }
+			                }
+			            }
+			        }
+			    };
+
+			    const existingChart = Chart.getChart(ctx);
+			    if (existingChart) {
+			        existingChart.destroy();
+			    }
+			    return new Chart(ctx, chartConfig);
+			}
+
+			const incomeChartData = {
+				labels: incomeData.map(item => {
+					const name = item.category_name;
+					return name.length > 15 ? name.substring(0, 15) + '...' : name;
+				}),
+				amounts: incomeData.map(item => Number(item.total_amount))
+			};
+
+			const expenseChartData = {
+				labels: expenseData.map(item => {
+					const name = item.category_name;
+					return name.length > 15 ? name.substring(0, 15) + '...' : name;
+				}),
+				amounts: expenseData.map(item => Number(item.total_amount))
+			};
+
+			const searchParams = new URLSearchParams(window.location.search);
+			const type = searchParams.get('type')
+			const num = searchParams.get('num')
+			
+			if (type === 'month') {
+				if (num === '0') {
+					document.getElementById('filterName').innerText = "Date"
+				} else if (num === '1') {
+					document.getElementById('filterName').innerText = "This Month"
+				} else if (num === '3') {
+					document.getElementById('filterName').innerText = "Last 3 Months"
+				} else if (num === '-1') {
+					document.getElementById('filterName').innerText = "Last Month"
+				}
+			} else if (type === 'week') {
+				document.getElementById('filterName').innerText = "This Week"
+			} else if (type === 'day') {
+				if (num === '1') {
+					document.getElementById('filterName').innerText = "Today"
+				} else if (num === '7') {
+					document.getElementById('filterName').innerText = "Last 7 Days"
+				} else if (num === '30') {
+					document.getElementById('filterName').innerText = "Last 30 Days"
+				}
+			} else {
+				document.getElementById('filterName').innerText = "Date"
+			}
+			document.getElementById('totalIncome').textContent = formatCurrency(
+			    incomeData.reduce((sum, item) => sum + Number(item.total_amount), 0), 
+			    baseCurrency
+			);
+			document.getElementById('totalExpense').textContent = formatCurrency(
+			    expenseData.reduce((sum, item) => sum + Number(item.total_amount), 0), 
+			    baseCurrency
+			);
+			if (incomeChartData.labels.length > 0) {
+				renderPieChart('incomeChart', incomeChartData, baseCurrency);
+			}
+			if (expenseChartData.labels.length > 0) {
+				renderPieChart('expenseChart', expenseChartData, baseCurrency);
+			}
+			function getLastSixMonths() {
+			    const months = [];
+			    const today = new Date();
+
+			    for (let i = 0; i < 6; i++) {
+			        const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
+			        const monthYear = date.toLocaleString('default', { month: 'long'});
+			        months.push(monthYear);
+			    }
+
+			    return months.reverse();
+			}
+			function getLastSevenDays() {
+			    const days = [];
+			    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+			    const today = new Date();
+			    
+			    for (let i = 6; i >= 0; i--) {
+			        const pastDate = new Date();
+			        pastDate.setDate(today.getDate() - i);
+			        days.push(dayNames[pastDate.getDay()]);
+			    }
+			    
+			    return days;
+			}
+			// Add default values for when barchart data is missing or incomplete
+			const incDay = JSON.parse('<%- JSON.stringify(barchart?.day?.income || [0,0,0,0,0,0,0]) %>').map(Number);
+			const expDay = JSON.parse('<%- JSON.stringify(barchart?.day?.expense || [0,0,0,0,0,0,0]) %>').map(Number);
+			const incWeek = JSON.parse('<%- JSON.stringify(barchart?.week?.income || [0,0,0,0]) %>').map(Number);
+			const expWeek = JSON.parse('<%- JSON.stringify(barchart?.week?.expense || [0,0,0,0]) %>').map(Number);
+			const incMonth = JSON.parse('<%- JSON.stringify(barchart?.month?.income || [0,0,0,0,0,0]) %>').map(Number);
+			const expMonth = JSON.parse('<%- JSON.stringify(barchart?.month?.expense || [0,0,0,0,0,0]) %>').map(Number);
+
+			const barChartData = {
+			    day: {
+			        labels: getLastSevenDays(),
+			        income: incDay,
+			        expense: expDay
+			    },
+			    week: {
+			        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
+			        income:	incWeek,
+			        expense: expWeek
+			    },
+			    month: {
+			        labels: getLastSixMonths(),
+			        income: incMonth,
+			        expense: expMonth
+			    }
+			};
+
+			let incomeExpenseBarChart = null;
+
+			function renderBarChart(chartData) {
+			    const ctx = document.getElementById('incomeExpenseBarChart').getContext('2d');
+			    
+			    if (incomeExpenseBarChart) {
+			        incomeExpenseBarChart.destroy();
+			    }
+
+			    incomeExpenseBarChart = new Chart(ctx, {
+			        type: 'bar',
+			        data: {
+			            labels: chartData.labels,
+			            datasets: [
+			                {
+			                    label: 'Income',
+			                    data: chartData.income,
+			                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+			                    borderColor: 'rgba(75, 192, 192, 1)',
+			                    borderWidth: 1
+			                },
+			                {
+			                    label: 'Expense',
+			                    data: chartData.expense,
+			                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+			                    borderColor: 'rgba(255, 99, 132, 1)',
+			                    borderWidth: 1
+			                }
+			            ]
+			        },
+			        options: {
+			            responsive: true,
+			            scales: {
+			                y: {
+			                    beginAtZero: true,
+			                    ticks: {
+			                        callback: function(value) {
+			                            return formatCurrency(value, baseCurrency);
+			                        }
+			                    }
+			                }
+			            },
+			            plugins: {
+			                tooltip: {
+			                    callbacks: {
+			                        label: function(context) {
+			                            return formatCurrency(context.parsed.y, baseCurrency);
+			                        }
+			                    }
+			                }
+			            }
+			        }
+			    });
+			}
+
+			function showTransactionOptions() {
+				const classes = document.getElementById('transactionPopup').classList;
+				let status = false
+				for (const i of classes) {
+					if (i === 'd-none') {
+						classes.remove('d-none')
+						status = true
+						break;
+					}
+					console.log(i);
+				}
+				if (!status) {
+					classes.add('d-none')
+				}
+			}
+
+			function createTransaction(type) {
+			    if (type === 'income') {
+			        window.location.href = '/subscriber/transaction/income';
+			    } else if (type === 'expense') {
+			        window.location.href = '/subscriber/transaction/expense';
+			    }
+			}
+
+			function updateBarChart(period) {
+				document.getElementById('day').classList.remove('btn-primary')
+				document.getElementById('day').classList.add('btn-outline-primary')
+				document.getElementById('week').classList.remove('btn-primary')
+				document.getElementById('week').classList.add('btn-outline-primary')
+				document.getElementById('month').classList.remove('btn-primary')
+				document.getElementById('month').classList.add('btn-outline-primary')
+				document.getElementById(period).classList.remove('btn-outline-primary')
+				document.getElementById(period).classList.add('btn-primary')
+			    const chartData = barChartData[period];
+			    renderBarChart(chartData);
+			}
+			updateBarChart('day');
+		</script>
+		<%- include('../partials/subscriber/footer.ejs') %>

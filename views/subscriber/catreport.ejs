@@ -1,0 +1,590 @@
+<%- include('../partials/subscriber/header.ejs') %>
+<%- include('../partials/subscriber/navbar.ejs') %>
+
+<style>
+@media (max-width: 576px) {
+	#searchInput {
+		width: 160px !important;
+	}
+}
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-btn {
+  cursor: pointer;
+}
+.dropdown-menu {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.dropdown-item:hover {
+  background-color: rgba(13,110,253,0.1);
+}
+.main-content {
+  margin-top: 100px;
+}
+#searchInput {
+    width: 250px;
+	height: 35px;
+	top: 58px;
+	left: 936px;
+	border-radius: 15px;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #4D4D4D;
+    outline: none;
+    transition: all 0.3s ease-in-out;
+    background-color: white;
+    color: #333;
+}
+
+#searchInput:focus {
+    box-shadow: 0px 4px 10px #4d4d4d5c;
+    border-color: #4D4D4D;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.table-responsive {
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table th:hover {
+    background-color: #e9ecef;
+}
+
+.table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-fixed-width {
+    min-width: 80px;
+}
+
+.chart-canvas {
+    max-height: 400px;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .chart-canvas {
+        max-height: 300px;
+    }
+}
+</style>
+
+<div class="main-content" style="padding-bottom: 300px;">
+  <!-- Main Content -->
+  <div id="mainContainer"></div>
+  
+  <main class="container">
+    <div class="content">
+      <!-- Messages -->
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= errorMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      
+      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= successMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+    </div>
+    
+	<div>
+		<button class="backBtn" onclick="goBack()">
+			&lt; Back
+		</button>
+	</div>
+    
+    <div id="contentArea">
+		<div class="d-block d-md-flex justify-content-between" style="margin: 10px 10px;">
+			<!-- Search Bar -->
+			<div class="d-flex search-container me-2 my-1">
+				<input type="text" 
+					   class="form-control" 
+					   placeholder="Search..." 
+					   id="searchInput" 
+					   onkeydown="searchKey(event)">
+				<button class="btn" id="searchBarButton" onclick="performSearch()">
+					<img src="/search_icon.svg" alt="search icon" id="searchIcon">
+				</button>
+			</div>
+			<!-- Date Filter -->
+			<div class="btn-group my-1">
+				<button type="button" 
+						class="btn btn-light dropdown-toggle" 
+						data-bs-toggle="dropdown" 
+						aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+					<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i><span id="filterName">Date</span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" data-bs-toggle="modal" data-bs-target="#customDateModal">Custom Date</button>
+				</ul>
+			</div>
+
+			<!-- Export As Csv -->
+			 <div class="my-1">
+			  <button class="exportBtn" onclick="exportCsv()">
+				Export As CSV
+			  </button>
+			</div>
+		</div>
+
+		<!-- Chart Section -->
+		<div class="container-fluid p-3">
+			<div class="row g-3">
+				<!-- Table Section -->
+				<div class="col-12 col-lg-7 order-2 order-lg-1">
+					<div class="table-container">
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead style="height: 50px;">
+								  <tr>
+									<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
+									<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Category Name <span></span></th>
+									<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
+									<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
+									<th style="min-width: 80px;">Actions</th>
+								</tr>
+								</thead>
+								<tbody id="salespersonTable">
+									<% if (category.length > 0) { %>
+										<% for (let i = 0; i < category.length; i++) { %>
+											<tr style="height: 55px;">
+												<td class="text-nowrap"><%= i + 1 %></td>
+												<td class="text-nowrap"><%= category[i].name.length > 30 ? category[i].name.substring(0, 30) + '...' : category[i].name %></td>
+												<td class="text-nowrap <%= category[i].type === 'income' ? 'text-income' : 'text-expense' %>">
+													<% let totalSales = parseInt(category[i].totalSales) %>
+													<% let formattedAmount = totalSales.toLocaleString(); %>
+													<% if (baseCurrency === 'MMK') { %>
+														<%= formattedAmount %> ks
+													<% } else if (baseCurrency === 'USD') { %>
+														$ <%= formattedAmount %>
+													<% } else if (baseCurrency === 'THB') { %>
+														฿ <%= formattedAmount %>
+													<% } else { %>
+														<%= formattedAmount %> <%= baseCurrency %>
+													<% } %>
+												</td>
+												<td class="text-nowrap">
+													<%= category[i].totalTransactions %>
+												</td>
+												<td>
+													<div class="d-flex flex-nowrap ">
+														<button onclick="viewDetail('<%= category[i].id %>', '<%= category[i].type %>')"
+															class="btn btn-primary btn-sm btn-fixed-width me-1" style="border-radius: 8px;">
+															Summary
+														</button>
+													</div>
+												</td>
+											</tr>
+										<% } %>
+									<% } else { %>
+										<tr>
+											<td colspan="5" class="text-center text-muted">No data found.</td>
+										</tr>
+									<% } %>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+				<!-- Chart section -->
+				<div class="col-12 col-lg-5 order-1 order-lg-2">
+					<div class="chart-container">
+						<h5 class="card-title text-center mb-3">Financial Breakdown by Category</h5>
+						<% 
+						function hasValidData(category) {
+							if (!category || category.length === 0) return false;
+							return category.some(item => item.totalSales > 0);
+						}
+						%>
+						<% if (hasValidData(category)) { %>
+							<canvas id="categoryDonutChart" class="chart-canvas"></canvas>
+						<% } else { %>
+							<div class="d-flex flex-column align-items-center justify-content-center h-100">
+								<i class="fas fa-chart-pie text-muted" style="font-size: 3rem;"></i>
+								<p class="text-muted mt-3 text-center">
+									No data available for chart. 
+									<a href="/subscriber/transaction/income" class="text-primary">Add transactions</a>
+								</p>
+							</div>
+						<% } %>
+					</div>
+				</div>
+
+				
+			</div>
+		</div>
+	</div>
+	
+
+	<!-- Modal for custom date -->
+	<div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content shadow">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="customDateModalLabel">Select Date Range</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        <div class="mb-3">
+	          <label for="start-date" class="form-label">From</label>
+	          <input type="date" class="form-control" id="start-date" onchange="updateEndMin()">
+	        </div>
+	        <div class="mb-3">
+	          <label for="end-date" class="form-label">To</label>
+	          <input type="date" class="form-control" id="end-date">
+	        </div>
+	      </div>
+		  <div>
+			<p id="errMsgDate" class="text-danger d-none">*Please select start date and end date!</p>
+		  </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-danger" onclick="getDateRange()">Apply</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div style="height: 300px;"></div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+let sortDirections = {};
+
+function sortTable(columnIndex, type, headerElement) {
+	let table = document.getElementById("salespersonTable");
+	let rows = Array.from(table.getElementsByTagName("tr"));
+	let ascending = !sortDirections[columnIndex];
+	sortDirections[columnIndex] = ascending;
+
+	rows.sort((rowA, rowB) => {
+		let cellA = rowA.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+		let cellB = rowB.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+
+		if (type === "number") {
+			cellA = parseFloat(cellA.replace(/[^0-9.-]/g, "")) || 0;
+			cellB = parseFloat(cellB.replace(/[^0-9.-]/g, "")) || 0;
+			return ascending ? cellA - cellB : cellB - cellA;
+		} else if (type === "date") {
+			cellA = new Date(cellA).getTime() || 0;
+			cellB = new Date(cellB).getTime() || 0;
+			return ascending ? cellA - cellB : cellB - cellA;
+		} else {
+			return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+		}
+	});
+	rows.forEach(row => table.appendChild(row));
+	document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
+	headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
+}
+
+const categoryData = <%- JSON.stringify(category) %>;
+const baseCurrency = '<%= baseCurrency %>';
+
+const processedData = categoryData
+	.filter(item => item.totalSales > 0)
+	.sort((a, b) => b.totalSales - a.totalSales)
+	.slice(0, 10);
+
+const labels = processedData.map(item => {
+	return item.name.length > 15 ? item.name.substring(0, 15) + '...' : item.name;
+});
+
+const data = processedData.map(item => parseInt(item.totalSales));
+
+function generateColorPalette(numCategories) {
+    const baseColors = [
+        'rgba(255, 99, 132, 0.8)', // Soft Red
+        'rgba(54, 162, 235, 0.8)', // Soft Blue
+        'rgba(255, 206, 86, 0.8)', // Soft Yellow
+        'rgba(75, 192, 192, 0.8)', // Soft Teal
+        'rgba(153, 102, 255, 0.8)', // Soft Purple
+        'rgba(255, 159, 64, 0.8)', // Soft Orange
+        'rgba(199, 199, 199, 0.8)', // Soft Gray
+        'rgba(83, 102, 255, 0.8)', // Soft Indigo
+        'rgba(40, 159, 64, 0.8)', // Soft Green
+        'rgba(210, 99, 132, 0.8)' // Soft Crimson
+    ];
+    if (numCategories <= baseColors.length) {
+        return baseColors.slice(0, numCategories);
+    }
+    const additionalColors = [];
+    for (let i = baseColors.length; i < numCategories; i++) {
+        const hue = (i * 137.508) % 360;
+        const saturation = 70 + Math.sin(i) * 20;
+        const lightness = 55 + Math.cos(i) * 10;
+        const color = `hsla(${hue}, ${saturation}%, ${lightness}%, 0.8)`;
+        additionalColors.push(color);
+    }
+    return [...baseColors, ...additionalColors];
+}
+
+
+const backgroundColors = generateColorPalette(labels.length);
+const borderColors = backgroundColors.map(color => color);
+
+// Chart configuration
+const donutConfig = {
+	type: 'doughnut',
+	data: {
+		labels: labels,
+		datasets: [{
+			data: data,
+			backgroundColor: backgroundColors,
+			borderColor: borderColors,
+			borderWidth: 2,
+			hoverOffset: 4
+		}]
+	},
+	options: {
+		responsive: true,
+		maintainAspectRatio: false,
+		plugins: {
+			legend: {
+				position: 'bottom',
+				labels: {
+					padding: 20,
+					usePointStyle: true,
+					font: {
+						size: 12
+					},
+					generateLabels: function(chart) {
+						const data = chart.data;
+						if (data.labels.length && data.datasets.length) {
+							return data.labels.map((label, i) => {
+								const value = data.datasets[0].data[i];
+								const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
+								const percentage = ((value / total) * 100).toFixed(1);
+								
+								return {
+									text: `${label} (${percentage}%)`,
+									fillStyle: data.datasets[0].backgroundColor[i],
+									strokeStyle: data.datasets[0].borderColor[i],
+									lineWidth: data.datasets[0].borderWidth,
+									pointStyle: 'circle',
+									hidden: false,
+									index: i
+								};
+							});
+						}
+						return [];
+					}
+				}
+			},
+			tooltip: {
+				backgroundColor: 'rgba(0, 0, 0, 0.8)',
+				titleColor: '#fff',
+				bodyColor: '#fff',
+				borderColor: '#ddd',
+				borderWidth: 1,
+				cornerRadius: 6,
+				callbacks: {
+					label: function(context) {
+						const value = context.parsed;
+						const total = context.dataset.data.reduce((a, b) => a + b, 0);
+						const percentage = ((value / total) * 100).toFixed(1);
+						
+						let formattedValue = value.toLocaleString();
+						let currencySymbol = '';
+						
+						if (baseCurrency === 'MMK') {currencySymbol = 'ks';
+							return `${context.label}: ${formattedValue} ${currencySymbol} (${percentage}%)`;
+						}
+						else if (baseCurrency === 'USD') currencySymbol = '$';
+						else if (baseCurrency === 'THB') currencySymbol = '฿';
+						
+						return `${context.label}: ${currencySymbol}${formattedValue} (${percentage}%)`;
+					}
+				}
+			}
+		},
+		cutout: '60%',
+		animation: {
+			animateScale: true,
+			animateRotate: true
+		}
+	}
+};
+
+// Create the donut chart
+const canvasElement = document.getElementById('categoryDonutChart');
+if (canvasElement && processedData.length > 0) {
+	const categoryChart = new Chart(canvasElement, donutConfig);
+}
+
+function filterDate(num, type) {
+    let url = new URL(window.location.href);
+    if (num && type && num !== 0) {
+        url.searchParams.set("num", num);
+		url.searchParams.set("type", type);
+		url.searchParams.delete("from");
+		url.searchParams.delete("to");
+		url.searchParams.delete("export");
+    } else {
+        url.searchParams.delete("num");
+		url.searchParams.delete("type");
+		url.searchParams.delete("from");
+		url.searchParams.delete("to");
+		url.searchParams.delete("export");
+    }
+    window.location.href = url.toString();
+}
+
+function updateEndMin() {
+	document.getElementById('errMsgDate').classList.add('d-none')
+    var start = document.getElementById("start-date");
+    var end = document.getElementById("end-date");
+    end.min = start.value;
+}
+
+function getDateRange() {
+    var start = document.getElementById("start-date").value;
+    var end = document.getElementById("end-date").value;
+
+    if (start && end) {
+        var endDateObj = new Date(end);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        var endPlusOne = endDateObj.toISOString().split('T')[0];
+
+        var modal = bootstrap.Modal.getInstance(document.getElementById('customDateModal'));
+        modal.hide();
+
+        let url = new URL(window.location.href);
+        url.searchParams.delete("num");
+        url.searchParams.delete("type");
+		url.searchParams.delete("export");
+        url.searchParams.set("from", start);
+        url.searchParams.set("to", endPlusOne);
+        window.location.href = url.toString();
+    } else {
+        document.getElementById('errMsgDate').classList.remove('d-none');
+    }
+}
+
+function exportCsv() {
+	let url = new URL(window.location.href);
+    url.searchParams.set("export", "true");
+    window.location.href = url.toString();
+}
+
+function searchKey(event){
+	if (event.key === 'Enter') {
+		performSearch();
+	}
+}
+
+function performSearch() {
+    let input = document.getElementById("searchInput").value.trim();
+    let url = new URL(window.location.href);
+    
+    if (input) {
+        url.searchParams.set("search", input);
+		url.searchParams.delete("export");
+    } else {
+        url.searchParams.delete("search");
+		url.searchParams.delete("export");
+    }
+    window.location.href = url.toString();
+}
+
+function viewDetail(id, type) {
+	let url = ''
+	if (type === 'income')
+		url = `/subscriber/report/category/income/${id}?num=30&type=day`
+	else
+		url = `/subscriber/report/category/expense/${id}?num=30&type=day`
+    window.location.href = url.toString();
+}
+
+function goBack() {
+	let url = `/subscriber/report?num=30&type=day`
+    window.location.href = url.toString();
+}
+
+const searchParams = new URLSearchParams(window.location.search);
+const type = searchParams.get('type')
+const num = searchParams.get('num')
+const from = searchParams.get('from')
+const to = searchParams.get('to')
+const search = searchParams.get('search')
+if (typeof search === 'string' && search.trim().length > 0) {
+	document.getElementById('searchInput').value = search;
+}
+if (type === 'month') {
+	if (num === '0') {
+		document.getElementById('filterName').innerText = "Date"
+	} else if (num === '1') {
+		document.getElementById('filterName').innerText = "This Month"
+	} else if (num === '3') {
+		document.getElementById('filterName').innerText = "Last 3 Months"
+	} else if (num === '-1') {
+		document.getElementById('filterName').innerText = "Last Month"
+	}
+} else if (type === 'week') {
+	document.getElementById('filterName').innerText = "This Week"
+} else if (type === 'day') {
+	if (num === '1') {
+		document.getElementById('filterName').innerText = "Today"
+	} else if (num === '7') {
+		document.getElementById('filterName').innerText = "Last 7 Days"
+	} else if (num === '30') {
+		document.getElementById('filterName').innerText = "Last 30 Days"
+	}
+} else {
+	if (from && to)
+		document.getElementById('filterName').innerText = "Custom Date"
+	else
+		document.getElementById('filterName').innerText = "Date"
+}
+
+</script>
+
+<%- include('../partials/subscriber/footer.ejs') %>

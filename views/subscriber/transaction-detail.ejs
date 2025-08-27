@@ -1,0 +1,220 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		<style>
+			#receipt {
+			    max-height: 200px;
+			    border-radius: 10px;
+			    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+			    border: 1px solid #ddd;
+			    padding: 5px;
+			    background: #fff;
+			    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+			}
+
+			#receipt:hover {
+			    transform: scale(1.05);
+			    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+				cursor: pointer;
+			}
+			@media (max-width: 768px) {
+		        .modal-dialog {
+		            max-width: 95% !important;
+		            margin: auto;
+		        }
+		    }
+
+		    @media (max-width: 480px) {
+		        #modalReceiptImage {
+		            max-height: 70vh;
+		        }
+		    }
+			#mainContainer {
+				margin-top: 100px;
+			}
+		</style>
+		<div class="main-content">
+			<div id="mainContainer"></div>
+			<main class="col-md-9 col-lg-10">
+				<div class="container my-5">
+					<h2 class="mb-4">Transaction Details</h2>
+			
+					<!-- Messages -->
+				      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+				        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+				          <%= errorMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+				      
+				      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+				        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+				          <%= successMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+					<!-- Category Details Form -->
+					<form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+						<div class="mb-3" >
+							<label for="transId" class="form-label">Transaction ID</label>
+							<div id="transId" class="form-control"><span id="transIDPrefix"></span><%= transaction.id %></div>
+						</div>
+						<div class="mb-3">
+							<label for="transDescription" class="form-label">Description</label>
+							<div id="transDescription" class="form-control"><%= transaction.description %></div>
+						</div>
+						<div class="mb-3">
+							<label for="transDate" class="form-label">Date</label>
+							<div id="transDate" class="form-control"></div>
+						</div>
+						<% if ((transaction.salesperson && transaction.salesperson.length > 0) || (transaction.itemName && transaction.itemName.length > 0)) {%> 
+							<% if(trans === 'income') {%> 
+								<div class="mb-3">
+									<label for="transSalesperson" class="form-label">Salesperson Name</label>
+									<div id="transSalesperson" class="form-control"><%= transaction.salesperson %></div>
+								</div>
+							<%}%>
+							<% if((trans === 'income' && transaction.customerName) || (trans === 'expense' && transaction.vendorName)) {%> 
+								<div class="mb-3">
+									<label for="transCustomer" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
+									<div id="transCustomer" class="form-control"><%= trans === 'income' ? transaction.customerName : transaction.vendorName %></div>
+								</div>
+							<%} %>
+							<div class="mb-3">
+								<label for="transItem" class="form-label">Item Name</label>
+								<div id="transItem" class="form-control"><%= transaction.itemName %></div>
+							</div>
+							<div class="mb-3">
+								<label for="transPrice" class="form-label">Price Per Unit</label>
+								<div id="transPrice" class="form-control">
+									<% let formattedPrice = transaction.price.toLocaleString(); %>
+							
+									<% if (transaction.baseCurrency === 'MMK') { %>
+										<%= formattedPrice %> ks
+									<% } else if (transaction.baseCurrency === 'USD') { %>
+										$ <%= formattedPrice %>
+									<% } else if (transaction.baseCurrency === 'THB') { %>
+										฿ <%= formattedPrice %>
+									<% } else { %>
+										<%= formattedPrice %> <%= transaction.baseCurrency %>
+									<% } %>
+								</div>
+							</div>
+							<div class="mb-3">
+								<label for="transQuantity" class="form-label">Quantity</label>
+								<div id="transQuantity" class="form-control"><%= transaction.quantity %></div>
+							</div>
+						<%} %>
+						
+						<div class="mb-3">
+							<label for="transAmount" class="form-label">Amount</label>
+							<div id="transAmount" class="form-control">
+								<% let formattedAmount = transaction.amount.toLocaleString(); %>
+							
+								<% if (transaction.baseCurrency === 'MMK') { %>
+									<%= formattedAmount %> ks
+								<% } else if (transaction.baseCurrency === 'THB') { %>
+									฿ <%= formattedAmount %>
+								<% } else if (transaction.baseCurrency === 'USD') { %>
+									$ <%= formattedAmount %>
+								<% } else { %>
+									<%= formattedAmount %> <%= transaction.baseCurrency %>
+								<% } %>
+							</div>
+						</div>
+						<div class="mb-3">
+							<label for="transCategory" class="form-label">Category</label>
+							<div id="transCategory" class="form-control bg-light text-dark">
+								<%= transaction.category %>
+							</div>
+						</div>
+						<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
+							<div class="mb-3">
+								<label for="transReceipt" class="form-label">Receipt</label><br>
+								<img src="/<%= transaction.receipt %>" data-bs-toggle="modal" data-bs-target="#receiptModal" id="receipt" alt="Receipt Image" class="img-fluid" />
+							</div>
+						<% } %>
+						<div class="mb-3">
+							<label for="transUsername" class="form-label">Created By</label>
+							<div id="transUsername" class="form-control"><%= transaction.username %></div>
+						</div>
+						<a href="" class="btn w-100 btn-primary" id="resetBtn">Back</a>
+			
+					</form>
+			
+				</div>
+				<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-xl">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="receiptModalLabel">Receipt Preview</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body text-center">
+								<img src="/<%= transaction.receipt %>" class="img-fluid" id="modalReceiptImage" alt="Receipt Image"
+									style="width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);" />
+							</div>
+						</div>
+					</div>
+				</div>
+			</main>
+		</div>
+		
+		<script>
+			let searchParams = new URLSearchParams(window.location.search);
+			let trans = searchParams.get('trans');
+			let cat = searchParams.get('cat');
+			let id = searchParams.get('id');
+
+			const resetBtn = document.getElementById('resetBtn');
+			const page = "<%= pagination.page %>"
+			if (resetBtn) {
+			    if (trans === 'income') {
+			        resetBtn.href = `/subscriber/transaction/income?page=${page}`;
+			    } else if (trans === 'expense') {
+			        resetBtn.href = `/subscriber/transaction/expense?page=${page}`;
+			    }
+			    else if (cat === 'income' && id) {
+			        resetBtn.href = `/subscriber/category/income/detail/${id}?page=${page}`;
+			    } else if (cat === 'expense' && id) {
+			        resetBtn.href = `/subscriber/category/expense/detail/${id}?page=${page}`;
+			    }
+			    else {
+			        resetBtn.href = `/subscriber/transaction/income?page=${page}`;
+			    }
+			}
+
+			let isoString = '';
+			if (trans === 'income' || cat === 'income') {
+			    isoString = `<%= new Date(
+								transaction.incomeDate 
+							).toLocaleString('en-US', { 
+								year: 'numeric',
+							    month: 'short',
+							    day: '2-digit',
+							    hour: '2-digit',
+							    minute: '2-digit',
+							    second: '2-digit',
+							    hour12: true
+							}) %>`;
+				document.getElementById('transIDPrefix').innerText = 'INC';
+			} else {
+			    isoString = `<%= new Date(
+								transaction.expenseDate 
+							).toLocaleString('en-US', { 
+								year: 'numeric',
+							    month: 'short',
+							    day: '2-digit',
+							    hour: '2-digit',
+							    minute: '2-digit',
+							    second: '2-digit',
+							    hour12: true
+							}) 
+				 			%>`;
+				document.getElementById('transIDPrefix').innerText = 'EXP';
+			}
+
+			document.getElementById('transDate').innerText = isoString;
+			
+		</script>
+        <%- include('../partials/subscriber/footer.ejs') %>

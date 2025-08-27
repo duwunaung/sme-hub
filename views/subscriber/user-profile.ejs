@@ -1,0 +1,265 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		<style>
+	        #mainContainer {
+				margin-top: 100px;
+			}
+	    </style>
+		<div class="main-content">
+			<!-- Main Content -->
+			<div id="mainContainer"></div>
+	        <main>
+				<!-- Messages -->
+			      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+			        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+			          <%= errorMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+			      
+			      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+			        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+			          <%= successMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+	            <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+					<div class="container mt-5">
+						<div class="row justify-content-center">
+							<div class="col-md-8">
+								<div class="card shadow-sm">
+									<div class="card-body">
+										<div class="row" style="display: flex; justify-content: center; align-items: center;">
+											<h3 class="mb-2">User Details</h3>
+											
+											<!-- Name field -->
+											<div class="mb-3">
+												<label for="usrName" class="form-label">User Name</label><span> *</span>
+												<input type="text" class="form-control inputRequired" maxlength="100" name="name" id="usrName"
+													placeholder="Enter username" value="<%= user.name %>" oninput="checkInputs('usrNameError', 'usrName')" required>
+												<p id="usrNameError" class="mt-2 d-none text-danger">*User Name can't exceed 100 characters!</p>
+											</div>
+				
+											<!-- Email field -->
+											<div class="mb-3">
+												<label for="usrEmail" class="form-label">Email Address</label><span> *</span>
+												<input type="text" class="form-control" id="usrEmail" maxlength="45" name="email" 
+													placeholder="Enter email address" value="<%= user.email %>" oninput="checkInputs('usrEmailError', 'usrEmail')" required>
+												<p id="usrEmailError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
+											</div>
+				
+											<!-- Phone field -->
+											<div class="mb-3">
+												<label for="usrPhone" class="form-label">Phone</label><span> *</span>
+												<input type="tel" class="form-control" maxlength="45" id="usrPhone" name="phone"
+													placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('usrPhoneError', 'usrPhone')" required>
+												<p id="usrPhoneError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+											</div>
+				
+											<!-- Password Change Section -->
+											<div class="mb-3">
+												<button type="button" class="btn btn-outline-primary mb-3" onclick="togglePasswordFields()">
+													Change Password
+												</button>
+												
+												<div id="passwordChangeSection" style="display: none;">
+													<!-- Current Password -->
+													<div class="mb-3">
+														<label for="currentPassword" class="form-label">Current Password</label>
+														<div class="input-group">
+															<input type="password" class="form-control" id="currentPassword" name="currentPassword"
+																maxlength="255" placeholder="Enter current password">
+															<span class="input-group-text" style="cursor: pointer" 
+																onclick="togglePassword('currentPassword', 'currentPasswordIcon')">
+																<i id="currentPasswordIcon" class="fa-solid fa-eye"></i>
+															</span>
+														</div>
+														<p id="currentPasswordError" class="mt-2 d-none text-danger"></p>
+													</div>
+												
+													<!-- New Password -->
+													<div class="mb-3">
+														<label for="newPassword" class="form-label">New Password</label>
+														<div class="input-group">
+															<input type="password" class="form-control" id="newPassword" name="newPassword"
+																maxlength="255" placeholder="Enter new password" oninput="validateNewPassword(event)">
+															<span class="input-group-text" style="cursor: pointer"
+																onclick="togglePassword('newPassword', 'newPasswordIcon')">
+																<i id="newPasswordIcon" class="fa-solid fa-eye"></i>
+															</span>
+														</div>
+														<p id="newPasswordError" class="mt-2 d-none text-danger"></p>
+													</div>
+												
+													<!-- Confirm New Password -->
+													<div class="mb-3">
+														<label for="confirmPassword" class="form-label">Confirm New Password</label>
+														<div class="input-group">
+															<input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+																maxlength="255" placeholder="Confirm new password" oninput="validateConfirmPassword(event)">
+															<span class="input-group-text" style="cursor: pointer"
+																onclick="togglePassword('confirmPassword', 'confirmPasswordIcon')">
+																<i id="confirmPasswordIcon" class="fa-solid fa-eye"></i>
+															</span>
+														</div>
+														<p id="confirmPasswordError" class="mt-2 d-none text-danger"></p>
+													</div>
+												</div>
+											</div>
+											<div class="mb-3">
+												<p class="text-secondary">Version: <%= appVersion %> (<%= appCodeName %>)</p>
+											</div>
+											<div class="mt-4 d-flex justify-content-end">
+												<button type="submit" id="addBtn" class="btn btn-success mb-2">Save Changes</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+				
+	        
+	        </main>
+		</div>
+        
+		<script>
+			function togglePassword(passwordFieldId, iconId) {
+			    const passwordField = document.getElementById(passwordFieldId);
+			    const icon = document.getElementById(iconId);
+			    
+			    if (passwordField.type === 'password') {
+			        passwordField.type = 'text';
+			        icon.classList.remove('fa-eye');
+			        icon.classList.add('fa-eye-slash');
+			    } else {
+			        passwordField.type = 'password';
+			        icon.classList.remove('fa-eye-slash');
+			        icon.classList.add('fa-eye');
+			    }
+			}
+			function togglePasswordFields() {
+			    const passwordSection = document.getElementById('passwordChangeSection');
+			    passwordSection.style.display = passwordSection.style.display === 'none' ? 'block' : 'none';
+			   
+			    if (passwordSection.style.display === 'none') {
+			        document.getElementById('currentPassword').value = '';
+			        document.getElementById('newPassword').value = '';
+			        document.getElementById('confirmPassword').value = '';
+			    }
+			}
+
+			const addButton = document.getElementById('addBtn');
+			const form = document.getElementById('myForm');
+			const inputs = form.querySelectorAll('.form-control[required]');
+	
+			function checkInputs(messageBox, inputField) {
+				let allFilled = true;
+				inputs.forEach(index => {
+				if (!index.value.trim()) {
+					allFilled = false;
+				}
+				});
+				addButton.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+					message.classList.remove('d-none');
+				} else {
+					message.classList.add('d-none');
+				}
+			}
+
+			function validatePassword(password) {
+			    const errors = [];
+			    if (password.length < 8) {
+			        errors.push("Password must be at least 8 characters long");
+			    }
+			    if (!/\d/.test(password)) {
+			        errors.push("Password must contain at least one digit");
+			    }
+			    if (!/[A-Z]/.test(password)) {
+			        errors.push("Password must contain at least one capital letter");
+			    }
+			    if (!/[a-z]/.test(password)) {
+			        errors.push("Password must contain at least one small letter");
+			    }
+			    if (!/[!@#$%^&*]/.test(password)) {
+			        errors.push("Password must contain at least one special character (!@#$%^&*)");
+			    }
+			    if (/[<>]/.test(password)) {
+			        errors.push("Password cannot contain < or > characters");
+			    }
+			    return errors;
+			}
+
+			function submitForm(event) {
+			    event.preventDefault();
+			    
+			    const passwordSection = document.getElementById('passwordChangeSection');
+			    const currentPassword = document.getElementById('currentPassword');
+			    const newPassword = document.getElementById('newPassword');
+			    const confirmPassword = document.getElementById('confirmPassword');
+			    
+			    document.getElementById('currentPasswordError').classList.add('d-none');
+			    document.getElementById('newPasswordError').classList.add('d-none');
+			    document.getElementById('confirmPasswordError').classList.add('d-none');
+			    
+			    if (passwordSection.style.display !== 'none') {
+			        
+			        
+			        if (newPassword.value) {
+						if (!currentPassword.value) {
+				            document.getElementById('currentPasswordError').textContent = '*Current password is required';
+				            document.getElementById('currentPasswordError').classList.remove('d-none');
+				            return;
+				        }
+			            const passwordErrors = validatePassword(newPassword.value);
+			            
+			            if (newPassword.value === currentPassword.value) {
+			                passwordErrors.push("New password must be different from current password");
+			            }
+			            
+			            if (passwordErrors.length > 0) {
+			                document.getElementById('newPasswordError').textContent = passwordErrors.join(', ');
+			                document.getElementById('newPasswordError').classList.remove('d-none');
+			                return;
+			            }
+			            
+			            if (newPassword.value !== confirmPassword.value) {
+			                document.getElementById('confirmPasswordError').textContent = '*Passwords do not match';
+			                document.getElementById('confirmPasswordError').classList.remove('d-none');
+			                return;
+			            }
+			        }
+			    }
+			    
+			    document.getElementById('myForm').submit();
+			}
+
+			function validateNewPassword(e) {
+			    const passwordErrors = validatePassword(e.target.value);
+			    const errorElement = document.getElementById('newPasswordError');
+			    
+			    if (passwordErrors.length > 0) {
+			        errorElement.textContent = passwordErrors.join(', ');
+			        errorElement.classList.remove('d-none');
+			    } else {
+			        errorElement.classList.add('d-none');
+			    }
+			};
+			function validateConfirmPassword(e) {
+			    const newPassword = document.getElementById('newPassword').value;
+			    const errorElement = document.getElementById('confirmPasswordError');
+			    
+			    if (e.target.value !== newPassword) {
+			        errorElement.textContent = '*Passwords do not match';
+			        errorElement.classList.remove('d-none');
+			    } else {
+			        errorElement.classList.add('d-none');
+			    }
+			};
+		</script>
+        <%- include('../partials/subscriber/footer.ejs') %>

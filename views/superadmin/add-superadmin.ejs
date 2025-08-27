@@ -1,0 +1,221 @@
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
+
+            <div class="container my-3">
+                <% if (errorMessage) { %>
+                <div id="errorBox" class="alert alert-danger" role="alert">
+                    <%= errorMessage %>
+                </div>
+                <% } %>
+                <h2 class="mb-3">Add New System Admin</h2>
+                <form class="mb-4" method="POST" id="myForm" onsubmit="submitForm(event)">
+                    
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Admin Name</label><span> *</span>
+                        <input type="text" class="form-control" maxlength="100" name="name" id="userName"
+                            placeholder="Enter Admin name" value="<%= user.name %>" oninput="checkInputs('nameUserError', 'userName')" required>
+						<p id="nameUserError" class="mt-2 d-none text-danger">*Admin Name can't exceed 100 characters!</p>
+                    </div>
+
+					<div class="mb-3">
+                        <label for="userEmail" class="form-label" id="labelEmail">Email</label><span> *</span>
+                        <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
+                            placeholder="Enter Admin Email" value="<%= user.email %>" oninput="checkInputs('emailUserError', 'userEmail')" required>
+						<p id="emailUserError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="userPassword" class="form-label">Password</label><span> *</span>
+                        <input type="text" class="form-control" name="password" id="userPassword"
+                            placeholder="Enter Admin Password" value="" required readonly>
+						<input type="checkbox" class="me-2 mt-3" id="checkbox" onchange="showPassword(this)" checked><label for="checkbox">Show Password</label>
+						<p class="text-danger">*Please save the password before creating a user account!*</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="userPhone" class="form-label">Phone</label><span> *</span>
+                        <input type="tel" class="form-control" maxlength="45" name="phone" id="userPhone"
+                            placeholder="Enter Admin Phone Number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" required>
+						<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+                    </div>
+					<input type="hidden" id="userTime" name="userTime">
+
+                    <button type="button" class="btn btn-success w-100 mb-2" id="addBtn" onclick="showConfirmModal()">Add</button>
+                    <a onclick="clickBtn()" href="#" class="btn btn-danger w-100">Cancel</a>
+    
+                </form>
+            </div>
+        </main>
+		<!-- Password Confirmation Modal -->
+		<div id="confirmModal" class="modal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: auto; background-color: rgba(0,0,0,0.4);">
+			<div class="modal-dialog" style="margin: 15% auto; width: 80%; max-width: 500px;">
+				<div class="modal-content" style="background-color: #fefefe; padding: 20px; border: 1px solid #888; border-radius: 5px;">
+					<div class="modal-header">
+						<h5 class="modal-title">Password Confirmation</h5>
+						<button type="button" class="btn-close" onclick="closeModal()"></button>
+					</div>
+					<div class="modal-body">
+						<p>Have you saved the generated password? You won't be able to see it again after creating the account.</p>
+						<p class="fw-bold">Password: <span id="modalPassword"></span></p>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+						<button type="button" class="btn btn-primary" onclick="confirmSubmission()">Yes, I've saved it</button>
+					</div>
+				</div>
+			</div>
+		</div>
+        <script>
+            
+			function generatePassword() {
+			    const password = Math.random().toString(36).slice(-8);
+			    document.getElementById('userPassword').value = password;
+			}
+
+			const form = document.getElementById('myForm');
+			const addButton = document.getElementById('addBtn');
+			const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+			const userEmail = document.getElementById('userEmail')
+			const labelEmail = document.getElementById('labelEmail')
+			const userPassword = document.getElementById('userPassword')
+
+			function showPassword(checkbox) {
+				if (checkbox.checked) {
+			        userPassword.type = 'text';
+			    } else {
+			        userPassword.type = 'password';
+			    }
+			}
+
+
+			function checkInputs(messageBox, inputField) {
+                let allFilled = true;
+                inputs.forEach(index => {
+                if (!index.value.trim()) {
+                    allFilled = false;
+                }
+                });
+                addButton.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			    } else {
+			        message.classList.add('d-none');
+			    }
+				if (inputField === 'userEmail')
+				{
+					userEmail.classList.remove('border-danger')
+					labelEmail.style.color = 'black'
+					userEmail.classList.remove('input-error')
+				}
+            }
+
+			function submitForm(event) {
+				event.preventDefault();
+				const now = new Date();
+				const localTime = now.getFullYear() + "-" +
+									String(now.getMonth() + 1).padStart(2, '0') + "-" +
+									String(now.getDate()).padStart(2, '0') + " " +
+									String(now.getHours()).padStart(2, '0') + ":" +
+									String(now.getMinutes()).padStart(2, '0') + ":" +
+									String(now.getSeconds()).padStart(2, '0');
+				document.getElementById('userTime').value = localTime;
+				const addButton = document.getElementById('addBtn');
+				addButton.disabled = true;
+				addButton.textContent = 'Submitting...';
+				const form = document.getElementById('myForm');
+				form.submit();
+			}
+
+			function showConfirmModal() {
+				const form = document.getElementById('myForm');
+				if (!form.checkValidity()) {
+					form.reportValidity();
+					return;
+				}
+				const userPassword = document.getElementById('userPassword');
+				document.getElementById('modalPassword').textContent = userPassword.value;
+				const confirmModal = document.getElementById('confirmModal');
+				confirmModal.style.display = 'block';
+			}
+
+			function closeModal() {
+				const confirmModal = document.getElementById('confirmModal');
+				confirmModal.style.display = 'none';
+			}
+
+			function confirmSubmission() {
+				const now = new Date();
+				const localTime = now.getFullYear() + "-" +
+									String(now.getMonth() + 1).padStart(2, '0') + "-" +
+									String(now.getDate()).padStart(2, '0') + " " +
+									String(now.getHours()).padStart(2, '0') + ":" +
+									String(now.getMinutes()).padStart(2, '0') + ":" +
+									String(now.getSeconds()).padStart(2, '0');
+				document.getElementById('userTime').value = localTime;
+
+				closeModal();
+				const addButton = document.getElementById('addBtn');
+				const form = document.getElementById('myForm');
+				addButton.disabled = true;
+				addButton.textContent = 'Submitting...';
+				form.method = "POST";
+				form.onsubmit = null;
+				form.submit();
+			}
+
+	        window.onclick = function(event) {
+	            if (event.target === confirmModal) {
+	                closeModal();
+	            }
+	        }
+
+            generatePassword();
+
+			// checking error types
+			const searchParams = new URLSearchParams(window.location.search);
+			const error = searchParams.get('error')
+
+			if (error === 'true') {
+				const type = searchParams.get('type')
+				if (type === 'dup-email') {
+					userEmail.classList.add('border-danger')
+					labelEmail.style.color = '#bb2124'
+					userEmail.onfocus = function() {
+			            userEmail.classList.add('input-error');
+			        };
+			        
+			        userEmail.onblur = function() {
+			            userEmail.classList.remove('input-error');
+			        };
+				}
+			}
+			
+			// Click Btns
+			function clickBtn() {
+				let url = new URL(window.location.href);
+				let name = url.searchParams.get( 'name' )
+				let status = url.searchParams.get( 'status' )
+				let page = url.searchParams.get( 'page' )
+				let query = "?"
+				
+				if (page) {
+						query += "page=" + page
+				} else {
+						query += "page=1"
+				}
+
+				if (name) {
+						query += "&name=" + name
+				}
+
+				if (status) {
+						query += "&status=" + status
+				}
+
+				window.location.href = "/superadmin/users" + query
+			}
+			
+        </script>
+        <%- include('../partials/superadmin/footer.ejs') %>

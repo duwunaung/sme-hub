@@ -1,0 +1,424 @@
+<%- include('../partials/superadmin/header.ejs') %>
+	<%- include('../partials/superadmin/navbar.ejs') %>
+		<style>
+			.country-select-container {
+				position: relative;
+			}
+
+			.country-search {
+				display: block;
+				width: 100%;
+				margin-bottom: 5px;
+				padding: 5px;
+				border: 1px solid #ced4da;
+				border-radius: 4px;
+			}
+
+			.country-dropdown {
+				width: 100%;
+			}
+		</style>
+		<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+		<div class="container my-3">
+			<h2 class="mb-3">Update Organization</h2>
+
+			<!-- Messages -->
+		      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+		        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+		          <%= errorMessage %>
+		          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		        </div>
+		      <% } %>
+		      
+		      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+		        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+		          <%= successMessage %>
+		          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		        </div>
+		      <% } %>
+							<!-- Organization Details Form -->
+							<form class="mb-2" method="POST" id="myForm" onsubmit="submitForm(event)">
+								<div class="mb-3">
+									<label for="orgName" class="form-label">Organization Name</label><span> *</span>
+									<input type="text" class="form-control" maxlength="145" name="name" id="orgName"
+										placeholder="Enter organization name" value="<%= org.name %>"
+										oninput="checkInputs('nameOrgError', 'orgName')" required>
+									<p id="nameOrgError" class="mt-2 d-none text-danger">*Organization Name can't exceed 145 characters!
+									</p>
+								</div>
+								<div class="mb-3">
+									<label for="orgAddress" class="form-label">Address</label><span> *</span>
+									<textarea class="form-control" id="orgAddress" maxlength="145" name="address" rows="2"
+										placeholder="Enter organization address" oninput="checkInputs('addressOrgError', 'orgAddress')"
+										required><%= org.address %></textarea>
+									<p id="addressOrgError" class="mt-2 d-none text-danger">*Address can't exceed 145 characters!</p>
+								</div>
+								<div class="mb-3">
+									<label for="country">Country </label><span> *</span>
+									<div class="country-select-container mt-1">
+										<select id="country" name="country" class="form-control country-dropdown" onchange="checkInputs('countryError', 'country')">
+											<option value="" disabled>Select a country</option>
+											<% [
+											"Afghanistan", "Åland Islands", "Albania", "Algeria", "American Samoa", 
+											"Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", 
+											"Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", 
+											"Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", 
+											"Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", 
+											"Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", 
+											"Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", 
+											"Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central African Republic", 
+											"Chad", "Chile", "China", "Christmas Island", "Cocos (Keeling) Islands", 
+											"Colombia", "Comoros", "Congo", "Congo, The Democratic Republic of The", 
+											"Cook Islands", "Costa Rica", "Cote D'ivoire", "Croatia", "Cuba", "Cyprus", 
+											"Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", 
+											"Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", 
+											"Ethiopia", "Falkland Islands (Malvinas)", "Faroe Islands", "Fiji", "Finland", 
+											"France", "French Guiana", "French Polynesia", "French Southern Territories", 
+											"Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", 
+											"Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", 
+											"Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", 
+											"Holy See (Vatican City State)", "Honduras", "Hong Kong", "Hungary", "Iceland", 
+											"India", "Indonesia", "Iran, Islamic Republic of", "Iraq", "Ireland", 
+											"Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey", "Jordan", 
+											"Kazakhstan", "Kenya", "Kiribati", "Korea, Democratic People's Republic of", 
+											"Korea, Republic of", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic", 
+											"Latvia", "Lebanon", "Lesotho", "Liberia", "Libyan Arab Jamahiriya", 
+											"Liechtenstein", "Lithuania", "Luxembourg", "Macao", "Macedonia, The Former Yugoslav Republic of", 
+											"Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", 
+											"Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia, Federated States of", 
+											"Moldova, Republic of", "Monaco", "Mongolia", "Montenegro", "Montserrat", 
+											"Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", 
+											"Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", 
+											"Nigeria", "Niue", "Norfolk Island", "Northern Mariana Islands", "Norway", 
+											"Oman", "Pakistan", "Palau", "Palestinian Territory, Occupied", "Panama", 
+											"Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn", "Poland", 
+											"Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russian Federation", 
+											"Rwanda", "Saint Helena", "Saint Kitts and Nevis", "Saint Lucia", 
+											"Saint Pierre and Miquelon", "Saint Vincent and The Grenadines", "Samoa", 
+											"San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", 
+											"Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", 
+											"Solomon Islands", "Somalia", "South Africa", "South Georgia and The South Sandwich Islands", 
+											"Spain", "Sri Lanka", "Sudan", "Suriname", "Svalbard and Jan Mayen", 
+											"Swaziland", "Sweden", "Switzerland", "Syrian Arab Republic", "Taiwan", 
+											"Tajikistan", "Tanzania, United Republic of", "Thailand", "Timor-Leste", 
+											"Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", 
+											"Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", 
+											"United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", 
+											"Venezuela", "Viet Nam", "Western Sahara", "Yemen", "Zambia", "Zimbabwe"
+										  ].forEach(function(country) { %>
+												<option value="<%= country %>" <%= org.baseCountry === country ? 'selected' : '' %>><%= country %></option>
+											<% }); %>
+										</select>
+										<p id="countryError" class="mt-2 d-none text-danger">*Please select a country!</p>
+									</div>
+								</div>
+								<div class="mb-3">
+									<label for="orgPhone" class="form-label">Phone</label><span> *</span>
+									<input type="tel" class="form-control" maxlength="45" id="orgPhone" name="phone"
+										placeholder="Enter phone number" value="<%= org.phone %>"
+										oninput="checkInputs('phoneOrgError', 'orgPhone')" required>
+									<p id="phoneOrgError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+								</div>
+								<div class="mb-3">
+									<label for="orgStatus" class="form-label">Status</label><span> *</span>
+									<select id="orgStatus" name="status" class="form-select" oninput="checkInputs()" required>
+
+										<% options.forEach(option=> { %>
+											<option value="<%= option.name %>" <%=option.name===org.status ? 'selected' : '' %> >
+												<%= option.name.toUpperCase() %>
+											</option>
+											<% }); %>
+									</select>
+									<input type="hidden" id="userTime" name="userTime">
+								</div>
+								<button onclick="clickBtn()" type="submit" id="updateBtn" class="btn btn-success w-100 mb-2">Update
+									Organization</button>
+								<a onclick="Back()" id="resetBtn" class="btn btn-primary w-100 mb-2">Back to organizations</a>
+							</form>
+
+							<!-- License Extension -->
+							<div>
+								<h4>License Extension</h4>
+								<p>Extend the organization's license expiration date:</p>
+								<div class="d-flex gap-2" id="license-buttons">
+									<a href="" class="btn btn-outline-secondary reduceLicense" onclick="extLicense()" id="expireNowBtn"
+										data-bs-toggle="modal" data-bs-target="#confirmationModal">Expire Now</a>
+									<a href="" class="btn btn-outline-secondary reduceLicense" onclick="extLicense('month',-1)"
+										id="expireNowBtn" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="month"
+										data-num="-1">-1 Month</a>
+									<a href="" class="btn btn-outline-secondary reduceLicense" onclick="extLicense('day',-7)"
+										id="expireNowBtn" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="day"
+										data-num="-7">-7 Days</a>
+									<a href="" class="btn btn-outline-secondary reduceLicense" onclick="extLicense('day',-1)"
+										id="expireNowBtn" data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="day"
+										data-num="-1">-1 Day</a>
+									<a href="" class="btn btn-outline-secondary" onclick="extLicense('day',1)" id="expireNowBtn"
+										data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="day" data-num="-1">+1 Day</a>
+									<a href="" class="btn btn-outline-secondary" onclick="extLicense('day',7)" id="expireNowBtn"
+										data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="day" data-num="7">+7 Days</a>
+									<a href="" class="btn btn-outline-secondary" onclick="extLicense('month',1)" id="expireNowBtn"
+										data-bs-toggle="modal" data-bs-target="#confirmationModal" data-type="month" data-num="1">+1
+										Months</a>
+								</div>
+								<div class="mt-3">
+									<p>The last updated by <strong id="updatedBy">
+										<%= org.userName %>
+									</strong> at <span id="updatedAt" class="fw-bold">
+										<%= new Date(org.updatedAt).toLocaleString('en-US', { 
+											year: 'numeric', month: 'long', day: 'numeric', 
+											hour: 'numeric', minute: 'numeric', second: 'numeric', 
+											hour12: true 
+										}) %>
+									</span></p>
+									
+									<p>Current Expiration Date : <span id="currentExpirationDate" class="fw-bold mx-2">
+										<%= new Date(org.expiredDate).toLocaleDateString('en-US', { 
+											year: 'numeric', month: 'long', day: 'numeric' 
+										}) %>
+									</span></p>									
+								</div>
+							</div>
+							<!-- Modal HTML -->
+							<div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel"
+								aria-hidden="true">
+								<div class="modal-dialog">
+									<div class="modal-content">
+										<div class="modal-header">
+											<h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+											<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+										</div>
+										<div class="modal-body">
+											<p>The license will be <span id="licType">expired <strong>now</strong></span>. Do you want to
+												proceed?</p>
+											<p>Current Expiration Date: <span class="fw-bold">
+													<%= new Date(org.expiredDate).toDateString() %>
+												</span></p>
+
+											<p>New Expiration Date: <span id="newExpirationDate" class="fw-bold"></span></p>
+
+										</div>
+										<div class="modal-footer">
+											<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+											<button type="button" class="btn btn-primary" id="confirmBtn">Confirm</button>
+										</div>
+									</div>
+								</div>
+							</div>
+		</div>
+		<script>
+			
+			// Variables declaration
+			const orgExpiredDate = new Date("<%= org.expiredDate %>");
+
+			const orgOldName = "<%= org.name %>"
+			const orgOldAddress = "<%= org.address %>"
+			const orgOldPhone = "<%= org.phone %>"
+			const orgOldStatus = "<%= org.status %>"
+			const orgOLdCountry = "<%= org.baseCountry %>"
+
+			const updateBtn = document.getElementById('updateBtn');
+			const form = document.getElementById('myForm');
+			const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+
+			let url = new URL(window.location.href);
+			let orgName = url.searchParams.get('orgName')
+			let orgStatus = url.searchParams.get('orgStatus')
+			let expired = url.searchParams.get('expired')
+			let orgPage = url.searchParams.get('orgPage')
+
+			const orgId = "<%= org.id %>"
+			let query = "?"
+
+			if (orgPage) {
+				query += "orgPage=" + orgPage
+			} else {
+				query += "orgPage=1"
+			}
+
+			if (orgName) {
+				query += "&orgName=" + orgName
+			}
+
+			if (orgStatus) {
+				query += "&orgStatus=" + orgStatus
+			}
+
+			if (expired) {
+				query += "&expired=" + expired
+			}
+
+			// xxx
+			document.querySelectorAll('.reduceLicense').forEach(button => {
+				const num = parseInt(button.dataset.num);
+				const type = button.dataset.type;
+				let newExpiry = new Date(orgExpiredDate);
+
+				if (type === 'month') {
+					newExpiry.setMonth(newExpiry.getMonth() + num);
+				} else if (type === 'day') {
+					newExpiry.setDate(newExpiry.getDate() + num);
+				}
+
+				if (newExpiry <= today) {
+					button.classList.add('d-none');
+					button.setAttribute('d-none', true);
+				}
+			});
+
+			// Functions
+			function buttonType() {
+				const searchParams = new URLSearchParams(window.location.search);
+				const type = searchParams.get('type')
+				const resetBtn = document.getElementById("resetBtn")
+				if (type == 'update' || type == "extendLicense" || type == "reduceLicense") {
+					resetBtn.innerText = "Back"
+					resetBtn.classList.add("btn-primary")
+				} else {
+					resetBtn.innerText = "Cancel"
+					resetBtn.classList.add("btn-danger")
+				}
+			}
+			
+			function checkInputs(messageBox, inputField) {
+
+				const orgNameValue = document.getElementById('orgName').value
+				const orgAddressValue = document.getElementById('orgAddress').value
+				const orgPhoneValue = document.getElementById('orgPhone').value
+				const orgStatusValue = document.getElementById('orgStatus').value
+				const orgBaseCountry = document.getElementById('country').value
+
+				if ((orgOldName === orgNameValue) && (orgOldAddress === orgAddressValue) && (orgOldPhone === orgPhoneValue) && (orgOldStatus === orgStatusValue) && (orgOLdCountry === orgBaseCountry)) {
+					updateBtn.classList.add('disabled')
+				} else {
+					updateBtn.classList.remove('disabled')
+				}
+
+				let allFilled = true;
+				inputs.forEach(index => {
+					if (!index.value.trim()) {
+						allFilled = false;
+					}
+				});
+				updateBtn.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+					message.classList.remove('d-none');
+				} else {
+					message.classList.add('d-none');
+				}
+			}
+
+			function submitForm(event) {
+				const now = new Date();
+			    const localTime = now.getFullYear() + "-" +
+			                      String(now.getMonth() + 1).padStart(2, '0') + "-" +
+			                      String(now.getDate()).padStart(2, '0') + " " +
+			                      String(now.getHours()).padStart(2, '0') + ":" +
+			                      String(now.getMinutes()).padStart(2, '0') + ":" +
+			                      String(now.getSeconds()).padStart(2, '0');
+			    document.getElementById('userTime').value = localTime;
+				updateBtn.disabled = true;
+				updateBtn.textContent = 'Submitting...';
+			}
+			
+			function clickBtn() {
+				window.location.href = "/superadmin/organizations/update/" + orgId + query
+			}
+
+			function Back() {
+				window.location.href = "/superadmin/organizations" + query
+			}
+
+			// License Extension
+			function extLicense(type, num) {
+				let url = new URL(window.location.href);
+				let orgName = url.searchParams.get('orgName')
+				let orgStatus = url.searchParams.get('orgStatus')
+				let expired = url.searchParams.get('expired')
+				let orgPage = url.searchParams.get('orgPage')
+
+				const orgId = "<%= org.id %>"
+				let query = "?"
+
+				if (orgPage) {
+					query += "orgPage=" + orgPage
+				} else {
+					query += "orgPage=1"
+				}
+
+				if (orgName) {
+					query += "&orgName=" + orgName
+				}
+
+				if (orgStatus) {
+					query += "&orgStatus=" + orgStatus
+				}
+
+				if (expired) {
+					query += "&expired=" + expired
+				}
+				const newExpirationDate = document.getElementById('newExpirationDate')
+				const newDate = new Date(orgExpiredDate)
+				const today = new Date()
+
+				if (newDate < today) {
+					if (type == 'month') {
+						today.setMonth(today.getMonth() + num);
+						newExpirationDate.innerHTML = today.toDateString()
+					} else if (type == 'day') {
+						today.setDate(today.getDate() + num);
+						newExpirationDate.innerHTML = today.toDateString()
+					} else {
+						newExpirationDate.innerHTML = 'Now'
+					}
+				} else {
+					if (type == 'month') {
+						newDate.setMonth(newDate.getMonth() + num);
+						newExpirationDate.innerHTML = newDate.toDateString()
+					} else if (type == 'day') {
+						newDate.setDate(newDate.getDate() + num);
+						newExpirationDate.innerHTML = newDate.toDateString()
+					} else {
+						newExpirationDate.innerHTML = 'Now'
+					}
+				}
+
+				const licType = document.getElementById('licType')
+				if (num > 0) {
+					licType.innerHTML = 'extended'
+				} else if (num < 0) {
+					licType.innerHTML = 'reduced'
+				}
+
+				const confirmBtn = document.getElementById('confirmBtn')
+
+				confirmBtn.onclick = () => {
+					const now = new Date();
+					const localTime = now.getFullYear() + "-" +
+			                      String(now.getMonth() + 1).padStart(2, '0') + "-" +
+			                      String(now.getDate()).padStart(2, '0') + " " +
+			                      String(now.getHours()).padStart(2, '0') + ":" +
+			                      String(now.getMinutes()).padStart(2, '0') + ":" +
+			                      String(now.getSeconds()).padStart(2, '0');
+					const encodedUserTime = encodeURIComponent(localTime);
+					if (!type && !num) {
+					    const expireDays = Math.ceil(orgExpiredDate / (1000 * 60 * 60 * 24)) - Math.ceil(today / (1000 * 60 * 60 * 24));
+					    const newHref = `/superadmin/organizations/license/<%= org.id %>?num=-${expireDays}&type=day&userTime=${encodedUserTime}&` + query.slice(1);
+					    window.location.href = newHref;
+					} else {
+					    const newURL = `/superadmin/organizations/license/${orgId}?num=${num}&type=${type}&userTime=${encodedUserTime}&` + query.slice(1);
+					    window.location.href = newURL;
+					}
+				}
+			}
+
+			// Recall function
+			checkInputs();
+			buttonType();
+
+		</script>
+		</main>
+
+		<%- include('../partials/superadmin/footer.ejs') %>

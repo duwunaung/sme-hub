@@ -1,0 +1,408 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+	<style>
+		#receipt {
+		    max-height: 200px;
+		    border-radius: 10px;
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		    border: 1px solid #ddd;
+		    padding: 5px;
+		    background: #fff;
+		    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+		}
+
+		#receipt:hover {
+		    transform: scale(1.05);
+		    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+			cursor: pointer;
+		}
+		#receiptPreview {
+		    max-height: 200px;
+		    border-radius: 10px;
+		    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+		    border: 1px solid #ddd;
+		    padding: 5px;
+		    background: #fff;
+		    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+		}
+		#receiptPreview:hover {
+			transform: scale(1.05);
+		    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+			cursor: pointer;
+		}
+
+		#previewContainer {
+		    margin-bottom: 1rem;
+		}
+		#mainContainer {
+			margin-top: 100px;
+		}
+	</style>
+		<div class="main-content">
+			<div id="mainContainer"></div>
+			<main class="col-md-9 col-lg-10">
+				<div class="container my-5">
+					<h2 class="mb-4">Update Transaction</h2>
+			
+					<!-- Messages -->
+				      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+				        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+				          <%= errorMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+				      
+				      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+				        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+				          <%= successMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+					<!-- Category Details Form -->
+					<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)" onkeydown="return event.key != 'Enter';">
+						<div class="mb-3" >
+							<label for="transId" class="form-label">Transaction ID</label>
+							<div id="transId" class="form-control" style="background-color: #e9ecef;"><span id="transIDPrefix"></span><%= transaction.id %></div>
+						</div>
+						<div class="mb-3">
+							<label for="transDescription" class="form-label">Description *</label>
+							<input type="text" class="form-control inputRequired" maxlength="100" name="description" id="transDescription"
+								placeholder="Enter description" value="<%= transaction.description %>" oninput="checkInputs('transDescriptionError', 'transDescription')" required>
+							<p id="transDescriptionError" class="mt-2 d-none text-danger">*Description can't exceed 100 characters!</p>
+						</div>
+						<div class="mb-3" >
+							<label for="transDate" class="form-label">Created on</label>
+							<div id="transDate" class="form-control" style="background-color: #e9ecef;"></div>
+						</div>
+						<% if ((transaction.itemName && transaction.itemName.length > 0)) {%> 
+							<% if(salesperson.length > 0 && trans === 'income') {%> 
+								<div class="mb-3">
+									<label for="transSalesperson" class="form-label">Salesperson *</label>
+									<div class="mb-3">
+										<div class="dropdown">
+											<button type="button" class="form-control dropdown-toggle" type="button" id="dropdownSalesperson" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 100px;">
+												<%= transaction.salesperson.length > 25 ? transaction.salesperson.substring(0, 25) + '...' : transaction.salesperson %>
+											</button>
+											<ul class="dropdown-menu w-100 mt-2" id="salespersonDropdownMenu" style="min-width: 250px; max-height: 300px; overflow-y: auto;">
+												<!-- Search bar -->
+												 <% if (salesperson.length > 8) { %>
+													<li class="p-2">
+														<input type="text" class="form-control" id="salespersonSearch" placeholder="Search salesperson..." oninput="filterSalespersons()" >
+													</li>
+													<li><hr class="dropdown-divider"></li>
+												<% } %>
+												<% salesperson.forEach(option => { %>
+													<li>
+														<button class="dropdown-item salesperson-item" onclick="selectSalesperson('<%= option.id %>', '<%= option.name %>')">
+															<%= option.name.length > 20 ? option.name.substring(0, 20) + '...' : option.name %>
+														</button>
+													</li>
+												<% }); %>
+											</ul>
+										</div>
+										<input type="hidden" name="salespersonId" id="selectedSalesperson" value="<%= transaction.salespersonId %>">
+									</div>
+								</div>
+							<%} %>
+							
+							<div class="mb-3">
+								<label for="transCustomer" class="form-label"><%= trans === 'income' ? 'Customer': 'Vendor'%> Name</label>
+								<input type="text" class="form-control" maxlength="100" name="<%= trans === 'income' ? 'customer': 'vendorName'%>" id="transCustomer"
+									placeholder="Enter <%= trans === 'income' ? 'customer': 'vendor'%> name" value="<%= trans === 'income' ? transaction.customerName: transaction.vendorName %>" oninput="checkInputs('transCustomerError', 'transCustomer')">
+								<p id="transCustomerError" class="mt-2 d-none text-danger">*Customer Name can't exceed 100 characters!</p>
+							</div>
+							<div class="mb-3">
+								<label for="transItem" class="form-label">Item Name *</label>
+								<input type="text" class="form-control inputRequired" maxlength="100" name="itemName" id="transItem"
+									placeholder="Enter item name" value="<%= transaction.itemName %>" oninput="checkInputs('transItemError', 'transItem')" required>
+								<p id="transItemError" class="mt-2 d-none text-danger">*Item Name can't exceed 100 characters!</p>
+							</div>
+							<div class="mb-3">
+								<label for="transPrice" class="form-label">Price Per Unit *</label>
+								<input type="number" class="form-control inputRequired" maxlength="30" name="price" id="transPrice"
+									placeholder="Enter price per unit" value="<%= transaction.price %>" oninput="calculateTotalAmount('transPriceError', 'transPrice')" required>
+								<p id="transPriceError" class="mt-2 d-none text-danger">*Price Per Unit can't exceed 30 characters!</p>
+							</div>
+							<div class="mb-3">
+								<label for="transQuantity" class="form-label">Quantity *</label>
+								<input type="number" class="form-control inputRequired" maxlength="30" name="quantity" id="transQuantity"
+									placeholder="Enter quantity" value="<%= transaction.quantity %>" oninput="calculateTotalAmount('transQuantityError', 'transQuantity')" required>
+								<p id="transQuantityError" class="mt-2 d-none text-danger">*Quantity can't exceed 30 characters!</p>
+							</div>
+							<div class="mb-3">
+								<label class="form-label">Amount *</label>
+								<div class="form-control text-secondary" id="totalAmount" placeholder="Total Amount" >Total Amount</div>
+							</div>
+						<%} %>
+						<% if (!((transaction.itemName && transaction.itemName.length > 0))) {%>
+							<div class="mb-3">
+								<label for="transAmount" class="form-label">Amount *</label>
+								<input type="number" class="form-control inputRequired" maxlength="30" name="amount" id="transAmount"
+									placeholder="Enter amount" value="<%= transaction.amount %>" oninput="checkInputs('transAmountError', 'transAmount')" required>
+								<p id="transAmountError" class="mt-2 d-none text-danger">*Amount can't exceed 30 characters!</p>
+							</div>
+						<%} %>
+						
+						<div class="mb-3">
+							<label for="transCategory" class="form-label">Category *</label>
+							<div class="mb-3">
+								<div class="dropdown">
+									<button type="button" class="form-control dropdown-toggle" type="button" id="dropdownCategory" data-bs-toggle="dropdown" aria-expanded="false" style="min-width: 100px;">
+										<%= transaction.category.length > 25 ? transaction.category.substring(0, 25) + '...' : transaction.category %>
+									</button>
+									<ul class="dropdown-menu w-100 mt-2" id="categoryDropdownMenu" style="min-width: 250px; max-height: 300px; overflow-y: auto;">
+										<!-- Search bar -->
+										 <% if (category.length > 8) { %>
+											<li class="p-2">
+												<input type="text" class="form-control" id="categorySearch" placeholder="Search category..." oninput="filterCategories()" >
+											</li>
+											<li><hr class="dropdown-divider"></li>
+										<% } %>
+										<% category.forEach(option => { %>
+											<li>
+												<button class="dropdown-item category-item" onclick="selectCategory('<%= option.id %>', '<%= option.name %>')">
+													<%= option.name.length > 20 ? option.name.substring(0, 20) + '...' : option.name %>
+												</button>
+											</li>
+										<% }); %>
+									</ul>
+								</div>
+								<input type="hidden" name="catId" id="selectedCategory" value="<%= transaction.catId %>">
+							</div>
+						</div>
+						
+						<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
+							<div class="mb-3">
+								<label for="transReceipt" class="form-label">Receipt</label><br>
+								<img src="/<%= transaction.receipt %>" data-bs-toggle="modal" 
+									 data-bs-target="#receiptModal" id="receiptPreview" 
+									 alt="Receipt Image" class="img-fluid" />
+								<br>
+							</div>
+						<% } else { %>
+							<div class="mb-3" id="previewContainer" style="display: none;">
+								<label for="transReceipt" class="form-label">Receipt Preview</label><br>
+								<img id="receiptPreview" alt="Receipt Preview" class="img-fluid" />
+								<br>
+							</div>
+						<% } %>
+						<div class="mb-3">
+							<label for="transReceipt" class="form-label">
+								<% if (transaction.receipt && transaction.receipt !== 'null' ) { %>
+									Update Receipt
+								<% } else { %>
+									Upload Receipt
+								<% } %>
+							</label><br>
+							<input type="file" class="form-control" name="receipt" 
+								   id="transReceipt" accept="image/*" onchange="previewReceipt(this)">
+						</div>
+						<button type="submit" id="addBtn" class="btn btn-success w-100 mb-2">Update Transaction</button>
+						<a href="" class="btn w-100" id="resetBtn"></a>
+			
+					</form>
+			
+				</div>
+				<div class="modal fade" id="receiptModal" tabindex="-1" aria-labelledby="receiptModalLabel" aria-hidden="true">
+					<div class="modal-dialog modal-dialog-centered modal-xl">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title" id="receiptModalLabel">Receipt Preview</h5>
+								<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							</div>
+							<div class="modal-body text-center">
+								<img src="/<%= transaction.receipt %>" class="img-fluid" id="modalReceiptImage" alt="Receipt Image"
+									style="width: 100%; max-height: 90vh; object-fit: contain; border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					
+					function previewReceipt(input) {
+					    const previewContainer = document.getElementById('previewContainer');
+					    const previewImage = document.getElementById('receiptPreview');
+					    
+					    if (input.files && input.files[0]) {
+					        const reader = new FileReader();
+					        
+					        reader.onload = function(e) {
+					            if (previewContainer) {
+					                previewContainer.style.display = 'block';
+					            }
+					            previewImage.src = e.target.result;
+					            previewImage.style.display = 'block';
+					            if (!previewImage.hasAttribute('data-bs-toggle')) {
+					                previewImage.setAttribute('data-bs-toggle', 'modal');
+					                previewImage.setAttribute('data-bs-target', '#receiptModal');
+					            }
+					        };
+					        
+					        reader.readAsDataURL(input.files[0]);
+					    } else {
+					        if (previewContainer) {
+					            previewContainer.style.display = 'none';
+					        }
+					        previewImage.style.display = 'none';
+					    }
+					}
+
+					function filterCategories() {
+				        let input = document.getElementById("categorySearch").value.toLowerCase();
+				        let items = document.getElementsByClassName("category-item");
+				        
+				        for (let i = 0; i < items.length; i++) {
+				            let text = items[i].textContent.toLowerCase();
+				            items[i].style.display = text.includes(input) ? "" : "none";
+				        }
+				    }
+
+					
+					function filterSalespersons() {
+				        let input = document.getElementById("salespersonSearch").value.toLowerCase();
+				        let items = document.getElementsByClassName("salesperson-item");
+				        
+				        for (let i = 0; i < items.length; i++) {
+				            let text = items[i].textContent.toLowerCase();
+				            items[i].style.display = text.includes(input) ? "" : "none";
+				        }
+				    }
+
+				    function selectCategory(id, name) {
+						event.preventDefault(); 
+				        document.getElementById("dropdownCategory").textContent = name;
+				        document.getElementById("selectedCategory").value = id;
+				    }
+					
+					function selectSalesperson(id, name) {
+						event.preventDefault(); 
+				        document.getElementById("dropdownSalesperson").textContent = name;
+				        document.getElementById("selectedSalesperson").value = id;
+				    }
+
+					let searchParams = new URLSearchParams(window.location.search);
+					let trans = searchParams.get('trans')
+					let cat = searchParams.get('cat')
+					let id = searchParams.get('id')
+					const page = "<%= pagination.page %>"
+					let isoString = '';
+					if (trans === 'income' || cat === 'income') {
+					    isoString = `<%= new Date(
+										transaction.incomeDate 
+									).toLocaleString('en-US', { 
+										year: 'numeric',
+									    month: 'short',
+									    day: '2-digit',
+									    hour: '2-digit',
+									    minute: '2-digit',
+									    second: '2-digit',
+									    hour12: true
+									}) %>`;
+						document.getElementById('transIDPrefix').innerText = 'INC';
+					} else {
+					    isoString = `<%= new Date(
+										transaction.expenseDate 
+									).toLocaleString('en-US', { 
+										year: 'numeric',
+									    month: 'short',
+									    day: '2-digit',
+									    hour: '2-digit',
+									    minute: '2-digit',
+									    second: '2-digit',
+									    hour12: true
+									}) 
+						 			%>`;
+						document.getElementById('transIDPrefix').innerText = 'EXP';
+					}
+
+					document.getElementById('transDate').innerText = isoString;
+					function buttonType() {
+						searchParams = new URLSearchParams(window.location.search);
+						const type = searchParams.get('type')
+						const resetBtn = document.getElementById("resetBtn")
+						trans = searchParams.get('trans')
+						if (cat){
+							if (cat === 'income'){
+								resetBtn.href = `/subscriber/category/income/detail/${id}?page=${page}`
+							} else {
+								resetBtn.href = `/subscriber/category/expense/detail/${id}?page=${page}`
+							}
+						} else {
+							resetBtn.href = `/subscriber/transaction/${trans}?page=${page}`
+						}
+						if (type == 'update') {
+							resetBtn.innerText = "Back"
+							resetBtn.classList.add("btn-primary")
+						}
+						else {
+							resetBtn.innerText = "Cancel"
+							resetBtn.classList.add("btn-danger")
+						}
+			
+					}
+					buttonType();
+			
+					const addButton = document.getElementById('addBtn');
+					const form = document.getElementById('myForm');
+					const inputs = form.querySelectorAll('.form-control[required]');
+			
+					function checkInputs(messageBox, inputField) {
+						let allFilled = true;
+						inputs.forEach(index => {
+						if (!index.value.trim()) {
+							allFilled = false;
+						}
+						});
+						addButton.disabled = !allFilled;
+						const message = document.getElementById(messageBox)
+						const input = document.getElementById(inputField)
+						if (input.value.length === parseInt(input.maxLength)) {
+							message.classList.remove('d-none');
+						} else {
+							message.classList.add('d-none');
+						}
+					}
+			
+					function submitForm(event) {
+						addButton.disabled = true;
+						addButton.textContent = 'Submitting...';
+					}
+
+					function calculateTotal() {
+						const quantity = document.getElementById('transQuantity').value;
+						const price = document.getElementById('transPrice').value;
+						const total = document.getElementById('totalAmount');
+						const baseCurrency = "<%= baseCurrency %>"
+						let totalAmount;
+						if (!quantity || parseInt(quantity) <= 0 || !price || parseInt(price) <= 0) {
+							total.innerText = "Total Amount"
+							total.classList.add('text-secondary')
+						} else {
+							let amount;
+							totalAmount = parseInt(quantity) * parseInt(price)
+							totalAmount = totalAmount.toLocaleString()
+							if (baseCurrency === 'MMK') {
+								amount = `${totalAmount}  ks`
+							} else if (baseCurrency === 'USD') {
+								amount = `$ ${totalAmount}`
+							} else if (baseCurrency === 'THB') {
+								amount = `฿ ${totalAmount}`
+							} else { 
+								amount = `${totalAmount} baseCurrency`
+							}
+							total.classList.remove('text-secondary')
+							total.innerText = amount
+						}
+					}
+					calculateTotal();
+					function calculateTotalAmount(errorMsg, field) {
+						checkInputs(errorMsg, field);
+						calculateTotal();
+					}
+					
+							
+				</script>
+			</main>
+		</div>
+		
+        <%- include('../partials/subscriber/footer.ejs') %>

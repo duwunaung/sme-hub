@@ -1,0 +1,198 @@
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
+
+            <div class="container my-3">
+                <h2 class="mb-3">Update Superadmin's Details</h2>
+
+                <!-- Messages -->
+			      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+			        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+			          <%= errorMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+			      
+			      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+			        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+			          <%= successMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+                <!-- user Details Form -->
+                <form class="mb-3" method="POST" id="myForm" onsubmit="submitForm(event)">
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">Username</label><span> *</span>
+                        <input type="text" class="form-control" maxlength="100" name="name" id="userName"
+                            placeholder="Enter username" value="<%= user.name %>" oninput="checkInputs('nameUserError', 'userName')" required>
+						<p id="nameUserError" class="mt-2 d-none text-danger">*Username can't exceed 100 characters!</p>
+                    </div>
+					<div class="mb-3">
+                        <label for="userEmail" class="form-label" id="labelEmail">Email Address</label><span> *</span>
+                        <input type="email" class="form-control" maxlength="45" name="email" id="userEmail"
+                            placeholder="Enter email address" value="<%= user.email %>" oninput="checkInputs('emailUserError', 'userEmail')" required>
+						<p id="emailUserError" class="mt-2 d-none text-danger">*Email can't exceed 45 characters!</p>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userPhone" class="form-label">Phone</label><span> *</span>
+                        <input type="tel" class="form-control" maxlength="45" id="userPhone" name="phone"
+                            placeholder="Enter phone number" value="<%= user.phone %>" oninput="checkInputs('phoneUserError', 'userPhone')" required>
+						<p id="phoneUserError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+										</div>
+                    <div class="mb-3">
+                        <label for="userStatus" class="form-label">Status</label><span> *</span>
+                        <select id="userStatus" name="status" class="form-select" oninput="checkInputs()" required>
+
+                            <% options.forEach(option=> { %>
+                                <option value="<%= option.name %>" <%=option.name===user.status ? 'selected' : '' %> >
+                                    <%= option.name.toUpperCase() %>
+                                </option>
+                                <% }); %>
+                        </select>
+						<input type="hidden" id="userTime" name="userTime">
+                    </div>
+                    <button type="submit" id="updateBtn" class="btn btn-success w-100 mb-2">Update</button>
+                    <a onclick="clickBtn()" href="#" id="resetBtn"	class="btn  w-100"></a>
+											<div class="mt-3">
+                        <p>Registered Date: <span id="currentRegisteredDate"
+                                class="fw-bold">
+                            <%= new Date(user.registered).toDateString() %>
+													</span>
+                        </p>
+						<p>The last updated by <strong id="updatedBy"><%= user.superadminName %></strong> at <span id="updatedAt" class="fw-bold">
+							<%= new Date(user.updatedAt).toLocaleString('en-US', { 
+								year: 'numeric', month: 'long', day: 'numeric',
+								hour: 'numeric', minute: 'numeric', second: 'numeric',
+								hour12: true 
+							}) %>
+						</span></p>	
+                    </div>
+                </form>
+            </div>
+			<script>
+				
+				function buttonType() {
+	                const searchParams = new URLSearchParams(window.location.search);
+	                const type = searchParams.get('type')
+					const resetBtn = document.getElementById("resetBtn")
+	                if (type == 'update') {
+						resetBtn.innerText = "Back"
+						resetBtn.classList.add("btn-primary")
+	                }
+					else {
+						resetBtn.innerText = "Cancel"
+						resetBtn.classList.add("btn-danger")
+					}
+
+	            }
+
+	            buttonType();
+							// xxx
+
+				const form = document.getElementById('myForm');
+				const updateBtn = document.getElementById('updateBtn');
+				const inputs = form.querySelectorAll('.form-control[required]:not([readonly])');
+				const userEmail = document.getElementById('userEmail')
+				const labelEmail = document.getElementById('labelEmail')
+
+				const userOldName = "<%= user.name %>"
+				const userOldEmail = "<%= user.email %>"
+				const userOldPhone = "<%= user.phone %>"
+				const userOldStatus = "<%= user.status %>"
+
+                function checkInputs(messageBox, inputField) {
+
+									const userNameValue = document.getElementById('userName').value
+									const userEmailValue = document.getElementById('userEmail').value
+									const userPhoneValue = document.getElementById('userPhone').value
+									const userStatusValue = document.getElementById('userStatus').value
+
+									if ( (userOldName == userNameValue) && (userOldEmail == userEmailValue) && (userOldPhone == userPhoneValue) && (userOldStatus == userStatusValue) ) {
+										updateBtn.classList.add('disabled')
+									} else {
+										updateBtn.classList.remove('disabled')
+									}
+
+	                let allFilled = true;
+	                inputs.forEach(index => {
+	                if (!index.value.trim()) {
+	                    allFilled = false;
+	                }
+	                });
+	                updateBtn.disabled = !allFilled;
+					const message = document.getElementById(messageBox)
+					const input = document.getElementById(inputField)
+					if (input.value.length === parseInt(input.maxLength)) {
+				        message.classList.remove('d-none');
+				    } else {
+				        message.classList.add('d-none');
+				    }
+					if (inputField === 'userEmail')
+					{
+						userEmail.classList.remove('border-danger')
+						labelEmail.style.color = 'black'
+						userEmail.classList.remove('input-error')
+					}
+	            }
+
+							checkInputs();
+
+
+                function submitForm(event) {
+					const now = new Date();
+				    const localTime = now.getFullYear() + "-" +
+				                      String(now.getMonth() + 1).padStart(2, '0') + "-" +
+				                      String(now.getDate()).padStart(2, '0') + " " +
+				                      String(now.getHours()).padStart(2, '0') + ":" +
+				                      String(now.getMinutes()).padStart(2, '0') + ":" +
+				                      String(now.getSeconds()).padStart(2, '0');
+				    document.getElementById('userTime').value = localTime;
+				    updateBtn.disabled = true;
+				    updateBtn.textContent = 'Submitting...';
+				}
+
+				const searchParams = new URLSearchParams(window.location.search);
+				const error = searchParams.get('error')
+
+				if (error === 'true') {
+					const type = searchParams.get('type')
+					if (type === 'dup-email') {
+						userEmail.classList.add('border-danger')
+						labelEmail.style.color = '#bb2124'
+						userEmail.onfocus = function() {
+				            userEmail.classList.add('input-error');
+				        };
+				        
+				        userEmail.onblur = function() {
+				            userEmail.classList.remove('input-error');
+				        };
+					}
+				}
+
+				// Click Btns
+				function clickBtn() {
+					let url = new URL(window.location.href);
+					let name = url.searchParams.get( 'name' )
+					let status = url.searchParams.get( 'status' )
+					let page = url.searchParams.get( 'page' )
+					let query = "?"
+					
+					if (page) {
+							query += "page=" + page
+					} else {
+							query += "page=1"
+					}
+
+					if (name) {
+							query += "&name=" + name
+					}
+
+					if (status) {
+							query += "&status=" + status
+					}
+
+					window.location.href = "/superadmin/users/" + query
+				}
+			</script>
+        </main>
+
+        <%- include('../partials/superadmin/footer.ejs') %>

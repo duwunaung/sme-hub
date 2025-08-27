@@ -1,0 +1,395 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		<style>
+			.btn-fixed-width {
+				width: 80px;
+				min-width: 60px;
+				text-align: center;
+			}
+			.dropdown {
+				position: relative;
+				display: inline-block;
+			}
+		
+			.dropdown-btn {
+				cursor: pointer;
+			}
+		
+			.container-div {
+			    display: flex;
+			    justify-content: flex-end;
+			}
+
+			.page-item a:hover {
+		    	cursor: pointer;
+			}
+			.dropdown-menu {
+			    border-radius: 0.5rem;
+			    border: 1px solid rgba(0,0,0,0.08);
+			}
+
+			.form-control:focus {
+			    box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+			}
+
+			.btn-primary:focus {
+			    box-shadow: 0 0 0 0.25rem rgba(13,110,253,0.15);
+			}
+
+			.dropdown-item:hover {
+			    background-color: rgba(13,110,253,0.1);
+			}
+			.table-responsive {
+		        overflow-x: auto;
+		        -webkit-overflow-scrolling: touch;
+		    }
+		    
+			
+		    @media (max-width: 768px) {
+				.container-div {
+			        display: flex;
+			        justify-content: flex-end;
+			        flex-direction: column;
+			        align-items: flex-end;
+			    }
+
+			    .row.align-items-center {
+			        flex-direction: column;
+			        align-items: flex-end !important;
+			        width: 100%;
+			    }
+
+			    .col-auto.me-auto.mb-2 {
+			        align-self: flex-end;
+			        margin-right: 0 !important;
+			    }
+
+			    .container-div .row .col-auto {
+			        width: auto;
+			        max-width: none;
+			    }
+				.table th, .table td {
+					padding: 0.5rem;
+					font-size: 0.875rem;
+				}
+				
+				.btn-sm {
+					padding: 0.25rem 0.5rem;
+					font-size: 0.75rem;
+				}
+			}
+			.navBtnStyle {
+				max-width: 150px;
+				background-color: #4D4D4D;
+				padding: 8px 0;
+			}
+
+		</style>
+		<div class="main-content">
+			<!-- Main Content -->
+			<div id="mainContainer" style="margin-top: 100px;"></div>
+	        <main >
+	            <div class="content">
+					<!-- Messages -->
+				      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+				        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+				          <%= errorMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+				      
+				      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+				        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+				          <%= successMessage %>
+				          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+				        </div>
+				      <% } %>
+					<!-- Nav Buttons -->
+					<div class="btn-group d-flex justify-content-center" role="group" aria-label="Basic example" style="margin: 50px 0;">
+					  <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('salesperson')">By Salesperson</button>
+					  <!-- <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('date')">By Date</button> -->
+					  <button type="button" class="btn btn-secondary navBtnStyle" onclick="goToNav('category')">By Category</button>
+					</div>
+
+					<div class="d-flex justify-content-between" style="margin: 10px 10px;">
+						<!-- Date Filter -->
+						<div class="btn-group">
+							<button type="button" 
+									class="btn btn-light dropdown-toggle" 
+									data-bs-toggle="dropdown" 
+									aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+								<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i><span id="filterName">Date</span>
+							</button>
+							<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+								<button class="dropdown-item btn btn-light w-100 mb-1" data-bs-toggle="modal" data-bs-target="#customDateModal">Custom Date</button>
+							</ul>
+						</div>
+
+						<!-- Custom Date Filter -->
+						<!-- <div>
+						  <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#customDateModal">
+						    Custom Date
+						  </button>
+						</div> -->
+						<!-- Export As Csv -->
+						 <div>
+						  <button class="exportBtn" onclick="exportCsv()">
+							Export As CSV
+						  </button>
+						</div>
+					</div>
+					
+
+					<!-- Modal for custom date -->
+					<div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel" aria-hidden="true">
+					  <div class="modal-dialog">
+					    <div class="modal-content shadow">
+					      <div class="modal-header">
+					        <h5 class="modal-title" id="customDateModalLabel">Select Date Range</h5>
+					        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+					      </div>
+					      <div class="modal-body">
+					        <div class="mb-3">
+					          <label for="start-date" class="form-label">From</label>
+					          <input type="date" class="form-control" id="start-date" onchange="updateEndMin()">
+					        </div>
+					        <div class="mb-3">
+					          <label for="end-date" class="form-label">To</label>
+					          <input type="date" class="form-control" id="end-date">
+					        </div>
+					      </div>
+						  <div>
+							<p id="errMsgDate" class="text-danger d-none">*Please select start date and end date!</p>
+						  </div>
+					      <div class="modal-footer">
+					        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+					        <button type="button" class="btn btn-danger" onclick="getDateRange()">Apply</button>
+					      </div>
+					    </div>
+					  </div>
+					</div>
+
+					<!-- Transaction Table -->
+					<div class="table-responsive" style="margin-bottom: 300px;">
+						<table class="table table-hover">
+							<thead style="height: 50px;">
+								<tr>
+									<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
+									<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Description <span></span></th>
+									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Amount <span></span></th>
+									<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(3, 'date', this)">Date <span></span></th>
+									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(4, 'string', this)">Category <span></span></th>
+									<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
+								</tr>
+							</thead>
+							<tbody id="transactionTable">
+								<% 
+									let totalSum = 0; 
+									if (transaction.length > 0) { 
+										for (let i = 0; i < transaction.length; i++) { 
+											totalSum += transaction[i].amount;
+										} 
+									} 
+								%>
+								<% if (transaction.length > 0) { %>
+									<% for (let i = 0; i < transaction.length; i++) { %>
+										<tr style="height: 55px;">
+											<td class="text-nowrap ">
+												<%= i + 1 %>
+											</td>
+											<td class="text-nowrap " style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+												<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
+											</td>
+											<td class="text-nowrap <%= transaction[i].transactionType === 'income' || trans === 'income' ? 'text-income' : 'text-expense' %>">
+												<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
+												<% if (transaction[i].baseCurrency === 'MMK') { %>
+													<%= formattedAmount %> ks
+												<% } else if (transaction[i].baseCurrency === 'USD') { %>
+													$ <%= formattedAmount %>
+												<% } else if (transaction[i].baseCurrency === 'THB') { %>
+													฿ <%= formattedAmount %>
+												<% } else { %>
+													<%= formattedAmount %> <%= transaction[i].baseCurrency %>
+												<% } %>
+											</td>
+											<td class="text-nowrap ">
+												<%= new Date(
+													trans === 'income' ? transaction[i].incomeDate :
+													trans === 'expense' ? transaction[i].expenseDate :
+													transaction[i].transactionDate
+												).toLocaleString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric', 
+													hour: '2-digit', 
+													minute: '2-digit', 
+													second: '2-digit', 
+													hour12: true 
+												}) %>
+											</td>
+											<td class="text-nowrap ">
+												<%= transaction[i].category.length > 30 ? transaction[i].category.substring(0, 30) + '...' : transaction[i].category %>
+											</td>
+											<td class="text-nowrap ">
+												<%= transaction[i].createdBy %>
+											</td>
+										</tr>
+									<% } %>
+								<% } else { %>
+									<tr>
+										<td colspan="<%= trans === 'all' ? 6 : 7 %>" class="text-center text-muted">No data found.</td>
+									</tr>
+								<% } %>
+							</tbody>
+						</table>
+					</div>
+					
+					
+	            </div>
+	        </main>
+		</div>
+		<div style="height: 300px;"></div>
+		
+		
+		<script>
+			
+			let sortDirections = {};
+
+			function sortTable(columnIndex, type, headerElement) {
+			    let table = document.getElementById("transactionTable");
+			    let rows = Array.from(table.getElementsByTagName("tr"));
+			    let ascending = !sortDirections[columnIndex];
+			    sortDirections[columnIndex] = ascending;
+
+			    rows.sort((rowA, rowB) => {
+			        let cellA = rowA.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+			        let cellB = rowB.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+
+			        if (type === "number") {
+			            cellA = parseFloat(cellA.replace(/[^0-9.-]/g, "")) || 0;
+			            cellB = parseFloat(cellB.replace(/[^0-9.-]/g, "")) || 0;
+			            return ascending ? cellA - cellB : cellB - cellA;
+			        } else if (type === "date") {
+			            cellA = new Date(cellA).getTime() || 0;
+			            cellB = new Date(cellB).getTime() || 0;
+			            return ascending ? cellA - cellB : cellB - cellA;
+			        } else {
+			            return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+			        }
+			    });
+			    rows.forEach(row => table.appendChild(row));
+			    document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
+			    headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
+			}
+			
+			function goToNav(direction) {
+			  const currentPath = window.location.pathname;
+			  let targetPath = "/subscriber/report/" + direction;
+			  if (direction === 'category') {
+			    targetPath = "/subscriber/report/category?num=30&type=day";
+			  }
+			  if (currentPath === targetPath) {
+			    return;
+			  }
+			  window.location.href = window.location.origin + targetPath;
+			}
+
+			function filterDate(num, type) {
+			    let url = new URL(window.location.href);
+			    if (num && type && num !== 0) {
+			        url.searchParams.set("num", num);
+					url.searchParams.set("type", type);
+					url.searchParams.delete("from");
+					url.searchParams.delete("to");
+					url.searchParams.delete("export");
+			    } else {
+			        url.searchParams.delete("num");
+					url.searchParams.delete("type");
+					url.searchParams.delete("from");
+					url.searchParams.delete("to");
+					url.searchParams.delete("export");
+			    }
+			    window.location.href = url.toString();
+			}
+
+			function updateEndMin() {
+				document.getElementById('errMsgDate').classList.add('d-none')
+			    var start = document.getElementById("start-date");
+			    var end = document.getElementById("end-date");
+			    end.min = start.value;
+			}
+
+			function getDateRange() {
+			    var start = document.getElementById("start-date").value;
+			    var end = document.getElementById("end-date").value;
+
+			    if (start && end) {
+			        var endDateObj = new Date(end);
+			        endDateObj.setDate(endDateObj.getDate() + 1);
+			        var endPlusOne = endDateObj.toISOString().split('T')[0];
+
+			        var modal = bootstrap.Modal.getInstance(document.getElementById('customDateModal'));
+			        modal.hide();
+
+			        let url = new URL(window.location.href);
+			        url.searchParams.delete("num");
+			        url.searchParams.delete("type");
+					url.searchParams.delete("export");
+			        url.searchParams.set("from", start);
+			        url.searchParams.set("to", endPlusOne);
+			        window.location.href = url.toString();
+			    } else {
+			        document.getElementById('errMsgDate').classList.remove('d-none');
+			    }
+			}
+
+			function exportCsv() {
+				let url = new URL(window.location.href);
+		        url.searchParams.set("export", "true");
+		        window.location.href = url.toString();
+			}
+
+
+			const searchParams = new URLSearchParams(window.location.search);
+			const type = searchParams.get('type')
+			const num = searchParams.get('num')
+			const from = searchParams.get('from')
+			const to = searchParams.get('to')
+
+			if (type === 'month') {
+				if (num === '0') {
+					document.getElementById('filterName').innerText = "Date"
+				} else if (num === '1') {
+					document.getElementById('filterName').innerText = "This Month"
+				} else if (num === '3') {
+					document.getElementById('filterName').innerText = "Last 3 Months"
+				} else if (num === '-1') {
+					document.getElementById('filterName').innerText = "Last Month"
+				}
+			} else if (type === 'week') {
+				document.getElementById('filterName').innerText = "This Week"
+			} else if (type === 'day') {
+				if (num === '1') {
+					document.getElementById('filterName').innerText = "Today"
+				} else if (num === '7') {
+					document.getElementById('filterName').innerText = "Last 7 Days"
+				} else if (num === '30') {
+					document.getElementById('filterName').innerText = "Last 30 Days"
+				}
+			} else {
+				if (from && to)
+					document.getElementById('filterName').innerText = "Custom Date"
+				else
+					document.getElementById('filterName').innerText = "Date"
+			}
+		</script>
+        <%- include('../partials/subscriber/footer.ejs') %>

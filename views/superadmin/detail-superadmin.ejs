@@ -1,0 +1,93 @@
+<%- include('../partials/superadmin/header.ejs') %>
+    <%- include('../partials/superadmin/navbar.ejs') %>
+
+            <div class="container my-3">
+
+                <!-- Error type စစ်ရန် -->
+                <% if (errorMessage) { %>
+                    <div id="errorBox" class="alert alert-danger" role="alert">
+                        <%= errorMessage %>
+                    </div>
+                    <% } %>
+                <!-- xxx -->
+
+                <!-- Superadmin Details Form -->
+                <form id="detail-view" class="mb-3 view-containers">
+                    <h3 class="my-3">User Details</h3>
+                    <div class="mb-3">
+                        <label for="userName" class="form-label">User Name</label>
+                        <input type="text" class="form-control" name="name" id="userName"
+                            placeholder="Enter user name" value="<%= user.name %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userRole" class="form-label">User Role</label>
+                        <input type="text" class="form-control" name="role" id="userRole"
+                            placeholder="Enter user role" value="<%= user.role.charAt(0).toUpperCase() + user.role.slice(1).toLowerCase() %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" class="form-control" name="email" id="email"
+                            placeholder="Enter email address" value="<%= user.email %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userPhone" class="form-label">Phone</label>
+                        <input type="tel" class="form-control" id="userPhone" name="phone"
+                            placeholder="Enter phone number" value="<%= user.phone %>" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="userStatus" class="form-label">Status</label>
+                        <select id="userStatus" name="status" class="form-select" disabled>
+                            <% options.forEach(option => { %>
+                                <option value="<%= option.name %>" <%=option.name===user.status ? 'selected' : '' %> >
+                                    <%= option.name.toUpperCase() %>
+                                </option>
+                            <% }); %>
+                        </select>
+                    </div>
+                    <a onclick="clickBtn()" href="#" class="btn btn-primary w-100 mt-1 mb-3">Back to
+                        System Admins</a>
+
+                    <div>
+                        <p class="my-2">Registered Date: <span id="currentRegisteredDate"
+                                class="fw-bold">
+                            <%= new Date(user.registered).toDateString() %>
+                        </span>
+                        </p>
+						<p>The last updated by <strong id="updatedBy"><%= user.superadminName %></strong> at <span id="updatedAt" class="fw-bold">
+							<%= new Date(user.updatedAt).toLocaleString('en-US', { 
+								year: 'numeric', month: 'long', day: 'numeric',
+								hour: 'numeric', minute: 'numeric', second: 'numeric',
+								hour12: true 
+							}) %>
+						</span></p>	
+                    </div>
+                </form>
+            </div>
+            <script>
+                // Click Btns
+                function clickBtn() {
+                    let url = new URL(window.location.href);
+                    let name = url.searchParams.get( 'name' )
+                    let status = url.searchParams.get( 'status' )
+                    let page = url.searchParams.get( 'page' )
+                    let query = "?"
+                    
+                    if (page) {
+                        query += "page=" + page
+                    } else {
+                        query += "page=1"
+                    }
+
+                    if (name) {
+                        query += "&name=" + name
+                    }
+
+                    if (status) {
+                        query += "&status=" + status
+                    }
+
+                    window.location.href = "/superadmin/users/" + query
+                }
+            </script>
+        </main>
+        <%- include('../partials/superadmin/footer.ejs') %>

@@ -1,0 +1,529 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		<style>
+			.container-div {
+			    display: flex;
+			    justify-content: flex-end;
+			}
+
+			.button-fixed-width {
+				max-width: 80px;
+				width: 80px;
+		        min-width: 60px;
+		        text-align: center;
+			}
+			.page-item a:hover {
+		    	cursor: pointer;
+			}
+			.categoryName {
+				color: black;
+			}
+			.categoryName:hover {
+				cursor: pointer;
+				color: black;
+			}
+			#mainContainer {
+				margin-top: 100px;
+			}
+			.search-container {
+	            display: flex;
+	            align-items: center;
+	            position: relative;
+	            transition: all 0.3s ease-in-out;
+	        }
+
+	        #searchInput {
+	            width: 200px;
+				height: 35px;
+				top: 58px;
+				left: 936px;
+				border-radius: 15px;
+	            padding: 10px;
+	            font-size: 16px;
+	            border: 1px solid #4D4D4D;
+	            outline: none;
+	            transition: all 0.3s ease-in-out;
+	            background-color: white;
+	            color: #333;
+	        }
+
+	        #searchInput:focus {
+	            width: 250px;
+	            box-shadow: 0px 4px 10px #4d4d4d5c;
+	            border-color: #4D4D4D;
+	        }
+
+	        #searchBarButton {
+	            background-color: white;
+	            border: 1px solid #4D4D4D;
+	            border-radius: 50%;
+	            width: 33px;
+	            height: 33px;
+	            display: flex;
+	            justify-content: center;
+	            align-items: center;
+	            margin-left: 8px;
+	            transition: all 0.3s ease-in-out;
+	        }
+
+	        #searchBarButton:hover {
+	            background-color: #4D4D4D;
+	            border-color: #505050;
+	        }
+
+	        #searchBarButton:hover #searchIcon {
+	            filter: invert(1);
+	        }
+
+	        #searchIcon {
+	            width: 15px;
+	            height: 15px;
+	            transition: all 0.3s ease-in-out;
+	        }
+			@media (max-width: 576px ) {
+				#searchInput {
+					width: 180px !important;
+				}
+				#searchInput:focus {
+					width: 180px !important;
+				}
+			}
+			.actionBtn:hover {
+				background-color: #6e6e6e;
+				color: white;
+			}
+
+			.actionBtn {
+				cursor: pointer;
+				background-color: #4D4D4D;
+				color: white;
+				font-weight: 400;
+				border: none;
+				padding: 5px 10px;
+				border-radius: 6px;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+				transition: all 0.15s ease-in-out;
+			}
+		</style>
+		<div class="main-content">
+			<div id="mainContainer"></div>
+			<div class="my-2">
+				<h2 class="mb-4"><a href="/subscriber/category/<%= cat %>" class="categoryName"><strong><%= category.name.length > 25 ? category.name.toUpperCase().substring(0, 22) + '...' : category.name.toUpperCase() %></strong></a> Category (<%= cat === 'income' ? "Income" : "Expense" %>)</h2>
+		
+				<!-- Messages -->
+			      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+			        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+			          <%= errorMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+			      
+			      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+			        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+			          <%= successMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+				<!-- Search Bar and Filter -->
+				<div class="container-div">
+		
+					<div class="d-flex search-container me-2">
+						<input type="text" 
+							   class="form-control" 
+							   placeholder="Search..." 
+							   id="searchInput" 
+							   onkeydown="searchKey(event)">
+						<button class="btn" id="searchBarButton" onclick="performSearch()">
+							<img src="/search_icon.svg" alt="search icon" id="searchIcon">
+						</button>
+					</div>
+					<div class="btn-group">
+						<button type="button" 
+								class="btn btn-light dropdown-toggle" 
+								data-bs-toggle="dropdown" 
+								aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+							<i class="fas fa-calendar me-1"></i>Date
+						</button>
+						<ul class="dropdown-menu dropdown-menu-end mt-2" >
+							<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+							<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+							<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+							<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+							<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+							<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+							<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+							<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+						</ul>
+					</div>
+				</div>
+				<!-- Summary Card -->
+				<div class="card mb-2 mt-4 w-auto" style="max-width: 350px;">
+					<div class="card-body">
+						<div class="d-flex justify-content-between align-items-center">
+							<p class="small mb-1">Date: <span id="summaryDate"></span></p>
+							<button class="btn btn-sm btn-light" id="refreshButton" onclick="refreshAction()" style="color: #4D4D4D; border: 1px solid #4D4D4D; border-radius: 8px;">
+								Reset
+							</button>
+						</div>
+						<p class="small mb-1">Transactions: <span id="summaryTranTotal"></span></p>
+						<p class="small mb-1">Total Sum: <span id="summaryTotalSum"></span></p>
+					</div>
+				</div>
+				<!-- Transaction Table -->
+				<div class="table-responsive mt-3">
+					<table class="table table-hover">
+						<thead style="height: 50px;">
+							<tr>
+								<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
+								<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(1, 'string', this)">Description <span></span></th>
+								<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Amount <span></span></th>
+								<th style="min-width: 180px; cursor: pointer;" onclick="sortTable(3, 'date', this)">Date <span></span></th>
+								<th style="min-width: 120px; cursor: pointer;" onclick="sortTable(5, 'string', this)">Created By <span></span></th>
+								<th style="min-width: 140px;">Actions</th>
+							</tr>
+						</thead>
+						<tbody id="transactionTable">
+							<% 
+								let totalSum = 0; 
+								if (transaction.length > 0) { 
+									for (let i = 0; i < transaction.length; i++) { 
+										totalSum += transaction[i].amount;
+									} 
+								} 
+							%>
+							<% if (transaction.length > 0) { %>
+								<% for (let i = 0; i < transaction.length; i++) { %>
+									<tr style="height: 55px;">
+										<td class="text-nowrap"><%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %></td>
+										<td class="text-nowrap" style="max-width: 200px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;">
+											<%= transaction[i].description.length > 30 ? transaction[i].description.substring(0, 30) + '...' : transaction[i].description %>
+										</td>
+										<td class="text-nowrap <%= cat === 'income' ? 'text-income' : 'text-expense' %>">
+											<% let formattedAmount = transaction[i].amount.toLocaleString(); %>
+											<% if (transaction[i].baseCurrency === 'MMK') { %>
+												<%= formattedAmount %> ks
+											<% } else if (transaction[i].baseCurrency === 'USD') { %>
+												$ <%= formattedAmount %>
+											<% } else if (transaction[i].baseCurrency === 'THB') { %>
+												฿ <%= formattedAmount %>
+											<% } else { %>
+												<%= formattedAmount %> <%= transaction[i].baseCurrency %>
+											<% } %>
+										</td>
+										<td class="text-nowrap">
+											<%= new Date(cat === 'income' ? transaction[i].incomeDate : transaction[i].expenseDate)
+												.toLocaleString('en-US', { 
+													day: '2-digit', 
+													month: 'short', 
+													year: 'numeric', 
+													hour: '2-digit', 
+													minute: '2-digit', 
+													second: '2-digit', 
+													hour12: true 
+												}) 
+											%>
+										</td>
+										<td class="text-nowrap"><%= transaction[i].createdBy %></td>
+										<td>
+											<div >
+										        <button class="actionBtn" onclick="toggleDropdownAction(event, '<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>')">
+										            Actions
+										        </button>
+										        <div id="actionsDropdowns-<%= i + ((parseInt(pagination.page) - 1) * (parseInt(pagination.pageSize))) + 1 %>" 
+										             class="d-none" 
+										             style="z-index: 1000;">
+										            <div class="d-flex" style="margin-top: 10px;">
+										                <a href="/subscriber/category/transaction/<%= cat %>/detail/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>&page=<%= pagination.page %>"
+														class="btn btn-primary btn-sm w-100 button-fixed-width" style="border-radius: 8px; margin-right: 5px;">View</a>
+										                <a href="/subscriber/category/transaction/<%= cat %>/update/<%= transaction[i].id %>?cat=<%= cat %>&id=<%= category.id %>&page=<%= pagination.page %>"
+														class="btn btn-warning btn-sm w-100 button-fixed-width" style="border-radius: 8px;">Edit</a>
+										            </div>
+										        </div>
+										    </div>
+										</td>
+									</tr>
+								<% } %>
+							<% } else { %>
+								<tr>
+									<td colspan="6" class="text-center text-muted">No transactions found.</td>
+								</tr>
+							<% } %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+			<!-- PageSize -->
+			<div class="btn-group my-2" style="max-width: 100px;">
+				<button type="button" 
+						class="btn btn-outline-dark dropdown-toggle" 
+						data-bs-toggle="dropdown" 
+						aria-expanded="false">
+					Page Size
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end shadow-sm" id="dropdown-menu-pageSize" style="max-height: 280px; overflow-y: auto;">
+					
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(5)">
+						5
+					</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(10)">
+						10
+					</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(15)">
+						15
+					</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(20)">
+						20
+					</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="setPageSize(30)">
+						30
+					</button>
+				</ul>
+			</div>
+			<!-- Pagination -->
+			<% if (pagination && pagination.totalPages > 1) { %>
+				<nav aria-label="Pagination" id="paginationNav">
+					<ul class="pagination justify-content-center">
+						<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+							<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(1)' : '' %>><<</a>
+						</li>
+			   
+						<li class="page-item <%= pagination.page <= 1 ? 'disabled' : '' %>">
+							<a class="page-link" onclick=<%= pagination.page > 1 ? 'goToPage(' + (pagination.page - 1) + ')' : '' %>><</a>
+						</li>
+			   
+						<% if (pagination.page > 2) { %>
+							<li class="page-item"><a class="page-link" onclick="goToPage(1)">1</a></li>
+							<% if (pagination.page > 3) { %>
+								<li class="page-item disabled"><a class="page-link">...</a></li>
+							<% } %>
+						<% } %>
+						
+						<% if (pagination.page > 1) { %>
+							<% for (let i = Math.max(1, pagination.page - 1); i <= Math.min(parseInt(pagination.totalPages), parseInt(pagination.page) + 1); i++) { %>
+								<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
+									<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
+								</li>
+							<% } %>
+						<% } else { %>
+							<% for (let i = 1; i <= Math.min(2, pagination.totalPages); i++) { %>
+								<li class="page-item <%= parseInt(i) === parseInt(pagination.page) ? 'active' : '' %>">
+									<a class="page-link" onclick="goToPage('<%= i %>')"><%= i %></a>
+								</li>
+							<% } %>
+						<% } %>
+			   
+						<% if (pagination.page < pagination.totalPages - 1) { %>
+							<% if (pagination.page < pagination.totalPages - 2) { %>
+								<li class="page-item disabled"><a class="page-link">...</a></li>
+								<li class="page-item">
+									<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
+										<%= pagination.totalPages %>
+									</a>
+								</li>
+							<% } else if (pagination.page < pagination.totalPages) { %>
+								<li class="page-item">
+									<a class="page-link" onclick="goToPage('<%= pagination.totalPages %>')">
+										<%= pagination.totalPages %>
+									</a>
+								</li>
+							<% } %>
+						<% } %>
+			   
+						<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+							<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + (parseInt(pagination.page) + 1) + ')' : '' %>>></a>
+						</li>
+			   
+						<li class="page-item <%= pagination.page >= pagination.totalPages ? 'disabled' : '' %>">
+							<a class="page-link" onclick=<%= pagination.page < pagination.totalPages ? 'goToPage(' + pagination.totalPages + ')' : '' %>>>></a>
+						</li>
+					</ul>
+				</nav>
+			<% } %>
+		</div>
+		
+	
+		<script>
+
+			let sortDirections = {};
+
+			function sortTable(columnIndex, type, headerElement) {
+				let table = document.getElementById("transactionTable");
+				let rows = Array.from(table.getElementsByTagName("tr"));
+				let ascending = !sortDirections[columnIndex];
+				sortDirections[columnIndex] = ascending;
+
+				rows.sort((rowA, rowB) => {
+					let cellA = rowA.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+					let cellB = rowB.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+
+					if (type === "number") {
+						cellA = parseFloat(cellA.replace(/[^0-9.-]/g, "")) || 0;
+						cellB = parseFloat(cellB.replace(/[^0-9.-]/g, "")) || 0;
+						return ascending ? cellA - cellB : cellB - cellA;
+					} else if (type === "date") {
+						cellA = new Date(cellA).getTime() || 0;
+						cellB = new Date(cellB).getTime() || 0;
+						return ascending ? cellA - cellB : cellB - cellA;
+					} else {
+						return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+					}
+				});
+				rows.forEach(row => table.appendChild(row));
+				document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
+				headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
+			}
+
+			function refreshAction() {
+			    window.location.href = window.location.pathname;
+			}
+
+			function goToPage(pageNumber) {
+			    const baseUrl = new URL(window.location.href);
+			    baseUrl.searchParams.set("page", pageNumber);
+			    window.location.href = baseUrl.toString();
+			}
+
+
+			function toggleDropdown() {
+				let dropdown = document.getElementById("dropdown-menu");
+				dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+			}
+
+			function toggleDropdownAction(event, id) {
+			    event.preventDefault();
+			    event.stopPropagation();
+			    
+			    document.querySelectorAll('[id^="actionsDropdowns-"]').forEach(dropdown => {
+			        if (dropdown.id !== `actionsDropdowns-${id}` && !dropdown.classList.contains('d-none')) {
+			            dropdown.classList.add('d-none');
+			        }
+			    });
+			    
+			    const dropdown = document.getElementById(`actionsDropdowns-${id}`);
+			    if (dropdown) {
+			        dropdown.classList.toggle('d-none');
+			        
+			        if (!dropdown.classList.contains('d-none')) {
+			            positionDropdown(event.target, dropdown);
+			        }
+			    }
+			}
+
+			function positionDropdown(button, dropdown) {
+			    const buttonRect = button.getBoundingClientRect();
+			    const dropdownRect = dropdown.getBoundingClientRect();
+			    
+			    dropdown.style.top = '';
+			    dropdown.style.right = '';
+			    dropdown.style.left = '';
+			    
+			    dropdown.style.top = (buttonRect.bottom + window.scrollY + 5) + 'px';
+			    dropdown.style.left = (buttonRect.left + window.scrollX) + 'px';
+			    
+			    const viewportWidth = window.innerWidth;
+			    if (buttonRect.left + dropdownRect.width > viewportWidth) {
+			        dropdown.style.left = (buttonRect.right + window.scrollX - dropdownRect.width) + 'px';
+			    }
+			}
+	
+			function searchKey(event){
+				if (event.key === 'Enter') {
+					performSearch();
+				}
+			}
+			
+			function performSearch() {
+			    let input = document.getElementById("searchInput").value.trim();
+			    let url = new URL(window.location.href);
+			    
+			    if (input) {
+			        url.searchParams.set("search", input);
+					url.searchParams.delete("page");
+			    } else {
+			        url.searchParams.delete("search");
+					url.searchParams.delete("page");
+			    }
+			    window.location.href = url.toString();
+			}
+
+			function filterDate(num, type) {
+			    let url = new URL(window.location.href);
+			    if (num && type && num !== 0) {
+			        url.searchParams.set("num", num);
+					url.searchParams.set("type", type);
+					url.searchParams.delete("page");
+			    } else {
+			        url.searchParams.delete("num");
+					url.searchParams.delete("type");
+					url.searchParams.delete("page");
+			    }
+			    window.location.href = url.toString();
+			}
+
+			function setPageSize(pagesize) {
+				let url = new URL(window.location.href);
+			    if (pagesize && pagesize !== 10) {
+			        url.searchParams.set("pageSize", pagesize);
+					url.searchParams.delete("page");
+			    } else {
+			        url.searchParams.delete("pageSize");
+					url.searchParams.delete("page");
+			    }
+			    window.location.href = url.toString();
+			}
+
+
+			const searchParams = new URLSearchParams(window.location.search);
+			const type = searchParams.get('type')
+			const num = searchParams.get('num')
+			const search = searchParams.get('search')
+			if (typeof search === 'string' && search.trim().length > 0) {
+				document.getElementById('searchInput').value = search;
+			}
+			const totalTrans = "<%= transaction.length %>"
+			if (totalTrans) {
+				document.getElementById('summaryTranTotal').innerText = totalTrans
+			} else {
+				document.getElementById('summaryTranTotal').innerText = "0"
+			}
+
+			const totalSum = "<%= totalSum %>";
+			if (parseInt(totalTrans) > 0 && totalSum) {
+				const currency = "<%= transaction.length > 0 ? transaction[0].baseCurrency : '' %>";
+				let formattedTotal = new Intl.NumberFormat('en-US').format(totalSum);
+
+			    if (currency === "MMK") {
+			        document.getElementById('summaryTotalSum').innerText = `${formattedTotal} ks`;
+			    } else if (currency === "USD") {
+			        document.getElementById('summaryTotalSum').innerText = `$ ${formattedTotal}`;
+			    } else {
+			        document.getElementById('summaryTotalSum').innerText = `${currency} ${formattedTotal}`;
+			    }
+			} else {
+			    document.getElementById('summaryTotalSum').innerText = "0";
+			}
+			
+			if (type === 'month') {
+				if (num === '0') {
+					document.getElementById('summaryDate').innerText = "ALL"
+				} else if (num === '1') {
+					document.getElementById('summaryDate').innerText = "This Month"
+				} else if (num === '3') {
+					document.getElementById('summaryDate').innerText = "Last 3 Months"
+				}
+			} else if (type === 'week') {
+				document.getElementById('summaryDate').innerText = "This Week"
+			} else if (type === 'day') {
+				if (num === '1') {
+					document.getElementById('summaryDate').innerText = "Today"
+				} else if (num === '7') {
+					document.getElementById('summaryDate').innerText = "Last 7 Days"
+				} else if (num === '30') {
+					document.getElementById('summaryDate').innerText = "Last 30 Days"
+				}
+			} else {
+				document.getElementById('summaryDate').innerText = "ALL"
+			}
+		</script>
+        <%- include('../partials/subscriber/footer.ejs') %>

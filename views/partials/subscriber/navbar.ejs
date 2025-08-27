@@ -1,0 +1,637 @@
+<style>
+    #com-name {
+        text-decoration: none;
+        color: white;
+        position: fixed;
+        top: 25px;
+    }
+    
+    .pro-pic {
+        width: 30px;
+        height: 30px;
+        object-fit: cover;
+        object-position: center;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+    
+    .profile-placeholder {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #007bff, #0056b3);
+        color: white;
+        font-size: 20px;
+        font-weight: bold;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-transform: uppercase;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    #sidebarLabel {
+        position: fixed;
+        top: 30px;
+        left: 95px;
+    }
+    
+    .circle-icon {
+        width: 20px;
+        height: 20px;
+        color: white;
+        font-size: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-logo-preview {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        object-position: center;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    }
+    
+    #menuBtn {
+        width: 51px;
+        height: 56px;
+        border-radius: 8px;
+        background-color: #D62828;
+        position: fixed;
+        top: 25px;
+        left: 39.42px;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        cursor: pointer;
+        z-index: 1031;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+        position: fixed;
+        left: -280px;
+        top: 0;
+        width: 280px;
+        height: 100vh;
+        transition: left 0.3s ease-in-out;
+        z-index: 1030;
+        overflow-y: auto;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    .sidebar-header {
+        padding: 1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .sidebar-body {
+        padding-bottom: 50px;
+    }
+
+    .sidebar-body a {
+        transition: all 0.2s ease-in-out;
+        display: flex;
+        align-items: center;
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .sidebar-body a:hover {
+        background-color: #D62828;
+        color: white !important;
+        transform: translateX(10px);
+        box-shadow: 2px 4px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .sidebar-body a:hover img {
+        filter: grayscale(1) brightness(800%);
+    }
+
+    /* Overlay styles */
+    .sidebar-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        z-index: 1029;
+    }
+
+    .sidebar-overlay.active {
+        display: block;
+    }
+    
+    #sidebarBody {
+        position: relative;
+        margin-top: 125px;
+    }
+    
+    .iconColor{
+        filter: grayscale(1) brightness(1000%);
+    }
+    
+    .btnColor{
+        background-color: #D62828;
+    }
+    
+    #dashboardIcon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    #transactionIcon {
+        width: 26px;
+        height: 19.89px;
+    }
+    
+    #categoryIcon {
+        width: 26px;
+        height: 20px;
+    }
+    
+    #reportIcon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    #signoutIcon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    #salespersonIcon, #usrProfileIcon, #orgProfileIcon {
+        font-size: 20px;
+    }
+    
+    #usrProfileIcon, #orgProfileIcon {
+        width: 26px;
+        display: flex;
+        justify-content: center;
+    }
+    
+    #settingsIcon {
+        width: 26px;
+        height: 26px;
+    }
+    
+    #dashboardBtn, #transactionBtn, #reportBtn, #categoryBtn, #signoutBtn, #salespersonBtn, #settingsBtn, #usrProfileBtn, #orgProfileBtn {
+        width: 220px;
+        height: 45px;
+        top: 155px;
+        left: 42.17px;
+        border-radius: 16px;
+        padding-top: 16px;
+        padding-right: 24px;
+        padding-bottom: 16px;
+        padding-left: 24px;
+        gap: 24px;
+    }
+    
+    a{
+        text-decoration: none;
+    }
+    
+    #dashboardText {
+        margin-right: 10px;
+    }
+    
+    .top-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100px;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        z-index: 1000;
+    }
+    
+    #userProfile {
+        position: fixed;
+        right: 30px;
+    }
+    
+    #profileBtn {
+        background-color: transparent;
+        border: none;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+	.adjustImgSize {
+		width: 26px;
+		filter: invert(1);
+	}
+    #menuBtnDiv {
+		width: 51px;
+        height: 56px;
+        border-radius: 8px;
+        background-color: #D62828;
+        position: fixed;
+        top: 25px;
+        left: 39.42px;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border: none;
+        cursor: pointer;
+        z-index: 1031;
+	}
+
+    @media (min-width: 992px) {
+        .sidebar {
+            left: 0;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar-header {
+			position: absolute;
+			top: 12px;
+			margin-left: 60px;
+		}
+        /* .top-bar {
+            width: calc(100% - 280px);
+            left: 280px;
+        } */
+        
+	        /* .main-content {
+			    margin-left: 280px;
+			    width: calc(100% - 280px);
+			    overflow-x: hidden;
+			    position: relative;
+			} */
+		#menuBtn {
+			display: none;
+		}
+
+		.main-content .container {
+		    max-width: 100%;
+		    padding-left: 15px;
+		    padding-right: 15px;
+		}
+        
+        .sidebar-overlay {
+            display: none !important;
+        }
+        
+        #sidebarLabel {
+            position: relative;
+            left: 0;
+            top: 0;
+        }
+		#menuBtnDiv {
+			display: flex !important;
+		}
+    }
+	#sidebarHeader {
+		position: fixed;
+		width: 265px;
+		height: 100px;
+		background-color: rgb(248, 249, 250);
+		z-index: 1000;
+	}
+	#userNamePosition:hover {
+		cursor: pointer;
+	}
+	#settingsDropdowns li a:hover {
+	    background-color: #f1f1f1;
+	    color: #000;
+	    text-decoration: none;
+	}
+	#settingsDropdowns li a {
+	    transition: background-color 0.3s ease, color 0.3s ease;
+	}
+
+	#navTop div a:hover {
+		background-color: #f1f1f1;
+	    color: #000;
+	    text-decoration: none;
+
+	}
+
+	#navTop div a {
+		transition: background-color 0.3s ease, color 0.3s ease;
+	}
+
+	.topBtnNav {
+		padding: 5px 10px;
+		border-radius: 10px;
+		color: #606060;
+		font-weight: bold;
+	}
+
+	.topBtnBgActivate {
+		background-color: #f1f1f1;
+	    color: #000;
+		text-decoration: none;
+	}
+
+	#settingTop:hover {
+		background-color: #f1f1f1;
+	    color: #000;
+	    text-decoration: none;
+	}
+	#settingTop {
+		padding: 4px 8px;
+		border-radius: 8px;
+		transition: background-color 0.3s ease, color 0.3s ease;
+	}
+</style>
+
+<nav class="navbar navbar-dark navbar-expand-lg justify-content-center">
+    <button id="menuBtn" class="btn btn-dark menu-icon me-3" onclick="toggleSidebar()">
+        <img src="/closed_menu.svg" class="adjustImgSize" alt="menu logo" id="menulogo">
+    </button>
+	<div id="menuBtnDiv" class="btn btn-dark d-none me-3">
+		<img src="/dummy.svg" alt="menu logo" id="menulogoDiv">
+	</div>
+    <div class="top-bar">
+		<div id="menuBtnDiv" class="btn btn-dark d-none me-3">
+			<img src="/dummy.svg" alt="menu logo" id="menulogoDiv">
+		</div>
+		<div class=" text-dark fs-5 d-flex align-items-center p-1" style="margin-left: 80px; margin-right: 10px;">
+			<span class="fw-bold me-4 ms-2" style="font-size: larger; min-width: 150px; font-weight: bold">
+				 Flow Sight
+			</span>
+		</div>
+		<div id="navTop" class="d-none d-lg-flex gap-4 position-relative justify-content-center" style="width: 100%; margin-right: 320px;">
+		    <div><a href="/subscriber/home" class="nav-link topBtnNav" id="dashboardTop" onclick="changeBgColor('dashboardTop')">Dashboard</a></div>
+		    <div><a href="/subscriber/transaction/transactions" id="transactionTop" class="nav-link topBtnNav" onclick="changeBgColor('transactionTop')">Transactions</a></div>
+		    <div><a href="/subscriber/report?num=30&type=day" id="reportTop" class="nav-link topBtnNav" onclick="changeBgColor('reportTop')">Reports</a></div>
+			<div class="position-relative px-3 d-none d-lg-flex" style=" z-index: 1001;">
+		        <div style="cursor: pointer;" class="nav-link" onclick="toggleSettingDropdown(event)" id="settingTop">
+		            <img src="/settings_icon.svg" alt="Settings icon" id="settingsIcon">
+				</div>
+		        <ul id="settingsDropdowns" class="list-unstyled position-absolute bg-white shadow rounded ms-2 mt-2 d-none" style="width: 200px; top:30px; right: 20px;">
+		            <li><a href="/subscriber/salesperson" class="text-dark d-block py-2 px-3">People</a></li>
+		            <li><a href="/subscriber/category/income" class="text-dark d-block py-2 px-3">Categories</a></li>
+		            <li><a href="/subscriber/user/profile" class="text-dark d-block py-2 px-3">User Profile</a></li>
+		            <li><a href="/subscriber/organization/profile" class="text-dark d-block py-2 px-3">Organization Profile</a></li>
+					<li><a href="/subscriber/logout" class="text-dark d-block py-2 px-3">Sign Out</a></li>
+		        </ul>
+		    </div>
+		</div>
+		
+        <div id="userProfile" class="d-flex justify-content-center align-items-center">
+            <div class="me-3 d-none d-sm-flex flex-column align-items-end" id="userNamePosition" onclick="goToUserProfilePage()">
+                <span id="userName" class="d-block fw-bold" style="font-size: large;"><%= userName %> </span>
+                <span id="userPosition"><%= userRole%></span>
+            </div>
+            <div id="profileBtn" onclick="goToProfilePage()">
+                <% if (logo) {%> 
+                    <img src="/<%= logo %>" alt="Logo" class="profile-logo-preview">
+                <%} else {%> 
+                    <div class="profile-placeholder me-2">
+                        <%= organizationName.charAt(0).toUpperCase() %>
+                    </div>
+                <%} %>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<!-- Sidebar -->
+<div class="sidebar bg-light d-lg-none" id="sidebar">
+	<!-- <div id="sidebarHeader">
+		<div class="sidebar-header">
+			<div class="offcanvas-title text-dark fs-5 d-flex align-items-center p-1" id="sidebarLabel">
+				<span class="fw-bold me-4 ms-2" style="font-size: larger;">
+					 Flow Sight
+				</span>
+			</div>
+		</div>
+	</div> -->
+    
+    <div class="sidebar-body" id="sidebarBody">
+        <ul class="list-unstyled">
+            <li><a href="/subscriber/home" class="text-dark d-block py-2 d-flex align-items-center" id="dashboardBtn" onclick="setActiveButton('dashboardBtn')">
+				<span id="dashboardText">Dashboard</span></a></li>
+            <li><a href="/subscriber/transaction/transactions" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="transactionBtn" onclick="setActiveButton('transactionBtn')">
+				<span id="dashboardText">Transactions</span></a></li>
+            <li><a href="/subscriber/report?num=30&type=day" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="reportBtn" onclick="setActiveButton('reportBtn')">
+				<span id="dashboardText">Reports</span></a></li>
+			<li>
+			    <a class="text-dark d-block py-2 d-flex align-items-center mt-3" id="settingsBtn" onclick="toggleSettingsDropdown(event)">
+			        <span>Settings</span>
+			    </a>
+			    <ul id="settingsDropdown" class="list-unstyled ms-4 d-none">
+					<li><a href="/subscriber/salesperson" class="text-dark d-block py-2 my-1">People</a></li>
+					<li><a href="/subscriber/category/income" class="text-dark d-block py-2 my-1">Categories</a></li>
+			        <li><a href="/subscriber/user/profile" class="text-dark d-block py-2 my-1">User Profile</a></li>
+			        <li><a href="/subscriber/organization/profile" class="text-dark d-block py-2 my-1">Organization Profile</a></li>
+			    </ul>
+			</li>
+            <li><a href="/subscriber/logout" class="text-dark d-block py-2 d-flex align-items-center mt-3" id="signoutBtn" onclick="setActiveButton('signoutBtn')">
+				<span id="dashboardText">Sign Out</span></a></li>
+        </ul>
+    </div>
+</div>
+
+<div id="overlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
+
+<script>
+
+	const match = window.location.pathname.match(/^\/subscriber\/([^\/]+)/);
+	if (match) {
+		const section = match[1];
+		switch (section) {
+			case 'home':
+				setActiveButton('dashboardBtn');
+				changeBgColor('dashboardTop');
+				break;
+			case 'transaction':
+				setActiveButton('transactionBtn');
+				changeBgColor('transactionTop');
+				break;
+			case 'category':
+				setActiveButton('settingsBtn');
+				changeBgColor('settingTop');
+				break;
+			case 'salesperson':
+				setActiveButton('settingsBtn');
+				changeBgColor('settingTop');
+				break;
+			case 'user':
+				setActiveButton('settingsBtn');
+				changeBgColor('settingTop');
+				break;
+			case 'organization':
+				setActiveButton('settingsBtn');
+				changeBgColor('settingTop');
+				break;
+			case 'report':
+				setActiveButton('reportBtn');
+				changeBgColor('reportTop');
+
+			default:
+				break;
+		}
+	}
+
+
+    const currentPath = window.location.pathname;
+    
+    function setInitialActiveButton() {
+        const buttonMap = {
+            '/subscriber/home': 'dashboardBtn',
+            '/subscriber/transaction/transactions': 'transactionBtn',
+            '/subscriber/category/income': 'settingsBtn',
+            '/subscriber/salesperson': 'settingsBtn'
+        };
+
+        const activeButtonId = buttonMap[currentPath];
+        if (activeButtonId) {
+            setActiveButton(activeButtonId);
+        }
+    }
+
+    function setActiveButton(buttonId) {
+        const allButtons = document.querySelectorAll('.sidebar-body a');
+
+        allButtons.forEach(button => {
+            button.classList.remove('text-light', 'btnColor');
+            button.classList.add('text-dark');
+            button.style.transform = "translateX(0px)";
+            button.style.transition = "all 0.3s ease-in-out";
+            
+            const img = button.querySelector('img');
+            if (img) img.classList.remove('iconColor');
+        });
+
+        const activeButton = document.getElementById(buttonId);
+        if (activeButton) {
+            activeButton.classList.remove('text-dark');
+            activeButton.classList.add('text-light', 'btnColor');
+            activeButton.style.transform = "translateX(10px)";
+
+            const img = activeButton.querySelector('img');
+            if (img) img.classList.add('iconColor');
+        }
+    }
+
+	function toggleSidebar() {
+	    if (window.innerWidth < 992) {
+	        const sidebar = document.getElementById('sidebar');
+	        const overlay = document.getElementById('overlay');
+	        const menuLogo = document.getElementById('menulogo');
+	        
+	        sidebar.classList.toggle('active');
+	        overlay.classList.toggle('active');
+	        
+	        if (sidebar.classList.contains('active')) {
+	            menuLogo.src = "/dummy.svg";
+				menuLogo.classList.remove('adjustImgSize')
+	        } else {
+	            menuLogo.src = "/closed_menu.svg";
+				menuLogo.classList.add('adjustImgSize')
+	        }
+	    }
+	}
+
+    function handleOutsideClick(event) {
+        if (window.innerWidth < 992) {
+            const sidebar = document.getElementById('sidebar');
+            const menuBtn = document.getElementById('menuBtn');
+            
+            if (!sidebar.contains(event.target) && 
+                !menuBtn.contains(event.target) && 
+                sidebar.classList.contains('active')) {
+                toggleSidebar();
+            }
+        }
+    }
+
+    function goToProfilePage() {
+        window.location.href = "/subscriber/organization/profile";
+    }
+    
+    function goToUserProfilePage() {
+        window.location.href = "/subscriber/user/profile";
+    }
+    
+    function formatName(name) {
+        return name.toLowerCase().replace(/\b\w/g, (char) => char.toUpperCase());
+    }
+    
+    document.onreadystatechange = function() {
+        if (document.readyState === "complete") {
+            let userNameElement = document.getElementById("userName");
+            let userPositionElement = document.getElementById("userPosition");
+            
+            if (userNameElement) {
+                userNameElement.textContent = formatName(userNameElement.textContent);
+            }
+            
+            if (userPositionElement) {
+                userPositionElement.textContent = formatName(userPositionElement.textContent);
+            }
+
+            setInitialActiveButton();
+            setSidebarState();
+            
+            document.onclick = handleOutsideClick;
+            
+            window.onresize = setSidebarState;
+        }
+    };
+
+    function setSidebarState() {
+        const sidebar = document.getElementById('sidebar');
+        const menuLogo = document.getElementById('menulogo');
+        
+        if (window.innerWidth >= 992) {
+            sidebar.classList.add('active');
+        } else {
+            sidebar.classList.remove('active');
+            
+            if (sidebar.classList.contains('active')) {
+                menuLogo.src = "/dummy.svg";
+                menuLogo.classList.remove('adjustImgSize');
+            } else {
+                menuLogo.src = "/closed_menu.svg";
+                menuLogo.classList.add('adjustImgSize');
+            }
+        }
+    }
+
+	function toggleSettingDropdown(event) {
+	    event.preventDefault();
+	    const dropdown = document.getElementById('settingsDropdowns');
+	    dropdown.classList.toggle('d-none');
+	}
+
+	function toggleSettingsDropdown(event) {
+	    event.preventDefault();
+	    const dropdown = document.getElementById('settingsDropdown');
+	    dropdown.classList.toggle('d-none');
+		setActiveButton('settingsBtn');
+	}
+
+	function changeBgColor(id) {
+		const allButtons = document.querySelectorAll('.navTop div a');
+		allButtons.forEach((i) => {
+			i.classList.remove('topBtnBgActivate');
+		})
+		document.getElementById(id).classList.add('topBtnBgActivate')
+	}
+</script>

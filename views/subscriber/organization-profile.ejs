@@ -1,0 +1,299 @@
+<%- include('../partials/subscriber/header.ejs') %>
+    <%- include('../partials/subscriber/navbar.ejs') %>
+
+		<style>
+	        .profile-logo {
+				width: 150px;
+				height: 150px;
+	            object-fit: cover;
+				object-position: center;
+				border: 2px solid #ddd;
+				border-radius: 50%;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+				transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+	        }
+			.profile-logo:hover {
+				transform: scale(1.05);
+			    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+				cursor: pointer;
+			}
+	        .edit-button {
+	            position: absolute;
+	            top: 0%;
+	            left: 100px;
+				background-color: rgb(214, 214, 214); 
+				width: 40px; 
+				height: 40px; 
+				border-radius: 50%; 
+				display: flex; 
+				justify-content: 
+				center; align-items: center;
+				box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	        }
+	        .edit-button:hover {
+	            background-color: rgb(177, 177, 177);
+	        }
+	        .section-title {
+	            font-weight: bold;
+	        }
+			.profile-placeholder-img {
+			    width: 150px;
+			    height: 150px;
+			    background: linear-gradient(135deg, #007bff, #0056b3);
+			    color: white;
+			    font-size: 60px;
+			    font-weight: bold;
+			    border-radius: 50%;
+			    display: flex;
+			    align-items: center;
+			    justify-content: center;
+			    text-transform: uppercase;
+			    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+			    border: 2px solid rgba(255, 255, 255, 0.2); 
+			}
+			.profile-placeholder-img:hover {
+				cursor: pointer;
+			}
+			#mainContainer {
+				margin-top: 100px;
+			}
+	    </style>
+		<div class="main-content">
+			<!-- Main Content -->
+			<main id="mainContainer">
+				<!-- Messages -->
+			      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+			        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+			          <%= errorMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+			      
+			      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+			        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+			          <%= successMessage %>
+			          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+			        </div>
+			      <% } %>
+				<form class="mb-4" method="POST" id="myForm" enctype="multipart/form-data" onsubmit="submitForm(event)">
+					<div class="container mt-5">
+						<div class="row justify-content-center">
+							<div class="col-md-8">
+								<div class="card shadow-sm">
+									<div class="card-body" style=" justify-content: center; align-items: center;">
+										<div class="row mb-4" style="display: flex; justify-content: center; align-items: center;">
+											<div style="margin-bottom: 20px; display: flex; justify-content: center; align-items: center;">
+												<div style="position: relative; width: 150px; height: 150px; border-radius: 50%;">
+													<% if(org.logo && org.logo !== 'null' ) { %>
+														<img src="/<%= org.logo %>" alt="Logo" class="profile-logo" id="imagePreview" data-bs-toggle="modal" 
+														data-bs-target="#profileModal">
+													<% } else { %>
+														<div class="profile-placeholder-img me-2" id="placeholderPreview">
+															<%= org.name.charAt(0).toUpperCase() %>
+														</div>
+													<% } %>
+													<div class="edit-button">
+														<label for="orgLogo" style="cursor: pointer;">
+															<i class="fa-solid fa-pen-to-square fs-4"></i>
+														</label>
+														<input type="file" 
+															   class="form-control" 
+															   name="logo" 
+															   id="orgLogo" 
+															   style="display: none;" 
+															   accept="image/*"
+															   onchange="previewImage(this)">
+													</div>
+												</div>
+												
+											</div>
+										</div>
+										<div class="row " style="display: flex; justify-content: center; align-items: center;">
+											<h3 class="mb-2">Business Details</h3>
+											<div class="mb-3">
+												<label for="orgName" class="form-label">Organization Name</label><span> *</span>
+												<input type="text" class="form-control inputRequired" maxlength="145" name="name" id="orgName"
+													placeholder="Enter description" value="<%= org.name %>" oninput="checkInputs('orgNameError', 'orgName')" required>
+												<p id="orgNameError" class="mt-2 d-none text-danger">*Organization Name can't exceed 145 characters!</p>
+											</div>
+											<div class="mb-3">
+												<label for="orgAddress" class="form-label">Address</label><span> *</span>
+												<textarea class="form-control" id="orgAddress" maxlength="145" name="address" rows="2"
+													placeholder="Enter organization address" oninput="checkInputs('addressOrgError', 'orgAddress')" required><%= org.address %></textarea>
+												<p id="addressOrgError" class="mt-2 d-none text-danger">*Address can't exceed 145 characters!</p>
+											</div>
+											<div class="mb-3">
+												<label for="country">Country </label><span> *</span>
+												<div class="country-select-container mt-1">
+													<select id="country" name="country" class="form-control country-dropdown" onchange="checkInputs('countryError', 'country')">
+														<option value="" disabled>Select a country</option>
+														<% [
+														"Afghanistan", "Åland Islands", "Albania", "Algeria", "American Samoa", 
+														"Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", 
+														"Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", 
+														"Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", 
+														"Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bosnia and Herzegovina", 
+														"Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", 
+														"Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cambodia", 
+														"Cameroon", "Canada", "Cape Verde", "Cayman Islands", "Central African Republic", 
+														"Chad", "Chile", "China", "Christmas Island", "Cocos (Keeling) Islands", 
+														"Colombia", "Comoros", "Congo", "Congo, The Democratic Republic of The", 
+														"Cook Islands", "Costa Rica", "Cote D'ivoire", "Croatia", "Cuba", "Cyprus", 
+														"Czech Republic", "Denmark", "Djibouti", "Dominica", "Dominican Republic", 
+														"Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", 
+														"Ethiopia", "Falkland Islands (Malvinas)", "Faroe Islands", "Fiji", "Finland", 
+														"France", "French Guiana", "French Polynesia", "French Southern Territories", 
+														"Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", 
+														"Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", 
+														"Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", 
+														"Holy See (Vatican City State)", "Honduras", "Hong Kong", "Hungary", "Iceland", 
+														"India", "Indonesia", "Iran, Islamic Republic of", "Iraq", "Ireland", 
+														"Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey", "Jordan", 
+														"Kazakhstan", "Kenya", "Kiribati", "Korea, Democratic People's Republic of", 
+														"Korea, Republic of", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic", 
+														"Latvia", "Lebanon", "Lesotho", "Liberia", "Libyan Arab Jamahiriya", 
+														"Liechtenstein", "Lithuania", "Luxembourg", "Macao", "Macedonia, The Former Yugoslav Republic of", 
+														"Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", 
+														"Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia, Federated States of", 
+														"Moldova, Republic of", "Monaco", "Mongolia", "Montenegro", "Montserrat", 
+														"Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", 
+														"Netherlands Antilles", "New Caledonia", "New Zealand", "Nicaragua", "Niger", 
+														"Nigeria", "Niue", "Norfolk Island", "Northern Mariana Islands", "Norway", 
+														"Oman", "Pakistan", "Palau", "Palestinian Territory, Occupied", "Panama", 
+														"Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn", "Poland", 
+														"Portugal", "Puerto Rico", "Qatar", "Reunion", "Romania", "Russian Federation", 
+														"Rwanda", "Saint Helena", "Saint Kitts and Nevis", "Saint Lucia", 
+														"Saint Pierre and Miquelon", "Saint Vincent and The Grenadines", "Samoa", 
+														"San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", 
+														"Seychelles", "Sierra Leone", "Singapore", "Slovakia", "Slovenia", 
+														"Solomon Islands", "Somalia", "South Africa", "South Georgia and The South Sandwich Islands", 
+														"Spain", "Sri Lanka", "Sudan", "Suriname", "Svalbard and Jan Mayen", 
+														"Swaziland", "Sweden", "Switzerland", "Syrian Arab Republic", "Taiwan", 
+														"Tajikistan", "Tanzania, United Republic of", "Thailand", "Timor-Leste", 
+														"Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", 
+														"Turkmenistan", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", 
+														"United Kingdom", "United States", "Uruguay", "Uzbekistan", "Vanuatu", 
+														"Venezuela", "Viet Nam", "Western Sahara", "Yemen", "Zambia", "Zimbabwe"
+													  ].forEach(function(country) { %>
+															<option value="<%= country %>" <%= org.baseCountry === country ? 'selected' : '' %>><%= country %></option>
+														<% }); %>
+													</select>
+													<p id="countryError" class="mt-2 d-none text-danger">*Please select a country!</p>
+												</div>
+											</div>
+											<div class="mb-3">
+												<label for="orgPhone" class="form-label">Phone</label><span> *</span>
+												<input type="tel" class="form-control" maxlength="45" id="orgPhone" name="phone"
+													placeholder="Enter phone number" value="<%= org.phone %>" oninput="checkInputs('phoneOrgError', 'orgPhone')" required>
+												<p id="phoneOrgError" class="mt-2 d-none text-danger">*Phone can't exceed 45 characters!</p>
+											</div>
+											<div class="mb-3">
+												<label for="orgBaseCurrency" class="form-label">Base Currency</label><span> *</span>
+												<select id="orgBaseCurrency" name="baseCurrency" class="form-select" required>
+						
+													<% options.forEach(option=> { %>
+														<option value="<%= option.name %>" <%=option.name===org.baseCurrency ? 'selected' : '' %> >
+															<%= option.name.toUpperCase() %>
+														</option>
+														<% }); %>
+												</select>
+											</div>
+											<div class="mb-3">
+												<p class="mt-3">Current Expiration Date: <span id="currentExpirationDate" class="fw-bold">
+													<%= new Date(org.expiredDate).toDateString() %>
+											</span></p>
+												<p class="text-secondary">Version: <%= appVersion %> (<%= appCodeName %>)</p>
+											</div>
+											<div class="mt-4 d-flex justify-content-end">
+												<button id="extendBtn" class="btn btn-primary mb-2 me-2" onclick="extendLicense()">Extend License</button>
+												<button type="submit" id="addBtn" class="btn btn-success mb-2">Save Changes</button>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+				<% if (org.logo && org.logo !== 'null') {%> 
+					<div class="modal fade" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel" aria-hidden="true">
+						<div class="modal-dialog modal-dialog-centered modal-xl" style="max-width: 700px; max-height: 700px;">
+							<div class="modal-content">
+								<div class="modal-header">
+									<h5 class="modal-title" id="profileModalLabel">Profile Preview</h5>
+									<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+								</div>
+								<div class="modal-body text-center">
+									<img src="/<%= org.logo %>" class="img-fluid" id="modalReceiptImage" alt="Logo Image"
+										style="width: 100%; max-width: 500px; max-height: 500px; object-fit: contain; border-radius: 10px; box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);" />
+								</div>
+							</div>
+						</div>
+					</div>
+				<%} %>
+				
+			
+			</main>
+		</div>
+        
+		<script>
+			function previewImage(input) {
+			    if (input.files && input.files[0]) {
+			        const reader = new FileReader();
+			        
+			        reader.onload = function(e) {
+			            let imagePreview = document.getElementById('imagePreview');
+			            const placeholderPreview = document.getElementById('placeholderPreview');
+			            
+			            if (!imagePreview) {
+			                imagePreview = document.createElement('img');
+			                imagePreview.id = 'imagePreview';
+			                imagePreview.className = 'profile-logo';
+			                if (placeholderPreview) {
+			                    placeholderPreview.style.display = 'none';
+			                    placeholderPreview.parentNode.insertBefore(imagePreview, placeholderPreview);
+			                }
+			            }
+			            imagePreview.src = e.target.result;
+			        };
+
+			        reader.readAsDataURL(input.files[0]);
+			    }
+			}
+
+			function extendLicense() {
+				event.preventDefault();
+				window.open('https://docs.google.com/forms/d/e/1FAIpQLSdC2LlFBYv8I6H6WaX0wGmdYtbAqNbvILHeG_Xw0eyciu5BiA/viewform?usp=header', '_blank');
+			}
+
+
+			const form = document.getElementById('myForm');
+            const addButton = document.getElementById('addBtn');
+            const inputs = form.querySelectorAll('.inputRequired');
+            function checkInputs(messageBox, inputField) {
+                let allFilled = true;
+                inputs.forEach(index => {
+                if (!index.value.trim()) {
+                    allFilled = false;
+                }
+                });
+                addButton.disabled = !allFilled;
+				const message = document.getElementById(messageBox)
+				const input = document.getElementById(inputField)
+				if (input.value.length === parseInt(input.maxLength)) {
+			        message.classList.remove('d-none');
+			    } else {
+			        message.classList.add('d-none');
+			    }
+            }
+
+
+            function submitForm(event) {
+			    event.preventDefault();
+			    const addButton = document.getElementById('addBtn');
+			    addButton.disabled = true;
+			    addButton.textContent = 'Submitting...';
+			    document.getElementById('myForm').submit();
+			}
+		</script>
+        <%- include('../partials/subscriber/footer.ejs') %>

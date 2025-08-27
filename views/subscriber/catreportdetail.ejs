@@ -1,0 +1,635 @@
+<%- include('../partials/subscriber/header.ejs') %>
+<%- include('../partials/subscriber/navbar.ejs') %>
+
+<style>
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+.dropdown-btn {
+  cursor: pointer;
+}
+.dropdown-menu {
+  border-radius: 0.5rem;
+  border: 1px solid rgba(0,0,0,0.08);
+}
+.dropdown-item:hover {
+  background-color: rgba(13,110,253,0.1);
+}
+.main-content {
+  margin-top: 100px;
+}
+
+.table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+.chart-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 20px;
+}
+
+.table-responsive {
+    border-radius: 8px;
+    overflow-x: auto;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    border-bottom: 2px solid #dee2e6;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.table th:hover {
+    background-color: #e9ecef;
+}
+
+.table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+.btn-fixed-width {
+    min-width: 80px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .table-responsive {
+        font-size: 14px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 8px 4px;
+    }
+    
+    .actionBtn {
+        padding: 4px 8px;
+        font-size: 12px;
+    }
+    
+    .btn-fixed-width {
+        min-width: 60px;
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .table-responsive {
+        font-size: 12px;
+    }
+    
+    .table th,
+    .table td {
+        padding: 6px 2px;
+    }
+}
+
+.chart-canvas {
+    max-height: 300px;
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    .chart-canvas {
+        max-height: 400px;
+    }
+}
+</style>
+
+<div class="main-content" style="padding-bottom: 300px;">
+  <!-- Main Content -->
+  <div id="mainContainer"></div>
+  
+  <main class="container">
+    <div class="content">
+      <!-- Messages -->
+      <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+        <div id="errorBox" class="alert alert-danger alert-dismissible fade show" role="alert">
+          <%= errorMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+      
+      <% if (typeof successMessage !== 'undefined' && successMessage) { %>
+        <div id="successBox" class="alert alert-success alert-dismissible fade show" role="alert">
+          <%= successMessage %>
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      <% } %>
+    </div>
+    
+	<div>
+		<button class="backBtn" onclick="goBack()">
+			&lt; Back
+		</button>
+	</div>
+    <div>
+		<h3 class="my-4"><strong><%= catName && catName.length > 25 ? catName.toUpperCase().substring(0, 22) + '...' : catName.toUpperCase() %></strong></h3>
+	</div>
+    <div id="contentArea">
+		<div class="d-flex justify-content-between" style="margin: 10px 10px;">
+			<!-- Date Filter -->
+			<div class="btn-group">
+				<button type="button" 
+						class="btn btn-light dropdown-toggle" 
+						data-bs-toggle="dropdown" 
+						aria-expanded="false" style="border: 1px solid #4D4D4D; color: #4D4D4D; border-radius: 9px;">
+					<i class="fas fa-calendar me-1" style="color: #4D4D4D;"></i><span id="filterName">Date</span>
+				</button>
+				<ul class="dropdown-menu dropdown-menu-end shadow-sm my-2">
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(0, 'month')">All</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'day')">Today</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'week')">This Week</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(1, 'month')">This Month</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(7, 'day')">Last 7 Days</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(30, 'day')">Last 30 Days</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(-1, 'month')">Last Month</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" onclick="filterDate(3, 'month')">Last 3 Months</button>
+					<button class="dropdown-item btn btn-light w-100 mb-1" data-bs-toggle="modal" data-bs-target="#customDateModal">Custom Date</button>
+				</ul>
+			</div>
+
+			<!-- Export As Csv -->
+			 <div>
+			  <button class="exportBtn" onclick="exportCsv()">
+				Export As CSV
+			  </button>
+			</div>
+		</div>
+
+		<div class="container-fluid p-3">
+	        <div class="row g-3">
+	            <!-- Table Section - Left on large screens, bottom on small screens -->
+	            <div class="col-12 col-lg-8 order-2 order-lg-1">
+	                <div class="table-container">
+						<!-- Category Summary Report Table -->
+						<div class="table-responsive">
+							<table class="table table-hover">
+								<thead style="height: 50px;">
+								  <tr>
+									<th style="min-width: 60px; cursor: pointer;" onclick="sortTable(0, 'number', this)">No. <span></span></th>
+									<th style="min-width: 100px; cursor: pointer;" onclick="sortTable(1, 'date', this)">Date <span></span></th>
+									<th style="min-width: 150px; cursor: pointer;" onclick="sortTable(2, 'number', this)">Sale <span></span></th>
+									<th style="min-width: 80px; cursor: pointer;" onclick="sortTable(3, 'number', this)">Transaction Count <span></span></th>
+								</tr>
+								</thead>
+								<tbody id="salespersonTable">
+									<% if (category.length > 0) { %>
+										<% for (let i = 0; i < category.length; i++) { %>
+											<tr style="height: 55px;">
+												<td class="text-nowrap"><%= i + 1 %></td>
+												<td class="text-nowrap ">
+													<%= new Date(
+														category[i].transactionDate
+													).toLocaleString('en-US', { 
+														day: '2-digit', 
+														month: 'short', 
+														year: 'numeric'
+													}) %>
+												</td>
+												<td class="text-nowrap <%= category[i].type === 'income' ? 'text-income' : 'text-expense' %>">
+													<% let totalSales = parseInt(category[i].totalSales) %>
+													<% let formattedAmount = totalSales.toLocaleString(); %>
+													<% if (baseCurrency === 'MMK') { %>
+														<%= formattedAmount %> ks
+													<% } else if (baseCurrency === 'USD') { %>
+														$ <%= formattedAmount %>
+													<% } else if (baseCurrency === 'THB') { %>
+														฿ <%= formattedAmount %>
+													<% } else { %>
+														<%= formattedAmount %> <%= baseCurrency %>
+													<% } %>
+												</td>
+												<td class="text-nowrap">
+													<%= category[i].totalTransactions %>
+												</td>
+											</tr>
+										<% } %>
+									<% } else { %>
+										<tr>
+											<td colspan="4" class="text-center text-muted">No data found.</td>
+										</tr>
+									<% } %>
+								</tbody>
+							</table>
+						</div>
+					</div>
+	        	</div>
+				<!-- Chart Section - Top on small screens, right on large screens -->
+				<div class="col-12 col-lg-4 order-1 order-lg-2">
+	                <div class="chart-container">
+	                    <h5 class="card-title text-center mb-3">Category Performance Over Time</h5>
+						<% function checkCategory(category) { %>
+							<% if (category && category.length > 0) { %>
+								<% for (let i = 0; i < category.length; i++) { %>
+									<% if (category[i].totalSales > 0) { %>
+										<% return true; %>
+									<% } %>
+								<% } %>
+							<% } %>
+						<%}%>
+						<% if (category && category.length > 0 && checkCategory(category)) { %>
+	                        <canvas id="categoryChart" class="chart-canvas"></canvas>
+	                    <% } else { %>
+	                        <div class="d-flex flex-column align-items-center justify-content-center h-100">
+	                            <i class="fas fa-chart-pie text-muted" style="font-size: 3rem;"></i>
+	                            <p class="text-muted mt-3 text-center">
+	                                No data available. 
+	                                <a href="/subscriber/transaction/income" class="text-primary">Add new transaction</a>
+	                            </p>
+	                        </div>
+	                    <% } %>
+	                </div>
+	            </div>
+	    	</div>
+		</div>
+    </div>
+	
+
+	<!-- Modal for custom date -->
+	<div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel" aria-hidden="true">
+	  <div class="modal-dialog">
+	    <div class="modal-content shadow">
+	      <div class="modal-header">
+	        <h5 class="modal-title" id="customDateModalLabel">Select Date Range</h5>
+	        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+	      </div>
+	      <div class="modal-body">
+	        <div class="mb-3">
+	          <label for="start-date" class="form-label">From</label>
+	          <input type="date" class="form-control" id="start-date" onchange="updateEndMin()">
+	        </div>
+	        <div class="mb-3">
+	          <label for="end-date" class="form-label">To</label>
+	          <input type="date" class="form-control" id="end-date">
+	        </div>
+	      </div>
+		  <div>
+			<p id="errMsgDate" class="text-danger d-none">*Please select start date and end date!</p>
+		  </div>
+	      <div class="modal-footer">
+	        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+	        <button type="button" class="btn btn-danger" onclick="getDateRange()">Apply</button>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
+	<div style="height: 300px;"></div>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+
+const parseFlexibleDate = (dateStr) => {
+	let parsed = new Date(dateStr);
+	if (!isNaN(parsed)) return parsed.getTime();
+	const monthYearMatch = dateStr.match(/^([A-Za-z]+)\s+(\d{4})$/);
+	if (monthYearMatch) {
+		const [_, month, year] = monthYearMatch;
+		parsed = new Date(`${month} 1, ${year}`);
+		if (!isNaN(parsed)) return parsed.getTime();
+	}
+	const yearMatch = dateStr.match(/^\d{4}$/);
+	if (yearMatch) {
+		parsed = new Date(`${dateStr}-01-01`);
+		if (!isNaN(parsed)) return parsed.getTime();
+	}
+	return 0;
+};
+
+let sortDirections = {};
+
+function sortTable(columnIndex, type, headerElement) {
+	let table = document.getElementById("salespersonTable");
+	let rows = Array.from(table.getElementsByTagName("tr"));
+	let ascending = !sortDirections[columnIndex];
+	sortDirections[columnIndex] = ascending;
+
+	rows.sort((rowA, rowB) => {
+		let cellA = rowA.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+		let cellB = rowB.getElementsByTagName("td")[columnIndex]?.innerText.trim() || "";
+
+		if (type === "number") {
+			cellA = parseFloat(cellA.replace(/[^0-9.-]/g, "")) || 0;
+			cellB = parseFloat(cellB.replace(/[^0-9.-]/g, "")) || 0;
+			return ascending ? cellA - cellB : cellB - cellA;
+		} else if (type === "date") {
+			cellA = parseFlexibleDate(cellA);
+			cellB = parseFlexibleDate(cellB);
+			return ascending ? cellA - cellB : cellB - cellA;
+		} else {
+			return ascending ? cellA.localeCompare(cellB) : cellB.localeCompare(cellA);
+		}
+	});
+	rows.forEach(row => table.appendChild(row));
+	document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
+	headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
+}
+
+// Chart.js Implementation
+const canvasElement = document.getElementById('categoryChart');
+if (canvasElement) {
+    const ctx = canvasElement.getContext('2d');
+    
+    // Process the category data
+    const categoryData = <%- JSON.stringify(category) %>;
+    
+    const processedData = categoryData.map(item => {
+        const dateValue = new Date(item.transactionDate);
+        const dateString = dateValue.toLocaleDateString('en-US', { 
+            day: '2-digit', 
+            month: 'short',
+            year: 'numeric'
+        });
+        
+        return {
+            date: dateString,
+            totalSales: parseInt(item.totalSales) || 0,
+            totalTransactions: parseInt(item.totalTransactions) || 0,
+            sortDate: dateValue
+        };
+    }).sort((a, b) => a.sortDate - b.sortDate); // Sort by date
+    
+    // Extract data for Chart.js
+    const labels = processedData.map(item => item.date);
+    const salesData = processedData.map(item => item.totalSales);
+    const transactionData = processedData.map(item => item.totalTransactions);
+    
+    // Chart configuration with currency formatting
+    const baseCurrency = '<%= baseCurrency %>';
+    const config = {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Total Sales',
+                data: salesData,
+                borderColor: '#3b82f6',
+                backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                yAxisID: 'y',
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: '#3b82f6',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                fill: false
+            }, {
+                label: 'Total Transactions',
+                data: transactionData,
+                borderColor: '#ef4444',
+                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                yAxisID: 'y1',
+                tension: 0.4,
+                pointRadius: 5,
+                pointHoverRadius: 7,
+                pointBackgroundColor: '#ef4444',
+                pointBorderColor: '#ffffff',
+                pointBorderWidth: 2,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            size: 14
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: '#fff',
+                    bodyColor: '#fff',
+                    borderColor: '#ddd',
+                    borderWidth: 1,
+                    cornerRadius: 6,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            if (context.dataset.label === 'Total Sales') {
+                                let symbol = '';
+                                if (baseCurrency === 'MMK') { 
+                                    symbol = 'ks';
+                                    return `Sales: ${context.parsed.y.toLocaleString()} ${symbol}`;
+                                }
+                                else if (baseCurrency === 'USD') symbol = '$';
+                                else if (baseCurrency === 'THB') symbol = '฿';
+                                
+                                return `Sales: ${symbol}${context.parsed.y.toLocaleString()}`;
+                            } else {
+                                return 'Transactions: ' + context.parsed.y;
+                            }
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    display: true,
+                    title: {
+                        display: true,
+                        text: 'Date',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        }
+                    },
+                    grid: {
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: `Total Sales (${baseCurrency})`,
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        color: '#3b82f6'
+                    },
+                    ticks: {
+                        callback: function(value, index, values) {
+                            if (baseCurrency === 'MMK') {
+                                return (value / 1000).toFixed(0) + 'k ks';
+                            } else if (baseCurrency === 'USD') {
+                                return '$' + (value / 1000).toFixed(0) + 'k';
+                            } else if (baseCurrency === 'THB') {
+                                return '฿' + (value / 1000).toFixed(0) + 'k';
+                            }
+                            return (value / 1000).toFixed(0) + 'k';
+                        },
+                        color: '#3b82f6'
+                    },
+                    grid: {
+                        display: true,
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Transaction Count',
+                        font: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        color: '#ef4444'
+                    },
+                    ticks: {
+                        color: '#ef4444'
+                    },
+                    grid: {
+                        drawOnChartArea: false,
+                    },
+                }
+            }
+        },
+    };
+    
+    const categoryChart = new Chart(ctx, config);
+}
+
+function filterDate(num, type) {
+    let url = new URL(window.location.href);
+    if (num && type && num !== 0) {
+        url.searchParams.set("num", num);
+		url.searchParams.set("type", type);
+		url.searchParams.delete("from");
+		url.searchParams.delete("to");
+		url.searchParams.delete("export");
+    } else {
+        url.searchParams.delete("num");
+		url.searchParams.delete("type");
+		url.searchParams.delete("from");
+		url.searchParams.delete("to");
+		url.searchParams.delete("export");
+    }
+    window.location.href = url.toString();
+}
+
+function updateEndMin() {
+	document.getElementById('errMsgDate').classList.add('d-none')
+    var start = document.getElementById("start-date");
+    var end = document.getElementById("end-date");
+    end.min = start.value;
+}
+
+function getDateRange() {
+    var start = document.getElementById("start-date").value;
+    var end = document.getElementById("end-date").value;
+
+    if (start && end) {
+        var endDateObj = new Date(end);
+        endDateObj.setDate(endDateObj.getDate() + 1);
+        var endPlusOne = endDateObj.toISOString().split('T')[0];
+
+        var modal = bootstrap.Modal.getInstance(document.getElementById('customDateModal'));
+        modal.hide();
+
+        let url = new URL(window.location.href);
+        url.searchParams.delete("num");
+        url.searchParams.delete("type");
+		url.searchParams.delete("export");
+        url.searchParams.set("from", start);
+        url.searchParams.set("to", endPlusOne);
+        window.location.href = url.toString();
+    } else {
+        document.getElementById('errMsgDate').classList.remove('d-none');
+    }
+}
+
+function exportCsv() {
+	let url = new URL(window.location.href);
+    url.searchParams.set("export", "true");
+    window.location.href = url.toString();
+}
+
+function viewDetail(id, type) {
+	let url = ''
+	if (type === 'income')
+		url = `/subscriber/report/category/income/${id}?num=30&type=day`
+	else
+		url = `/subscriber/report/category/expense/${id}?num=30&type=day`
+    window.location.href = url.toString();
+}
+
+function goBack() {
+	let url = `/subscriber/report/category?num=30&type=day`
+    window.location.href = url.toString();
+}
+
+const searchParams = new URLSearchParams(window.location.search);
+const type = searchParams.get('type')
+const num = searchParams.get('num')
+const from = searchParams.get('from')
+const to = searchParams.get('to')
+const search = searchParams.get('search')
+if (typeof search === 'string' && search.trim().length > 0) {
+	document.getElementById('searchInput').value = search;
+}
+if (type === 'month') {
+	if (num === '0') {
+		document.getElementById('filterName').innerText = "Date"
+	} else if (num === '1') {
+		document.getElementById('filterName').innerText = "This Month"
+	} else if (num === '3') {
+		document.getElementById('filterName').innerText = "Last 3 Months"
+	} else if (num === '-1') {
+		document.getElementById('filterName').innerText = "Last Month"
+	}
+} else if (type === 'week') {
+	document.getElementById('filterName').innerText = "This Week"
+} else if (type === 'day') {
+	if (num === '1') {
+		document.getElementById('filterName').innerText = "Today"
+	} else if (num === '7') {
+		document.getElementById('filterName').innerText = "Last 7 Days"
+	} else if (num === '30') {
+		document.getElementById('filterName').innerText = "Last 30 Days"
+	}
+} else {
+	if (from && to)
+		document.getElementById('filterName').innerText = "Custom Date"
+	else
+		document.getElementById('filterName').innerText = "Date"
+}
+
+</script>
+
+<%- include('../partials/subscriber/footer.ejs') %>
