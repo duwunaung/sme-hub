@@ -15,8 +15,8 @@ exports.createIncome = (req, res) => {
 			}
 		)
 	}
-	let sql = 'INSERT INTO incs (description, amount, incomeDate, catId, orgId, createdBy';
-	let values = [description, amount, incomeDate, catId, orgId, createdBy];
+	let sql = 'INSERT INTO incs (description, amount, incomeDate, catId, orgId, createdBy, updatedBy';
+	let values = [description, amount, incomeDate, catId, orgId, createdBy, createdBy];
 	const customerName = req.body.customer;
 	const receipt = req.body.receipt;
 	
@@ -65,8 +65,10 @@ exports.updateIncome = (req, res) => {
 			}
 		)
 	}
-	let sql = 'UPDATE incs SET description = ?, amount = ? , catId = ?'
-	let values = [description, amount, catId];
+	const updatedBy = req.user.id
+	const updatedAt = moment().format('YYYY-MM-DD HH:mm:ss');
+	let sql = 'UPDATE incs SET description = ?, amount = ? , catId = ?, updatedBy = ?, updatedAt = ?'
+	let values = [description, amount, catId, updatedBy, updatedAt];
 	const customerName = req.body.customer;
 	const receipt = req.body.receipt;
 	const optionalFields = { receipt, itemName, price, quantity, salespersonId, customerName };

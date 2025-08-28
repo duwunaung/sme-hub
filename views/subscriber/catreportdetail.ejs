@@ -342,12 +342,10 @@ function sortTable(columnIndex, type, headerElement) {
 	headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
 }
 
-// Chart.js Implementation
 const canvasElement = document.getElementById('categoryChart');
 if (canvasElement) {
     const ctx = canvasElement.getContext('2d');
     
-    // Process the category data
     const categoryData = <%- JSON.stringify(category) %>;
     
     const processedData = categoryData.map(item => {
@@ -364,14 +362,12 @@ if (canvasElement) {
             totalTransactions: parseInt(item.totalTransactions) || 0,
             sortDate: dateValue
         };
-    }).sort((a, b) => a.sortDate - b.sortDate); // Sort by date
+    }).sort((a, b) => a.sortDate - b.sortDate);
     
-    // Extract data for Chart.js
     const labels = processedData.map(item => item.date);
     const salesData = processedData.map(item => item.totalSales);
     const transactionData = processedData.map(item => item.totalTransactions);
     
-    // Chart configuration with currency formatting
     const baseCurrency = '<%= baseCurrency %>';
     const config = {
         type: 'line',

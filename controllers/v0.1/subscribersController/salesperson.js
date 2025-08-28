@@ -73,7 +73,7 @@ exports.listSalesperson = (req, res) => {
 				{ id: 1, name: 'active' },
 				{ id: 2, name: 'deleted' }
 			];
-			const {success, type} = req.query
+			const {success, type, error} = req.query
 			if (success === 'true') {
 				if (type === 'delete') {
 					res.render('subscriber/salesperson', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully Deleted!"});
@@ -81,10 +81,15 @@ exports.listSalesperson = (req, res) => {
 					res.render('subscriber/salesperson', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully Created!"});
 				} else if (type === 'restore') {
 					res.render('subscriber/salesperson', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully Restored!"});
+				} else if (type === 'update') {
+					res.render('subscriber/salesperson', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: "Successfully Updated!"});
 				} else {
 					res.render('subscriber/salesperson', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
 				}
-			} else {
+			} else if (error === 'true') {
+				res.render('subscriber/salesperson', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: "Internal Server Error!" , successMessage: null});
+			}
+			else {
 				res.render('subscriber/salesperson', {baseCurrency: req.session.baseCurrency, userName: req.session.user, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, salesperson: response.data.data ,  pagination: response.data.pagination, options: options, errorMessage: null , successMessage: null});
 			}
 			

@@ -554,7 +554,6 @@ exports.reportSalesDetailPage = async (req, res) => {
 						successMessage: null
 		        	});
 				}
-				
 				res.render('subscriber/salesdetailrep', {
 					userName: req.session.user, 
 					userRole: req.session.role,
@@ -624,7 +623,6 @@ exports.reportSalesDetailPage = async (req, res) => {
 					successMessage: null
 	        	});
 				}
-				
 				res.render('subscriber/salesdetailrep', {
 					userName: req.session.user, 
 					userRole: req.session.role,
@@ -819,7 +817,6 @@ function reportCatDetail (req, res, url_api, catType, catId) {
 			}
 		}).then(response => {
 			const data = response.data.data;
-			console.log(data)
 			if (exportCsv === 'true') {
 				if (!data || data.length === 0) {
 					res.render('subscriber/catreportdetail', {baseCurrency: req.session.baseCurrency, userName: req.session.user, catName: responseCategory.data.data.name, userRole: req.session.role, logo: req.session.orgLogo, organizationName: req.session.orgName, category: [], errorMessage: "No data available to export!", successMessage: null });
@@ -857,7 +854,6 @@ exports.reportCatExpDetailPage = (req, res) => {
 	if (req.method == 'GET') {
 		const {id} = req.params
 		let url_api = `${process.env.API_URL}/subscribers/categories/expense/detail/report/${id}`
-		console.log(url_api)
 		reportCatDetail(req, res, url_api, 'expense', id)
 	}
 }

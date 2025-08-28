@@ -84,7 +84,6 @@ function detailCatReport(req, res, catType) {
     `;
     db_connection.query(query, queryParams, (err, results) => {
         if (err) {
-            console.log(err);
             return res.status(500).send({
                 success: false,
                 message: 'internal server error',

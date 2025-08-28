@@ -1,5 +1,6 @@
 const { query } = require('express')
 const db_connection = require('../../../utils/connection')
+const moment = require('moment')
 
 exports.listIncCatUpdate = (req, res) => {
     const orgId = req.user.orgId
@@ -70,12 +71,13 @@ exports.createIncomeCategory = (req, res) => {
     }
 	let query = ''
 	const parameters = []
-	query = `INSERT INTO inccats (name, orgId, createdBy, status, parentId) VALUES (?, ?, ?, ?, ?)`
+	query = `INSERT INTO inccats (name, orgId, createdBy, status, parentId, updatedBy) VALUES (?, ?, ?, ?, ?, ?)`;
 	parameters.push(name)
 	parameters.push(orgId)
 	parameters.push(createdBy)
 	parameters.push('active')
 	parameters.push(parentId)
+	parameters.push(createdBy)
     db_connection.query(query, parameters, (err, results) => {
         if (err) {
 			if (err.code === "ER_DUP_ENTRY") {
@@ -354,11 +356,15 @@ exports.updateIncomeCategory = (req, res) => {
     }
 	if (!parentId) {parentId = 0;}
 	let query;
+	const updatedBy = req.user.id
+	const updatedAt = moment().format('YYYY-MM-DD HH:mm:ss');
 	const queryParams = []
-	query = `UPDATE inccats SET name = ? , parentId = ?, status = ? WHERE id = ? AND orgId = ?`
+	query = `UPDATE inccats SET name = ? , parentId = ?, status = ?, updatedBy = ?, updatedAt = ? WHERE id = ? AND orgId = ?`
 	queryParams.push(name)
 	queryParams.push(parentId)
 	queryParams.push(status)
+	queryParams.push(updatedBy)
+	queryParams.push(updatedAt)
 	queryParams.push(id)
 	queryParams.push(orgId)
     db_connection.query(query, queryParams, (err, results) => {

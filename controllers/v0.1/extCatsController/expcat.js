@@ -1,5 +1,6 @@
 const { query } = require('express')
 const db_connection = require('../../../utils/connection')
+const moment = require('moment')
 
 exports.createExpenseCategory = (req, res) => {
     const { name, parentId } = req.body
@@ -15,12 +16,13 @@ exports.createExpenseCategory = (req, res) => {
     }
 	let query = ''
 	const parameters = []
-	query = `INSERT INTO expcats (name, orgId, createdBy, status, parentId) VALUES (?, ?, ?, ?, ?)`;
+	query = `INSERT INTO expcats (name, orgId, createdBy, status, parentId, updatedBy) VALUES (?, ?, ?, ?, ?, ?)`;
 	parameters.push(name)
 	parameters.push(orgId)
 	parameters.push(createdBy)
 	parameters.push('active')
 	parameters.push(parentId)
+	parameters.push(createdBy)
 
     db_connection.query(query, parameters, (err, results) => {
         if (err) {
@@ -498,12 +500,16 @@ exports.updateExpenseCategory = (req, res) => {
         return res.status(400).send({ error: 'Name is required' });
     }
 	let query;
+	const updatedBy = req.user.id
+	const updatedAt = moment().format('YYYY-MM-DD HH:mm:ss');
 	const queryParams = []
 	if (!parentId) {parentId = 0;}
-	query = `UPDATE expcats SET name = ? , parentId = ?, status = ? WHERE id = ? AND orgId = ?`
+	query = `UPDATE expcats SET name = ? , parentId = ?, status = ?, updatedBy = ?, updatedAt = ? WHERE id = ? AND orgId = ?`
 	queryParams.push(name)
 	queryParams.push(parentId)
 	queryParams.push(status)
+	queryParams.push(updatedBy)
+	queryParams.push(updatedAt)
 	queryParams.push(id)
 	queryParams.push(orgId)
     db_connection.query(query, queryParams, (err, results) => {
