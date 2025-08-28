@@ -515,6 +515,42 @@
                                 </select>
 								<input type="hidden" id="userTime" name="userTime">
                             </div>
+							<div class="mb-3">
+							    <strong class="form-label">Income Categories *</strong>
+							    <div class="mb-2">
+							        <label>* Primary:</label>
+							        <div id="income-primary">
+							            <input type="text" class="form-control my-1" name="income[primary][]" placeholder="e.g., Product Sales" oninput="checkInputs()">
+							        </div>
+							        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addField('income-primary', 'income[primary][]')">+ Add Primary</button>
+							    </div>
+							    <div>
+							        <label>Supplementary:</label>
+							        <div id="income-supplementary">
+							            <input type="text" class="form-control my-1" name="income[supplementary][]" placeholder="e.g., Bank Loan">
+							        </div>
+							        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addField('income-supplementary', 'income[supplementary][]')">+ Add Supplementary</button>
+							    </div>
+							</div>
+
+							<div class="mb-3">
+							    <strong class="form-label">Expense Categories *</strong>
+							    <div class="mb-2">
+							        <label>* Primary:</label>
+							        <div id="expense-primary">
+							            <input type="text" class="form-control my-1" name="expense[primary][]" placeholder="e.g., Purchases" oninput="checkInputs()">
+							        </div>
+							        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addField('expense-primary', 'expense[primary][]')">+ Add Primary</button>
+							    </div>
+							    <div>
+							        <label>Supplementary:</label>
+							        <div id="expense-supplementary">
+							            <input type="text" class="form-control my-1" name="expense[supplementary][]" placeholder="e.g., Office Supplies">
+							        </div>
+							        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="addField('expense-supplementary', 'expense[supplementary][]')">+ Add Supplementary</button>
+							    </div>
+							</div>
+
                             <button type="submit" id="addBtn" class="btn btnColor w-100">Add Organization</button>
                         </form>
                     </div>
@@ -551,33 +587,82 @@
                 document.querySelectorAll("th span").forEach(span => span.innerHTML = "");
                 headerElement.querySelector("span").innerHTML = ascending ? " ▲" : " ▼";
             }
-            // xxx
 
             const form = document.getElementById('addOrganizationForm');
-            const addButton = document.getElementById('addBtn');
-            const inputs = form.querySelectorAll('.inputRequired');
+			const addButton = document.getElementById('addBtn');
+			const inputs = form.querySelectorAll('.inputRequired');
 			const countryOption = document.getElementById('orgCountry');
-            function checkInputs(messageBox, inputField) {
-                let allFilled = true;
-                inputs.forEach(index => {
-                if (!index.value.trim()) {
-                    allFilled = false;
-                }
-                });
-				if (countryOption.value.length === 0) {
-					countryOption.classList.add('text-secondary')
-				} else {
-					countryOption.classList.remove('text-secondary')
-				}
-                addButton.disabled = !allFilled;
-				const message = document.getElementById(messageBox)
-				const input = document.getElementById(inputField)
-				if (input.value.length === parseInt(input.maxLength)) {
-			        message.classList.remove('d-none');
+
+			function hasAtLeastOneInput(containerId) {
+			    const inputs = document.querySelectorAll(`#${containerId} input`);
+			    return Array.from(inputs).some(input => input.value.trim() !== '');
+			}
+
+			function checkInputs(messageBox, inputField) {
+			    let allFilled = true;
+
+			    inputs.forEach(input => {
+			        if (!input.value.trim()) {
+			            allFilled = false;
+			        }
+			    });
+
+			    if (countryOption.value.length === 0) {
+			        allFilled = false;
+			        countryOption.classList.add('text-secondary');
 			    } else {
-			        message.classList.add('d-none');
+			        countryOption.classList.remove('text-secondary');
 			    }
-            }
+
+			    const incomePrimaryOK = hasAtLeastOneInput('income-primary');
+			    const expensePrimaryOK = hasAtLeastOneInput('expense-primary');
+
+			    if (!incomePrimaryOK || !expensePrimaryOK) {
+			        allFilled = false;
+			    }
+
+			    if (messageBox && inputField) {
+			        const message = document.getElementById(messageBox);
+			        const input = document.getElementById(inputField);
+			        if (input && message) {
+			            if (input.value.length === parseInt(input.maxLength)) {
+			                message.classList.remove('d-none');
+			            } else {
+			                message.classList.add('d-none');
+			            }
+			        }
+			    }
+
+			    addButton.disabled = !allFilled;
+			}
+
+			function addField(containerId, nameAttr) {
+			    const container = document.getElementById(containerId);
+
+			    const wrapper = document.createElement('div');
+			    wrapper.classList.add('d-flex', 'gap-2', 'my-1');
+
+			    const input = document.createElement('input');
+			    input.type = 'text';
+			    input.name = nameAttr;
+			    input.placeholder = 'Enter category';
+			    input.classList.add('form-control');
+			    
+			    input.addEventListener('input', () => checkInputs());
+
+			    const removeBtn = document.createElement('button');
+			    removeBtn.type = 'button';
+			    removeBtn.classList.add('btn', 'btn-danger', 'btn-sm');
+			    removeBtn.textContent = '✕';
+			    removeBtn.onclick = () => {
+			        container.removeChild(wrapper);
+			        checkInputs();
+			    };
+
+			    wrapper.appendChild(input);
+			    wrapper.appendChild(removeBtn);
+			    container.appendChild(wrapper);
+			}
 
             function submitForm(event) {
 				event.preventDefault();

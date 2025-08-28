@@ -17,8 +17,8 @@ exports.createExpense = (req, res) => {
     }
 
 	const receipt = req.body.receipt
-    let query = `INSERT INTO exps (description, amount, expenseDate, catId, orgId, createdBy`
-	let values = [description, amount, expenseDate, catId, orgId, createdBy];
+    let query = `INSERT INTO exps (description, amount, expenseDate, catId, orgId, createdBy, updatedBy`
+	let values = [description, amount, expenseDate, catId, orgId, createdBy, createdBy];
 	const optionalFields = { receipt, itemName, price, quantity, vendorName };
 	Object.entries(optionalFields).forEach(([key, value]) => {
 		if (value !== null && value !== undefined) {
@@ -62,8 +62,10 @@ exports.updateExpense = (req, res) => {
             }
         )
     }
-	let sql = 'UPDATE exps SET description = ?, amount = ? , catId = ?'
-	let values = [description, amount, catId];
+	const updatedBy = req.user.id
+	const updatedAt = moment().format('YYYY-MM-DD HH:mm:ss');
+	let sql = 'UPDATE exps SET description = ?, amount = ? , catId = ?, updatedBy = ?, updatedAt = ?'
+	let values = [description, amount, catId, updatedBy, updatedAt];
 	const receipt = req.body.receipt;
 	const optionalFields = { receipt, itemName, price, quantity, vendorName };
 	Object.entries(optionalFields).forEach(([key, value]) => {

@@ -255,8 +255,8 @@ exports.extendLicense = (req, res) => {
 exports.registerOrg = (req, res) => {
     if (req.method == 'POST') {
         const page = req.query.page
-        const { name, address, phone, status, country, userTime } = req.body;
-        axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status, country , userTime}, {
+        const { name, address, phone, status, country, userTime, income, expense } = req.body;
+        axios.post(`${process.env.API_URL}/organizations/create`, { name, address, phone, status, country , userTime, income, expense}, {
             headers: {
                 'Authorization': `${req.session.token}`
             }

@@ -21,7 +21,8 @@ exports.updateSalesperson = (req, res) => {
     const orgId = req.user.orgId
 	const createdBy = req.user.id
 	const id = req.params.id
-    db_connection.query("UPDATE salesperson SET name = ? WHERE orgId = ? and id = ?", [name, orgId, id], (err, results) => {
+	const now = moment().format('YYYY-MM-DD HH:mm:ss');
+    db_connection.query("UPDATE salesperson SET name = ?, updatedBy = ?, updatedAt = ? WHERE orgId = ? and id = ?", [name, createdBy, now, orgId, id], (err, results) => {
         if (err) {
             return res.status(500).send({
                 success: false,
@@ -587,11 +588,12 @@ exports.createSalesperson = (req, res) => {
     }
 	let query = ''
 	const parameters = []
-	query = `INSERT INTO salesperson (name, orgId, createdBy, status) VALUES (?, ?, ?, ?)`
+	query = `INSERT INTO salesperson (name, orgId, createdBy, status, updatedBy) VALUES (?, ?, ?, ?, ?)`
 	parameters.push(name)
 	parameters.push(orgId)
 	parameters.push(createdBy)
 	parameters.push('active')
+	parameters.push(createdBy)
     db_connection.query(query, parameters, (err, results) => {
         if (err) {
 			if (err.code === "ER_DUP_ENTRY") {
